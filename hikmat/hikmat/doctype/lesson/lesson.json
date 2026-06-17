@@ -1,0 +1,138 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{track}-{lesson_key}",
+ "creation": "2026-06-17 00:06:12.905482",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "track",
+  "lesson_key",
+  "title",
+  "title_hi",
+  "sort_order",
+  "published",
+  "sec_words",
+  "words",
+  "sec_code",
+  "code",
+  "sec_fix",
+  "fix",
+  "sec_email",
+  "email"
+ ],
+ "fields": [
+  {
+   "fieldname": "track",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Track",
+   "options": "Track",
+   "reqd": 1
+  },
+  {
+   "fieldname": "lesson_key",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Key (slug)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "title_hi",
+   "fieldtype": "Data",
+   "label": "Title (Hindi)"
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort order"
+  },
+  {
+   "default": "1",
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "sec_words",
+   "fieldtype": "Section Break",
+   "label": "Words"
+  },
+  {
+   "fieldname": "words",
+   "fieldtype": "Table",
+   "label": "Words",
+   "options": "Lesson Word"
+  },
+  {
+   "fieldname": "sec_code",
+   "fieldtype": "Section Break",
+   "label": "Code challenges"
+  },
+  {
+   "fieldname": "code",
+   "fieldtype": "Table",
+   "label": "Code challenges",
+   "options": "Lesson Code"
+  },
+  {
+   "fieldname": "sec_fix",
+   "fieldtype": "Section Break",
+   "label": "Find-the-bug sentences"
+  },
+  {
+   "fieldname": "fix",
+   "fieldtype": "Table",
+   "label": "Find-the-bug sentences",
+   "options": "Lesson Fix"
+  },
+  {
+   "fieldname": "sec_email",
+   "fieldtype": "Section Break",
+   "label": "Email tasks"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Table",
+   "label": "Email tasks",
+   "options": "Lesson Email"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-17 00:06:12.905482",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

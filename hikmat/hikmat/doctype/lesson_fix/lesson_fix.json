@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-17 13:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sentence",
+  "wrong_word",
+  "correction",
+  "teach",
+  "teach_hi"
+ ],
+ "fields": [
+  {
+   "fieldname": "sentence",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sentence (with one wrong word)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "wrong_word",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Wrong word (must be one token of the sentence)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "correction",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Correction (replaces the wrong word)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "teach",
+   "fieldtype": "Small Text",
+   "label": "Why (explains the fix)"
+  },
+  {
+   "fieldname": "teach_hi",
+   "fieldtype": "Small Text",
+   "label": "Why (Hindi)"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-17 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson Fix",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-17 00:06:12.520175",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "en",
+  "hi",
+  "pron",
+  "emoji",
+  "word_type",
+  "uncountable",
+  "plural",
+  "use_en",
+  "use_hi"
+ ],
+ "fields": [
+  {
+   "fieldname": "en",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "English",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hi",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Hindi meaning"
+  },
+  {
+   "fieldname": "pron",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Pronunciation (Devanagari)"
+  },
+  {
+   "fieldname": "emoji",
+   "fieldtype": "Data",
+   "label": "Emoji"
+  },
+  {
+   "fieldname": "word_type",
+   "fieldtype": "Data",
+   "label": "Word type (thing/mass/person/verb/adj/time/phrase)"
+  },
+  {
+   "default": "0",
+   "fieldname": "uncountable",
+   "fieldtype": "Check",
+   "label": "Uncountable (mass noun \u2192 'some')"
+  },
+  {
+   "fieldname": "plural",
+   "fieldtype": "Data",
+   "label": "Plural form (if countable)"
+  },
+  {
+   "fieldname": "use_en",
+   "fieldtype": "Data",
+   "label": "Example sentence (overrides auto Build-a-Sentence)"
+  },
+  {
+   "fieldname": "use_hi",
+   "fieldtype": "Data",
+   "label": "Example sentence (Hindi hint)"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-17 00:06:12.520175",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson Word",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

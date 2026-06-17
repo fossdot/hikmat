@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hikmat Learn — Learn by Playing</title>
+<style>
+  :root {
+    --bg: #fbf7ef;
+    --bg2: #fff3df;
+    --card: #ffffff;
+    --ink: #2c2440;
+    --muted: #8d86a0;
+    --line: #ece6dc;
+    --primary: #ff7a45;       /* warm orange — main action */
+    --primary-d: #d85a28;     /* its shadow */
+    --grape: #6c5ce7;         /* journey / current */
+    --grape-d: #4b3fc0;
+    --gold: #ffb830;
+    --good: #2ec27e;
+    --good-d: #1e9d62;
+    --bad: #ff5a5f;
+    --bad-d: #d83a40;
+    --r: 16px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Nunito", -apple-system, "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(900px 500px at 15% -5%, var(--bg2), transparent),
+      radial-gradient(700px 500px at 100% 110%, #ffe9f0, transparent),
+      var(--bg);
+    color: var(--ink);
+    display: flex; align-items: safe center; justify-content: center;
+    padding: 22px;
+    line-height: 1.45;
+  }
+  #shell { width: min(840px, 100%); display:flex; flex-direction:column; gap:12px; }
+  #topnav:empty { display:none; }
+  .backbtn { align-self:flex-start; background:#fff; border:2px solid var(--line); border-radius:12px;
+             padding:9px 16px; cursor:pointer; font-weight:800; color:var(--ink); font-size:14px;
+             box-shadow:0 3px 0 var(--line); transition:transform .06s, box-shadow .06s; }
+  .backbtn:active { transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  #app {
+    width: 100%;
+    background: var(--card);
+    border-radius: 26px;
+    box-shadow: 0 24px 60px -20px rgba(76,63,150,.35), 0 0 0 1px var(--line);
+    overflow: hidden;
+    position: relative;
+    min-height: 600px;
+  }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 14px 20px;
+    background: linear-gradient(90deg,#fff,#fffaf2);
+    border-bottom: 2px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 18px; }
+  .brand .logo { font-size: 24px; display:inline-flex; align-items:center; }
+  .brand .logo .logoimg { height:28px; width:auto; max-width:120px; object-fit:contain; vertical-align:middle; border-radius:6px; }
+  .stats { display: flex; gap: 8px; align-items:center; }
+  .pill {
+    padding: 6px 13px; border-radius: 999px; background:#fff; border:2px solid var(--line);
+    font-weight: 800; font-size: 14px; display:flex; align-items:center; gap:6px; color:var(--ink);
+  }
+  .pill.star { border-color:#ffe2a8; color:#e08a00; }
+  /* glossy gold star (CSS-drawn so it isn't the pale 🌟 emoji) */
+  .staricon { font-size:1.12em; line-height:1; background:linear-gradient(180deg,#ffe14d,#ffab00);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    filter: drop-shadow(0 1px 0 #d98a00) drop-shadow(0 0 4px rgba(255,170,0,.65)); }
+  .pill.coin { border-color:#ffd9c2; color:var(--primary-d); }
+  .toggle {
+    background: #fff; border: 2px solid var(--line); color:var(--muted); cursor:pointer;
+    padding: 6px 13px; border-radius: 999px; font-weight:800; font-size: 12px;
+  }
+  .toggle.on { background: var(--grape); color: #fff; border-color: var(--grape-d); }
+  .screen { padding: 30px 28px; }
+
+  /* tactile button base */
+  .tap { border:0; cursor:pointer; font:inherit; font-weight:800; border-radius:14px;
+         transition: transform .06s, box-shadow .06s; position:relative; }
+  .tap:active { transform: translateY(3px); }
+
+  /* HOME */
+  .hero { text-align:center; padding: 14px 10px 22px; }
+  .hero h1 { font-size: 30px; font-weight:900; margin: 4px 0 6px; letter-spacing:-.4px;}
+  .hero p { color: var(--muted); margin: 0; font-size: 15px; font-weight:700;}
+  .themes { display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
+  .theme {
+    border-radius: 20px; padding: 22px 20px; cursor:pointer; color:#fff;
+    text-align:left; font: inherit; position:relative; overflow:hidden; border:0;
+    background: linear-gradient(160deg,#ff9a5a,#ff7a45);
+    box-shadow: 0 7px 0 var(--primary-d); transition: transform .08s, box-shadow .08s;
+  }
+  .theme:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--primary-d); }
+  .theme.locked { background: #efeae2; color:#aaa39a; box-shadow: 0 7px 0 #d9d3c8; cursor: not-allowed; }
+  .theme.locked:active { transform:none; box-shadow: 0 7px 0 #d9d3c8; }
+  .theme .big { font-size: 40px; }
+  .theme h3 { margin: 10px 0 2px; font-size: 19px; font-weight:900; }
+  .theme small { opacity:.92; font-weight:700; }
+  .theme .lock { position:absolute; top:16px; right:18px; font-size:18px;}
+
+  /* LEVEL MAP — the journey path */
+  .maphead { display:flex; align-items:center; gap:14px; margin-bottom: 6px;}
+  .back { background:#fff; border:2px solid var(--line); border-radius:12px; padding:9px 14px; cursor:pointer; font-weight:800; color:var(--ink); font-size:14px;}
+  .back:active { transform: translateY(2px); }
+  .maphead h2 { margin:0; font-size:24px; font-weight:900; }
+  .maphead .sub { color:var(--muted); font-size:14px; font-weight:700; }
+
+  .path { position:relative; max-width:540px; margin: 16px auto 30px; }
+  .cpath { position:absolute; left:0; top:0; z-index:0; pointer-events:none; }   /* the winding trail */
+  .step { position:absolute; left:0; right:0; z-index:1; }                        /* top + height set inline */
+  .node {
+    position:absolute; top:0; border:0; cursor:pointer;                           /* left/width/height/border-radius set inline */
+    display:grid; place-items:center; font-size:28px; color:#fff;
+    background: linear-gradient(160deg,#8a7bf0,var(--grape));
+    box-shadow: 0 6px 0 var(--grape-d); transition: transform .08s, box-shadow .08s;
+  }
+  .node .num {                                                                    /* number rides on the node, so it follows the curve */
+    position:absolute; top:-6px; left:-6px; min-width:20px; height:20px; padding:0 4px;
+    border-radius:999px; background:#fff; color:var(--ink); font-size:11px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,.2); z-index:3;
+  }
+  .step.locked .node .num { color:#b7b0a6; }
+  .node:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--grape-d); }
+  .step.done .node { background: linear-gradient(160deg,#46d68f,var(--good)); box-shadow: 0 6px 0 var(--good-d); }
+  .step.locked .node { background:#e7e1d8; color:#b7b0a6; box-shadow: 0 6px 0 #d2ccc1; cursor:not-allowed; }
+  .step.locked .node:active { transform:none; box-shadow:0 6px 0 #d2ccc1; }
+  /* hover: unlocked nodes lift & brighten; the label leans in; locked ones give a little "no" nudge */
+  .step:not(.locked) .node:hover:not(:active) { transform: translateY(-4px) scale(1.06); filter: brightness(1.07); }
+  .step:not(.locked):hover .label { color: var(--primary-d); }
+  .step:not(.locked):hover .node { cursor:pointer; }
+  .step.locked .node:hover { animation: nudge .32s ease; }
+  @keyframes nudge { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 60%{transform:translateX(4px)} 80%{transform:translateX(-2px)} }
+  .step.current .node { background: linear-gradient(160deg,#ff9a5a,var(--primary)); box-shadow: 0 6px 0 var(--primary-d); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse {
+    0%,100%{ box-shadow:0 6px 0 var(--primary-d), 0 0 0 0 rgba(255,150,0,.5),  0 0 16px 2px rgba(255,170,60,.35); }
+    50%    { box-shadow:0 6px 0 var(--primary-d), 0 0 0 13px rgba(255,150,0,0), 0 0 28px 7px rgba(255,170,60,.6);  }
+  }
+  .starttag {
+    position:absolute; top:-21px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(135deg,#ffe16b,#ff9e00); color:#5a3500;
+    font-size:11px; font-weight:900; letter-spacing:1.2px;
+    padding:4px 12px; border-radius:999px; white-space:nowrap; overflow:hidden;
+    box-shadow:0 3px 10px rgba(255,150,0,.55), 0 0 0 2px #fff;
+    animation: bob 1s ease-in-out infinite;
+  }
+  .starttag::after {
+    content:""; position:absolute; top:0; left:-70%; width:45%; height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.9), transparent);
+    transform:skewX(-20deg); animation: shimmer 1.8s infinite;
+  }
+  @keyframes shimmer { 0%{left:-70%} 55%,100%{left:150%} }
+  @keyframes bob { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-4px)} }
+  .sparkle { position:absolute; top:-7px; right:-5px; font-size:17px; animation: twinkle 1.4s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.35; transform:scale(.8) rotate(0deg)} 50%{opacity:1; transform:scale(1.25) rotate(18deg)} }
+  .step .labelblock { position:absolute; top:0; right:14px; display:flex; flex-direction:column; justify-content:center; }   /* left + height set inline */
+  .step .label { line-height:1.2; }
+  .step .label { font-weight:900; font-size:16px; }
+  .step.locked .label { color:var(--muted); }
+  .step .ls { color:var(--muted); font-size:13px; font-weight:700; margin-top:1px; }
+  .step .ls .lstars { font-size:17px; font-weight:900; color:#7a726a; }
+  .step .ministars { margin-top:7px; height:22px; display:flex; gap:4px; }
+  .ministars .st { font-size:18px; line-height:1; color:#ded8cc; }                       /* unlit */
+  .ministars .st.on { color:#ffc12e; text-shadow:0 1px 0 #e08a00, 0 0 7px rgba(255,180,0,.6); } /* lit gold + glow */
+
+  /* GAME */
+  .progress { height:14px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:26px;}
+  .progress > div { height:100%; background:linear-gradient(90deg,var(--gold),var(--primary)); width:0; transition:width .35s; border-radius:999px;}
+  .prompt { text-align:center; margin-bottom: 20px; }
+  .prompt .q { font-size: 22px; font-weight:900; }
+  .prompt .hint { color: var(--muted); margin-top:6px; min-height:20px; font-size:14px; font-weight:700;}
+  .display { text-align:center; margin: 10px 0 24px; }
+  .display .emoji { font-size: 92px; line-height:1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.12)); }
+  .display .word { font-size: 32px; font-weight:900; letter-spacing:.5px; margin-top:12px;}
+  .display .hi { color:var(--muted); font-size:17px; margin-top:4px; font-weight:700;}
+  .display .say { margin-top:8px; font-size:19px; font-weight:800; }
+  .display .say .pron { color:var(--grape); }
+  .display .say .meaning { color:var(--muted); font-weight:700; }
+  .speakbtn {
+    background:var(--grape); color:#fff; border:0; border-radius:14px; padding:12px 18px;
+    font-size:15px; font-weight:800; cursor:pointer; display:inline-flex; gap:7px; align-items:center;
+    box-shadow: 0 5px 0 var(--grape-d); transition: transform .06s, box-shadow .06s;
+  }
+  .speakbtn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--grape-d); }
+  .options { display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:8px;}
+  .opt {
+    background:#fff; border:2px solid var(--line); border-radius:16px; padding:18px; font-size:18px; font-weight:800;
+    cursor:pointer; transition: transform .06s, box-shadow .06s, border-color .12s;
+    display:flex; flex-direction:column; align-items:center; gap:8px; box-shadow:0 4px 0 var(--line);
+  }
+  .opt .oe { font-size:40px; }
+  .opt:hover { border-color:var(--grape); }
+  .opt:active { transform: translateY(3px); box-shadow:0 1px 0 var(--line); }
+  .opt.correct { border-color:var(--good); color:var(--good-d); background:#eafaf2; box-shadow:0 4px 0 #c6efd9; }
+  .opt.wrong { border-color:var(--bad); color:var(--bad-d); background:#fff0f0; box-shadow:0 4px 0 #ffd1d3; }
+  .opt.disabled { pointer-events:none; }
+
+  /* tiles for spelling / phrase */
+  .tray { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; min-height:62px; align-items:center;
+          background:var(--bg); border:2px dashed #ddd5c8; border-radius:14px; padding:14px; margin-bottom:14px;}
+  .bank { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .tile {
+    background:#fff; border:2px solid var(--line); border-radius:12px; padding:11px 16px; font-size:19px;
+    font-weight:900; cursor:pointer; user-select:none; box-shadow:0 4px 0 var(--line); transition: transform .06s, box-shadow .06s;
+  }
+  .tile:active { transform: translateY(3px); box-shadow:0 1px 0 var(--line); }
+  .tile.placed { background:var(--grape); color:#fff; border-color:var(--grape-d); box-shadow:0 4px 0 var(--grape-d); }
+  .teachbox {
+    display:flex; gap:8px; align-items:flex-start; max-width:520px; margin:2px auto 12px;
+    background:#fff7e6; border:2px solid #ffd86b; border-radius:14px; padding:12px 14px;
+    text-align:left; font-size:15px; font-weight:700; color:#5b4a1a; line-height:1.5;
+  }
+  .teachbox i { color:#7a6a3a; font-weight:600; }
+  .opt .optHi { display:block; font-size:13px; font-weight:600; opacity:.7; margin-top:3px; }
+  .bugline { display:flex; flex-wrap:wrap; gap:8px 6px; justify-content:center; align-items:center;
+    max-width:520px; margin:14px auto 16px; font-size:21px; line-height:1.8; }
+  .bugword { padding:4px 10px; border-radius:10px; border:2px solid transparent; cursor:pointer;
+    user-select:none; transition:background .1s, transform .06s; }
+  .bugword:hover { background:#fff3f2; }
+  .bugword:active { transform:translateY(2px); }
+  .bugword.fixed { background:var(--good,#2ec27e); color:#fff; border-color:var(--good-d,#25a36a); font-weight:900; }
+  .bugword.shake { animation:shakeX .35s; background:#ffe3e0; }
+  @keyframes shakeX { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+  .email { max-width:520px; margin:6px auto 12px; background:#fff; border:2px solid var(--line);
+    border-radius:14px; padding:14px 16px; text-align:left; box-shadow:0 4px 0 var(--line); transition:transform .5s, opacity .5s; }
+  .email .erow { padding:5px 0; font-size:16px; border-bottom:1px dashed #eee; }
+  .email .erow:last-child { border-bottom:0; }
+  .email .elabel { font-weight:900; color:var(--grape,#6c5ce7); margin-right:6px; }
+  .email .esig { font-style:italic; color:#666; padding-top:8px; }
+  .eslot.set { font-weight:700; }
+  .eslot.bad { background:#ffe3e0; border-radius:6px; padding:0 4px; }
+  .eplace { color:#aaa; font-weight:600; }
+  .email.sent { transform:translateY(-40px) scale(.9); opacity:0; }
+  .eopts { display:flex; flex-direction:column; gap:10px; max-width:520px; margin:0 auto; }
+  .optgroup { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .oglabel { width:100%; font-size:12px; font-weight:900; color:#999; text-transform:uppercase; letter-spacing:.5px; }
+  .echip { background:#fff; border:2px solid var(--line); border-radius:10px; padding:8px 12px; font-size:15px;
+    font-weight:700; cursor:pointer; box-shadow:0 3px 0 var(--line); }
+  .echip small { display:block; font-size:12px; font-weight:600; opacity:.65; }
+  .echip.sel { background:var(--grape,#6c5ce7); color:#fff; border-color:var(--grape-d,#5a4bd4); box-shadow:0 3px 0 var(--grape-d,#5a4bd4); }
+  .codeblock {
+    background:#1e1e2e; color:#e6e6f0; border-radius:14px; padding:16px 18px; margin:6px auto 14px;
+    max-width:520px; font-family:"SF Mono",Menlo,Consolas,monospace; font-size:17px; line-height:1.7;
+    white-space:pre; overflow-x:auto; text-align:left; box-shadow:0 4px 0 #15151f;
+  }
+  .codeblock .blank {
+    display:inline-block; min-width:74px; text-align:center; padding:0 8px; border-radius:8px;
+    background:#3a3a52; color:#ffd86b; border:2px dashed #6c6c8a; font-weight:900;
+  }
+  .codeblock .blank.filled { background:var(--grape,#6c5ce7); color:#fff; border-style:solid; border-color:var(--grape-d,#5a4bd4); }
+  .feedback { text-align:center; font-size:16px; font-weight:900; min-height:24px; margin-top:10px;}
+  .feedback.good { color:var(--good-d); }
+  .feedback.bad { color:var(--bad-d); }
+  .actionrow { display:flex; gap:12px; justify-content:center; margin-top:22px; flex-wrap:wrap;}
+  .btn { border:0; border-radius:14px; padding:14px 26px; font-size:16px; font-weight:900; cursor:pointer;
+         background:#fff; color:var(--ink); box-shadow:0 5px 0 var(--line); transition: transform .06s, box-shadow .06s; }
+  .btn:active { transform: translateY(3px); box-shadow:0 2px 0 var(--line); }
+  .btn.primary { background:var(--primary); color:#fff; box-shadow:0 5px 0 var(--primary-d); }
+  .btn.primary:active { box-shadow:0 2px 0 var(--primary-d); }
+  .btn.ghost { background:#fff; color:var(--ink); }
+  .btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+  /* consistent layout: content fills, primary action pinned to a bottom bar */
+  .gameplay { display:flex; flex-direction:column; min-height:520px; }
+  .gamebody { flex:1; }
+  .gamefooter { margin:20px -28px -30px; padding:16px 28px; border-top:1px solid var(--line);
+                display:flex; justify-content:flex-end; align-items:center; gap:12px; }
+  .gamefooter:empty { display:none; }
+  /* audio is a secondary, content-attached affordance, not a primary button */
+  .wordrow { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:12px; }
+  .wordrow .word { margin-top:0; }
+  .speakchip { width:46px; height:46px; border-radius:50%; border:0; background:var(--grape); color:#fff;
+               font-size:18px; cursor:pointer; flex:0 0 auto;
+               box-shadow:0 4px 0 var(--grape-d); transition:transform .06s, box-shadow .06s; }
+  .speakchip:active { transform:translateY(3px); box-shadow:0 1px 0 var(--grape-d); }
+  .emoji.tap-emoji { cursor:pointer; }
+
+  /* conversation */
+  .chat { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .bubble { max-width:80%; padding:12px 15px; border-radius:18px; font-size:16px; line-height:1.4; font-weight:700;}
+  .bubble.them { background:#f1edff; align-self:flex-start; border-bottom-left-radius:4px;}
+  .bubble.me { background:var(--grape); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+  .bubble small { display:block; opacity:.7; font-size:12px; margin-top:4px; font-weight:600;}
+
+  /* MASCOT — Roshni, the guide */
+  .mascotrow { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+  .mascot { width:96px; flex:0 0 auto; transform-origin:center bottom; animation: float 3s ease-in-out infinite; }
+  .mascot svg { width:100%; height:auto; display:block; overflow:visible; }
+  .mascot.big { width:150px; margin:0 auto 4px; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  .mascot.m-happy { animation: hop .55s ease; }
+  @keyframes hop { 0%{transform:translateY(0)} 30%{transform:translateY(-16px)} 55%{transform:translateY(0)} 78%{transform:translateY(-7px)} 100%{transform:translateY(0)} }
+  .mascot.m-sad { animation:none; transform: rotate(-5deg); }
+  body.speaking .mascot { animation: nod .45s ease-in-out infinite; }
+  @keyframes nod { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg)} }
+  .lid { transform-box: fill-box; transform-origin:center; animation: blink 4.5s infinite; }
+  @keyframes blink { 0%,93%,100%{transform:scaleY(0)} 96%{transform:scaleY(1)} }
+  .m-open, .m-frown { display:none; }
+  .mascot.m-happy .m-smile { display:none; }  .mascot.m-happy .m-open { display:block; }
+  .mascot.m-sad .m-smile { display:none; }    .mascot.m-sad .m-frown { display:block; }
+  .bubble2 { position:relative; background:#fff; border:2px solid var(--line); border-radius:18px;
+             padding:14px 18px; box-shadow:0 4px 0 var(--line); flex:1; }
+  .bubble2::before { content:""; position:absolute; left:-9px; top:50%; margin-top:-9px; width:16px; height:16px;
+             background:#fff; border-left:2px solid var(--line); border-bottom:2px solid var(--line); transform:rotate(45deg); }
+  .bubble2 .q { font-weight:900; font-size:19px; }
+  .bubble2 .hint { color:var(--muted); font-size:13px; margin-top:4px; font-weight:700; }
+  .hiLine { margin-top:8px; color:var(--grape); font-weight:800; font-size:15px;
+            border-top:1px dashed var(--line); padding-top:7px; display:flex; align-items:center; gap:6px; }
+
+  /* RESULT */
+  .result { text-align:center; padding: 36px 10px; }
+  .result .big { font-size:70px;}
+  .result h2 { font-size:28px; font-weight:900; margin:12px 0 4px;}
+  .result .earn { font-size:40px; letter-spacing:6px; color:var(--gold); margin:14px 0;}
+  @keyframes pop { 0%{transform:scale(.5); opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1); opacity:1} }
+  .pop { animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+  .center { text-align:center; }
+  .muted { color: var(--muted); font-weight:700; }
+
+  /* LOGIN / student picker */
+  .chiptab { background:#fff; border:2px solid var(--line); border-radius:999px; padding:7px 14px; margin:3px;
+             font-weight:800; font-size:14px; cursor:pointer; color:var(--ink); }
+  .chiptab.on { background:var(--grape); color:#fff; border-color:var(--grape-d); }
+  .searchbox { width:min(440px,92%); font-size:17px; font-weight:700; padding:13px 18px; margin:0 auto 16px;
+               display:block; border:2px solid var(--line); border-radius:14px; box-shadow:0 4px 0 var(--line); }
+  .searchbox:focus { outline:none; border-color:var(--grape); }
+  .searchbox::placeholder { color:var(--muted); font-weight:600; }
+  .pinov { position:fixed; inset:0; background:rgba(44,36,64,.45); display:grid; place-items:center; z-index:9999; }
+  .pincard { background:#fff; border-radius:20px; padding:26px 28px; width:min(320px,90%); text-align:center;
+             box-shadow:0 20px 50px rgba(0,0,0,.3); }
+  .pincard .big { font-size:54px; }
+  .pinname { font-weight:900; font-size:20px; margin-top:4px; }
+  .pinlabel { color:var(--muted); font-weight:700; margin:10px 0 8px; }
+  .pininput { width:100%; font-size:28px; text-align:center; letter-spacing:8px; padding:10px;
+              border:2px solid var(--line); border-radius:12px; font-weight:900; }
+  .pininput:focus { outline:none; border-color:var(--grape); }
+  .profilebtn { display:inline-block; white-space:nowrap; background:#fff; border:2px solid var(--line);
+                border-radius:999px; padding:8px 16px; font-weight:800; font-size:14px; cursor:pointer; color:var(--ink); }
+  .profilebtn:hover { border-color:var(--grape); }
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topnav"></div>
+  <div id="app">
+    <div class="topbar">
+      <div class="brand"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></div>
+      <div class="stats">
+        <span class="pill star"><span class="staricon">★</span> <span id="totalStars">0</span></span>
+        <span class="pill coin">💎 <span id="coins">0</span></span>
+        <button class="toggle on" id="soundToggle" title="Sound">🔊</button>
+        <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
+        <button class="toggle" id="hiToggle" title="Help">Help: OFF</button>
+      </div>
+    </div>
+    <div id="root"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Hikmat Bazaar — offline functional-English game (pilot)
+   Single file. No server, no internet. Uses macOS built-in
+   speech (English + Hindi) and localStorage for progress.
+   ============================================================ */
+
+// ---------- App-level settings (an admin dashboard / backend will manage these) ----------
+const SETTINGS = {
+  appName: "Hikmat",
+  logo: "",                                   // image URL from Hikmat Settings; empty = the diya 🪔
+  tagline: { en: "Learn  by playing", hi: "खेल-खेल में सीखो" },
+};
+
+// ---------- Curriculum: Tracks → Lessons → Words / Dialogues ----------
+// The WHOLE curriculum is data. Adding a track or lesson = adding to this object
+// (and later: a row in the Frappe admin). The game engine renders entirely from it.
+//   word:     en · hi(meaning) · pron(Devanagari) · emoji · plural OR uncount:true
+//   dialogue: who(emoji) · line · lineHi · replies[{text,ok}] · then(reply)
+let COURSES = [
+  {
+    key:"bazaar", title:"The Bazaar", titleHi:"बाज़ार", icon:"🛒", color:"#ff7a45",
+    blurb:"Food & market words", blurbHi:"खाने और बाज़ार के शब्द", published:true,
+    lessons:[
+      { key:"fruits", title:"Fruits & Drinks", titleHi:"फल और पेय",
+        words:[
+          { en:"apple",  hi:"सेब",  pron:"ऐप्पल", emoji:"🍎", plural:"apples" },
+          { en:"banana", hi:"केला", pron:"बनाना", emoji:"🍌", plural:"bananas" },
+          { en:"milk",   hi:"दूध",  pron:"मिल्क", emoji:"🥛", uncount:true },
+          { en:"egg",    hi:"अंडा", pron:"एग",   emoji:"🥚", plural:"eggs" },
+          { en:"tea",    hi:"चाय",  pron:"टी",    emoji:"🍵", uncount:true },
+        ],
+        dialogues:[
+          { who:"🧑‍🦱", line:"Hello! What do you want to buy?", lineHi:"नमस्ते! आप क्या खरीदना चाहती हैं?",
+            replies:[ {text:"I want some milk, please.", ok:true}, {text:"Goodbye, see you!", ok:false}, {text:"I am ten years old.", ok:false} ],
+            then:"Sure! Here is the milk." },
+          { who:"🧑‍🦱", line:"Do you want anything else?", lineHi:"क्या आपको और कुछ चाहिए?",
+            replies:[ {text:"No, that is all. Thank you.", ok:true}, {text:"I am hungry now.", ok:false}, {text:"It is raining.", ok:false} ],
+            then:"Okay! Have a nice day." },
+        ] },
+      { key:"veg", title:"Veg & Staples", titleHi:"सब्ज़ी और अनाज",
+        words:[
+          { en:"tomato", hi:"टमाटर", pron:"टमैटो", emoji:"🍅", plural:"tomatoes" },
+          { en:"potato", hi:"आलू",   pron:"पटैटो", emoji:"🥔", plural:"potatoes" },
+          { en:"rice",   hi:"चावल",  pron:"राइस",  emoji:"🍚", uncount:true },
+          { en:"bread",  hi:"रोटी",  pron:"ब्रेड",  emoji:"🍞", uncount:true },
+          { en:"fish",   hi:"मछली",  pron:"फ़िश",  emoji:"🐟", plural:"fish" },
+        ],
+        dialogues:[
+          { who:"🧑‍🦱", line:"That will be fifty rupees.", lineHi:"यह पचास रुपये का होगा।",
+            replies:[ {text:"Here is the money. Thank you.", ok:true}, {text:"What is your name?", ok:false}, {text:"I like blue.", ok:false} ],
+            then:"Thank you. Come again!" },
+          { who:"🧑‍🦱", line:"Good morning! How are you?", lineHi:"सुप्रभात! आप कैसी हैं?",
+            replies:[ {text:"I am fine, thank you.", ok:true}, {text:"Two apples.", ok:false}, {text:"It is fifty rupees.", ok:false} ],
+            then:"Glad to hear it!" },
+        ] },
+    ]
+  },
+  {
+    key:"home", title:"At Home", titleHi:"घर पर", icon:"🏠", color:"#6c5ce7",
+    blurb:"Everyday home words", blurbHi:"घर के रोज़ के शब्द", published:true,
+    lessons:[
+      { key:"house", title:"Around the House", titleHi:"घर के आस-पास",
+        words:[
+          { en:"door",  hi:"दरवाज़ा", pron:"डोर",  emoji:"🚪", plural:"doors" },
+          { en:"bed",   hi:"बिस्तर",  pron:"बेड",  emoji:"🛏️", plural:"beds" },
+          { en:"book",  hi:"किताब",  pron:"बुक",  emoji:"📖", plural:"books" },
+          { en:"water", hi:"पानी",   pron:"वॉटर", emoji:"💧", uncount:true },
+          { en:"clock", hi:"घड़ी",   pron:"क्लॉक", emoji:"🕐", plural:"clocks" },
+        ],
+        dialogues:[
+          { who:"👩", line:"Where is your book?", lineHi:"तुम्हारी किताब कहाँ है?",
+            replies:[ {text:"It is on the bed.", ok:true}, {text:"I am fine, thank you.", ok:false}, {text:"Two rupees.", ok:false} ],
+            then:"Good. Please bring it here." },
+          { who:"👩", line:"Please close the door.", lineHi:"कृपया दरवाज़ा बंद करो।",
+            replies:[ {text:"Okay, I will close it.", ok:true}, {text:"I want two apples.", ok:false}, {text:"It is raining.", ok:false} ],
+            then:"Thank you!" },
+        ] },
+    ]
+  },
+  {
+    key:"school", title:"At School", titleHi:"स्कूल में", icon:"🏫", color:"#2ec27e",
+    blurb:"Classroom words", blurbHi:"कक्षा के शब्द", published:true,
+    lessons:[
+      { key:"class", title:"In the Classroom", titleHi:"कक्षा में",
+        words:[
+          { en:"pen",   hi:"कलम",   pron:"पेन",  emoji:"🖊️", plural:"pens" },
+          { en:"book",  hi:"किताब", pron:"बुक",  emoji:"📚", plural:"books" },
+          { en:"bag",   hi:"बस्ता", pron:"बैग",  emoji:"🎒", plural:"bags" },
+          { en:"chair", hi:"कुर्सी", pron:"चेयर", emoji:"🪑", plural:"chairs" },
+          { en:"board", hi:"बोर्ड",  pron:"बोर्ड", emoji:"📋", plural:"boards" },
+        ],
+        dialogues:[
+          { who:"👩‍🏫", line:"Good morning, students!", lineHi:"सुप्रभात, बच्चों!",
+            replies:[ {text:"Good morning, teacher.", ok:true}, {text:"It is fifty rupees.", ok:false}, {text:"I want some rice.", ok:false} ],
+            then:"Please sit down." },
+          { who:"👩‍🏫", line:"Open your book, please.", lineHi:"अपनी किताब खोलो।",
+            replies:[ {text:"Yes, teacher.", ok:true}, {text:"Goodbye!", ok:false}, {text:"I am hungry.", ok:false} ],
+            then:"Let us begin." },
+        ] },
+    ]
+  },
+  {
+    key:"work", title:"At Work", titleHi:"काम पर", icon:"🧰", color:"#e0a800",
+    blurb:"Coming soon", blurbHi:"जल्द आ रहा है", published:false, lessons:[]
+  },
+];
+
+// ---------- Levels: the vertical ladder (easy -> hard) ----------
+const LEVELS = [
+  { id:"learn",  name:"Learn the Words", nameHi:"शब्द सीखो",        sub:"See, hear, say",      subHi:"देखो, सुनो, बोलो",        ico:"📖", type:"learn" },
+  { id:"listen", name:"Listen & Match",  nameHi:"सुनो और चुनो",     sub:"Hear it, pick it",    subHi:"सुनो, सही चुनो",          ico:"👂", type:"listen" },
+  { id:"spell",  name:"Spell the Word",  nameHi:"शब्द लिखो",        sub:"Build the letters",   subHi:"अक्षर जोड़ो",             ico:"🔤", type:"spell" },
+  { id:"phrase", name:"Build a Sentence",nameHi:"वाक्य बनाओ",       sub:"Put words in order", subHi:"शब्दों को क्रम में रखो",  ico:"🧩", type:"phrase" },
+  { id:"talk",   name:"Talk & Reply",    nameHi:"बातचीत करो",       sub:"Hold a chat",    subHi:"बातचीत करो",             ico:"🗣️", type:"talk" },
+];
+
+// Extra activities, added only when the lesson carries that content (the IT/Work track).
+const CODE_LEVEL  = { id:"code",  name:"Complete the Code", nameHi:"कोड पूरा करो", sub:"Fill the blank",    subHi:"खाली जगह भरो",   ico:"💻", type:"code" };
+const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती ढूँढो",  sub:"Spot the wrong word", subHi:"गलत शब्द पकड़ो", ico:"🐞", type:"fix" };
+const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
+// The activities for a given lesson: the 5 base ones, plus any extra activity whose content exists.
+function levelsFor(lesson){
+  let lv = LEVELS;
+  if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
+  if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
+  if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
+  return lv;
+}
+
+// ---------- State / progress ----------
+// Identity: progress is stored per student so shared laptops keep girls separate.
+// null = "guest" (offline / not signed in) — still fully playable, just device-local.
+let currentStudent = null;
+try { currentStudent = JSON.parse(localStorage.getItem("hikmat_current")) || null; } catch(e){}
+function stateKey(){ return "hikmat_state_" + (currentStudent ? currentStudent.id : "guest"); }
+function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true }; }
+function loadState(){
+  try { return JSON.parse(localStorage.getItem(stateKey())) || fresh(); }
+  catch(e){ return fresh(); }
+}
+function save(){ localStorage.setItem(stateKey(), JSON.stringify(state)); }
+let state = loadState();
+
+// ---------- Progress: state.progress[courseKey][lessonKey][activityId] = stars(0-3) ----------
+function getStars(ck, lk, aid){ return (((state.progress||{})[ck]||{})[lk]||{})[aid] || 0; }
+function setStars(ck, lk, aid, s){
+  state.progress = state.progress || {};
+  state.progress[ck] = state.progress[ck] || {};
+  state.progress[ck][lk] = state.progress[ck][lk] || {};
+  state.progress[ck][lk][aid] = Math.max(state.progress[ck][lk][aid] || 0, s);
+}
+function lessonEarned(ck, lk){ const o=((state.progress||{})[ck]||{})[lk]||{}; let t=0; for(const a in o) t+=o[a]; return t; }
+function lessonMax(lesson){ return levelsFor(lesson).length * 3; }                 // activities × 3 stars
+function trackEarned(ck){ const c=(state.progress||{})[ck]||{}; let t=0; for(const l in c) t+=lessonEarned(ck,l); return t; }
+function totalStars(){ let t=0; const p=state.progress||{}; for(const c in p) t+=trackEarned(c); return t; }
+
+// ---------- Speech (offline, macOS voices) ----------
+let voices = [];
+function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+if (window.speechSynthesis){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(lang){
+  const v = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(lang));
+  return v[0] || null;
+}
+let audioHintShown = false;
+let speechEverStarted = false;   // becomes true the first time audio actually plays
+function showAudioHint(){
+  if(audioHintShown || document.getElementById("audiohint")) return;
+  audioHintShown = true;
+  const bar = el(`<div id="audiohint" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;display:flex;gap:12px;align-items:center;max-width:92%;">🔇 No sound here? Open this file in <b style="white-space:nowrap">Safari</b> or <b>Chrome</b> to hear the words.<button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:6px 13px;border-radius:8px;cursor:pointer;">OK</button></div>`);
+  document.body.appendChild(bar);
+  bar.querySelector("button").onclick = () => bar.remove();
+}
+// --- speech queue: plays utterances one after another so nothing cancels
+//     anything else, and a small batched delay dodges Chrome's cancel→speak race
+let speechQ = [];
+let speaking = false;
+let playTimer = null;
+function buildUtterance(text, lang){
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice(lang === "hi" ? "hi" : "en");
+  if(v) u.voice = v;
+  u.lang = lang === "hi" ? "hi-IN" : "en-US";
+  u.rate = lang === "hi" ? 0.95 : 0.85;
+  u.onstart = () => { speechEverStarted = true; document.body.classList.add("speaking"); };
+  u.onend   = () => { document.body.classList.remove("speaking"); speaking = false; playNext(); };
+  u.onerror = () => { document.body.classList.remove("speaking"); speaking = false; playNext(); };
+  return u;
+}
+function playNext(){
+  if(speaking || !speechQ.length) return;
+  if(!window.speechSynthesis){ showAudioHint(); return; }
+  const item = speechQ[0];
+  // honour a requested gap AFTER the previous utterance finishes, before this one starts
+  if(item.gap && !item._waited){ item._waited = true; setTimeout(playNext, item.gap); return; }
+  speechQ.shift();
+  speaking = true;
+  try { speechSynthesis.speak(buildUtterance(item.text, item.lang)); speechSynthesis.resume(); }
+  catch(e){ speaking = false; showAudioHint(); return; }
+  setTimeout(() => { if(!speechEverStarted) showAudioHint(); }, 1200);
+}
+function stopSpeech(){
+  clearAnnounce();
+  speechQ = []; speaking = false;
+  try { if(window.speechSynthesis) speechSynthesis.cancel(); } catch(e){}
+}
+// auto-announce content (word/sentence) AFTER the UI "ding" finishes, so the
+// click sound completes before the item name is spoken (no overlap).
+let _announceTimer = null;
+function clearAnnounce(){ if(_announceTimer){ clearTimeout(_announceTimer); _announceTimer = null; } }
+function announce(fn){ clearAnnounce(); _announceTimer = setTimeout(() => { _announceTimer = null; fn(); }, 300); }
+// speak now (interrupts current speech). Pass {queue:true} to play AFTER what's already queued.
+function speak(text, lang="en", opts){
+  try {
+    if(!window.speechSynthesis){ showAudioHint(); return; }
+    if(!(opts && opts.queue)) stopSpeech();
+    speechQ.push({ text, lang, gap: (opts && opts.gap) || 0 });
+    if(playTimer) return;            // batch same-tick calls (e.g. word + Hindi line)
+    playTimer = setTimeout(() => { playTimer = null; playNext(); }, 130);
+  } catch(e){ showAudioHint(); }
+}
+function sayHi(text){ if(state.hindi) speak(text, "hi", { queue:true }); }
+
+// ---------- Helpers ----------
+const $ = sel => document.querySelector(sel);
+const root = $("#root");
+// interface translation: returns Hindi text when the UI language is Hindi, else English.
+// Used ONLY for interface/chrome — never for the English content being taught.
+function tx(en, hi){ return state.lang === "hi" ? hi : en; }
+// pointer to re-render the current screen (so the language toggle updates live)
+let rerender = function(){};
+
+// ---------- Sonic identity: tiny offline Web-Audio sound kit ----------
+// One warm timbre + a major-pentatonic scale, so every cue is consonant and
+// recognisably "Hikmat". Rewards rise (dopamine); navigation is soft; errors
+// are gentle, never punishing; finishing plays a signature flourish.
+let _actx = null;
+function audioCtx(){
+  if(state.sound === false) return null;
+  try {
+    if(!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+    if(_actx.state !== "running") _actx.resume();   // also wakes Safari's "interrupted" state
+  } catch(e){ return null; }
+  return _actx;
+}
+const NOTE = { G4:392, A4:440, C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880, C6:1046.5, E6:1318.5, G6:1568 };
+function tone(freq, startIn, dur, vol, type){
+  const ac = audioCtx(); if(!ac) return;
+  if(ac.state !== "running"){ try { ac.resume(); } catch(e){} }   // fire-and-forget resume; schedule anyway
+  const t = ac.currentTime + 0.04 + startIn;   // lookahead so a just-woken context doesn't clip the attack
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type || "triangle"; o.frequency.value = freq;
+  o.connect(g); g.connect(ac.destination);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || 0.12, t + 0.012);   // soft attack
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);          // smooth decay
+  o.start(t); o.stop(t + dur + 0.03);
+}
+function seq(notes){ let t = 0; notes.forEach(n => { tone(n[0], t, n[1], n[2], n[3]); t += n[4] || n[1]; }); }
+// Create/resume the audio context on a reliable user gesture, and (crucially for
+// Safari/iOS) play a one-frame silent buffer to fully unlock audio output.
+// pointerdown is NOT a reliable unlock event in Safari — use click/touchend/mousedown.
+function unlockAudio(){
+  try {
+    if(!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+    if(_actx.state === "suspended") _actx.resume();
+    if(_actx && !_actx._unlocked){
+      const b = _actx.createBuffer(1, 1, 22050);
+      const s = _actx.createBufferSource();
+      s.buffer = b; s.connect(_actx.destination); s.start(0);
+      _actx._unlocked = true;
+    }
+  } catch(e){}
+}
+["touchend","mousedown","click","keydown"].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, true));
+document.addEventListener("visibilitychange", () => { if(!document.hidden) unlockAudio(); });
+const sfx = {
+  tap(){ tone(NOTE.E5, 0, 0.08, 0.14); },                                            // micro-click on tiles
+  enter(){ seq([[NOTE.C5,0.10,0.20],[NOTE.G5,0.14,0.20]]); },                        // rising — "open"
+  back(){ seq([[NOTE.G5,0.10,0.18],[NOTE.D5,0.14,0.18]]); },                         // gentle descending
+  next(){ tone(NOTE.G5,0,0.13,0.20); tone(NOTE.C6,0,0.13,0.12); },                   // confident blip
+  correct(){ seq([[NOTE.C5,0.10,0.20],[NOTE.E5,0.10,0.20],[NOTE.G5,0.18,0.22]]); },  // reward arpeggio
+  wrong(){ tone(NOTE.A4,0,0.17,0.18,"sine"); tone(NOTE.G4,0.07,0.20,0.15,"sine"); }, // soft, not punishing
+  locked(){ tone(NOTE.G4,0,0.15,0.12,"sine"); },                                     // muted "not yet"
+  restart(){ seq([[NOTE.E5,0.09,0.20],[NOTE.A5,0.13,0.20]]); },
+  complete(){ seq([[NOTE.C5,0.13,0.22],[NOTE.E5,0.13,0.22],[NOTE.G5,0.13,0.22],[NOTE.C6,0.30,0.24]]);
+              tone(NOTE.E6,0.54,0.34,0.12); tone(NOTE.G6,0.60,0.34,0.10); },         // signature flourish
+};
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstChild; }
+
+// ---------- Roshni, the guide (self-contained SVG mascot) ----------
+function mascotSVG(){ return `<svg viewBox="0 0 120 142" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="64" rx="40" ry="42" fill="#2b2233"/>
+  <ellipse cx="24" cy="94" rx="9" ry="22" fill="#2b2233"/>
+  <ellipse cx="96" cy="94" rx="9" ry="22" fill="#2b2233"/>
+  <path d="M28 142 Q30 110 60 105 Q90 110 92 142 Z" fill="#ef5da8"/>
+  <path d="M44 112 Q60 124 76 112 L74 105 Q60 113 46 105 Z" fill="#ffd23f"/>
+  <rect x="52" y="92" width="16" height="18" rx="6" fill="#e0a276"/>
+  <circle cx="60" cy="58" r="33" fill="#f1b785"/>
+  <path d="M27 56 Q28 23 60 23 Q92 23 93 56 Q80 39 60 39 Q40 39 27 56 Z" fill="#2b2233"/>
+  <circle cx="60" cy="44" r="2.4" fill="#c0392b"/>
+  <circle cx="43" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
+  <circle cx="77" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
+  <ellipse cx="49" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
+  <ellipse cx="71" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
+  <circle cx="50" cy="59" r="3.4" fill="#2b2233"/>
+  <circle cx="72" cy="59" r="3.4" fill="#2b2233"/>
+  <circle cx="51.4" cy="57.4" r="1.1" fill="#fff"/>
+  <circle cx="73.4" cy="57.4" r="1.1" fill="#fff"/>
+  <rect class="lid" x="42" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
+  <rect class="lid" x="64" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
+  <path d="M43 49 Q49 46 55 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M65 49 Q71 46 77 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M60 62 Q62 67 59 69" stroke="#d99a6c" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path class="m-smile" d="M50 75 Q60 84 70 75" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path class="m-open" d="M52 74 Q60 90 68 74 Q60 80 52 74 Z" fill="#a0392b"/>
+  <path class="m-frown" d="M50 80 Q60 73 70 80" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>`; }
+
+let lastHi = "";   // the Hindi help line for the current prompt
+function head(q, hint, hi){
+  lastHi = hi || "";
+  const hindiLine = (state.hindi && lastHi) ? `<div class="hiLine">🔊 ${lastHi}</div>` : "";
+  return `<div class="mascotrow">
+    <div class="mascot" id="mascot">${mascotSVG()}</div>
+    <div class="bubble2"><div class="q">${q}</div><div class="hint">${hint||""}</div>${hindiLine}</div>
+  </div>`;
+}
+// Toggle the Hindi line in/out of the current bubble live (no full re-render)
+function updateHiLine(){
+  const bubble = document.querySelector(".bubble2");
+  if(!bubble) return;
+  const existing = bubble.querySelector(".hiLine");
+  if(state.hindi && lastHi){
+    if(!existing){
+      const node = el(`<div class="hiLine">🔊 ${lastHi}</div>`);
+      bubble.appendChild(node);
+    }
+    sayHi(lastHi);
+  } else if(existing){
+    existing.remove();
+  }
+}
+function setMood(mood){
+  const m = document.getElementById("mascot");
+  if(!m) return;
+  m.classList.remove("m-happy","m-sad");
+  if(mood){ void m.offsetWidth; m.classList.add("m-"+mood); }
+}
+// render the primary action(s) into the pinned bottom bar
+function setFooter(html){ const f = document.getElementById("footer"); if(f) f.innerHTML = html || ""; }
+// a 3-star rating row — lit gold stars for earned, unlit for the rest
+function starRow(earned){
+  let s=""; for(let i=0;i<3;i++) s += `<span class="st ${i<earned?"on":""}">★</span>`; return s;
+}
+// Render a winding game "trail" of nodes into #path. Nodes oscillate left↔right in a
+// lane; a smooth SVG curve is drawn through their centres; labels sit in a fixed column.
+// items: [{ cls, face, extras, label, sub, starsHtml, onClick }]
+// node shapes cycle so the trail isn't the same circle over and over (kept cohesive: same size/colour)
+const NODE_SHAPES = ["50%", "30%", "46% 54% 52% 48% / 53% 45% 55% 47%", "50% / 38%"];
+function renderPath(items){
+  const wrap = $("#path");
+  wrap.innerHTML = "";
+  const N = items.length;
+  const NR = 33, D = NR*2, AMP = 28, ROW = 90, TOP = 24, LANE = 20;
+  const CX = LANE + NR + AMP;          // x of a centred node
+  const H = TOP + N * ROW + 14;
+  wrap.style.height = H + "px";
+  const pts = items.map((_, i) => ({ x: CX + Math.round(AMP * Math.sin(i * Math.PI / 3)), y: TOP + i * ROW + NR }));
+  let d = "";
+  pts.forEach((p, i) => {
+    if(i === 0){ d += "M " + p.x + " " + p.y; }
+    else { const q = pts[i-1], my = ((q.y + p.y) / 2).toFixed(1); d += " C " + q.x + " " + my + " " + p.x + " " + my + " " + p.x + " " + p.y; }
+  });
+  const W = CX + NR + AMP + 8;
+  wrap.insertAdjacentHTML("beforeend",
+    `<svg class="cpath" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none">
+       <path d="${d}" stroke="var(--line)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>`);
+  items.forEach((it, i) => {
+    const p = pts[i];
+    const shape = NODE_SHAPES[i % NODE_SHAPES.length];
+    const step = el(`<div class="step ${it.cls||''}" style="top:${TOP + i*ROW}px; height:${D}px">
+      <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${i+1}</span>${it.extras||""}</button>
+      <div class="labelblock" style="left:${p.x + NR + 16}px; height:${D}px">
+        <div class="label">${it.label}</div>
+        <div class="ls">${it.sub||""}</div>
+        ${it.starsHtml ? `<div class="ministars">${it.starsHtml}</div>` : ""}
+      </div>
+    </div>`);
+    if(it.onClick) step.querySelector(".node").onclick = it.onClick;
+    wrap.appendChild(step);
+  });
+}
+// the back button lives above the card; pass null to hide it (home screen)
+function setBack(label, fn){
+  const n = document.getElementById("topnav"); if(!n) return;
+  if(!label){ n.innerHTML = ""; return; }
+  n.innerHTML = `<button class="backbtn">${label}</button>`;
+  n.querySelector("button").onclick = () => { sfx.back(); fn(); };
+}
+
+function refreshTop(){
+  const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
+  const lg = $("#brandLogo");
+  if(lg) lg.innerHTML = SETTINGS.logo ? `<img class="logoimg" src="${SETTINGS.logo}" alt="${SETTINGS.appName}">` : "🪔";
+  $("#totalStars").textContent = totalStars();
+  $("#coins").textContent = state.coins;
+  const ht = $("#hiToggle");
+  ht.classList.toggle("on", state.hindi);
+  ht.textContent = tx("Help","मदद") + ": " + (state.hindi ? tx("ON","चालू") : tx("OFF","बंद"));
+  const lt = $("#langToggle");
+  if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.textContent = "🌐 " + (state.lang==="hi" ? "हिं" : "EN"); }
+  const st = $("#soundToggle");
+  if(st){ const on = state.sound !== false; st.classList.toggle("on", on); st.textContent = on ? "🔊" : "🔇"; }
+}
+$("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop(); updateHiLine(); };
+$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
+$("#soundToggle").onclick = () => { state.sound = state.sound===false; save(); refreshTop(); if(state.sound) sfx.enter(); };
+
+// ============================================================
+//  SCREENS
+// ============================================================
+function renderHome(){
+  stopSpeech();
+  rerender = renderHome;
+  root.innerHTML = "";
+  setBack(null);
+  const s = el(`<div class="screen">
+    <div class="hero">
+      <h1>${tx("Welcome to "+SETTINGS.appName+"! ✨", SETTINGS.appName+" में आपका स्वागत है! ✨")}</h1>
+      <p>${tx("Pick a place to explore and learn.","सीखने के लिए कोई जगह चुनो।")}</p>
+    </div>
+    <div class="center" id="profileRow" style="margin:8px 0 20px"></div>
+    <div class="themes" id="tracks"></div>
+  </div>`);
+  root.appendChild(s);
+  const pr = $("#profileRow");
+  if(currentStudent){
+    const b = el(`<button class="profilebtn">${currentStudent.avatar||"🙂"} ${currentStudent.name} · ${tx("Switch","बदलें")}</button>`);
+    b.onclick = () => { sfx.tap(); renderLogin(); };
+    pr.appendChild(b);
+  } else if(backendLive){
+    const b = el(`<button class="profilebtn">${tx("Sign in","साइन इन")}</button>`);
+    b.onclick = () => { sfx.tap(); renderLogin(); };
+    pr.appendChild(b);
+  }
+  const wrap = $("#tracks");
+  COURSES.forEach(course => {
+    const earned = trackEarned(course.key);
+    const maxStars = course.lessons.reduce((a,ls)=>a+lessonMax(ls),0);
+    const locked = !course.published || course.lessons.length===0;
+    const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
+        style="${locked?"":`background:linear-gradient(160deg,${course.color}dd,${course.color})`}">
+      ${locked ? `<span class="lock">🔒</span>` : ""}
+      <div class="big">${course.icon}</div>
+      <h3>${tx(course.title, course.titleHi)}</h3>
+      <small>${locked ? tx("Coming soon","जल्द आ रहा है")
+                      : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : tx(course.blurb, course.blurbHi))}</small>
+    </button>`);
+    if(!locked) node.onclick = () => { sfx.enter(); renderTrack(course); };
+    wrap.appendChild(node);
+  });
+  refreshTop();
+}
+
+// TRACK screen — the lessons inside a track
+function renderTrack(course){
+  stopSpeech();
+  rerender = () => renderTrack(course);
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead">
+      <div><h2>${course.icon} ${tx(course.title, course.titleHi)}</h2>
+      <div class="sub">${tx("Choose a lesson","कोई पाठ चुनो")}</div></div>
+    </div>
+    <div class="path" id="path"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack(tx("← Home","← घर"), renderHome);
+  const wrap = $("#path");
+  // a lesson is "complete" (green) once every one of its activities has at least 1 star
+  const isComplete = ls => levelsFor(ls).every(lv => getStars(course.key, ls.key, lv.id) > 0);
+  const firstIncomplete = course.lessons.findIndex(ls => !isComplete(ls));
+  const items = course.lessons.map((ls, i) => {
+    const earned = lessonEarned(course.key, ls.key);
+    const done = isComplete(ls);
+    const cls = done ? "done" : (i===firstIncomplete ? "current" : "");
+    return {
+      cls,
+      face: done ? "✓" : "📚",
+      extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
+      label: tx(ls.title, ls.titleHi),
+      sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
+      onClick: () => { sfx.enter(); renderLessonMap(course, ls); },
+    };
+  });
+  renderPath(items);
+  refreshTop();
+}
+
+// LESSON screen — the 5 activities (the vertical path) for one lesson
+function renderLessonMap(course, lesson){
+  stopSpeech();
+  rerender = () => renderLessonMap(course, lesson);
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead">
+      <div><h2>${tx(lesson.title, lesson.titleHi)}</h2>
+      <div class="sub">${tx("Climb the path — finish a stall to open the next","रास्ते पर चढ़ो — हर पड़ाव पूरा करके अगला खोलो")}</div></div>
+    </div>
+    <div class="path" id="path"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course));
+  const wrap = $("#path");
+  const ck = course.key, lk = lesson.key;
+  const LV = levelsFor(lesson);
+  let currentIdx = LV.findIndex((lv,i)=> getStars(ck,lk,lv.id)===0 && (i===0 || getStars(ck,lk,LV[i-1].id)>0) );
+  const items = LV.map((lv, i) => {
+    const earned = getStars(ck,lk,lv.id);
+    const unlocked = i===0 || getStars(ck,lk,LV[i-1].id) > 0;
+    const cls = !unlocked ? "locked" : (i===currentIdx ? "current" : (earned>0 ? "done" : ""));
+    return {
+      cls,
+      face: !unlocked ? "🔒" : (earned>0 ? "✓" : lv.ico),
+      extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
+      label: tx(lv.name, lv.nameHi),
+      sub: tx(lv.sub, lv.subHi),
+      starsHtml: cls!=="locked" ? starRow(earned) : "",
+      onClick: unlocked
+        ? (() => { sfx.enter(); startLevel(course, lesson, lv); })
+        : (() => { sfx.locked(); sayHi("पहले पिछला स्तर पूरा करें"); }),
+    };
+  });
+  renderPath(items);
+  refreshTop();
+}
+
+// ---------- Level runner ----------
+function startLevel(course, lesson, lv){
+  const rounds = buildRounds(lv, lesson);
+  let idx = 0, score = 0;
+  const backToLesson = () => renderLessonMap(course, lesson);
+  const backLbl = "← " + tx(lesson.title, lesson.titleHi);
+  setBack(backLbl, backToLesson);
+  rerender = runRound;   // language toggle re-renders the current round in place
+  runRound();
+
+  function header(){
+    return `<div class="screen gameplay">
+      <div class="maphead">
+        <div><div style="font-weight:800;font-size:20px">${lv.ico} ${tx(lv.name, lv.nameHi)}</div></div></div>
+      <div class="progress"><div id="bar" style="width:${(idx/rounds.length)*100}%"></div></div>
+      <div id="body" class="gamebody"></div>
+      <div class="gamefooter" id="footer"></div>
+    </div>`;
+  }
+  function mount(bodyHTML){
+    clearAnnounce();
+    root.innerHTML="";
+    root.appendChild(el(header()));
+    setBack(backLbl, backToLesson);
+    $("#body").innerHTML = bodyHTML;
+  }
+  function next(correct){
+    if(correct){ score++; state.coins += 5; }
+    idx++; save(); refreshTop();
+    if(idx>=rounds.length) finish();
+    else runRound();
+  }
+  function runRound(){
+    const r = rounds[idx];
+    if(lv.type==="learn")  return roundLearn(r);
+    if(lv.type==="listen") return roundListen(r);
+    if(lv.type==="spell")  return roundSpell(r);
+    if(lv.type==="phrase") return roundPhrase(r);
+    if(lv.type==="talk")   return roundTalk(r);
+    if(lv.type==="code")   return roundCode(r);
+    if(lv.type==="fix")    return roundFix(r);
+    if(lv.type==="email")  return roundEmail(r);
+  }
+
+  // --- LEARN: flashcard, see + hear + Hindi, then "Got it"
+  function roundLearn(it){
+    mount(`${head(tx("What is this?","ये क्या है?"), tx("Tap the word or picture to hear it 🔊","शब्द या तस्वीर पर छूकर सुनो 🔊"), "ये क्या है? सुनो और दोहराओ।")}
+      <div class="display">
+        <div class="emoji pop tap-emoji" id="emojiBtn">${it.emoji}</div>
+        <div class="wordrow"><span class="word">${it.en}</span>
+          <button class="speakchip" id="say" title="Hear it">🔊</button></div>
+        <div class="say"><span class="pron">${it.pron}</span> · <span class="meaning">${it.hi}</span></div>
+      </div>`);
+    setFooter(`<button class="btn primary" id="next">${tx("Got it →","समझ गई →")}</button>`);
+    $("#say").onclick = () => speak(it.en);
+    $("#emojiBtn").onclick = () => speak(it.en);
+    $("#next").onclick = () => { sfx.next(); next(true); };
+    announce(() => { speak(it.en); sayHi("ये है " + it.hi); });
+  }
+
+  // --- LISTEN: hear English, choose the right picture
+  function roundListen(r){
+    mount(`${head(tx("Tap what you hear 👂","जो सुनो उसे चुनो 👂"), tx("Press the speaker to hear it again","फिर सुनने के लिए स्पीकर दबाओ"),"जो शब्द सुनो, उसकी तस्वीर चुनो।")}
+      <div class="center"><button class="speakbtn" id="say">🔊 ${tx("Play word","शब्द सुनो")}</button></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    $("#say").onclick = () => speak(r.answer.en);
+    announce(() => speak(r.answer.en));
+    const opts = $("#opts");
+    r.choices.forEach(c => {
+      const b = el(`<button class="opt"><span class="oe">${c.emoji}</span><span>${c.en}</span></button>`);
+      b.onclick = () => {
+        const correct = c.en===r.answer.en;
+        document.querySelectorAll(".opt").forEach(o=>o.classList.add("disabled"));
+        b.classList.add(correct?"correct":"wrong");
+        setMood(correct?"happy":"sad");
+        (correct?sfx.correct:sfx.wrong)();
+        const fb=$("#fb");
+        if(correct){ fb.textContent=tx("Correct! 🎉","सही! 🎉"); fb.className="feedback good"; }
+        else { fb.textContent=tx("Try to remember: ","याद रखो: ")+r.answer.en; fb.className="feedback bad";
+               document.querySelectorAll(".opt").forEach(o=>{ if(o.textContent.includes(r.answer.en)) o.classList.add("correct"); }); }
+        setTimeout(()=>next(correct), correct?900:1600);
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- SPELL: show picture, build word from letter tiles
+  function roundSpell(it){
+    const letters = shuffle(it.en.split(""));
+    mount(`${head(tx("Spell the word","शब्द लिखो"), tx("Tap the letters in order","अक्षरों को सही क्रम में छुओ"),"अक्षरों को सही क्रम में लगाओ।")}
+      <div class="display"><div class="emoji">${it.emoji}</div><div class="hi">${it.hi}</div></div>
+      <div class="center" style="margin-bottom:10px"><button class="speakbtn" id="say">🔊 ${tx("Hear it","सुनो")}</button></div>
+      <div class="tray" id="tray"></div>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    $("#say").onclick=()=>speak(it.en);
+    announce(() => speak(it.en));
+    const tray=$("#tray"), bank=$("#bank");
+    let built=[];
+    function redraw(){
+      tray.innerHTML=""; bank.innerHTML="";
+      built.forEach((ch,i)=>{ const t=el(`<div class="tile placed">${ch}</div>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach((ch,i)=>{ const t=el(`<div class="tile">${ch}</div>`); t.onclick=()=>{built.push(ch);sfx.tap();redraw();}; bank.appendChild(t); });
+      $("#check").disabled = built.length!==it.en.length;
+    }
+    function remaining(){ const used={}; built.forEach(c=>used[c]=(used[c]||0)+1); const out=[]; const tmp={...used};
+      letters.forEach(c=>{ if(tmp[c]){tmp[c]--;} else out.push(c); }); return out; }
+    $("#clear").onclick=()=>{built=[];redraw();};
+    $("#check").onclick=()=>{
+      const ok = built.join("")===it.en;
+      setMood(ok?"happy":"sad");
+      (ok?sfx.correct:sfx.wrong)();
+      const fb=$("#fb");
+      if(ok){ fb.textContent=tx("Perfect! ⭐","बढ़िया! ⭐"); fb.className="feedback good"; speak(it.en); setTimeout(()=>next(true),1000); }
+      else { fb.textContent=tx("Not yet — the word is ","अभी नहीं — शब्द है ")+"\""+it.en+"\""; fb.className="feedback bad"; setTimeout(()=>next(false),1700); }
+    };
+    redraw();
+  }
+
+  // --- PHRASE: arrange word tiles into a sentence
+  function roundPhrase(r){
+    const words = shuffle(r.words.slice());
+    mount(`${head(tx("Make the sentence","वाक्य बनाओ"), tx("Put the words in the right order","शब्दों को सही क्रम में लगाओ"), r.hintHi)}
+      <div class="display"><div class="emoji">${r.emoji}</div></div>
+      <div class="tray" id="tray"></div>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    announce(() => sayHi(r.hintHiSpoken));
+    const tray=$("#tray"), bank=$("#bank");
+    let built=[];
+    function redraw(){
+      tray.innerHTML=""; bank.innerHTML="";
+      built.forEach((w,i)=>{ const t=el(`<div class="tile placed">${w}</div>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach(w=>{ const t=el(`<div class="tile">${w}</div>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
+      $("#check").disabled = built.length!==r.words.length;
+    }
+    function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
+      words.forEach(w=>{ if(tmp[w]){tmp[w]--;} else out.push(w); }); return out; }
+    $("#clear").onclick=()=>{built=[];redraw();};
+    $("#check").onclick=()=>{
+      const ok = built.join(" ")===r.words.join(" ");
+      setMood(ok?"happy":"sad");
+      (ok?sfx.correct:sfx.wrong)();
+      const fb=$("#fb");
+      if(ok){ fb.textContent=tx("Great sentence! 🎉","बढ़िया वाक्य! 🎉"); fb.className="feedback good"; speak(r.words.join(" ")); setTimeout(()=>next(true),1200); }
+      else { fb.textContent=tx("Right answer: ","सही जवाब: ")+'"'+r.words.join(" ")+'"'; fb.className="feedback bad"; speak(r.words.join(" ")); setTimeout(()=>next(false),2000); }
+    };
+    redraw();
+  }
+
+  // --- TALK: speaker says a line, you choose the right reply
+  function roundTalk(r){
+    mount(`${head(tx("🗣️ Conversation","🗣️ बातचीत"), tx("Choose the best reply","सही जवाब चुनो"),"बातचीत — सही जवाब चुनो।")}
+      <div class="chat" id="chat"></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    const chat=$("#chat");
+    chat.appendChild(el(`<div class="bubble them">${r.who||"🙂"} ${r.line}<small>${state.hindi?r.lineHi:""}</small></div>`));
+    // first question speaks right away; later ones wait for the previous response to finish, then pause ~2s
+    if(idx===0) announce(() => speak(r.line));
+    else speak(r.line, "en", { queue:true, gap:2000 });
+    const opts=$("#opts");
+    let answered=false;
+    shuffle(r.replies).forEach(rep=>{
+      const gloss = (state.hindi && rep.textHi) ? `<small class="optHi">${rep.textHi}</small>` : "";
+      const b=el(`<button class="opt" style="font-size:17px">${rep.text}${gloss}</button>`);
+      b.onclick=()=>{
+        if(answered) return;
+        speak(rep.text);
+        const fb=$("#fb");
+        if(rep.ok){
+          answered=true;
+          document.querySelectorAll(".opt").forEach(o=>o.classList.add("disabled"));
+          b.classList.add("correct");
+          chat.appendChild(el(`<div class="bubble me">${rep.text}</div>`));
+          setMood("happy");
+          sfx.correct();
+          fb.textContent=tx("Nice reply! 🎉","बढ़िया जवाब! 🎉"); fb.className="feedback good";
+          // speaker replies, then let the player continue at their own pace
+          setTimeout(()=>{
+            chat.appendChild(el(`<div class="bubble them">${r.who||"🙂"} ${r.then}</div>`));
+            speak(r.then, "en", { queue:true, gap:500 });   // play after the reply finishes, don't cut it
+            setFooter(`<button class="btn primary" id="next">${tx("Continue →","आगे बढ़ो →")}</button>`);
+            $("#next").onclick = () => { sfx.next(); next(true); };
+          }, 1000);
+        } else {
+          // wrong: gentle nudge, let them try again — no rushing ahead
+          b.classList.add("wrong");
+          setMood("sad");
+          sfx.wrong();
+          fb.textContent=tx("Not quite — try again.","बिल्कुल नहीं — फिर कोशिश करो।"); fb.className="feedback bad";
+          setTimeout(()=>{ b.classList.remove("wrong"); fb.textContent=""; }, 1200);
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- CODE: fill the blank in a Python snippet (offline, no execution — token match)
+  function roundCode(r){
+    let filled = null;
+    const codeText = (r.lines ? r.lines.join("\n") : (r.code || ""));
+    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const teachMain = tx(r.teach, r.teachHi || r.teach);
+    const teachAlt = (state.hindi && state.lang !== "hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
+    mount(`${head(tx("💻 Complete the code","💻 कोड पूरा करो"), tx(r.prompt, r.promptHi || r.prompt), r.promptHi)}
+      ${r.teach ? `<div class="teachbox">💡 <span>${esc(teachMain)}${teachAlt}</span></div>` : ""}
+      <pre class="codeblock" id="code"></pre>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    announce(() => { speak(tx(r.prompt, r.promptHi || r.prompt), state.lang==="hi" ? "hi" : "en"); });
+    const codeEl=$("#code"), bank=$("#bank");
+    function renderCode(){
+      const i = codeText.indexOf("___");
+      const a = esc(codeText.slice(0, i)), b = esc(codeText.slice(i+3));
+      codeEl.innerHTML = a + `<span class="blank ${filled?"filled":""}">${filled?esc(filled):"______"}</span>` + b;
+      $("#check").disabled = !filled;
+    }
+    shuffle(r.choices).forEach(c=>{
+      const t=el(`<div class="tile">${esc(c)}</div>`);
+      t.onclick=()=>{ filled=c; sfx.tap(); renderCode(); };
+      bank.appendChild(t);
+    });
+    $("#clear").onclick=()=>{ filled=null; renderCode(); };
+    $("#check").onclick=()=>{
+      const ok = filled===r.answer;
+      setMood(ok?"happy":"sad");
+      (ok?sfx.correct:sfx.wrong)();
+      const fb=$("#fb");
+      if(ok){ fb.textContent=tx("Correct! 🎉","सही! 🎉"); fb.className="feedback good"; setTimeout(()=>next(true),1100); }
+      else { fb.textContent=tx('Answer: ','सही जवाब: ')+'"'+r.answer+'"'; fb.className="feedback bad"; setTimeout(()=>next(false),1900); }
+    };
+    renderCode();
+  }
+
+  // --- FIX: tap the one wrong word in the sentence (IT "debugging")
+  function roundFix(r){
+    let done=false;
+    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    mount(`${head(tx("🐞 Find the bug","🐞 गलती ढूँढो"), tx("Tap the wrong word","गलत शब्द पर टैप करो"), "")}
+      <div class="bugline" id="line"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    announce(() => speak(r.sentence));
+    const line=$("#line");
+    r.sentence.split(" ").forEach(tok=>{
+      const chip=el(`<span class="bugword">${esc(tok)}</span>`);
+      chip.onclick=()=>{
+        if(done) return;
+        if(tok===r.wrongWord){
+          done=true;
+          chip.textContent=r.fix; chip.classList.add("fixed");
+          setMood("happy"); sfx.correct();
+          const tb=$("#teach"); tb.style.display="flex";
+          const main=tx(r.teach, r.teachHi||r.teach);
+          const alt=(state.hindi && state.lang!=="hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
+          tb.innerHTML=`💡 <span>${esc(main)}${alt}</span>`;
+          const fb=$("#fb"); fb.textContent=tx("Bug fixed! 🎉","गलती ठीक हो गई! 🎉"); fb.className="feedback good";
+          speak(r.sentence.replace(r.wrongWord, r.fix));
+          setFooter(`<button class="btn primary" id="next">${tx("Continue →","आगे बढ़ो →")}</button>`);
+          $("#next").onclick=()=>{ sfx.next(); next(true); };
+        } else {
+          chip.classList.add("shake"); setMood("sad"); sfx.wrong();
+          const fb=$("#fb"); fb.textContent=tx("Not the bug — try again.","यह गलती नहीं — फिर कोशिश करो।"); fb.className="feedback bad";
+          setTimeout(()=>{ chip.classList.remove("shake"); fb.textContent=""; }, 800);
+        }
+      };
+      line.appendChild(chip);
+    });
+  }
+
+  // --- EMAIL: compose a real email by choosing the right line for each slot, then Send
+  function roundEmail(r){
+    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const chosen = {};   // slotIndex -> optionIndex
+    mount(`${head(tx("📧 Write the email","📧 ईमेल लिखो"), tx(r.scenario, r.scenarioHi || r.scenario), r.scenarioHi)}
+      <div class="email" id="email"></div>
+      <div class="eopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn primary" id="send" disabled>${tx("Send 📤","भेजो 📤")}</button>`);
+    announce(() => speak(tx(r.scenario, r.scenarioHi || r.scenario), state.lang==="hi"?"hi":"en"));
+    const emailEl=$("#email"), optsEl=$("#opts");
+    // shuffle each slot's options ONCE so the correct line isn't always first (stable across re-renders)
+    const slots = r.slots.map(s => ({ label:s.label, labelHi:s.labelHi, options:shuffle(s.options) }));
+    function lineFor(si){
+      const c=chosen[si];
+      return c==null ? `<i class="eplace">${tx("Tap a line below ↓","नीचे से चुनो ↓")}</i>` : esc(slots[si].options[c].t);
+    }
+    function render(){
+      emailEl.innerHTML =
+        `<div class="erow"><span class="elabel">${tx("To","प्रति")}:</span> ${esc(r.to)}</div>` +
+        slots.map((s,si)=>`<div class="erow"><span class="elabel">${tx(s.label, s.labelHi || s.label)}:</span> <span class="eslot ${chosen[si]!=null?"set":""}" data-si="${si}">${lineFor(si)}</span></div>`).join("") +
+        `<div class="erow esig">${esc(r.from)}</div>`;
+      optsEl.innerHTML = slots.map((s,si)=>
+        `<div class="optgroup"><div class="oglabel">${tx(s.label, s.labelHi || s.label)}</div>` +
+        s.options.map((o,oi)=>`<button class="echip ${chosen[si]===oi?"sel":""}" data-si="${si}" data-oi="${oi}">${esc(o.t)}${(state.hindi && o.hi)?`<small>${esc(o.hi)}</small>`:""}</button>`).join("") +
+        `</div>`).join("");
+      optsEl.querySelectorAll(".echip").forEach(b=> b.onclick=()=>{ chosen[+b.dataset.si]=+b.dataset.oi; sfx.tap(); render(); });
+      $("#send").disabled = Object.keys(chosen).length !== slots.length;
+    }
+    render();
+    $("#send").onclick=()=>{
+      const allOk = slots.every((s,si)=> s.options[chosen[si]] && s.options[chosen[si]].ok);
+      const fb=$("#fb");
+      if(allOk){
+        setMood("happy"); sfx.correct(); emailEl.classList.add("sent"); setFooter("");
+        fb.textContent=tx("Email sent! 🎉","ईमेल भेज दी! 🎉"); fb.className="feedback good";
+        setTimeout(()=>next(true),1400);
+      } else {
+        setMood("sad"); sfx.wrong();
+        slots.forEach((s,si)=>{ if(!(s.options[chosen[si]] && s.options[chosen[si]].ok)){ const e=emailEl.querySelector(`.eslot[data-si="${si}"]`); if(e) e.classList.add("bad"); } });
+        fb.textContent=tx("Some lines are wrong — fix the red ones.","कुछ पंक्तियाँ गलत हैं — लाल को ठीक करो।"); fb.className="feedback bad";
+        setTimeout(()=>{ emailEl.querySelectorAll(".eslot.bad").forEach(e=>e.classList.remove("bad")); fb.textContent=""; }, 1700);
+      }
+    };
+  }
+
+  // --- finish: award stars
+  function finish(){
+    clearAnnounce();
+    const pct = rounds.length ? score/rounds.length : 0;   // guard: admin lesson could yield 0 rounds
+    const stars = pct>=0.99?3 : pct>=0.6?2 : pct>=0.3?1 : 0;
+    setStars(course.key, lesson.key, lv.id, stars); state.coins += stars*10; save(); refreshTop();
+    recordAttempt({ track: course.key, lesson: lesson.key, activity: lv.id,
+                    stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5 });
+    if(stars>=1) sfx.complete(); else sfx.wrong();
+    root.innerHTML="";
+    root.appendChild(el(`<div class="screen result">
+      <div class="mascot big ${stars>=1?"m-happy":"m-sad"}">${mascotSVG()}</div>
+      <h2>${stars>=2?tx("Shabash!","शाबाश!"):tx("Good try!","अच्छी कोशिश!")} ${stars>=2?"🏆":""}</h2>
+      <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
+      <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
+      <div class="muted">+${score*5 + stars*10} ${tx("💎 gems","💎 रत्न")}</div>
+      <div class="actionrow">
+        <button class="btn ghost" id="again">${tx("Play again","फिर से खेलो")}</button>
+        <button class="btn primary" id="map">${tx("Back to map →","नक्शे पर वापस →")}</button>
+      </div>
+    </div>`));
+    speak(stars>=2?"Shabash! Well done":"Good try");
+    $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv); };
+    $("#map").onclick=()=>{ sfx.back(); backToLesson(); };
+  }
+}
+
+// ---------- Type-aware sentence frames for "Build a Sentence" ----------
+// Each word carries a `type` (thing/mass/person/verb/adj/time/phrase). Frames are
+// chosen to fit the type, so we never generate nonsense like "How much is the mother?"
+// or "I want one read". Words of type time/phrase have no good frame and are skipped.
+const PHRASE_FRAMES = {
+  thing: [
+    it => ({ words:["I","want","one",it.en],        hintHi:`"मुझे एक ${it.hi} चाहिए"`, hintHiSpoken:`मुझे एक ${it.hi} चाहिए` }),
+    it => ({ words:["This","is","a",it.en],          hintHi:`"यह एक ${it.hi} है"`,     hintHiSpoken:`यह एक ${it.hi} है` }),
+    it => ({ words:["Give","me","two",it.plural||it.en], hintHi:`"मुझे दो ${it.hi} दीजिए"`, hintHiSpoken:`मुझे दो ${it.hi} दीजिए` }),
+  ],
+  mass: [
+    it => ({ words:["I","want","some",it.en],        hintHi:`"मुझे कुछ ${it.hi} चाहिए"`, hintHiSpoken:`मुझे कुछ ${it.hi} चाहिए` }),
+    it => ({ words:["Give","me","some",it.en],        hintHi:`"मुझे थोड़ा ${it.hi} दीजिए"`, hintHiSpoken:`मुझे थोड़ा ${it.hi} दीजिए` }),
+    it => ({ words:["I","need","some",it.en],         hintHi:`"मुझे ${it.hi} चाहिए"`,     hintHiSpoken:`मुझे ${it.hi} चाहिए` }),
+  ],
+  person: [
+    it => ({ words:["This","is","my",it.en],          hintHi:`"यह मेरा ${it.hi} है"`,    hintHiSpoken:`यह मेरा ${it.hi} है` }),
+    it => ({ words:["She","is","my",it.en],           hintHi:`"वह मेरी ${it.hi} है"`,    hintHiSpoken:`वह मेरी ${it.hi} है` }),
+    it => ({ words:["I","have","a",it.en],            hintHi:`"मेरा एक ${it.hi} है"`,    hintHiSpoken:`मेरा एक ${it.hi} है` }),
+  ],
+  verb: [
+    it => ({ words:["I","can",it.en],                 hintHi:`"मैं ${it.hi} सकती हूँ"`,  hintHiSpoken:`मैं ${it.hi} सकती हूँ` }),
+    it => ({ words:["Please",it.en,"now"],            hintHi:`"कृपया अभी ${it.hi}"`,     hintHiSpoken:`कृपया अभी ${it.hi}` }),
+    it => ({ words:["I","will",it.en,"today"],        hintHi:`"मैं आज ${it.hi}"`,        hintHiSpoken:`मैं आज ${it.hi}` }),
+  ],
+  adj: [
+    it => ({ words:["It","is",it.en],                 hintHi:`"यह ${it.hi} है"`,        hintHiSpoken:`यह ${it.hi} है` }),
+    it => ({ words:["I","am",it.en],                  hintHi:`"मैं ${it.hi} हूँ"`,       hintHiSpoken:`मैं ${it.hi} हूँ` }),
+    it => ({ words:["This","is","very",it.en],        hintHi:`"यह बहुत ${it.hi} है"`,    hintHiSpoken:`यह बहुत ${it.hi} है` }),
+  ],
+};
+// resolve a usable frame-type for a word; null = skip in Build a Sentence
+function phraseType(it){
+  if(it.type && PHRASE_FRAMES[it.type]) return it.type;
+  if(it.type==="time" || it.type==="phrase") return null;   // no good sentence frame
+  if(it.uncount) return "mass";                              // fallback for untyped content
+  return "thing";
+}
+
+// ---------- Build rounds per activity type, from a lesson's content ----------
+function buildRounds(lv, lesson){
+  const ITEMS = lesson.words;
+  if(lv.type==="learn")  return pick(ITEMS, 6);
+  if(lv.type==="spell")  return pick(ITEMS.filter(i=>i.en.length<=6), 5);
+  if(lv.type==="listen"){
+    return pick(ITEMS,6).map(ans=>{
+      const distract = pick(ITEMS.filter(i=>i.en!==ans.en),3);
+      return { answer:ans, choices: shuffle([ans,...distract]) };
+    });
+  }
+  if(lv.type==="phrase"){
+    // usable = words with an authored example sentence, or a type that has a frame (skips time/phrase)
+    const usable = ITEMS.filter(it => it.use || phraseType(it));
+    const pool = usable.length ? usable : ITEMS;
+    return pick(pool,5).map((it,i)=>{
+      if(it.use){   // authored, context-real sentence (the IT/coding lessons use this)
+        return { emoji:it.emoji, words: it.use.split(" "),
+                 hintHi:`"${it.useHi||it.hi}"`, hintHiSpoken: it.useHi||it.hi };
+      }
+      const t = phraseType(it) || (it.uncount ? "mass" : "thing");
+      const frames = PHRASE_FRAMES[t];
+      const v = frames[i % frames.length](it);
+      return { emoji:it.emoji, ...v };
+    });
+  }
+  if(lv.type==="talk") return lesson.dialogues.slice();
+  if(lv.type==="code") return (lesson.code||[]).slice();
+  if(lv.type==="fix")  return (lesson.fix||[]).slice();
+  if(lv.type==="email") return (lesson.email||[]).slice();
+  return [];
+}
+
+// ---------- boot ----------
+// ---------- Backend sync (offline-first; bundled COURSES is the fallback) ----------
+// When served from the Frappe app, fetch live content + cache it. When opened as a
+// plain file (no server) or offline, the bundled/cached COURSES is used unchanged.
+const CACHE_KEY = "hikmat_courses_cache";
+const ATTEMPT_QUEUE = "hikmat_attempt_queue";
+let backendLive = false;   // true once we've reached the Frappe server
+
+function apiURL(m){ return "/api/method/hikmat.api." + m; }
+async function api(method, params, post){
+  try {
+    const opts = post ? { method:"POST", body:new URLSearchParams(params||{}) }
+                      : { headers:{ Accept:"application/json" } };
+    const url = apiURL(method) + (!post && params ? "?" + new URLSearchParams(params) : "");
+    const r = await fetch(url, opts);
+    if(!r.ok) return null;
+    return (await r.json()).message;
+  } catch(e){ return null; }
+}
+
+async function loadFromBackend(){
+  // 1) cached content + settings first → instant and works offline (logo, name, taglines persist)
+  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if(Array.isArray(c) && c.length) COURSES = c; } catch(e){}
+  try { const s = JSON.parse(localStorage.getItem("hikmat_settings_cache"));
+        if(s && s.appName){ SETTINGS.appName = s.appName; SETTINGS.logo = s.logo || ""; if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn; if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi; } } catch(e){}
+  // 2) then try live (only succeeds when served from Frappe and online)
+  try {
+    const [cr, sr] = await Promise.all([
+      fetch(apiURL("get_courses"),  {headers:{Accept:"application/json"}}),
+      fetch(apiURL("get_settings"), {headers:{Accept:"application/json"}}),
+    ]);
+    if(cr.ok){
+      const j = await cr.json();
+      if(j && Array.isArray(j.message) && j.message.length){
+        COURSES = j.message;
+        localStorage.setItem(CACHE_KEY, JSON.stringify(COURSES));
+      }
+    }
+    if(sr.ok){
+      const s = (await sr.json()).message;
+      if(s && s.appName){
+        SETTINGS.appName = s.appName;
+        SETTINGS.logo = s.logo || "";
+        if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn;
+        if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi;
+        try { localStorage.setItem("hikmat_settings_cache", JSON.stringify(s)); } catch(e){}
+      }
+    }
+    return true;
+  } catch(e){ return false; }   // offline / file:// — keep bundled or cached data
+}
+
+// queue a finished activity and push it to the server when possible
+function recordAttempt(a){
+  if(!currentStudent) return;            // guest / not signed in → local progress only
+  let q = []; try { q = JSON.parse(localStorage.getItem(ATTEMPT_QUEUE)) || []; } catch(e){}
+  q.push({ ...a, student: currentStudent.id });
+  localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify(q));
+  syncAttempts();
+}
+async function syncAttempts(){
+  let q = []; try { q = JSON.parse(localStorage.getItem(ATTEMPT_QUEUE)) || []; } catch(e){}
+  if(!q.length) return;
+  const remaining = [];
+  for(const a of q){
+    try { const r = await fetch(apiURL("submit_attempt"), {method:"POST", body:new URLSearchParams(a)}); if(!r.ok) remaining.push(a); }
+    catch(e){ remaining.push(a); }       // still offline → keep for next time
+  }
+  localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify(remaining));
+}
+window.addEventListener("online", syncAttempts);
+
+// ---------- identity & login (only when served from Frappe; offline = guest) ----------
+function setStudent(stu){
+  currentStudent = stu || null;
+  if(stu) localStorage.setItem("hikmat_current", JSON.stringify(stu));
+  else localStorage.removeItem("hikmat_current");
+  state = loadState();                  // swap to this identity's saved progress
+}
+async function mergeServerProgress(){
+  if(!currentStudent) return;
+  const res = await api("get_progress", { student: currentStudent.id });
+  const p = res && res.progress;
+  if(!p) return;
+  for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]) setStars(ck, lk, aid, p[ck][lk][aid]);
+  save();
+}
+
+function renderLogin(){
+  stopSpeech(); rerender = renderLogin; root.innerHTML = ""; setBack(null);
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Who is playing? 🙋‍♀️","कौन खेल रहा है? 🙋‍♀️")}</h1>
+      <p>${tx("Tap your name to start.","शुरू करने के लिए अपना नाम चुनो।")}</p></div>
+    <div class="center" id="cohortRow" style="margin-bottom:12px"></div>
+    <input id="studentSearch" class="searchbox" type="text" autocomplete="off"
+           placeholder="${tx('🔎 Type your name…','🔎 अपना नाम लिखो…')}">
+    <div class="themes" id="studentGrid"></div>
+    <div class="center" style="margin-top:18px">
+      <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button></div>
+  </div>`));
+  $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+  loadLogin();
+  refreshTop();
+}
+async function loadLogin(){
+  const cohorts = (await api("get_cohorts")) || [];
+  let selected = cohorts.length ? cohorts[0].name : null;
+  let allStudents = [];
+  const cohortRow = $("#cohortRow");
+  const grid = $("#studentGrid");
+  const search = $("#studentSearch");
+
+  function drawCohorts(){
+    cohortRow.innerHTML = "";
+    if(cohorts.length <= 1) return;          // one centre → no chips, just search + names
+    cohorts.forEach(c => {
+      const b = el(`<button class="chiptab ${c.name===selected?'on':''}">${c.cohort_name}</button>`);
+      b.onclick = () => { selected = c.name; sfx.tap(); drawCohorts(); loadStudents(); };
+      cohortRow.appendChild(b);
+    });
+  }
+  function renderGrid(){
+    const q = (search.value || "").trim().toLowerCase();
+    grid.innerHTML = "";
+    if(!allStudents.length){ grid.innerHTML = `<div class="muted center">${tx("No students yet — ask your teacher.","अभी कोई छात्र नहीं — शिक्षक से पूछें।")}</div>`; return; }
+    const list = q ? allStudents.filter(s => s.name.toLowerCase().includes(q)) : allStudents;
+    if(!list.length){ grid.innerHTML = `<div class="muted center">${tx("No name found — keep typing or ask your teacher.","कोई नाम नहीं मिला — और लिखो या शिक्षक से पूछो।")}</div>`; return; }
+    list.forEach(stu => {
+      const card = el(`<button class="theme" style="background:linear-gradient(160deg,#8a7bf0,#6c5ce7)">
+        <div class="big">${stu.avatar||"🙂"}</div><h3>${stu.name}</h3>${stu.hasPin?`<small>🔒 ${tx("PIN","पिन")}</small>`:""}</button>`);
+      card.onclick = () => pickStudent(stu);
+      grid.appendChild(card);
+    });
+  }
+  async function loadStudents(){
+    grid.innerHTML = `<div class="muted center">${tx("Loading…","लोड हो रहा है…")}</div>`;
+    allStudents = (await api("get_students", selected ? { cohort: selected } : null)) || [];
+    renderGrid();
+  }
+  search.oninput = renderGrid;
+  drawCohorts(); loadStudents();
+}
+function pickStudent(stu){ sfx.tap(); if(stu.hasPin) askPin(stu); else finishLogin(stu); }
+function askPin(stu){
+  const ov = el(`<div class="pinov"><div class="pincard">
+    <div class="big">${stu.avatar||"🙂"}</div><div class="pinname">${stu.name}</div>
+    <div class="pinlabel">${tx("Enter your PIN","अपना पिन डालो")}</div>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="8" class="pininput">
+    <div class="feedback bad" id="pinErr" style="min-height:18px"></div>
+    <div class="actionrow"><button class="btn ghost" id="pinCancel">${tx("Cancel","रद्द")}</button>
+      <button class="btn primary" id="pinOk">${tx("OK","ठीक")}</button></div>
+  </div></div>`);
+  document.body.appendChild(ov);
+  const inp = ov.querySelector("#pinInput"); setTimeout(() => inp.focus(), 50);
+  const submit = async () => {
+    const r = await api("login_student", { student: stu.id, pin: inp.value }, true);
+    if(r && r.ok){ ov.remove(); finishLogin(r); }
+    else { ov.querySelector("#pinErr").textContent = tx("Wrong PIN — try again","ग़लत पिन — फिर कोशिश करो"); inp.value=""; inp.focus(); }
+  };
+  ov.querySelector("#pinCancel").onclick = () => { sfx.back(); ov.remove(); };
+  ov.querySelector("#pinOk").onclick = submit;
+  inp.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+}
+async function finishLogin(stu){
+  sfx.enter();
+  setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂" });
+  await mergeServerProgress();
+  renderHome();
+}
+
+// ---------- boot ----------
+state.progress = state.progress || {};
+state.hindi = state.hindi===true;
+state.lang = state.lang || "en";
+state.sound = state.sound!==false;
+renderHome();          // instant: bundled or cached content, fully offline
+syncAttempts();        // flush any progress queued while offline
+loadFromBackend().then(async ok => {
+  backendLive = ok;
+  if(ok && !currentStudent){
+    const studs = await api("get_students");
+    if(studs && studs.length){ renderLogin(); refreshTop(); return; }   // served + roster exists → pick your name
+  }
+  if(ok && currentStudent) await mergeServerProgress();
+  if(document.getElementById("tracks")) renderHome();
+  refreshTop();
+});
+</script>
+</body>
+</html>

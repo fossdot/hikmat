@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-06-17 00:06:13.382141",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "track",
+  "lesson",
+  "activity",
+  "stars",
+  "score",
+  "total",
+  "coins",
+  "attempted_on",
+  "student_name",
+  "cohort"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Track key"
+  },
+  {
+   "fieldname": "lesson",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Lesson key"
+  },
+  {
+   "fieldname": "activity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Activity"
+  },
+  {
+   "fieldname": "stars",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Stars"
+  },
+  {
+   "fieldname": "score",
+   "fieldtype": "Int",
+   "label": "Score"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Int",
+   "label": "Total"
+  },
+  {
+   "fieldname": "coins",
+   "fieldtype": "Int",
+   "label": "Coins"
+  },
+  {
+   "fieldname": "attempted_on",
+   "fieldtype": "Datetime",
+   "label": "Attempted on"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Cohort"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-17 00:59:23.621045",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson Attempt",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student"
+}
