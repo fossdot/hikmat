@@ -17,7 +17,7 @@ def get_courses():
 
     published = frappe.get_all(
         "Track", filters={"published": 1},
-        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi"],
+        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi", "band", "subject"],
         order_by="sort_order asc, creation asc",
     )
     for t in published:
@@ -26,7 +26,7 @@ def get_courses():
     # locked / coming-soon tracks (shown greyed in the game, no lessons)
     locked = frappe.get_all(
         "Track", filters={"published": 0},
-        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi"],
+        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi", "band", "subject"],
         order_by="sort_order asc, creation asc",
     )
     for t in locked:
@@ -35,10 +35,33 @@ def get_courses():
     return out
 
 
+@frappe.whitelist(allow_guest=True)
+def get_structure():
+    """Grade bands + subjects metadata for the Class 1–10 navigation."""
+    bands = frappe.get_all(
+        "Grade Band", filters={"published": 1},
+        fields=["band_key", "title", "title_hi", "subtitle", "subtitle_hi", "icon", "color"],
+        order_by="sort_order asc, creation asc",
+    )
+    subjects = frappe.get_all(
+        "Subject",
+        fields=["subject_key", "title", "title_hi", "icon", "color"],
+        order_by="sort_order asc, creation asc",
+    )
+    return {
+        "bands": [{"key": b.band_key, "title": b.title, "titleHi": b.title_hi,
+                   "subtitle": b.subtitle or "", "subtitleHi": b.subtitle_hi or "",
+                   "icon": b.icon or "📚", "color": b.color or "#6c5ce7"} for b in bands],
+        "subjects": [{"key": s.subject_key, "title": s.title, "titleHi": s.title_hi,
+                      "icon": s.icon or "📘", "color": s.color or "#6c5ce7"} for s in subjects],
+    }
+
+
 def _track_json(t, with_content):
     track = {
         "key": t.track_key, "title": t.title, "titleHi": t.title_hi,
         "icon": t.icon, "color": t.color, "blurb": t.blurb, "blurbHi": t.blurb_hi,
+        "band": t.get("band") or "", "subject": t.get("subject") or "",
         "published": bool(with_content), "lessons": [],
     }
     if not with_content:
@@ -111,9 +134,20 @@ def _track_json(t, with_content):
                 "slots": spec.get("slots", []),
             })
 
+        quiz = []
+        for q in frappe.get_all("Lesson Quiz", filters={"parent": l.name},
+                                fields=["question", "question_hi", "emoji", "choices", "answer", "teach", "teach_hi"],
+                                order_by="idx asc"):
+            quiz.append({
+                "q": q.question, "qHi": q.question_hi or "", "emoji": q.emoji or "",
+                "choices": [x for x in (q.choices or "").split("\n") if x != ""],
+                "answer": q.answer, "teach": q.teach or "", "teachHi": q.teach_hi or "",
+            })
+
         track["lessons"].append({
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
-            "words": words, "dialogues": dialogues, "code": code, "fix": fix, "email": email,
+            "words": words, "dialogues": dialogues, "code": code, "fix": fix,
+            "email": email, "quiz": quiz,
         })
     return track
 
@@ -179,6 +213,33 @@ def login_student(student, pin=None):
     if s.login_pin and str(s.login_pin) != str(pin or ""):
         return {"ok": False, "error": "wrong_pin"}
     return {"ok": True, "id": student, "name": s.student_name, "avatar": s.avatar or "🙂"}
+
+
+@frappe.whitelist(allow_guest=True)
+def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None):
+    """Self-service signup: a learner creates their own profile and is logged straight in.
+    No email/password — just a name (+ optional avatar & PIN). Returns the login_student shape."""
+    name = (name or "").strip()
+    if not name:
+        return {"ok": False, "error": "no_name"}
+    pin = (pin or "").strip()
+    if pin and not (pin.isdigit() and 3 <= len(pin) <= 8):
+        return {"ok": False, "error": "bad_pin"}
+    # self-signups land in their own cohort (keeps facilitator-managed centres clean),
+    # unless an explicit cohort is passed.
+    if not cohort:
+        if not frappe.db.exists("Cohort", "New Learners"):
+            frappe.get_doc({"doctype": "Cohort", "cohort_name": "New Learners",
+                            "center": "Self sign-up"}).insert(ignore_permissions=True)
+        cohort = "New Learners"
+    doc = frappe.get_doc({
+        "doctype": "Student", "student_name": name, "avatar": avatar or "🙂",
+        "cohort": cohort, "login_pin": pin, "active": 1, "gender": "Other",
+        "age": int(age) if (age and str(age).isdigit()) else None,
+    }).insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"ok": True, "id": doc.name, "name": doc.student_name,
+            "avatar": doc.avatar or "🙂", "hasPin": bool(doc.login_pin)}
 
 
 @frappe.whitelist()

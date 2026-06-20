@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-20 23:35:33.345258",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "question",
+  "question_hi",
+  "emoji",
+  "choices",
+  "answer",
+  "teach",
+  "teach_hi"
+ ],
+ "fields": [
+  {
+   "fieldname": "question",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Question (English)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "question_hi",
+   "fieldtype": "Data",
+   "label": "Question (Hindi)"
+  },
+  {
+   "fieldname": "emoji",
+   "fieldtype": "Data",
+   "label": "Picture / emoji (optional, shown above the question)"
+  },
+  {
+   "fieldname": "choices",
+   "fieldtype": "Small Text",
+   "label": "Choices (one per line)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "answer",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Answer (correct choice)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "teach",
+   "fieldtype": "Small Text",
+   "label": "Why (explains the answer)"
+  },
+  {
+   "fieldname": "teach_hi",
+   "fieldtype": "Small Text",
+   "label": "Why (Hindi)"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-20 23:35:33.345258",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson Quiz",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

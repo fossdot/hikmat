@@ -97,6 +97,39 @@ def create_doctypes():
         f("spec_json", "Long Text", "Email spec (JSON: to, from, slots[])", reqd=1),
     ], istable=1)
 
+    # generic multiple-choice question — works for any subject (Math, Science, GK…)
+    _mk("Lesson Quiz", [
+        f("question", "Data", "Question (English)", reqd=1, in_list_view=1),
+        f("question_hi", "Data", "Question (Hindi)"),
+        f("emoji", "Data", "Picture / emoji (optional, shown above the question)"),
+        f("choices", "Small Text", "Choices (one per line)", reqd=1),
+        f("answer", "Data", "Answer (correct choice)", reqd=1, in_list_view=1),
+        f("teach", "Small Text", "Why (explains the answer)"),
+        f("teach_hi", "Small Text", "Why (Hindi)"),
+    ], istable=1)
+
+    # --- structure: grade bands + subjects (Class 1–10 grouping) ---
+    _mk("Grade Band", [
+        f("band_key", "Data", "Key (slug, e.g. 1-4)", reqd=1, unique=1, in_list_view=1),
+        f("title", "Data", "Title (e.g. Class 1–4)", reqd=1, in_list_view=1),
+        f("title_hi", "Data", "Title (Hindi)"),
+        f("subtitle", "Data", "Subtitle / blurb"),
+        f("subtitle_hi", "Data", "Subtitle (Hindi)"),
+        f("icon", "Data", "Icon (emoji)"),
+        f("color", "Data", "Color (hex)"),
+        f("sort_order", "Int", "Sort order"),
+        f("published", "Check", "Published", default="1"),
+    ], autoname="field:band_key", title_field="title")
+
+    _mk("Subject", [
+        f("subject_key", "Data", "Key (slug, e.g. english)", reqd=1, unique=1, in_list_view=1),
+        f("title", "Data", "Title (e.g. English)", reqd=1, in_list_view=1),
+        f("title_hi", "Data", "Title (Hindi)"),
+        f("icon", "Data", "Icon (emoji)"),
+        f("color", "Data", "Color (hex)"),
+        f("sort_order", "Int", "Sort order"),
+    ], autoname="field:subject_key", title_field="title")
+
     # --- main doctypes ---
     _mk("Track", [
         f("track_key", "Data", "Key (slug)", reqd=1, unique=1, in_list_view=1),
@@ -177,6 +210,77 @@ def create_doctypes():
 
     frappe.db.commit()
     print("=== create_doctypes done ===")
+
+
+def add_structure_fields():
+    """Add band+subject Link fields to Track and a quiz Table to Lesson.
+    Mirrors add_attempt_fields() — safe to re-run (skips fields that exist)."""
+    tr = frappe.get_doc("DocType", "Track")
+    have = [x.fieldname for x in tr.fields]
+    if "band" not in have:
+        tr.append("fields", {"fieldname": "band", "fieldtype": "Link", "label": "Grade band",
+                             "options": "Grade Band", "in_list_view": 1,
+                             "insert_after": "blurb_hi"})
+    if "subject" not in have:
+        tr.append("fields", {"fieldname": "subject", "fieldtype": "Link", "label": "Subject",
+                             "options": "Subject", "in_list_view": 1,
+                             "insert_after": "band"})
+    tr.save()
+
+    ls = frappe.get_doc("DocType", "Lesson")
+    have = [x.fieldname for x in ls.fields]
+    if "quiz" not in have:
+        ls.append("fields", {"fieldname": "sec_quiz", "fieldtype": "Section Break", "label": "Quiz questions"})
+        ls.append("fields", {"fieldname": "quiz", "fieldtype": "Table", "label": "Quiz questions",
+                             "options": "Lesson Quiz"})
+    ls.save()
+    frappe.db.commit()
+    print("=== Track: band+subject added; Lesson: quiz table added ===")
+
+
+# the three grade bands and the subject palette (icons/colours used by the game)
+GRADE_BANDS = [
+    {"key": "1-4",  "title": "Class 1–4",  "titleHi": "कक्षा 1–4",
+     "subtitle": "Foundation — letters, numbers, the world around me",
+     "subtitleHi": "नींव — अक्षर, अंक और मेरे आस-पास की दुनिया",
+     "icon": "🌱", "color": "#22b8a6"},
+    {"key": "5-8",  "title": "Class 5–8",  "titleHi": "कक्षा 5–8",
+     "subtitle": "Middle — grammar, operations, science",
+     "subtitleHi": "मध्य — व्याकरण, गणित और विज्ञान",
+     "icon": "🌟", "color": "#f59e0b"},
+    {"key": "9-10", "title": "Class 9–10", "titleHi": "कक्षा 9–10",
+     "subtitle": "Secondary — board-level skills & computers",
+     "subtitleHi": "माध्यमिक — बोर्ड स्तर के कौशल और कंप्यूटर",
+     "icon": "🎓", "color": "#6c5ce7"},
+]
+SUBJECTS = [
+    {"key": "english",  "title": "English",        "titleHi": "अंग्रेज़ी",   "icon": "🔤", "color": "#2ec27e"},
+    {"key": "math",     "title": "Mathematics",    "titleHi": "गणित",        "icon": "➗", "color": "#3b82f6"},
+    {"key": "science",  "title": "Science",        "titleHi": "विज्ञान",     "icon": "🔬", "color": "#06b6d4"},
+    {"key": "evs",      "title": "EVS",            "titleHi": "पर्यावरण",    "icon": "🌍", "color": "#16a34a"},
+    {"key": "hindi",    "title": "Hindi",          "titleHi": "हिंदी",       "icon": "📖", "color": "#e11d48"},
+    {"key": "sst",      "title": "Social Studies", "titleHi": "सामाजिक अध्ययन", "icon": "🗺️", "color": "#d97706"},
+    {"key": "computer", "title": "Computer",       "titleHi": "कंप्यूटर",    "icon": "💻", "color": "#8b5cf6"},
+]
+
+
+def seed_structure():
+    """Create the grade bands + subjects (idempotent — updates if they exist)."""
+    for i, b in enumerate(GRADE_BANDS):
+        doc = frappe.get_doc("Grade Band", b["key"]) if frappe.db.exists("Grade Band", b["key"]) \
+            else frappe.new_doc("Grade Band")
+        doc.update({"band_key": b["key"], "title": b["title"], "title_hi": b["titleHi"],
+                    "subtitle": b["subtitle"], "subtitle_hi": b["subtitleHi"],
+                    "icon": b["icon"], "color": b["color"], "sort_order": i, "published": 1})
+        doc.save(ignore_permissions=1)
+    for i, s in enumerate(SUBJECTS):
+        doc = frappe.get_doc("Subject", s["key"]) if frappe.db.exists("Subject", s["key"]) \
+            else frappe.new_doc("Subject")
+        doc.update({"subject_key": s["key"], "title": s["title"], "title_hi": s["titleHi"],
+                    "icon": s["icon"], "color": s["color"], "sort_order": i})
+        doc.save(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== seeded", len(GRADE_BANDS), "bands +", len(SUBJECTS), "subjects ===")
 
 
 # ---------------------------------------------------------------------------
@@ -284,6 +388,7 @@ def _load_curriculum():
 
 def seed_content():
     courses = _load_curriculum()
+    seed_structure()   # bands + subjects must exist before tracks Link to them
     # clean slate (dev): remove existing curriculum docs, then recreate
     for dt in ["Dialogue", "Lesson", "Track"]:
         for n in frappe.get_all(dt, pluck="name"):
@@ -293,6 +398,7 @@ def seed_content():
         track = frappe.get_doc({
             "doctype": "Track", "track_key": c["key"], "title": c["title"], "title_hi": c["titleHi"],
             "icon": c["icon"], "color": c["color"], "blurb": c["blurb"], "blurb_hi": c["blurbHi"],
+            "band": c.get("band") or None, "subject": c.get("subject") or None,
             "published": 1 if c["published"] else 0, "sort_order": ti,
         }).insert(ignore_permissions=1)
 
@@ -305,7 +411,7 @@ def seed_content():
                     "word_type": w.get("type", ""),
                     "uncountable": 1 if w.get("uncount") else 0, "plural": w.get("plural", ""),
                     "use_en": w.get("use", ""), "use_hi": w.get("useHi", ""),
-                } for w in les["words"]],
+                } for w in les.get("words", [])],
                 "code": [{
                     "prompt": c["prompt"], "prompt_hi": c.get("promptHi", ""),
                     "teach": c.get("teach", ""), "teach_hi": c.get("teachHi", ""),
@@ -320,6 +426,11 @@ def seed_content():
                     "scenario": e["scenario"], "scenario_hi": e.get("scenarioHi", ""),
                     "spec_json": json.dumps({"to": e["to"], "from": e["from"], "slots": e["slots"]}, ensure_ascii=False),
                 } for e in les.get("email", [])],
+                "quiz": [{
+                    "question": q["q"], "question_hi": q.get("qHi", ""), "emoji": q.get("emoji", ""),
+                    "choices": "\n".join(q["choices"]), "answer": q["answer"],
+                    "teach": q.get("teach", ""), "teach_hi": q.get("teachHi", ""),
+                } for q in les.get("quiz", [])],
             }).insert(ignore_permissions=1)
 
             for di, dl in enumerate(les.get("dialogues", [])):

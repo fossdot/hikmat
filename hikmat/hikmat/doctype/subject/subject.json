@@ -1,30 +1,25 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:track_key",
- "creation": "2026-06-17 00:06:12.828441",
+ "autoname": "field:subject_key",
+ "creation": "2026-06-20 23:35:33.818657",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "track_key",
+  "subject_key",
   "title",
   "title_hi",
   "icon",
   "color",
-  "blurb",
-  "blurb_hi",
-  "sort_order",
-  "published",
-  "band",
-  "subject"
+  "sort_order"
  ],
  "fields": [
   {
-   "fieldname": "track_key",
+   "fieldname": "subject_key",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Key (slug)",
+   "label": "Key (slug, e.g. english)",
    "reqd": 1,
    "unique": 1
   },
@@ -32,7 +27,7 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Title",
+   "label": "Title (e.g. English)",
    "reqd": 1
   },
   {
@@ -51,48 +46,18 @@
    "label": "Color (hex)"
   },
   {
-   "fieldname": "blurb",
-   "fieldtype": "Data",
-   "label": "Blurb"
-  },
-  {
-   "fieldname": "blurb_hi",
-   "fieldtype": "Data",
-   "label": "Blurb (Hindi)"
-  },
-  {
    "fieldname": "sort_order",
    "fieldtype": "Int",
    "label": "Sort order"
-  },
-  {
-   "default": "1",
-   "fieldname": "published",
-   "fieldtype": "Check",
-   "label": "Published"
-  },
-  {
-   "fieldname": "band",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Grade band",
-   "options": "Grade Band"
-  },
-  {
-   "fieldname": "subject",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Subject",
-   "options": "Subject"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-20 23:35:59.129921",
+ "modified": "2026-06-20 23:35:33.818657",
  "modified_by": "Administrator",
  "module": "Hikmat",
- "name": "Track",
+ "name": "Subject",
  "owner": "Administrator",
  "permissions": [
   {

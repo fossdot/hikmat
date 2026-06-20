@@ -6827,5 +6827,1445 @@
     ]
    }
   ]
+ },
+ {
+  "key": "eng-foundation",
+  "title": "First English",
+  "titleHi": "पहली अंग्रेज़ी",
+  "icon": "🔤",
+  "color": "#2ec27e",
+  "blurb": "Letters, sounds & first words",
+  "blurbHi": "अक्षर, ध्वनि और पहले शब्द",
+  "published": true,
+  "band": "1-4",
+  "subject": "english",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "ABC Sounds",
+    "titleHi": "ए बी सी ध्वनि",
+    "words": [
+     {
+      "en": "apple",
+      "hi": "सेब",
+      "pron": "ऐप्पल",
+      "emoji": "🍎",
+      "type": "thing",
+      "plural": "apples"
+     },
+     {
+      "en": "ball",
+      "hi": "गेंद",
+      "pron": "बॉल",
+      "emoji": "⚽",
+      "type": "thing",
+      "plural": "balls"
+     },
+     {
+      "en": "cat",
+      "hi": "बिल्ली",
+      "pron": "कैट",
+      "emoji": "🐱",
+      "type": "thing",
+      "plural": "cats"
+     },
+     {
+      "en": "dog",
+      "hi": "कुत्ता",
+      "pron": "डॉग",
+      "emoji": "🐶",
+      "type": "thing",
+      "plural": "dogs"
+     },
+     {
+      "en": "egg",
+      "hi": "अंडा",
+      "pron": "एग",
+      "emoji": "🥚",
+      "type": "thing",
+      "plural": "eggs"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which animal says 'meow'?",
+      "qHi": "कौन 'म्याऊँ' बोलता है?",
+      "choices": [
+       "cat",
+       "dog",
+       "egg"
+      ],
+      "answer": "cat",
+      "emoji": "🐱",
+      "teach": "A cat says meow.",
+      "teachHi": "बिल्ली म्याऊँ बोलती है।"
+     },
+     {
+      "q": "Which one is a fruit?",
+      "qHi": "कौन-सा फल है?",
+      "choices": [
+       "apple",
+       "ball",
+       "dog"
+      ],
+      "answer": "apple"
+     },
+     {
+      "q": "Which word starts with 'b'?",
+      "qHi": "कौन-सा शब्द 'b' से शुरू होता है?",
+      "choices": [
+       "ball",
+       "cat",
+       "egg"
+      ],
+      "answer": "ball"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Colours",
+    "titleHi": "रंग",
+    "words": [
+     {
+      "en": "red",
+      "hi": "लाल",
+      "pron": "रेड",
+      "emoji": "🔴",
+      "type": "adj",
+      "plural": "reds"
+     },
+     {
+      "en": "blue",
+      "hi": "नीला",
+      "pron": "ब्लू",
+      "emoji": "🔵",
+      "type": "adj",
+      "plural": "blues"
+     },
+     {
+      "en": "green",
+      "hi": "हरा",
+      "pron": "ग्रीन",
+      "emoji": "🟢",
+      "type": "adj",
+      "plural": "greens"
+     },
+     {
+      "en": "yellow",
+      "hi": "पीला",
+      "pron": "यलो",
+      "emoji": "🟡",
+      "type": "adj",
+      "plural": "yellows"
+     },
+     {
+      "en": "black",
+      "hi": "काला",
+      "pron": "ब्लैक",
+      "emoji": "⚫",
+      "type": "adj",
+      "plural": "blacks"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What colour is the sky on a clear day?",
+      "qHi": "साफ़ दिन में आसमान का रंग?",
+      "choices": [
+       "blue",
+       "red",
+       "black"
+      ],
+      "answer": "blue",
+      "emoji": "🌤️"
+     },
+     {
+      "q": "What colour is grass?",
+      "qHi": "घास का रंग?",
+      "choices": [
+       "green",
+       "yellow",
+       "red"
+      ],
+      "answer": "green",
+      "emoji": "🌿"
+     },
+     {
+      "q": "What colour is a banana?",
+      "qHi": "केले का रंग?",
+      "choices": [
+       "yellow",
+       "blue",
+       "black"
+      ],
+      "answer": "yellow",
+      "emoji": "🍌"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "math-early",
+  "title": "Early Math",
+  "titleHi": "शुरुआती गणित",
+  "icon": "➗",
+  "color": "#3b82f6",
+  "blurb": "Counting, shapes & adding",
+  "blurbHi": "गिनती, आकार और जोड़",
+  "published": true,
+  "band": "1-4",
+  "subject": "math",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Count 1 to 10",
+    "titleHi": "1 से 10 गिनती",
+    "quiz": [
+     {
+      "q": "How many apples?",
+      "qHi": "कितने सेब?",
+      "choices": [
+       "2",
+       "3",
+       "4"
+      ],
+      "answer": "3",
+      "emoji": "🍎🍎🍎",
+      "teach": "Count them: 1, 2, 3.",
+      "teachHi": "गिनो: 1, 2, 3।"
+     },
+     {
+      "q": "How many stars?",
+      "qHi": "कितने तारे?",
+      "choices": [
+       "4",
+       "5",
+       "6"
+      ],
+      "answer": "5",
+      "emoji": "⭐⭐⭐⭐⭐"
+     },
+     {
+      "q": "What number comes after 6?",
+      "qHi": "6 के बाद कौन-सी संख्या?",
+      "choices": [
+       "5",
+       "7",
+       "8"
+      ],
+      "answer": "7",
+      "teach": "6 then 7.",
+      "teachHi": "6 के बाद 7।"
+     },
+     {
+      "q": "How many fingers on one hand?",
+      "qHi": "एक हाथ में कितनी उँगलियाँ?",
+      "choices": [
+       "5",
+       "4",
+       "10"
+      ],
+      "answer": "5",
+      "emoji": "✋"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Adding Small Numbers",
+    "titleHi": "छोटे जोड़",
+    "quiz": [
+     {
+      "q": "2 + 1 = ?",
+      "qHi": "",
+      "choices": [
+       "2",
+       "3",
+       "4"
+      ],
+      "answer": "3"
+     },
+     {
+      "q": "3 + 2 = ?",
+      "qHi": "",
+      "choices": [
+       "4",
+       "5",
+       "6"
+      ],
+      "answer": "5"
+     },
+     {
+      "q": "🍎🍎 + 🍎🍎 = ?",
+      "qHi": "",
+      "choices": [
+       "3",
+       "4",
+       "5"
+      ],
+      "answer": "4",
+      "emoji": "🍎🍎 + 🍎🍎"
+     },
+     {
+      "q": "5 + 0 = ?",
+      "qHi": "",
+      "choices": [
+       "0",
+       "5",
+       "10"
+      ],
+      "answer": "5",
+      "teach": "Adding zero keeps the number the same.",
+      "teachHi": "शून्य जोड़ने से संख्या वही रहती है।"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Shapes",
+    "titleHi": "आकार",
+    "words": [
+     {
+      "en": "circle",
+      "hi": "वृत्त",
+      "pron": "सर्कल",
+      "emoji": "⭕",
+      "type": "thing",
+      "plural": "circles"
+     },
+     {
+      "en": "square",
+      "hi": "वर्ग",
+      "pron": "स्क्वेयर",
+      "emoji": "🟦",
+      "type": "thing",
+      "plural": "squares"
+     },
+     {
+      "en": "triangle",
+      "hi": "त्रिभुज",
+      "pron": "ट्रायंगल",
+      "emoji": "🔺",
+      "type": "thing",
+      "plural": "triangles"
+     },
+     {
+      "en": "star",
+      "hi": "तारा",
+      "pron": "स्टार",
+      "emoji": "⭐",
+      "type": "thing",
+      "plural": "stars"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which shape is round?",
+      "qHi": "कौन-सा आकार गोल है?",
+      "choices": [
+       "circle",
+       "square",
+       "triangle"
+      ],
+      "answer": "circle"
+     },
+     {
+      "q": "How many sides does a triangle have?",
+      "qHi": "त्रिभुज की कितनी भुजाएँ?",
+      "choices": [
+       "2",
+       "3",
+       "4"
+      ],
+      "answer": "3",
+      "emoji": "🔺"
+     },
+     {
+      "q": "Which shape is this?",
+      "qHi": "यह कौन-सा आकार है?",
+      "choices": [
+       "square",
+       "circle",
+       "star"
+      ],
+      "answer": "square",
+      "emoji": "🟦"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "evs-myworld",
+  "title": "My World",
+  "titleHi": "मेरी दुनिया",
+  "icon": "🌍",
+  "color": "#16a34a",
+  "blurb": "My body, animals & nature",
+  "blurbHi": "शरीर, जानवर और प्रकृति",
+  "published": true,
+  "band": "1-4",
+  "subject": "evs",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "My Body",
+    "titleHi": "मेरा शरीर",
+    "words": [
+     {
+      "en": "hand",
+      "hi": "हाथ",
+      "pron": "हैंड",
+      "emoji": "✋",
+      "type": "thing",
+      "plural": "hands"
+     },
+     {
+      "en": "eye",
+      "hi": "आँख",
+      "pron": "आई",
+      "emoji": "👁️",
+      "type": "thing",
+      "plural": "eyes"
+     },
+     {
+      "en": "ear",
+      "hi": "कान",
+      "pron": "इयर",
+      "emoji": "👂",
+      "type": "thing",
+      "plural": "ears"
+     },
+     {
+      "en": "nose",
+      "hi": "नाक",
+      "pron": "नोज़",
+      "emoji": "👃",
+      "type": "thing",
+      "plural": "noses"
+     },
+     {
+      "en": "leg",
+      "hi": "टाँग",
+      "pron": "लेग",
+      "emoji": "🦵",
+      "type": "thing",
+      "plural": "legs"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What do we see with?",
+      "qHi": "हम किससे देखते हैं?",
+      "choices": [
+       "eyes",
+       "ears",
+       "nose"
+      ],
+      "answer": "eyes",
+      "emoji": "👁️",
+      "teach": "We see with our eyes.",
+      "teachHi": "हम आँखों से देखते हैं।"
+     },
+     {
+      "q": "What do we hear with?",
+      "qHi": "हम किससे सुनते हैं?",
+      "choices": [
+       "ears",
+       "hands",
+       "legs"
+      ],
+      "answer": "ears",
+      "emoji": "👂"
+     },
+     {
+      "q": "How many hands do you have?",
+      "qHi": "तुम्हारे कितने हाथ हैं?",
+      "choices": [
+       "1",
+       "2",
+       "3"
+      ],
+      "answer": "2"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Animals",
+    "titleHi": "जानवर",
+    "words": [
+     {
+      "en": "cow",
+      "hi": "गाय",
+      "pron": "काउ",
+      "emoji": "🐄",
+      "type": "thing",
+      "plural": "cows"
+     },
+     {
+      "en": "goat",
+      "hi": "बकरी",
+      "pron": "गोट",
+      "emoji": "🐐",
+      "type": "thing",
+      "plural": "goats"
+     },
+     {
+      "en": "hen",
+      "hi": "मुर्गी",
+      "pron": "हेन",
+      "emoji": "🐔",
+      "type": "thing",
+      "plural": "hens"
+     },
+     {
+      "en": "fish",
+      "hi": "मछली",
+      "pron": "फ़िश",
+      "emoji": "🐟",
+      "type": "thing",
+      "plural": "fish"
+     },
+     {
+      "en": "bird",
+      "hi": "चिड़िया",
+      "pron": "बर्ड",
+      "emoji": "🐦",
+      "type": "thing",
+      "plural": "birds"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which animal gives us milk?",
+      "qHi": "कौन-सा जानवर दूध देता है?",
+      "choices": [
+       "cow",
+       "hen",
+       "fish"
+      ],
+      "answer": "cow",
+      "emoji": "🥛",
+      "teach": "A cow gives us milk.",
+      "teachHi": "गाय हमें दूध देती है।"
+     },
+     {
+      "q": "Which animal can fly?",
+      "qHi": "कौन-सा जानवर उड़ सकता है?",
+      "choices": [
+       "bird",
+       "goat",
+       "cow"
+      ],
+      "answer": "bird"
+     },
+     {
+      "q": "Which animal lives in water?",
+      "qHi": "कौन-सा जानवर पानी में रहता है?",
+      "choices": [
+       "fish",
+       "hen",
+       "goat"
+      ],
+      "answer": "fish"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "eng-grammar",
+  "title": "Grammar Basics",
+  "titleHi": "व्याकरण की नींव",
+  "icon": "🔤",
+  "color": "#2ec27e",
+  "blurb": "Nouns, verbs & tenses",
+  "blurbHi": "संज्ञा, क्रिया और काल",
+  "published": true,
+  "band": "5-8",
+  "subject": "english",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Nouns & Verbs",
+    "titleHi": "संज्ञा और क्रिया",
+    "quiz": [
+     {
+      "q": "Which word is a noun (naming word)?",
+      "qHi": "कौन-सा शब्द संज्ञा है?",
+      "choices": [
+       "table",
+       "run",
+       "quickly"
+      ],
+      "answer": "table",
+      "teach": "A noun names a person, place or thing.",
+      "teachHi": "संज्ञा व्यक्ति, स्थान या वस्तु का नाम है।"
+     },
+     {
+      "q": "Which word is a verb (action word)?",
+      "qHi": "कौन-सा शब्द क्रिया है?",
+      "choices": [
+       "jump",
+       "chair",
+       "blue"
+      ],
+      "answer": "jump",
+      "teach": "A verb shows an action.",
+      "teachHi": "क्रिया किसी काम को दर्शाती है।"
+     },
+     {
+      "q": "Pick the noun: 'The dog runs fast.'",
+      "qHi": "संज्ञा चुनो",
+      "choices": [
+       "dog",
+       "runs",
+       "fast"
+      ],
+      "answer": "dog"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "She go to school every day.",
+      "wrongWord": "go",
+      "fix": "goes",
+      "teach": "With he/she/it, add -s: goes.",
+      "teachHi": "he/she/it के साथ -s लगता है: goes।"
+     },
+     {
+      "sentence": "They is my friends.",
+      "wrongWord": "is",
+      "fix": "are",
+      "teach": "Use 'are' with they.",
+      "teachHi": "they के साथ 'are' आता है।"
+     },
+     {
+      "sentence": "I has a red bag.",
+      "wrongWord": "has",
+      "fix": "have",
+      "teach": "Use 'have' with I.",
+      "teachHi": "I के साथ 'have' आता है।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Past & Present",
+    "titleHi": "भूत और वर्तमान",
+    "quiz": [
+     {
+      "q": "Past tense of 'go'?",
+      "qHi": "'go' का भूतकाल?",
+      "choices": [
+       "went",
+       "goed",
+       "gone"
+      ],
+      "answer": "went"
+     },
+     {
+      "q": "Past tense of 'eat'?",
+      "qHi": "'eat' का भूतकाल?",
+      "choices": [
+       "ate",
+       "eated",
+       "eaten"
+      ],
+      "answer": "ate"
+     },
+     {
+      "q": "Present tense: 'I ___ to school.'",
+      "qHi": "वर्तमान काल चुनो",
+      "choices": [
+       "walk",
+       "walked",
+       "walking"
+      ],
+      "answer": "walk"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "Yesterday I go to the market.",
+      "wrongWord": "go",
+      "fix": "went",
+      "teach": "Yesterday is past, so use 'went'.",
+      "teachHi": "Yesterday भूतकाल है, इसलिए 'went'।"
+     },
+     {
+      "sentence": "She eat rice yesterday.",
+      "wrongWord": "eat",
+      "fix": "ate",
+      "teach": "Past tense of eat is ate.",
+      "teachHi": "eat का भूतकाल ate है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "math-numbers",
+  "title": "Numbers & Operations",
+  "titleHi": "संख्या और संक्रियाएँ",
+  "icon": "➗",
+  "color": "#3b82f6",
+  "blurb": "Tables, fractions & more",
+  "blurbHi": "पहाड़े, भिन्न और अधिक",
+  "published": true,
+  "band": "5-8",
+  "subject": "math",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Multiplication",
+    "titleHi": "गुणा",
+    "quiz": [
+     {
+      "q": "7 × 8 = ?",
+      "qHi": "",
+      "choices": [
+       "54",
+       "56",
+       "48"
+      ],
+      "answer": "56"
+     },
+     {
+      "q": "6 × 9 = ?",
+      "qHi": "",
+      "choices": [
+       "54",
+       "56",
+       "63"
+      ],
+      "answer": "54"
+     },
+     {
+      "q": "12 × 5 = ?",
+      "qHi": "",
+      "choices": [
+       "55",
+       "60",
+       "65"
+      ],
+      "answer": "60"
+     },
+     {
+      "q": "9 × 9 = ?",
+      "qHi": "",
+      "choices": [
+       "81",
+       "72",
+       "99"
+      ],
+      "answer": "81"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Fractions",
+    "titleHi": "भिन्न",
+    "quiz": [
+     {
+      "q": "What is 1/2 of 8?",
+      "qHi": "8 का आधा कितना?",
+      "choices": [
+       "2",
+       "4",
+       "6"
+      ],
+      "answer": "4",
+      "teach": "Half of 8 is 4.",
+      "teachHi": "8 का आधा 4 है।"
+     },
+     {
+      "q": "Which is bigger: 1/2 or 1/4?",
+      "qHi": "कौन बड़ा है?",
+      "choices": [
+       "1/2",
+       "1/4",
+       "they are equal"
+      ],
+      "answer": "1/2",
+      "teach": "A half is bigger than a quarter.",
+      "teachHi": "आधा, चौथाई से बड़ा है।"
+     },
+     {
+      "q": "1/3 + 1/3 = ?",
+      "qHi": "",
+      "choices": [
+       "1/3",
+       "2/3",
+       "1"
+      ],
+      "answer": "2/3"
+     },
+     {
+      "q": "1/4 of 12 = ?",
+      "qHi": "",
+      "choices": [
+       "3",
+       "4",
+       "6"
+      ],
+      "answer": "3"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "sci-around",
+  "title": "Science Around Us",
+  "titleHi": "हमारे आस-पास विज्ञान",
+  "icon": "🔬",
+  "color": "#06b6d4",
+  "blurb": "Matter, water & space",
+  "blurbHi": "पदार्थ, पानी और अंतरिक्ष",
+  "published": true,
+  "band": "5-8",
+  "subject": "science",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "States of Matter",
+    "titleHi": "पदार्थ की अवस्थाएँ",
+    "words": [
+     {
+      "en": "solid",
+      "hi": "ठोस",
+      "pron": "सॉलिड",
+      "emoji": "🧊",
+      "type": "thing",
+      "plural": "solids",
+      "use": "Ice is a solid",
+      "useHi": "बर्फ़ ठोस है"
+     },
+     {
+      "en": "liquid",
+      "hi": "तरल",
+      "pron": "लिक्विड",
+      "emoji": "🥛",
+      "type": "thing",
+      "plural": "liquids",
+      "use": "Water is a liquid",
+      "useHi": "पानी तरल है"
+     },
+     {
+      "en": "gas",
+      "hi": "गैस",
+      "pron": "गैस",
+      "emoji": "💨",
+      "type": "thing",
+      "plural": "gases",
+      "use": "Air is a gas",
+      "useHi": "हवा गैस है"
+     },
+     {
+      "en": "ice",
+      "hi": "बर्फ़",
+      "pron": "आइस",
+      "emoji": "❄️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "steam",
+      "hi": "भाप",
+      "pron": "स्टीम",
+      "emoji": "♨️",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Ice is which state of matter?",
+      "qHi": "बर्फ़ किस अवस्था में है?",
+      "choices": [
+       "solid",
+       "liquid",
+       "gas"
+      ],
+      "answer": "solid",
+      "emoji": "🧊",
+      "teach": "Ice is frozen water — a solid.",
+      "teachHi": "बर्फ़ जमा पानी है — ठोस।"
+     },
+     {
+      "q": "Water is a ___.",
+      "qHi": "पानी एक ___ है।",
+      "choices": [
+       "liquid",
+       "solid",
+       "gas"
+      ],
+      "answer": "liquid"
+     },
+     {
+      "q": "When water boils it becomes ___.",
+      "qHi": "उबलने पर पानी ___ बनता है।",
+      "choices": [
+       "steam",
+       "ice",
+       "a solid"
+      ],
+      "answer": "steam",
+      "teach": "Boiling water turns into steam (a gas).",
+      "teachHi": "उबलता पानी भाप (गैस) बनता है।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "The Solar System",
+    "titleHi": "सौर मंडल",
+    "words": [
+     {
+      "en": "sun",
+      "hi": "सूरज",
+      "pron": "सन",
+      "emoji": "☀️",
+      "type": "thing",
+      "plural": "suns",
+      "use": "The sun gives us light",
+      "useHi": "सूरज हमें रोशनी देता है"
+     },
+     {
+      "en": "earth",
+      "hi": "पृथ्वी",
+      "pron": "अर्थ",
+      "emoji": "🌍",
+      "type": "thing",
+      "uncount": true,
+      "use": "We live on the earth",
+      "useHi": "हम पृथ्वी पर रहते हैं"
+     },
+     {
+      "en": "moon",
+      "hi": "चाँद",
+      "pron": "मून",
+      "emoji": "🌙",
+      "type": "thing",
+      "plural": "moons"
+     },
+     {
+      "en": "star",
+      "hi": "तारा",
+      "pron": "स्टार",
+      "emoji": "⭐",
+      "type": "thing",
+      "plural": "stars"
+     },
+     {
+      "en": "planet",
+      "hi": "ग्रह",
+      "pron": "प्लैनेट",
+      "emoji": "🪐",
+      "type": "thing",
+      "plural": "planets"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is at the centre of the solar system?",
+      "qHi": "सौर मंडल के केंद्र में क्या है?",
+      "choices": [
+       "the Sun",
+       "the Moon",
+       "the Earth"
+      ],
+      "answer": "the Sun",
+      "emoji": "☀️",
+      "teach": "The Sun is at the centre.",
+      "teachHi": "सूरज केंद्र में है।"
+     },
+     {
+      "q": "What moves around the Earth?",
+      "qHi": "पृथ्वी के चारों ओर क्या घूमता है?",
+      "choices": [
+       "the Moon",
+       "the Sun",
+       "a planet"
+      ],
+      "answer": "the Moon"
+     },
+     {
+      "q": "How many planets are in our solar system?",
+      "qHi": "हमारे सौर मंडल में कितने ग्रह हैं?",
+      "choices": [
+       "8",
+       "5",
+       "12"
+      ],
+      "answer": "8"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "eng-mastery",
+  "title": "English Mastery",
+  "titleHi": "अंग्रेज़ी में निपुणता",
+  "icon": "🔤",
+  "color": "#2ec27e",
+  "blurb": "Grammar, usage & writing",
+  "blurbHi": "व्याकरण, प्रयोग और लेखन",
+  "published": true,
+  "band": "9-10",
+  "subject": "english",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Grammar & Usage",
+    "titleHi": "व्याकरण और प्रयोग",
+    "quiz": [
+     {
+      "q": "Choose the correct verb: 'Neither of the boys ___ here.'",
+      "qHi": "सही क्रिया चुनो",
+      "choices": [
+       "is",
+       "are",
+       "were"
+      ],
+      "answer": "is",
+      "teach": "'Neither' takes a singular verb.",
+      "teachHi": "'Neither' के साथ एकवचन क्रिया आती है।"
+     },
+     {
+      "q": "Pick the adverb: 'She sings beautifully.'",
+      "qHi": "क्रिया-विशेषण चुनो",
+      "choices": [
+       "beautifully",
+       "sings",
+       "she"
+      ],
+      "answer": "beautifully"
+     },
+     {
+      "q": "Passive of 'He writes a letter.'",
+      "qHi": "कर्मवाच्य रूप चुनो",
+      "choices": [
+       "A letter is written by him.",
+       "A letter writes him.",
+       "He is written a letter."
+      ],
+      "answer": "A letter is written by him."
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "He don't like coffee.",
+      "wrongWord": "don't",
+      "fix": "doesn't",
+      "teach": "With he/she/it use 'doesn't'.",
+      "teachHi": "he/she/it के साथ 'doesn't' आता है।"
+     },
+     {
+      "sentence": "There is many books on the shelf.",
+      "wrongWord": "is",
+      "fix": "are",
+      "teach": "'Many books' is plural, so use 'are'.",
+      "teachHi": "'Many books' बहुवचन है, इसलिए 'are'।"
+     },
+     {
+      "sentence": "I have went to Delhi.",
+      "wrongWord": "went",
+      "fix": "gone",
+      "teach": "After 'have' use the past participle 'gone'.",
+      "teachHi": "'have' के बाद 'gone' आता है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "math-algebra",
+  "title": "Algebra",
+  "titleHi": "बीजगणित",
+  "icon": "➗",
+  "color": "#3b82f6",
+  "blurb": "Equations & basics",
+  "blurbHi": "समीकरण और मूल बातें",
+  "published": true,
+  "band": "9-10",
+  "subject": "math",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Linear Equations",
+    "titleHi": "रैखिक समीकरण",
+    "quiz": [
+     {
+      "q": "Solve: x + 3 = 7.  x = ?",
+      "qHi": "",
+      "choices": [
+       "3",
+       "4",
+       "10"
+      ],
+      "answer": "4",
+      "teach": "Subtract 3 from both sides: x = 4.",
+      "teachHi": "दोनों ओर से 3 घटाओ: x = 4।"
+     },
+     {
+      "q": "Solve: 2x = 10.  x = ?",
+      "qHi": "",
+      "choices": [
+       "5",
+       "8",
+       "20"
+      ],
+      "answer": "5"
+     },
+     {
+      "q": "Solve: x − 5 = 0.  x = ?",
+      "qHi": "",
+      "choices": [
+       "0",
+       "5",
+       "-5"
+      ],
+      "answer": "5"
+     },
+     {
+      "q": "If x = 2, what is 3x + 1?",
+      "qHi": "",
+      "choices": [
+       "6",
+       "7",
+       "9"
+      ],
+      "answer": "7",
+      "teach": "3 × 2 + 1 = 7.",
+      "teachHi": "3 × 2 + 1 = 7।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "sci-physics",
+  "title": "Physics & Chemistry",
+  "titleHi": "भौतिकी और रसायन",
+  "icon": "🔬",
+  "color": "#06b6d4",
+  "blurb": "Motion, force & matter",
+  "blurbHi": "गति, बल और पदार्थ",
+  "published": true,
+  "band": "9-10",
+  "subject": "science",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Force & Motion",
+    "titleHi": "बल और गति",
+    "words": [
+     {
+      "en": "force",
+      "hi": "बल",
+      "pron": "फ़ोर्स",
+      "emoji": "💪",
+      "type": "thing",
+      "plural": "forces",
+      "use": "A force can push or pull",
+      "useHi": "बल धक्का या खिंचाव कर सकता है"
+     },
+     {
+      "en": "speed",
+      "hi": "चाल",
+      "pron": "स्पीड",
+      "emoji": "🏃",
+      "type": "thing",
+      "uncount": true,
+      "use": "Speed is how fast it moves",
+      "useHi": "चाल बताती है कितनी तेज़"
+     },
+     {
+      "en": "gravity",
+      "hi": "गुरुत्वाकर्षण",
+      "pron": "ग्रैविटी",
+      "emoji": "🌍",
+      "type": "thing",
+      "uncount": true,
+      "use": "Gravity pulls us down",
+      "useHi": "गुरुत्वाकर्षण हमें नीचे खींचता है"
+     },
+     {
+      "en": "energy",
+      "hi": "ऊर्जा",
+      "pron": "एनर्जी",
+      "emoji": "⚡",
+      "type": "thing",
+      "uncount": true,
+      "use": "Energy makes things work",
+      "useHi": "ऊर्जा से चीज़ें चलती हैं"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What force pulls objects toward the Earth?",
+      "qHi": "कौन-सा बल वस्तुओं को पृथ्वी की ओर खींचता है?",
+      "choices": [
+       "gravity",
+       "speed",
+       "light"
+      ],
+      "answer": "gravity",
+      "emoji": "🌍",
+      "teach": "Gravity pulls things down.",
+      "teachHi": "गुरुत्वाकर्षण चीज़ों को नीचे खींचता है।"
+     },
+     {
+      "q": "The unit of force is the ___.",
+      "qHi": "बल का मात्रक ___ है।",
+      "choices": [
+       "newton",
+       "metre",
+       "litre"
+      ],
+      "answer": "newton"
+     },
+     {
+      "q": "Speed = distance ÷ ___.",
+      "qHi": "",
+      "choices": [
+       "time",
+       "mass",
+       "force"
+      ],
+      "answer": "time",
+      "teach": "Speed = distance / time.",
+      "teachHi": "चाल = दूरी / समय।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Atoms & Elements",
+    "titleHi": "परमाणु और तत्व",
+    "words": [
+     {
+      "en": "atom",
+      "hi": "परमाणु",
+      "pron": "ऐटम",
+      "emoji": "⚛️",
+      "type": "thing",
+      "plural": "atoms",
+      "use": "An atom is very small",
+      "useHi": "परमाणु बहुत छोटा होता है"
+     },
+     {
+      "en": "element",
+      "hi": "तत्व",
+      "pron": "एलिमेंट",
+      "emoji": "🧪",
+      "type": "thing",
+      "plural": "elements",
+      "use": "Gold is an element",
+      "useHi": "सोना एक तत्व है"
+     },
+     {
+      "en": "oxygen",
+      "hi": "ऑक्सीजन",
+      "pron": "ऑक्सिजन",
+      "emoji": "💨",
+      "type": "thing",
+      "uncount": true,
+      "use": "We breathe oxygen",
+      "useHi": "हम ऑक्सीजन साँस लेते हैं"
+     },
+     {
+      "en": "water",
+      "hi": "पानी",
+      "pron": "वॉटर",
+      "emoji": "💧",
+      "type": "thing",
+      "uncount": true,
+      "use": "Water is made of two gases",
+      "useHi": "पानी दो गैसों से बना है"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "The smallest unit of matter is the ___.",
+      "qHi": "पदार्थ की सबसे छोटी इकाई ___ है।",
+      "choices": [
+       "atom",
+       "brick",
+       "cell"
+      ],
+      "answer": "atom",
+      "emoji": "⚛️",
+      "teach": "Atoms are the building blocks of matter.",
+      "teachHi": "परमाणु पदार्थ की मूल इकाई हैं।"
+     },
+     {
+      "q": "Water is made of hydrogen and ___.",
+      "qHi": "पानी हाइड्रोजन और ___ से बना है।",
+      "choices": [
+       "oxygen",
+       "iron",
+       "gold"
+      ],
+      "answer": "oxygen",
+      "emoji": "💧",
+      "teach": "Water = H₂O (hydrogen + oxygen).",
+      "teachHi": "पानी = H₂O (हाइड्रोजन + ऑक्सीजन)।"
+     },
+     {
+      "q": "Which gas do we breathe in to stay alive?",
+      "qHi": "जीने के लिए हम कौन-सी गैस साँस में लेते हैं?",
+      "choices": [
+       "oxygen",
+       "helium",
+       "neon"
+      ],
+      "answer": "oxygen"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "comp-basics",
+  "title": "Computer Basics",
+  "titleHi": "कंप्यूटर की मूल बातें",
+  "icon": "💻",
+  "color": "#8b5cf6",
+  "blurb": "How computers work",
+  "blurbHi": "कंप्यूटर कैसे काम करते हैं",
+  "published": true,
+  "band": "9-10",
+  "subject": "computer",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Inside a Computer",
+    "titleHi": "कंप्यूटर के अंदर",
+    "words": [
+     {
+      "en": "mouse",
+      "hi": "माउस",
+      "pron": "माउस",
+      "emoji": "🖱️",
+      "type": "thing",
+      "plural": "mice",
+      "use": "Click with the mouse",
+      "useHi": "माउस से क्लिक करो"
+     },
+     {
+      "en": "screen",
+      "hi": "स्क्रीन",
+      "pron": "स्क्रीन",
+      "emoji": "🖥️",
+      "type": "thing",
+      "plural": "screens",
+      "use": "Look at the screen",
+      "useHi": "स्क्रीन को देखो"
+     },
+     {
+      "en": "file",
+      "hi": "फ़ाइल",
+      "pron": "फ़ाइल",
+      "emoji": "📄",
+      "type": "thing",
+      "plural": "files",
+      "use": "Save your file",
+      "useHi": "अपनी फ़ाइल सेव करो"
+     },
+     {
+      "en": "folder",
+      "hi": "फ़ोल्डर",
+      "pron": "फ़ोल्डर",
+      "emoji": "📁",
+      "type": "thing",
+      "plural": "folders",
+      "use": "Open the folder",
+      "useHi": "फ़ोल्डर खोलो"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which device do you use to type?",
+      "qHi": "टाइप करने के लिए कौन-सा उपकरण?",
+      "choices": [
+       "keyboard",
+       "mouse",
+       "screen"
+      ],
+      "answer": "keyboard",
+      "emoji": "⌨️"
+     },
+     {
+      "q": "The 'brain' of a computer is the ___.",
+      "qHi": "कंप्यूटर का 'दिमाग' ___ है।",
+      "choices": [
+       "CPU",
+       "mouse",
+       "screen"
+      ],
+      "answer": "CPU",
+      "teach": "CPU = Central Processing Unit.",
+      "teachHi": "CPU = सेंट्रल प्रोसेसिंग यूनिट।"
+     },
+     {
+      "q": "Where are your documents kept?",
+      "qHi": "आपके दस्तावेज़ कहाँ रखे जाते हैं?",
+      "choices": [
+       "in files",
+       "on the mouse",
+       "on the desk"
+      ],
+      "answer": "in files"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Using the Internet",
+    "titleHi": "इंटरनेट का उपयोग",
+    "quiz": [
+     {
+      "q": "What do we use to open websites?",
+      "qHi": "वेबसाइट खोलने के लिए क्या प्रयोग करते हैं?",
+      "choices": [
+       "a browser",
+       "a printer",
+       "a mouse pad"
+      ],
+      "answer": "a browser",
+      "teach": "A browser like Chrome opens websites.",
+      "teachHi": "Chrome जैसा ब्राउज़र वेबसाइट खोलता है।"
+     },
+     {
+      "q": "A safe password should be ___.",
+      "qHi": "सुरक्षित पासवर्ड कैसा होना चाहिए?",
+      "choices": [
+       "long and secret",
+       "your name",
+       "1234"
+      ],
+      "answer": "long and secret"
+     },
+     {
+      "q": "Email is mainly used to ___.",
+      "qHi": "ईमेल किसलिए प्रयोग होती है?",
+      "choices": [
+       "send messages",
+       "cook food",
+       "charge the phone"
+      ],
+      "answer": "send messages"
+     }
+    ]
+   }
+  ]
  }
 ]

@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Hikmat Learn — Learn by Playing</title>
+<!-- PWA: installable + offline on Android & iOS (paths resolve only when served from Frappe) -->
+<meta name="theme-color" content="#6c5ce7" />
+<link rel="manifest" href="/assets/hikmat/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/assets/hikmat/icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/hikmat/icons/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Hikmat" />
 <style>
   :root {
     --bg: #fbf7ef;
@@ -197,6 +206,23 @@
   .opt.correct { border-color:var(--good); color:var(--good-d); background:#eafaf2; box-shadow:0 4px 0 #c6efd9; }
   .opt.wrong { border-color:var(--bad); color:var(--bad-d); background:#fff0f0; box-shadow:0 4px 0 #ffd1d3; }
   .opt.disabled { pointer-events:none; }
+  /* Class 1–10 home sections + Quiz activity */
+  .sectionhead { font-size:14px; font-weight:900; color:var(--muted); letter-spacing:.04em;
+                 text-transform:uppercase; margin:22px 4px 10px; }
+  .sectionhead:first-child { margin-top:4px; }
+  .quizemoji { font-size:52px; text-align:center; margin:2px 0 14px; line-height:1.1; }
+  .quizopts { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); }
+  .opt.quizopt { flex-direction:row; justify-content:center; text-align:center; padding:16px; font-size:17px; }
+  /* Sign up */
+  .signup { max-width:440px; margin:0 auto; text-align:left; }
+  .signup .searchbox { width:100%; margin:0; }
+  .fieldlabel { display:block; font-weight:800; color:var(--muted); font-size:13px; margin:16px 2px 6px; }
+  .avpick { display:flex; flex-wrap:wrap; gap:8px; }
+  .av { font-size:24px; width:46px; height:46px; border:2px solid var(--line); border-radius:14px; background:#fff;
+        cursor:pointer; box-shadow:0 3px 0 var(--line); transition:transform .06s, box-shadow .06s; }
+  .av:active { transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  .av.sel { border-color:var(--grape); background:#efeaff; box-shadow:0 3px 0 #d9cffb; }
+  .profilebtn.signup { background:var(--primary); color:#fff; border-color:var(--primary); }
 
   /* tiles for spelling / phrase */
   .tray { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; min-height:62px; align-items:center;
@@ -374,6 +400,24 @@ const SETTINGS = {
   tagline: { en: "Learn  by playing", hi: "खेल-खेल में सीखो" },
 };
 
+// ---------- Class 1–10 structure (grade bands + subjects) ----------
+// Overridden by get_structure() when served from Frappe; these are the offline fallback.
+// Tracks carry { band, subject } keys; the Home "By Class" view groups by band → subject.
+let BANDS = [
+  { key:"1-4",  title:"Class 1–4",  titleHi:"कक्षा 1–4",  subtitle:"Foundation",  subtitleHi:"नींव",      icon:"🌱", color:"#22b8a6" },
+  { key:"5-8",  title:"Class 5–8",  titleHi:"कक्षा 5–8",  subtitle:"Middle",      subtitleHi:"मध्य",      icon:"🌟", color:"#f59e0b" },
+  { key:"9-10", title:"Class 9–10", titleHi:"कक्षा 9–10", subtitle:"Secondary",   subtitleHi:"माध्यमिक",  icon:"🎓", color:"#6c5ce7" },
+];
+let SUBJECTS = [
+  { key:"english",  title:"English",        titleHi:"अंग्रेज़ी",        icon:"🔤", color:"#2ec27e" },
+  { key:"math",     title:"Mathematics",    titleHi:"गणित",             icon:"➗", color:"#3b82f6" },
+  { key:"science",  title:"Science",        titleHi:"विज्ञान",          icon:"🔬", color:"#06b6d4" },
+  { key:"evs",      title:"EVS",            titleHi:"पर्यावरण",         icon:"🌍", color:"#16a34a" },
+  { key:"hindi",    title:"Hindi",          titleHi:"हिंदी",            icon:"📖", color:"#e11d48" },
+  { key:"sst",      title:"Social Studies", titleHi:"सामाजिक अध्ययन",   icon:"🗺️", color:"#d97706" },
+  { key:"computer", title:"Computer",       titleHi:"कंप्यूटर",         icon:"💻", color:"#8b5cf6" },
+];
+
 // ---------- Curriculum: Tracks → Lessons → Words / Dialogues ----------
 // The WHOLE curriculum is data. Adding a track or lesson = adding to this object
 // (and later: a row in the Frappe admin). The game engine renders entirely from it.
@@ -478,12 +522,18 @@ const LEVELS = [
 ];
 
 // Extra activities, added only when the lesson carries that content (the IT/Work track).
+const QUIZ_LEVEL  = { id:"quiz",  name:"Quiz",              nameHi:"प्रश्नोत्तरी", sub:"Choose the answer", subHi:"सही उत्तर चुनो", ico:"❓", type:"quiz" };
 const CODE_LEVEL  = { id:"code",  name:"Complete the Code", nameHi:"कोड पूरा करो", sub:"Fill the blank",    subHi:"खाली जगह भरो",   ico:"💻", type:"code" };
 const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती ढूँढो",  sub:"Spot the wrong word", subHi:"गलत शब्द पकड़ो", ico:"🐞", type:"fix" };
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
-// The activities for a given lesson: the 5 base ones, plus any extra activity whose content exists.
+// The activities for a given lesson. The 5 base activities need their content: learn/listen/
+// spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
+// only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
 function levelsFor(lesson){
-  let lv = LEVELS;
+  const hasWords = !!(lesson && lesson.words && lesson.words.length);
+  const hasTalk  = !!(lesson && lesson.dialogues && lesson.dialogues.length);
+  let lv = LEVELS.filter(l => l.type==="talk" ? hasTalk : hasWords);
+  if(lesson && lesson.quiz  && lesson.quiz.length)  lv = lv.concat([QUIZ_LEVEL]);
   if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
   if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
@@ -790,53 +840,162 @@ $("#soundToggle").onclick = () => { state.sound = state.sound===false; save(); r
 // ============================================================
 //  SCREENS
 // ============================================================
+// ---- Class 1–10 grouping helpers ----
+const trackMax = c => c.lessons.reduce((a,ls)=>a+lessonMax(ls),0);
+const bandTracks = bk => COURSES.filter(c => c.band===bk);                 // tracks tagged to a grade band
+const lifeSkillsTracks = () => COURSES.filter(c => !c.band);               // the original thematic tracks
+function subjectsInBand(bk){
+  const present = new Set(bandTracks(bk).filter(c=>c.published && c.lessons.length).map(c=>c.subject));
+  return SUBJECTS.filter(s => present.has(s.key));
+}
+function progressOf(tracks){
+  let earned=0, max=0; tracks.forEach(c=>{ earned+=trackEarned(c.key); max+=trackMax(c); }); return {earned, max};
+}
+
+// A single track card → opens the lesson list. `back` = where its inner screens return to.
+function trackCard(course, back){
+  const earned = trackEarned(course.key), maxStars = trackMax(course);
+  const locked = !course.published || course.lessons.length===0;
+  const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
+      style="${locked?"":`background:linear-gradient(160deg,${course.color}dd,${course.color})`}">
+    ${locked ? `<span class="lock">🔒</span>` : ""}
+    <div class="big">${course.icon}</div>
+    <h3>${tx(course.title, course.titleHi)}</h3>
+    <small>${locked ? tx("Coming soon","जल्द आ रहा है")
+                    : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : tx(course.blurb, course.blurbHi))}</small>
+  </button>`);
+  if(!locked) node.onclick = () => { sfx.enter(); renderTrack(course, back); };
+  return node;
+}
+// A grade-band card (1–4 / 5–8 / 9–10) → opens the subject grid. null if the band has no content.
+function bandCard(band){
+  const tracks = bandTracks(band.key).filter(c=>c.published && c.lessons.length);
+  if(!tracks.length) return null;
+  const {earned, max} = progressOf(tracks);
+  const node = el(`<button class="theme band" style="background:linear-gradient(160deg,${band.color}dd,${band.color})">
+    <div class="big">${band.icon}</div>
+    <h3>${tx(band.title, band.titleHi)}</h3>
+    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(band.subtitle, band.subtitleHi)}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); renderBand(band); };
+  return node;
+}
+// A subject card inside a band → opens that band+subject's tracks.
+function subjectCard(band, subj){
+  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key && c.published && c.lessons.length);
+  const {earned, max} = progressOf(tracks);
+  const lessons = tracks.reduce((a,c)=>a+c.lessons.length,0);
+  const node = el(`<button class="theme" style="background:linear-gradient(160deg,${subj.color}dd,${subj.color})">
+    <div class="big">${subj.icon}</div>
+    <h3>${tx(subj.title, subj.titleHi)}</h3>
+    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(lessons+" lessons", lessons+" पाठ")}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); renderSubject(band, subj); };
+  return node;
+}
+
+function profileChip(host){
+  if(currentStudent){
+    const b = el(`<button class="profilebtn">${currentStudent.avatar||"🙂"} ${currentStudent.name} · ${tx("Switch","बदलें")}</button>`);
+    b.onclick = () => { sfx.tap(); renderLogin(); }; host.appendChild(b);
+  } else if(backendLive){
+    const login = el(`<button class="profilebtn">${tx("Log in","लॉग इन")}</button>`);
+    login.onclick = () => { sfx.tap(); renderLogin(); }; host.appendChild(login);
+    const signup = el(`<button class="profilebtn signup">${tx("✨ Sign up","✨ साइन अप")}</button>`);
+    signup.onclick = () => { sfx.tap(); renderSignup(); }; host.appendChild(signup);
+  }
+}
+
+// HOME — "By Class" grade bands on top, the original thematic tracks as "Life Skills" below.
 function renderHome(){
   stopSpeech();
   rerender = renderHome;
   root.innerHTML = "";
   setBack(null);
+  const guest = !currentStudent;
+  // Build the grade-band cards first so the hero copy can adapt to whether groups exist.
+  const bands = BANDS.map(bandCard).filter(Boolean);
+  const heroH1 = guest
+    ? (bands.length ? tx("Choose your class group ✨", "अपनी कक्षा का समूह चुनो ✨")
+                    : tx("Welcome to "+SETTINGS.appName+"! ✨", SETTINGS.appName+" में आपका स्वागत है! ✨"))
+    : tx("Welcome back, "+currentStudent.name+"! ✨", "वापसी पर स्वागत है, "+currentStudent.name+"! ✨");
+  const heroP = bands.length
+    ? tx("Pick your class, then choose a subject to start.", "अपनी कक्षा चुनो, फिर विषय चुनकर शुरू करो।")
+    : tx("Pick a place to explore and learn.", "सीखने के लिए कोई जगह चुनो।");
   const s = el(`<div class="screen">
     <div class="hero">
-      <h1>${tx("Welcome to "+SETTINGS.appName+"! ✨", SETTINGS.appName+" में आपका स्वागत है! ✨")}</h1>
-      <p>${tx("Pick a place to explore and learn.","सीखने के लिए कोई जगह चुनो।")}</p>
+      <h1>${heroH1}</h1>
+      <p>${heroP}</p>
     </div>
     <div class="center" id="profileRow" style="margin:8px 0 20px"></div>
-    <div class="themes" id="tracks"></div>
+    <div id="homeSections"></div>
   </div>`);
   root.appendChild(s);
-  const pr = $("#profileRow");
-  if(currentStudent){
-    const b = el(`<button class="profilebtn">${currentStudent.avatar||"🙂"} ${currentStudent.name} · ${tx("Switch","बदलें")}</button>`);
-    b.onclick = () => { sfx.tap(); renderLogin(); };
-    pr.appendChild(b);
-  } else if(backendLive){
-    const b = el(`<button class="profilebtn">${tx("Sign in","साइन इन")}</button>`);
-    b.onclick = () => { sfx.tap(); renderLogin(); };
-    pr.appendChild(b);
+  profileChip($("#profileRow"));
+  const host = $("#homeSections");
+  // By Class — the primary call to action: choose your class group, then a subject
+  if(bands.length){
+    host.appendChild(el(`<div class="sectionhead">${tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
+    const grid = el(`<div class="themes"></div>`); bands.forEach(b=>grid.appendChild(b)); host.appendChild(grid);
   }
-  const wrap = $("#tracks");
-  COURSES.forEach(course => {
-    const earned = trackEarned(course.key);
-    const maxStars = course.lessons.reduce((a,ls)=>a+lessonMax(ls),0);
-    const locked = !course.published || course.lessons.length===0;
-    const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
-        style="${locked?"":`background:linear-gradient(160deg,${course.color}dd,${course.color})`}">
-      ${locked ? `<span class="lock">🔒</span>` : ""}
-      <div class="big">${course.icon}</div>
-      <h3>${tx(course.title, course.titleHi)}</h3>
-      <small>${locked ? tx("Coming soon","जल्द आ रहा है")
-                      : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : tx(course.blurb, course.blurbHi))}</small>
-    </button>`);
-    if(!locked) node.onclick = () => { sfx.enter(); renderTrack(course); };
-    wrap.appendChild(node);
-  });
+  // Life Skills (the original thematic tracks)
+  const life = lifeSkillsTracks();
+  if(life.length){
+    if(bands.length) host.appendChild(el(`<div class="sectionhead">${tx("🌼 Life Skills","🌼 जीवन कौशल")}</div>`));
+    const grid = el(`<div class="themes"></div>`); life.forEach(c=>grid.appendChild(trackCard(c))); host.appendChild(grid);
+  }
   refreshTop();
 }
 
-// TRACK screen — the lessons inside a track
-function renderTrack(course){
+// BAND screen — the subjects available in one grade band
+function renderBand(band){
   stopSpeech();
-  rerender = () => renderTrack(course);
+  rerender = () => renderBand(band);
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>${band.icon} ${tx(band.title, band.titleHi)}</h2>
+      <div class="sub">${tx("Choose a subject","कोई विषय चुनो")}</div></div>
+    </div>
+    <div class="center" id="profileRow" style="margin:2px 0 16px"></div>
+    <div class="themes" id="subjects"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack(tx("← Home","← घर"), renderHome);
+  profileChip($("#profileRow"));
+  const wrap = $("#subjects");
+  const subs = subjectsInBand(band.key);
+  if(!subs.length) wrap.innerHTML = `<div class="muted center">${tx("No subjects yet.","अभी कोई विषय नहीं।")}</div>`;
+  subs.forEach(subj => wrap.appendChild(subjectCard(band, subj)));
+  refreshTop();
+}
+
+// SUBJECT screen — the tracks (topics) for one band+subject
+function renderSubject(band, subj){
+  stopSpeech();
+  rerender = () => renderSubject(band, subj);
+  root.innerHTML = "";
+  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key);
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>${subj.icon} ${tx(subj.title, subj.titleHi)}</h2>
+      <div class="sub">${tx(band.title, band.titleHi)} · ${tx("Choose a topic","कोई विषय-वस्तु चुनो")}</div></div>
+    </div>
+    <div class="themes" id="tracks"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack("← " + tx(band.title, band.titleHi), () => renderBand(band));
+  const back = { label: "← " + tx(subj.title, subj.titleHi), fn: () => renderSubject(band, subj) };
+  const wrap = $("#tracks");
+  tracks.forEach(c => wrap.appendChild(trackCard(c, back)));
+  refreshTop();
+}
+
+// TRACK screen — the lessons inside a track. `back` = button target (Home, or the subject screen).
+function renderTrack(course, back){
+  back = back || { label: tx("← Home","← घर"), fn: renderHome };
+  stopSpeech();
+  rerender = () => renderTrack(course, back);
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
@@ -846,7 +1005,7 @@ function renderTrack(course){
     <div class="path" id="path"></div>
   </div>`);
   root.appendChild(s);
-  setBack(tx("← Home","← घर"), renderHome);
+  setBack(back.label, back.fn);
   const wrap = $("#path");
   // a lesson is "complete" (green) once every one of its activities has at least 1 star
   const isComplete = ls => levelsFor(ls).every(lv => getStars(course.key, ls.key, lv.id) > 0);
@@ -861,7 +1020,7 @@ function renderTrack(course){
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(ls.title, ls.titleHi),
       sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
-      onClick: () => { sfx.enter(); renderLessonMap(course, ls); },
+      onClick: () => { sfx.enter(); renderLessonMap(course, ls, back); },
     };
   });
   renderPath(items);
@@ -869,9 +1028,9 @@ function renderTrack(course){
 }
 
 // LESSON screen — the 5 activities (the vertical path) for one lesson
-function renderLessonMap(course, lesson){
+function renderLessonMap(course, lesson, back){
   stopSpeech();
-  rerender = () => renderLessonMap(course, lesson);
+  rerender = () => renderLessonMap(course, lesson, back);
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
@@ -881,7 +1040,7 @@ function renderLessonMap(course, lesson){
     <div class="path" id="path"></div>
   </div>`);
   root.appendChild(s);
-  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course));
+  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course, back));
   const wrap = $("#path");
   const ck = course.key, lk = lesson.key;
   const LV = levelsFor(lesson);
@@ -898,7 +1057,7 @@ function renderLessonMap(course, lesson){
       sub: tx(lv.sub, lv.subHi),
       starsHtml: cls!=="locked" ? starRow(earned) : "",
       onClick: unlocked
-        ? (() => { sfx.enter(); startLevel(course, lesson, lv); })
+        ? (() => { sfx.enter(); startLevel(course, lesson, lv, back); })
         : (() => { sfx.locked(); sayHi("पहले पिछला स्तर पूरा करें"); }),
     };
   });
@@ -907,10 +1066,10 @@ function renderLessonMap(course, lesson){
 }
 
 // ---------- Level runner ----------
-function startLevel(course, lesson, lv){
+function startLevel(course, lesson, lv, back){
   const rounds = buildRounds(lv, lesson);
   let idx = 0, score = 0;
-  const backToLesson = () => renderLessonMap(course, lesson);
+  const backToLesson = () => renderLessonMap(course, lesson, back);
   const backLbl = "← " + tx(lesson.title, lesson.titleHi);
   setBack(backLbl, backToLesson);
   rerender = runRound;   // language toggle re-renders the current round in place
@@ -945,6 +1104,7 @@ function startLevel(course, lesson, lv){
     if(lv.type==="spell")  return roundSpell(r);
     if(lv.type==="phrase") return roundPhrase(r);
     if(lv.type==="talk")   return roundTalk(r);
+    if(lv.type==="quiz")   return roundQuiz(r);
     if(lv.type==="code")   return roundCode(r);
     if(lv.type==="fix")    return roundFix(r);
     if(lv.type==="email")  return roundEmail(r);
@@ -1148,6 +1308,41 @@ function startLevel(course, lesson, lv){
     renderCode();
   }
 
+  // --- QUIZ: a multiple-choice question (any subject) — read it, tap the answer
+  function roundQuiz(r){
+    const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    mount(`${head(tx(r.q, r.qHi || r.q), tx("Choose the answer","सही उत्तर चुनो"), r.qHi || "")}
+      ${r.emoji ? `<div class="quizemoji">${r.emoji}</div>` : ""}
+      <div class="options quizopts" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    announce(() => speak(tx(r.q, r.qHi || r.q), state.lang==="hi" ? "hi" : "en"));
+    const opts = $("#opts");
+    shuffle(r.choices.slice()).forEach(c => {
+      const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+      b.onclick = () => {
+        const correct = c === r.answer;
+        document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        if(!correct) document.querySelectorAll(".quizopt").forEach(o => { if(o.textContent === r.answer) o.classList.add("correct"); });
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        fb.textContent = correct ? tx("Correct! 🎉","सही! 🎉") : tx("Answer: ","सही जवाब: ") + r.answer;
+        fb.className = "feedback " + (correct ? "good" : "bad");
+        if(r.teach){
+          const tb = $("#teach"); tb.style.display = "flex";
+          const main = tx(r.teach, r.teachHi || r.teach);
+          const alt = (state.hindi && state.lang!=="hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
+          tb.innerHTML = `💡 <span>${esc(main)}${alt}</span>`;
+        }
+        setTimeout(() => next(correct), r.teach ? 2200 : (correct ? 1000 : 1700));
+      };
+      opts.appendChild(b);
+    });
+  }
+
   // --- FIX: tap the one wrong word in the sentence (IT "debugging")
   function roundFix(r){
     let done=false;
@@ -1253,7 +1448,7 @@ function startLevel(course, lesson, lv){
       </div>
     </div>`));
     speak(stars>=2?"Shabash! Well done":"Good try");
-    $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv); };
+    $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv, back); };
     $("#map").onclick=()=>{ sfx.back(); backToLesson(); };
   }
 }
@@ -1324,6 +1519,7 @@ function buildRounds(lv, lesson){
     });
   }
   if(lv.type==="talk") return lesson.dialogues.slice();
+  if(lv.type==="quiz") return (lesson.quiz||[]).slice();
   if(lv.type==="code") return (lesson.code||[]).slice();
   if(lv.type==="fix")  return (lesson.fix||[]).slice();
   if(lv.type==="email") return (lesson.email||[]).slice();
@@ -1335,6 +1531,7 @@ function buildRounds(lv, lesson){
 // When served from the Frappe app, fetch live content + cache it. When opened as a
 // plain file (no server) or offline, the bundled/cached COURSES is used unchanged.
 const CACHE_KEY = "hikmat_courses_cache";
+const STRUCT_KEY = "hikmat_structure_cache";
 const ATTEMPT_QUEUE = "hikmat_attempt_queue";
 let backendLive = false;   // true once we've reached the Frappe server
 
@@ -1353,19 +1550,28 @@ async function api(method, params, post){
 async function loadFromBackend(){
   // 1) cached content + settings first → instant and works offline (logo, name, taglines persist)
   try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if(Array.isArray(c) && c.length) COURSES = c; } catch(e){}
+  try { const st = JSON.parse(localStorage.getItem(STRUCT_KEY)); if(st && st.bands && st.bands.length){ BANDS = st.bands; SUBJECTS = st.subjects || SUBJECTS; } } catch(e){}
   try { const s = JSON.parse(localStorage.getItem("hikmat_settings_cache"));
         if(s && s.appName){ SETTINGS.appName = s.appName; SETTINGS.logo = s.logo || ""; if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn; if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi; } } catch(e){}
   // 2) then try live (only succeeds when served from Frappe and online)
   try {
-    const [cr, sr] = await Promise.all([
-      fetch(apiURL("get_courses"),  {headers:{Accept:"application/json"}}),
-      fetch(apiURL("get_settings"), {headers:{Accept:"application/json"}}),
+    const [cr, sr, xr] = await Promise.all([
+      fetch(apiURL("get_courses"),   {headers:{Accept:"application/json"}}),
+      fetch(apiURL("get_settings"),  {headers:{Accept:"application/json"}}),
+      fetch(apiURL("get_structure"), {headers:{Accept:"application/json"}}),
     ]);
     if(cr.ok){
       const j = await cr.json();
       if(j && Array.isArray(j.message) && j.message.length){
         COURSES = j.message;
         localStorage.setItem(CACHE_KEY, JSON.stringify(COURSES));
+      }
+    }
+    if(xr.ok){
+      const x = (await xr.json()).message;
+      if(x && Array.isArray(x.bands) && x.bands.length){
+        BANDS = x.bands; SUBJECTS = x.subjects || SUBJECTS;
+        try { localStorage.setItem(STRUCT_KEY, JSON.stringify(x)); } catch(e){}
       }
     }
     if(sr.ok){
@@ -1418,6 +1624,59 @@ async function mergeServerProgress(){
   save();
 }
 
+// SIGN UP — a learner creates their own profile (name + avatar + optional PIN), then plays.
+const AVATARS = ["🙂","👧","🧒","👩","😀","🦋","🌸","🌟","🐱","🦊","🐥","🚀"];
+function renderSignup(){
+  stopSpeech(); rerender = renderSignup; root.innerHTML = "";
+  setBack(tx("← Log in","← लॉग इन"), renderLogin);
+  let avatar = AVATARS[0];
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Create your name ✨","अपना नाम बनाओ ✨")}</h1>
+      <p>${tx("Make a profile so your stars are saved.","प्रोफ़ाइल बनाओ ताकि तुम्हारे सितारे सुरक्षित रहें।")}</p></div>
+    <div class="signup">
+      <label class="fieldlabel">${tx("Your name","तुम्हारा नाम")}</label>
+      <input id="suName" class="searchbox" type="text" autocomplete="off" maxlength="40"
+             placeholder="${tx('Type your name…','अपना नाम लिखो…')}">
+      <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
+      <div class="avpick" id="avpick"></div>
+      <label class="fieldlabel">${tx("PIN (optional)","पिन (वैकल्पिक)")}</label>
+      <input id="suPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
+             placeholder="${tx('3–8 digits — keeps your progress safe','3–8 अंक — प्रगति सुरक्षित रखे')}">
+      <div class="feedback bad" id="suErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="suLogin">${tx("Already have a name? Log in","पहले से नाम है? लॉग इन")}</button>
+        <button class="btn ghost" id="suGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+      </div>
+    </div>
+  </div>`));
+  const avwrap = $("#avpick");
+  AVATARS.forEach((a,i) => {
+    const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
+    b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
+    avwrap.appendChild(b);
+  });
+  const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr");
+  name.oninput = () => { go.disabled = !name.value.trim(); err.textContent = ""; };
+  setTimeout(() => name.focus(), 60);
+  $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
+  $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+  const submit = async () => {
+    const nm = name.value.trim();
+    if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
+    const p = pin.value.trim();
+    if(p && !/^\d{3,8}$/.test(p)){ err.textContent = tx("PIN must be 3–8 digits.","पिन 3–8 अंकों का हो।"); return; }
+    go.disabled = true; err.textContent = "";
+    const r = await api("signup_student", { name:nm, avatar, pin:p }, true);
+    if(r && r.ok){ finishLogin(r); }
+    else { go.disabled = false; err.textContent = tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।"); }
+  };
+  go.onclick = submit;
+  name.onkeydown = (e) => { if(e.key==="Enter" && name.value.trim()) submit(); };
+  pin.onkeydown  = (e) => { if(e.key==="Enter") submit(); };
+  refreshTop();
+}
+
 function renderLogin(){
   stopSpeech(); rerender = renderLogin; root.innerHTML = ""; setBack(null);
   root.appendChild(el(`<div class="screen">
@@ -1427,9 +1686,12 @@ function renderLogin(){
     <input id="studentSearch" class="searchbox" type="text" autocomplete="off"
            placeholder="${tx('🔎 Type your name…','🔎 अपना नाम लिखो…')}">
     <div class="themes" id="studentGrid"></div>
-    <div class="center" style="margin-top:18px">
-      <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button></div>
+    <div class="center" style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+      <button class="btn primary" id="signupBtn">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
+      <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+    </div>
   </div>`));
+  $("#signupBtn").onclick = () => { sfx.tap(); renderSignup(); };
   $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   loadLogin();
   refreshTop();
@@ -1514,9 +1776,17 @@ loadFromBackend().then(async ok => {
     if(studs && studs.length){ renderLogin(); refreshTop(); return; }   // served + roster exists → pick your name
   }
   if(ok && currentStudent) await mergeServerProgress();
-  if(document.getElementById("tracks")) renderHome();
+  if(document.getElementById("homeSections")) renderHome();   // refresh home in place once live content + structure arrive
   refreshTop();
 });
+
+// ---------- PWA: install + offline (only when served over http(s); skipped for the file:// build) ----------
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/assets/hikmat/sw.js", { scope: "/assets/hikmat/" })
+      .catch(e => console.warn("Hikmat SW registration failed:", e));
+  });
+}
 </script>
 </body>
 </html>

@@ -20,7 +20,9 @@
   "sec_fix",
   "fix",
   "sec_email",
-  "email"
+  "email",
+  "sec_quiz",
+  "quiz"
  ],
  "fields": [
   {
@@ -104,12 +106,23 @@
    "fieldtype": "Table",
    "label": "Email tasks",
    "options": "Lesson Email"
+  },
+  {
+   "fieldname": "sec_quiz",
+   "fieldtype": "Section Break",
+   "label": "Quiz questions"
+  },
+  {
+   "fieldname": "quiz",
+   "fieldtype": "Table",
+   "label": "Quiz questions",
+   "options": "Lesson Quiz"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-17 00:06:12.905482",
+ "modified": "2026-06-20 23:35:59.409951",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Lesson",
