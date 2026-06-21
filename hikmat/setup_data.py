@@ -283,6 +283,21 @@ def seed_structure():
     print("=== seeded", len(GRADE_BANDS), "bands +", len(SUBJECTS), "subjects ===")
 
 
+def export_offline_curriculum():
+    """Write the live get_courses() payload to public/curriculum.json — the static, SW-precached
+    offline baseline the PWA falls back to on a first-ever-offline launch or after a localStorage
+    wipe. Run after content changes and commit the file:
+        bench --site hikmat.local execute hikmat.setup_data.export_offline_curriculum
+    """
+    import os
+    from hikmat.api import _build_courses
+    path = frappe.get_app_path("hikmat", "public", "curriculum.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(_build_courses(), f, ensure_ascii=False, separators=(",", ":"))
+    print("=== wrote", path, "===")
+
+
 # ---------------------------------------------------------------------------
 # Seed content — the prototype's curriculum, so the API returns the same data
 # ---------------------------------------------------------------------------
@@ -451,7 +466,12 @@ def seed_content():
         s.save(ignore_permissions=1)
 
     frappe.db.commit()
-    print("=== seeded", len(COURSES), "tracks ===")
+    try:
+        from hikmat.api import clear_content_cache
+        clear_content_cache()
+    except Exception:
+        pass
+    print("=== seeded", len(courses), "tracks ===")
 
 
 def demo_students():

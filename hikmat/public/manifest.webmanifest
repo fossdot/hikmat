@@ -4,6 +4,7 @@
   "description": "A game-style app to learn English, Maths, Science and more, for Class 1–10.",
   "lang": "en",
   "dir": "auto",
+  "id": "/assets/hikmat/game.html",
   "start_url": "/assets/hikmat/game.html",
   "scope": "/assets/hikmat/",
   "display": "standalone",

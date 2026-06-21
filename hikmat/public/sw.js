@@ -1,23 +1,26 @@
-/* Hikmat PWA service worker — offline-first app shell.
-   Scope: /assets/hikmat/ (covers game.html). Bump CACHE to ship an update. */
-const CACHE = "hikmat-pwa-v1";
+/* Hikmat PWA service worker — offline-first app shell + content.
+   Scope: /assets/hikmat/. Bump CACHE to ship an update to installed PWAs. */
+const CACHE = "hikmat-pwa-v2";
 const BASE = "/assets/hikmat/";
 const SHELL = [
   BASE + "game.html",
+  BASE + "curriculum.json",          // full 74-lesson offline baseline (survives localStorage eviction)
   BASE + "manifest.webmanifest",
   BASE + "icons/icon-192.png",
   BASE + "icons/icon-512.png",
   BASE + "icons/icon-512-maskable.png",
   BASE + "icons/icon-180.png",
 ];
+// read APIs cached (network-first) so the game keeps full content offline even if localStorage is wiped
+const CACHED_API = ["hikmat.api.get_courses", "hikmat.api.get_structure", "hikmat.api.get_settings"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then((c) => Promise.allSettled(SHELL.map((u) => c.add(u))))  // tolerate a missing asset
-      .then(() => self.skipWaiting())
-  );
+  // tolerate a missing asset; do NOT unconditionally skipWaiting — the page asks us to activate
+  // (see 'message') so an update never reloads a child mid-activity.
+  e.waitUntil(caches.open(CACHE).then((c) => Promise.allSettled(SHELL.map((u) => c.add(u)))));
 });
+
+self.addEventListener("message", (e) => { if (e.data === "SKIP_WAITING") self.skipWaiting(); });
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
@@ -27,27 +30,30 @@ self.addEventListener("activate", (e) => {
   );
 });
 
+function networkFirst(req) {
+  return fetch(req)
+    .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res; })
+    .catch(() => caches.match(req));
+}
+
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== "GET") return;                      // never cache POSTs (login, submit_attempt)
+  if (req.method !== "GET") return;                       // never touch POSTs (login, submit_attempt)
   const url = new URL(req.url);
-  if (url.pathname.startsWith("/api/")) return;          // API hits the network; the game falls back to localStorage offline
-  if (!url.pathname.startsWith(BASE)) return;            // only manage this app's own static files
+
+  if (url.pathname.startsWith("/api/method/")) {
+    // cache only the content read endpoints; other API GETs (roster etc.) go straight to the network
+    if (CACHED_API.some((m) => url.pathname.indexOf(m) !== -1)) e.respondWith(networkFirst(req));
+    return;
+  }
+  if (!url.pathname.startsWith(BASE)) return;             // only manage this app's own static files
 
   const isDoc = req.mode === "navigate" || url.pathname.endsWith("game.html");
   if (isDoc) {
-    // network-first so the game updates when online, cache fallback when offline
-    e.respondWith(
-      fetch(req)
-        .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res; })
-        .catch(() => caches.match(req).then((r) => r || caches.match(BASE + "game.html")))
-    );
+    e.respondWith(networkFirst(req).then((r) => r || caches.match(BASE + "game.html")));
   } else {
-    // cache-first for icons/manifest/etc.
-    e.respondWith(
-      caches.match(req).then((r) => r || fetch(req).then((res) => {
-        const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res;
-      }))
-    );
+    e.respondWith(caches.match(req).then((r) => r || fetch(req).then((res) => {
+      const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); return res;
+    })));
   }
 });

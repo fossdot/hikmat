@@ -19,7 +19,7 @@
     --bg2: #fff3df;
     --card: #ffffff;
     --ink: #2c2440;
-    --muted: #8d86a0;
+    --muted: #6f6886;         /* AA contrast (~5.2:1 on white/cream); was #8d86a0 (failed 4.5:1) */
     --line: #ece6dc;
     --primary: #ff7a45;       /* warm orange — main action */
     --primary-d: #d85a28;     /* its shadow */
@@ -27,9 +27,9 @@
     --grape-d: #4b3fc0;
     --gold: #ffb830;
     --good: #2ec27e;
-    --good-d: #1e9d62;
+    --good-d: #157a4b;        /* AA on white + the #eafaf2 success tint (was #1e9d62) */
     --bad: #ff5a5f;
-    --bad-d: #d83a40;
+    --bad-d: #c0282d;         /* AA on white + the #fff0f0 error tint (was #d83a40) */
     --r: 16px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -366,6 +366,43 @@
   .profilebtn { display:inline-block; white-space:nowrap; background:#fff; border:2px solid var(--line);
                 border-radius:999px; padding:8px 16px; font-weight:800; font-size:14px; cursor:pointer; color:var(--ink); }
   .profilebtn:hover { border-color:var(--grape); }
+
+  /* ===== Audit fixes: accessibility + responsive ===== */
+  /* Visible keyboard focus on the coloured buttons/tiles — white halo so it reads on any gradient */
+  .theme:focus-visible, .node:focus-visible, .opt:focus-visible, .btn:focus-visible, .tile:focus-visible,
+  .backbtn:focus-visible, .av:focus-visible, .chiptab:focus-visible, .toggle:focus-visible, .pill:focus-visible,
+  .profilebtn:focus-visible, .speakbtn:focus-visible, .speakchip:focus-visible, .echip:focus-visible,
+  .bugword:focus-visible, .tap-emoji:focus-visible {
+    outline:3px solid var(--ink); outline-offset:3px; box-shadow:0 0 0 6px #fff; }
+  .searchbox:focus-visible, .pininput:focus-visible { outline:3px solid var(--grape); outline-offset:2px; }
+  /* Don't rely on colour alone for right/wrong (WCAG 1.4.1) */
+  .opt.correct::after { content:" ✓"; font-weight:900; }
+  .opt.wrong::after   { content:" ✗"; font-weight:900; }
+  /* 44px+ touch targets on touch devices */
+  @media (pointer:coarse){
+    .toggle, .pill, .chiptab, .profilebtn, .backbtn, .echip { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
+    .bugword { padding:9px 12px; }
+    .bugline { gap:10px 8px; }
+  }
+  /* Top bar wraps instead of clipping its controls on narrow phones */
+  .topbar { flex-wrap:wrap; }
+  .stats { flex-wrap:wrap; row-gap:6px; justify-content:flex-end; }
+  @media (max-width:430px){
+    .topbar { padding:10px 12px; }
+    .pill, .toggle { padding:5px 9px; font-size:12px; }
+    .step .labelblock { right:8px; }
+  }
+  /* Long trail labels wrap rather than clip */
+  .step .label { white-space:normal; overflow-wrap:break-word; }
+  /* Darken decorative greys that failed contrast */
+  .eplace { color:#6f6886; }
+  .oglabel { color:#6f6886; }
+  /* Respect reduced-motion preference */
+  @media (prefers-reduced-motion: reduce){
+    * { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+  }
+  /* Screen-reader-only live region */
+  .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 </style>
 </head>
 <body>
@@ -383,6 +420,7 @@
       </div>
     </div>
     <div id="root"></div>
+    <div id="sr" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
   </div>
 </div>
 
@@ -706,6 +744,18 @@ const sfx = {
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function pick(arr,n){ return shuffle(arr).slice(0,n); }
 function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstChild; }
+// HTML-escape any value before injecting it via innerHTML/template strings (XSS guard).
+// Content (words, dialogue, quizzes, student names, etc.) comes from the backend/admin/
+// self-signup and must never be trusted as markup. String() coerces undefined/numbers;
+// escAttr also neutralises quotes for attribute contexts (e.g. an <img alt>).
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escAttr(s){ return esc(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+// only let a content-supplied colour into a style attribute if it's a plain hex (else it could break out of the attribute)
+function col(c){ return /^#[0-9a-fA-F]{3,8}$/.test(String(c||"")) ? c : "#6c5ce7"; }
+// Screen-reader live announcement (the app's speech IS the main audio channel; this serves AT users).
+function srSay(msg){ const sr=document.getElementById("sr"); if(!sr) return; sr.textContent=""; setTimeout(()=>{ sr.textContent=msg; }, 40); }
+// Move keyboard/screen-reader focus to the new screen's heading so it isn't stranded on <body> after a re-render.
+function moveFocusToTop(){ const h = root.querySelector(".hero h1, .maphead h2, .bubble2 .q"); if(h){ h.setAttribute("tabindex","-1"); try { h.focus({preventScroll:true}); } catch(e){} } }
 
 // ---------- Roshni, the guide (self-contained SVG mascot) ----------
 function mascotSVG(){ return `<svg viewBox="0 0 120 142" xmlns="http://www.w3.org/2000/svg">
@@ -739,10 +789,10 @@ function mascotSVG(){ return `<svg viewBox="0 0 120 142" xmlns="http://www.w3.or
 let lastHi = "";   // the Hindi help line for the current prompt
 function head(q, hint, hi){
   lastHi = hi || "";
-  const hindiLine = (state.hindi && lastHi) ? `<div class="hiLine">🔊 ${lastHi}</div>` : "";
+  const hindiLine = (state.hindi && lastHi) ? `<div class="hiLine">🔊 ${esc(lastHi)}</div>` : "";
   return `<div class="mascotrow">
     <div class="mascot" id="mascot">${mascotSVG()}</div>
-    <div class="bubble2"><div class="q">${q}</div><div class="hint">${hint||""}</div>${hindiLine}</div>
+    <div class="bubble2"><div class="q">${esc(q)}</div><div class="hint">${esc(hint||"")}</div>${hindiLine}</div>
   </div>`;
 }
 // Toggle the Hindi line in/out of the current bubble live (no full re-render)
@@ -752,7 +802,7 @@ function updateHiLine(){
   const existing = bubble.querySelector(".hiLine");
   if(state.hindi && lastHi){
     if(!existing){
-      const node = el(`<div class="hiLine">🔊 ${lastHi}</div>`);
+      const node = el(`<div class="hiLine">🔊 ${esc(lastHi)}</div>`);
       bubble.appendChild(node);
     }
     sayHi(lastHi);
@@ -781,7 +831,9 @@ function renderPath(items){
   const wrap = $("#path");
   wrap.innerHTML = "";
   const N = items.length;
-  const NR = 33, D = NR*2, AMP = 28, ROW = 90, TOP = 24, LANE = 20;
+  const wide = (wrap.clientWidth || 360) >= 420;     // phones get a tighter trail so long labels aren't crushed to ~50px
+  const NR = 33, D = NR*2, AMP = wide?28:12, ROW = 90, TOP = 24, LANE = wide?20:12;
+  const LABELGAP = wide?16:8;
   const CX = LANE + NR + AMP;          // x of a centred node
   const H = TOP + N * ROW + 14;
   wrap.style.height = H + "px";
@@ -801,8 +853,8 @@ function renderPath(items){
     const shape = NODE_SHAPES[i % NODE_SHAPES.length];
     const step = el(`<div class="step ${it.cls||''}" style="top:${TOP + i*ROW}px; height:${D}px">
       <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${i+1}</span>${it.extras||""}</button>
-      <div class="labelblock" style="left:${p.x + NR + 16}px; height:${D}px">
-        <div class="label">${it.label}</div>
+      <div class="labelblock" style="left:${p.x + NR + LABELGAP}px; height:${D}px">
+        <div class="label">${esc(it.label)}</div>
         <div class="ls">${it.sub||""}</div>
         ${it.starsHtml ? `<div class="ministars">${it.starsHtml}</div>` : ""}
       </div>
@@ -815,14 +867,22 @@ function renderPath(items){
 function setBack(label, fn){
   const n = document.getElementById("topnav"); if(!n) return;
   if(!label){ n.innerHTML = ""; return; }
-  n.innerHTML = `<button class="backbtn">${label}</button>`;
+  n.innerHTML = `<button class="backbtn">${esc(label)}</button>`;
   n.querySelector("button").onclick = () => { sfx.back(); fn(); };
 }
 
 function refreshTop(){
+  document.documentElement.lang = state.lang || "en";   // keep <html lang> in sync for screen readers
   const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
   const lg = $("#brandLogo");
-  if(lg) lg.innerHTML = SETTINGS.logo ? `<img class="logoimg" src="${SETTINGS.logo}" alt="${SETTINGS.appName}">` : "🪔";
+  if(lg){                                   // build via DOM + scheme-check so a hostile logo URL can't break out / run javascript:
+    lg.textContent = "";
+    if(SETTINGS.logo && /^(https?:|data:image\/)/i.test(SETTINGS.logo)){
+      const img = document.createElement("img");
+      img.className = "logoimg"; img.src = SETTINGS.logo; img.alt = SETTINGS.appName || "";
+      lg.appendChild(img);
+    } else { lg.textContent = "🪔"; }
+  }
   $("#totalStars").textContent = totalStars();
   $("#coins").textContent = state.coins;
   const ht = $("#hiToggle");
@@ -857,12 +917,12 @@ function trackCard(course, back){
   const earned = trackEarned(course.key), maxStars = trackMax(course);
   const locked = !course.published || course.lessons.length===0;
   const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
-      style="${locked?"":`background:linear-gradient(160deg,${course.color}dd,${course.color})`}">
+      style="${locked?"":`background:linear-gradient(160deg,${col(course.color)}dd,${col(course.color)})`}">
     ${locked ? `<span class="lock">🔒</span>` : ""}
-    <div class="big">${course.icon}</div>
-    <h3>${tx(course.title, course.titleHi)}</h3>
+    <div class="big">${esc(course.icon)}</div>
+    <h3>${esc(tx(course.title, course.titleHi))}</h3>
     <small>${locked ? tx("Coming soon","जल्द आ रहा है")
-                    : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : tx(course.blurb, course.blurbHi))}</small>
+                    : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : esc(tx(course.blurb, course.blurbHi)))}</small>
   </button>`);
   if(!locked) node.onclick = () => { sfx.enter(); renderTrack(course, back); };
   return node;
@@ -872,10 +932,10 @@ function bandCard(band){
   const tracks = bandTracks(band.key).filter(c=>c.published && c.lessons.length);
   if(!tracks.length) return null;
   const {earned, max} = progressOf(tracks);
-  const node = el(`<button class="theme band" style="background:linear-gradient(160deg,${band.color}dd,${band.color})">
-    <div class="big">${band.icon}</div>
-    <h3>${tx(band.title, band.titleHi)}</h3>
-    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(band.subtitle, band.subtitleHi)}</small>
+  const node = el(`<button class="theme band" style="background:linear-gradient(160deg,${col(band.color)}dd,${col(band.color)})">
+    <div class="big">${esc(band.icon)}</div>
+    <h3>${esc(tx(band.title, band.titleHi))}</h3>
+    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : esc(tx(band.subtitle, band.subtitleHi))}</small>
   </button>`);
   node.onclick = () => { sfx.enter(); renderBand(band); };
   return node;
@@ -885,9 +945,9 @@ function subjectCard(band, subj){
   const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key && c.published && c.lessons.length);
   const {earned, max} = progressOf(tracks);
   const lessons = tracks.reduce((a,c)=>a+c.lessons.length,0);
-  const node = el(`<button class="theme" style="background:linear-gradient(160deg,${subj.color}dd,${subj.color})">
-    <div class="big">${subj.icon}</div>
-    <h3>${tx(subj.title, subj.titleHi)}</h3>
+  const node = el(`<button class="theme" style="background:linear-gradient(160deg,${col(subj.color)}dd,${col(subj.color)})">
+    <div class="big">${esc(subj.icon)}</div>
+    <h3>${esc(tx(subj.title, subj.titleHi))}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(lessons+" lessons", lessons+" पाठ")}</small>
   </button>`);
   node.onclick = () => { sfx.enter(); renderSubject(band, subj); };
@@ -896,7 +956,7 @@ function subjectCard(band, subj){
 
 function profileChip(host){
   if(currentStudent){
-    const b = el(`<button class="profilebtn">${currentStudent.avatar||"🙂"} ${currentStudent.name} · ${tx("Switch","बदलें")}</button>`);
+    const b = el(`<button class="profilebtn">${esc(currentStudent.avatar||"🙂")} ${esc(currentStudent.name)} · ${tx("Switch","बदलें")}</button>`);
     b.onclick = () => { sfx.tap(); renderLogin(); }; host.appendChild(b);
   } else if(backendLive){
     const login = el(`<button class="profilebtn">${tx("Log in","लॉग इन")}</button>`);
@@ -924,8 +984,8 @@ function renderHome(){
     : tx("Pick a place to explore and learn.", "सीखने के लिए कोई जगह चुनो।");
   const s = el(`<div class="screen">
     <div class="hero">
-      <h1>${heroH1}</h1>
-      <p>${heroP}</p>
+      <h1>${esc(heroH1)}</h1>
+      <p>${esc(heroP)}</p>
     </div>
     <div class="center" id="profileRow" style="margin:8px 0 20px"></div>
     <div id="homeSections"></div>
@@ -954,7 +1014,7 @@ function renderBand(band){
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead"><div>
-      <h2>${band.icon} ${tx(band.title, band.titleHi)}</h2>
+      <h2>${esc(band.icon)} ${esc(tx(band.title, band.titleHi))}</h2>
       <div class="sub">${tx("Choose a subject","कोई विषय चुनो")}</div></div>
     </div>
     <div class="center" id="profileRow" style="margin:2px 0 16px"></div>
@@ -978,8 +1038,8 @@ function renderSubject(band, subj){
   const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key);
   const s = el(`<div class="screen">
     <div class="maphead"><div>
-      <h2>${subj.icon} ${tx(subj.title, subj.titleHi)}</h2>
-      <div class="sub">${tx(band.title, band.titleHi)} · ${tx("Choose a topic","कोई विषय-वस्तु चुनो")}</div></div>
+      <h2>${esc(subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
+      <div class="sub">${esc(tx(band.title, band.titleHi))} · ${tx("Choose a topic","कोई विषय-वस्तु चुनो")}</div></div>
     </div>
     <div class="themes" id="tracks"></div>
   </div>`);
@@ -999,7 +1059,7 @@ function renderTrack(course, back){
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
-      <div><h2>${course.icon} ${tx(course.title, course.titleHi)}</h2>
+      <div><h2>${esc(course.icon)} ${esc(tx(course.title, course.titleHi))}</h2>
       <div class="sub">${tx("Choose a lesson","कोई पाठ चुनो")}</div></div>
     </div>
     <div class="path" id="path"></div>
@@ -1034,7 +1094,7 @@ function renderLessonMap(course, lesson, back){
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
-      <div><h2>${tx(lesson.title, lesson.titleHi)}</h2>
+      <div><h2>${esc(tx(lesson.title, lesson.titleHi))}</h2>
       <div class="sub">${tx("Climb the path — finish a stall to open the next","रास्ते पर चढ़ो — हर पड़ाव पूरा करके अगला खोलो")}</div></div>
     </div>
     <div class="path" id="path"></div>
@@ -1090,6 +1150,8 @@ function startLevel(course, lesson, lv, back){
     root.appendChild(el(header()));
     setBack(backLbl, backToLesson);
     $("#body").innerHTML = bodyHTML;
+    const bar=$("#bar"); if(bar && bar.parentElement){ const pb=bar.parentElement; pb.setAttribute("role","progressbar"); pb.setAttribute("aria-valuemin","0"); pb.setAttribute("aria-valuemax",String(rounds.length)); pb.setAttribute("aria-valuenow",String(idx)); }
+    moveFocusToTop();   // land focus on the new question, not <body>
   }
   function next(correct){
     if(correct){ score++; state.coins += 5; }
@@ -1114,10 +1176,10 @@ function startLevel(course, lesson, lv, back){
   function roundLearn(it){
     mount(`${head(tx("What is this?","ये क्या है?"), tx("Tap the word or picture to hear it 🔊","शब्द या तस्वीर पर छूकर सुनो 🔊"), "ये क्या है? सुनो और दोहराओ।")}
       <div class="display">
-        <div class="emoji pop tap-emoji" id="emojiBtn">${it.emoji}</div>
-        <div class="wordrow"><span class="word">${it.en}</span>
+        <div class="emoji pop tap-emoji" id="emojiBtn">${esc(it.emoji)}</div>
+        <div class="wordrow"><span class="word">${esc(it.en)}</span>
           <button class="speakchip" id="say" title="Hear it">🔊</button></div>
-        <div class="say"><span class="pron">${it.pron}</span> · <span class="meaning">${it.hi}</span></div>
+        <div class="say"><span class="pron">${esc(it.pron)}</span> · <span class="meaning">${esc(it.hi)}</span></div>
       </div>`);
     setFooter(`<button class="btn primary" id="next">${tx("Got it →","समझ गई →")}</button>`);
     $("#say").onclick = () => speak(it.en);
@@ -1136,7 +1198,7 @@ function startLevel(course, lesson, lv, back){
     announce(() => speak(r.answer.en));
     const opts = $("#opts");
     r.choices.forEach(c => {
-      const b = el(`<button class="opt"><span class="oe">${c.emoji}</span><span>${c.en}</span></button>`);
+      const b = el(`<button class="opt" data-en="${escAttr(c.en)}"><span class="oe">${esc(c.emoji)}</span><span>${esc(c.en)}</span></button>`);
       b.onclick = () => {
         const correct = c.en===r.answer.en;
         document.querySelectorAll(".opt").forEach(o=>o.classList.add("disabled"));
@@ -1146,7 +1208,7 @@ function startLevel(course, lesson, lv, back){
         const fb=$("#fb");
         if(correct){ fb.textContent=tx("Correct! 🎉","सही! 🎉"); fb.className="feedback good"; }
         else { fb.textContent=tx("Try to remember: ","याद रखो: ")+r.answer.en; fb.className="feedback bad";
-               document.querySelectorAll(".opt").forEach(o=>{ if(o.textContent.includes(r.answer.en)) o.classList.add("correct"); }); }
+               document.querySelectorAll(".opt").forEach(o=>{ if(o.dataset.en===r.answer.en) o.classList.add("correct"); }); }
         setTimeout(()=>next(correct), correct?900:1600);
       };
       opts.appendChild(b);
@@ -1157,7 +1219,7 @@ function startLevel(course, lesson, lv, back){
   function roundSpell(it){
     const letters = shuffle(it.en.split(""));
     mount(`${head(tx("Spell the word","शब्द लिखो"), tx("Tap the letters in order","अक्षरों को सही क्रम में छुओ"),"अक्षरों को सही क्रम में लगाओ।")}
-      <div class="display"><div class="emoji">${it.emoji}</div><div class="hi">${it.hi}</div></div>
+      <div class="display"><div class="emoji">${esc(it.emoji)}</div><div class="hi">${esc(it.hi)}</div></div>
       <div class="center" style="margin-bottom:10px"><button class="speakbtn" id="say">🔊 ${tx("Hear it","सुनो")}</button></div>
       <div class="tray" id="tray"></div>
       <div class="bank" id="bank"></div>
@@ -1170,8 +1232,8 @@ function startLevel(course, lesson, lv, back){
     let built=[];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
-      built.forEach((ch,i)=>{ const t=el(`<div class="tile placed">${ch}</div>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
-      remaining().forEach((ch,i)=>{ const t=el(`<div class="tile">${ch}</div>`); t.onclick=()=>{built.push(ch);sfx.tap();redraw();}; bank.appendChild(t); });
+      built.forEach((ch,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(ch)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach((ch,i)=>{ const t=el(`<button type="button" class="tile">${esc(ch)}</button>`); t.onclick=()=>{built.push(ch);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==it.en.length;
     }
     function remaining(){ const used={}; built.forEach(c=>used[c]=(used[c]||0)+1); const out=[]; const tmp={...used};
@@ -1192,7 +1254,7 @@ function startLevel(course, lesson, lv, back){
   function roundPhrase(r){
     const words = shuffle(r.words.slice());
     mount(`${head(tx("Make the sentence","वाक्य बनाओ"), tx("Put the words in the right order","शब्दों को सही क्रम में लगाओ"), r.hintHi)}
-      <div class="display"><div class="emoji">${r.emoji}</div></div>
+      <div class="display"><div class="emoji">${esc(r.emoji)}</div></div>
       <div class="tray" id="tray"></div>
       <div class="bank" id="bank"></div>
       <div class="feedback" id="fb"></div>`);
@@ -1203,8 +1265,8 @@ function startLevel(course, lesson, lv, back){
     let built=[];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
-      built.forEach((w,i)=>{ const t=el(`<div class="tile placed">${w}</div>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
-      remaining().forEach(w=>{ const t=el(`<div class="tile">${w}</div>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
+      built.forEach((w,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(w)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach(w=>{ const t=el(`<button type="button" class="tile">${esc(w)}</button>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==r.words.length;
     }
     function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
@@ -1228,15 +1290,15 @@ function startLevel(course, lesson, lv, back){
       <div class="options" id="opts"></div>
       <div class="feedback" id="fb"></div>`);
     const chat=$("#chat");
-    chat.appendChild(el(`<div class="bubble them">${r.who||"🙂"} ${r.line}<small>${state.hindi?r.lineHi:""}</small></div>`));
+    chat.appendChild(el(`<div class="bubble them">${esc(r.who||"🙂")} ${esc(r.line)}<small>${state.hindi?esc(r.lineHi):""}</small></div>`));
     // first question speaks right away; later ones wait for the previous response to finish, then pause ~2s
     if(idx===0) announce(() => speak(r.line));
     else speak(r.line, "en", { queue:true, gap:2000 });
     const opts=$("#opts");
     let answered=false;
     shuffle(r.replies).forEach(rep=>{
-      const gloss = (state.hindi && rep.textHi) ? `<small class="optHi">${rep.textHi}</small>` : "";
-      const b=el(`<button class="opt" style="font-size:17px">${rep.text}${gloss}</button>`);
+      const gloss = (state.hindi && rep.textHi) ? `<small class="optHi">${esc(rep.textHi)}</small>` : "";
+      const b=el(`<button class="opt" style="font-size:17px">${esc(rep.text)}${gloss}</button>`);
       b.onclick=()=>{
         if(answered) return;
         speak(rep.text);
@@ -1245,13 +1307,13 @@ function startLevel(course, lesson, lv, back){
           answered=true;
           document.querySelectorAll(".opt").forEach(o=>o.classList.add("disabled"));
           b.classList.add("correct");
-          chat.appendChild(el(`<div class="bubble me">${rep.text}</div>`));
+          chat.appendChild(el(`<div class="bubble me">${esc(rep.text)}</div>`));
           setMood("happy");
           sfx.correct();
           fb.textContent=tx("Nice reply! 🎉","बढ़िया जवाब! 🎉"); fb.className="feedback good";
           // speaker replies, then let the player continue at their own pace
           setTimeout(()=>{
-            chat.appendChild(el(`<div class="bubble them">${r.who||"🙂"} ${r.then}</div>`));
+            chat.appendChild(el(`<div class="bubble them">${esc(r.who||"🙂")} ${esc(r.then)}</div>`));
             speak(r.then, "en", { queue:true, gap:500 });   // play after the reply finishes, don't cut it
             setFooter(`<button class="btn primary" id="next">${tx("Continue →","आगे बढ़ो →")}</button>`);
             $("#next").onclick = () => { sfx.next(); next(true); };
@@ -1273,7 +1335,7 @@ function startLevel(course, lesson, lv, back){
   function roundCode(r){
     let filled = null;
     const codeText = (r.lines ? r.lines.join("\n") : (r.code || ""));
-    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!Array.isArray(r.choices) || !r.choices.includes(r.answer)) return next(true);  // malformed content → skip, never trap the child
     const teachMain = tx(r.teach, r.teachHi || r.teach);
     const teachAlt = (state.hindi && state.lang !== "hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
     mount(`${head(tx("💻 Complete the code","💻 कोड पूरा करो"), tx(r.prompt, r.promptHi || r.prompt), r.promptHi)}
@@ -1292,7 +1354,7 @@ function startLevel(course, lesson, lv, back){
       $("#check").disabled = !filled;
     }
     shuffle(r.choices).forEach(c=>{
-      const t=el(`<div class="tile">${esc(c)}</div>`);
+      const t=el(`<button type="button" class="tile">${esc(c)}</button>`);
       t.onclick=()=>{ filled=c; sfx.tap(); renderCode(); };
       bank.appendChild(t);
     });
@@ -1310,9 +1372,9 @@ function startLevel(course, lesson, lv, back){
 
   // --- QUIZ: a multiple-choice question (any subject) — read it, tap the answer
   function roundQuiz(r){
-    const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!Array.isArray(r.choices) || !r.choices.includes(r.answer)) return next(true);  // malformed content → skip, never trap the child
     mount(`${head(tx(r.q, r.qHi || r.q), tx("Choose the answer","सही उत्तर चुनो"), r.qHi || "")}
-      ${r.emoji ? `<div class="quizemoji">${r.emoji}</div>` : ""}
+      ${r.emoji ? `<div class="quizemoji">${esc(r.emoji)}</div>` : ""}
       <div class="options quizopts" id="opts"></div>
       <div id="teach" class="teachbox" style="display:none"></div>
       <div class="feedback" id="fb"></div>`);
@@ -1346,7 +1408,6 @@ function startLevel(course, lesson, lv, back){
   // --- FIX: tap the one wrong word in the sentence (IT "debugging")
   function roundFix(r){
     let done=false;
-    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     mount(`${head(tx("🐞 Find the bug","🐞 गलती ढूँढो"), tx("Tap the wrong word","गलत शब्द पर टैप करो"), "")}
       <div class="bugline" id="line"></div>
       <div id="teach" class="teachbox" style="display:none"></div>
@@ -1355,7 +1416,7 @@ function startLevel(course, lesson, lv, back){
     announce(() => speak(r.sentence));
     const line=$("#line");
     r.sentence.split(" ").forEach(tok=>{
-      const chip=el(`<span class="bugword">${esc(tok)}</span>`);
+      const chip=el(`<button type="button" class="bugword">${esc(tok)}</button>`);
       chip.onclick=()=>{
         if(done) return;
         if(tok===r.wrongWord){
@@ -1382,7 +1443,6 @@ function startLevel(course, lesson, lv, back){
 
   // --- EMAIL: compose a real email by choosing the right line for each slot, then Send
   function roundEmail(r){
-    const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     const chosen = {};   // slotIndex -> optionIndex
     mount(`${head(tx("📧 Write the email","📧 ईमेल लिखो"), tx(r.scenario, r.scenarioHi || r.scenario), r.scenarioHi)}
       <div class="email" id="email"></div>
@@ -1448,6 +1508,8 @@ function startLevel(course, lesson, lv, back){
       </div>
     </div>`));
     speak(stars>=2?"Shabash! Well done":"Good try");
+    srSay(tx("You got "+score+" of "+rounds.length+", "+stars+" stars", rounds.length+" में से "+score+" सही, "+stars+" सितारे"));
+    const rh=root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try{ rh.focus({preventScroll:true}); }catch(e){} }
     $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv, back); };
     $("#map").onclick=()=>{ sfx.back(); backToLesson(); };
   }
@@ -1549,10 +1611,20 @@ async function api(method, params, post){
 
 async function loadFromBackend(){
   // 1) cached content + settings first → instant and works offline (logo, name, taglines persist)
-  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if(Array.isArray(c) && c.length) COURSES = c; } catch(e){}
+  let haveCache = false;
+  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if(Array.isArray(c) && c.length){ COURSES = c; haveCache = true; } } catch(e){}
   try { const st = JSON.parse(localStorage.getItem(STRUCT_KEY)); if(st && st.bands && st.bands.length){ BANDS = st.bands; SUBJECTS = st.subjects || SUBJECTS; } } catch(e){}
   try { const s = JSON.parse(localStorage.getItem("hikmat_settings_cache"));
         if(s && s.appName){ SETTINGS.appName = s.appName; SETTINGS.logo = s.logo || ""; if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn; if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi; } } catch(e){}
+  // 1b) durable offline baseline: the full curriculum shipped as a static file (precached by the
+  //     service worker). Without this, a first-ever-offline launch or a localStorage wipe would fall
+  //     back to the tiny bundled COURSES (4 tracks) instead of all lessons.
+  if(!haveCache){
+    try {
+      const cj = await fetch("/assets/hikmat/curriculum.json", {headers:{Accept:"application/json"}});
+      if(cj.ok){ const arr = await cj.json(); if(Array.isArray(arr) && arr.length){ COURSES = arr; } }
+    } catch(e){}
+  }
   // 2) then try live (only succeeds when served from Frappe and online)
   try {
     const [cr, sr, xr] = await Promise.all([
@@ -1589,22 +1661,37 @@ async function loadFromBackend(){
 }
 
 // queue a finished activity and push it to the server when possible
+let _syncing = false;
+function _readQueue(){ try { return JSON.parse(localStorage.getItem(ATTEMPT_QUEUE)) || []; } catch(e){ return []; } }
+function _saveQueue(q){ try { localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify(q)); } catch(e){ /* quota: best-effort, retry next sync */ } }
 function recordAttempt(a){
   if(!currentStudent) return;            // guest / not signed in → local progress only
-  let q = []; try { q = JSON.parse(localStorage.getItem(ATTEMPT_QUEUE)) || []; } catch(e){}
+  const q = _readQueue();
   q.push({ ...a, student: currentStudent.id });
-  localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify(q));
+  _saveQueue(q);
   syncAttempts();
 }
 async function syncAttempts(){
-  let q = []; try { q = JSON.parse(localStorage.getItem(ATTEMPT_QUEUE)) || []; } catch(e){}
+  if(_syncing) return;                   // serialize runs so concurrent calls can't clobber the queue
+  const q = _readQueue();
   if(!q.length) return;
+  _syncing = true;
   const remaining = [];
-  for(const a of q){
-    try { const r = await fetch(apiURL("submit_attempt"), {method:"POST", body:new URLSearchParams(a)}); if(!r.ok) remaining.push(a); }
-    catch(e){ remaining.push(a); }       // still offline → keep for next time
-  }
-  localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify(remaining));
+  try {
+    for(const a of q){
+      try {
+        const r = await fetch(apiURL("submit_attempt"), {method:"POST", body:new URLSearchParams(a)});
+        if(!r.ok){ remaining.push(a); continue; }                  // HTTP/network error → retry later
+        let body = null; try { body = (await r.json()).message; } catch(e){}
+        if(body && body.ok === false && body.error === "rate_limited") remaining.push(a);  // transient → retry
+        // success, or a permanent rejection (e.g. unknown_student) → drop so it can't loop forever
+      } catch(e){ remaining.push(a); }                             // offline → keep for next time
+    }
+    // merge anything enqueued DURING this run so a mid-sync recordAttempt isn't lost
+    const seen = new Set(q.map(x => JSON.stringify(x)));
+    _readQueue().forEach(x => { if(!seen.has(JSON.stringify(x))) remaining.push(x); });
+    _saveQueue(remaining);
+  } finally { _syncing = false; }
 }
 window.addEventListener("online", syncAttempts);
 
@@ -1708,7 +1795,7 @@ async function loadLogin(){
     cohortRow.innerHTML = "";
     if(cohorts.length <= 1) return;          // one centre → no chips, just search + names
     cohorts.forEach(c => {
-      const b = el(`<button class="chiptab ${c.name===selected?'on':''}">${c.cohort_name}</button>`);
+      const b = el(`<button class="chiptab ${c.name===selected?'on':''}">${esc(c.cohort_name)}</button>`);
       b.onclick = () => { selected = c.name; sfx.tap(); drawCohorts(); loadStudents(); };
       cohortRow.appendChild(b);
     });
@@ -1721,7 +1808,7 @@ async function loadLogin(){
     if(!list.length){ grid.innerHTML = `<div class="muted center">${tx("No name found — keep typing or ask your teacher.","कोई नाम नहीं मिला — और लिखो या शिक्षक से पूछो।")}</div>`; return; }
     list.forEach(stu => {
       const card = el(`<button class="theme" style="background:linear-gradient(160deg,#8a7bf0,#6c5ce7)">
-        <div class="big">${stu.avatar||"🙂"}</div><h3>${stu.name}</h3>${stu.hasPin?`<small>🔒 ${tx("PIN","पिन")}</small>`:""}</button>`);
+        <div class="big">${esc(stu.avatar||"🙂")}</div><h3>${esc(stu.name)}</h3>${stu.hasPin?`<small>🔒 ${tx("PIN","पिन")}</small>`:""}</button>`);
       card.onclick = () => pickStudent(stu);
       grid.appendChild(card);
     });
@@ -1737,7 +1824,7 @@ async function loadLogin(){
 function pickStudent(stu){ sfx.tap(); if(stu.hasPin) askPin(stu); else finishLogin(stu); }
 function askPin(stu){
   const ov = el(`<div class="pinov"><div class="pincard">
-    <div class="big">${stu.avatar||"🙂"}</div><div class="pinname">${stu.name}</div>
+    <div class="big">${esc(stu.avatar||"🙂")}</div><div class="pinname">${esc(stu.name)}</div>
     <div class="pinlabel">${tx("Enter your PIN","अपना पिन डालो")}</div>
     <input id="pinInput" type="password" inputmode="numeric" maxlength="8" class="pininput">
     <div class="feedback bad" id="pinErr" style="min-height:18px"></div>
@@ -1749,7 +1836,12 @@ function askPin(stu){
   const submit = async () => {
     const r = await api("login_student", { student: stu.id, pin: inp.value }, true);
     if(r && r.ok){ ov.remove(); finishLogin(r); }
-    else { ov.querySelector("#pinErr").textContent = tx("Wrong PIN — try again","ग़लत पिन — फिर कोशिश करो"); inp.value=""; inp.focus(); }
+    else {
+      const msg = (r && r.error==="locked")
+        ? tx("Too many tries — wait a few minutes.","बहुत बार कोशिश — कुछ मिनट रुको।")
+        : tx("Wrong PIN — try again","ग़लत पिन — फिर कोशिश करो");
+      ov.querySelector("#pinErr").textContent = msg; inp.value=""; inp.focus();
+    }
   };
   ov.querySelector("#pinCancel").onclick = () => { sfx.back(); ov.remove(); };
   ov.querySelector("#pinOk").onclick = submit;
@@ -1772,8 +1864,8 @@ syncAttempts();        // flush any progress queued while offline
 loadFromBackend().then(async ok => {
   backendLive = ok;
   if(ok && !currentStudent){
-    const studs = await api("get_students");
-    if(studs && studs.length){ renderLogin(); refreshTop(); return; }   // served + roster exists → pick your name
+    const r = await api("has_students");                                // bool only — don't enumerate minors on boot
+    if(r && r.any){ renderLogin(); refreshTop(); return; }              // served + roster exists → pick your name
   }
   if(ok && currentStudent) await mergeServerProgress();
   if(document.getElementById("homeSections")) renderHome();   // refresh home in place once live content + structure arrive
@@ -1782,8 +1874,26 @@ loadFromBackend().then(async ok => {
 
 // ---------- PWA: install + offline (only when served over http(s); skipped for the file:// build) ----------
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if(reloaded) return; reloaded = true; location.reload();    // the new SW took control → load the new build
+  });
+  function showUpdateToast(worker){
+    if(document.getElementById("updToast")) return;             // a refresh is offered, NOT forced — never yank a child mid-activity
+    const t = el(`<div id="updToast" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#2c2440;color:#fff;border-radius:999px;padding:10px 16px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer;font-size:14px">${tx("New version — tap to refresh","नया वर्शन — रिफ्रेश करें")}</div>`);
+    t.onclick = () => { t.textContent = tx("Updating…","अपडेट हो रहा है…"); worker.postMessage("SKIP_WAITING"); };
+    document.body.appendChild(t);
+  }
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/assets/hikmat/sw.js", { scope: "/assets/hikmat/" })
+      .then(reg => {
+        reg.addEventListener("updatefound", () => {
+          const nw = reg.installing;
+          nw && nw.addEventListener("statechange", () => {
+            if(nw.state === "installed" && navigator.serviceWorker.controller) showUpdateToast(nw);
+          });
+        });
+      })
       .catch(e => console.warn("Hikmat SW registration failed:", e));
   });
 }

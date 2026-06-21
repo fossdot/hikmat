@@ -137,13 +137,17 @@ after_install = "hikmat.install.after_install"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+# Bust the cached read endpoints (get_courses/get_structure/get_settings) whenever
+# content is edited in Desk, so teacher changes show up without waiting for a TTL.
+_bust = {"on_update": "hikmat.api.clear_content_cache", "on_trash": "hikmat.api.clear_content_cache"}
+doc_events = {
+	"Track": _bust,
+	"Lesson": _bust,
+	"Dialogue": _bust,
+	"Grade Band": _bust,
+	"Subject": _bust,
+	"Hikmat Settings": {"on_update": "hikmat.api.clear_content_cache"},
+}
 
 # Scheduled Tasks
 # ---------------
