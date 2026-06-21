@@ -83,7 +83,7 @@ app_license = "mit"
 # ------------
 
 # before_install = "hikmat.install.before_install"
-# after_install = "hikmat.install.after_install"
+after_install = "hikmat.install.after_install"
 
 # Uninstallation
 # ------------
