@@ -213,14 +213,22 @@ def create_doctypes():
 
 
 def add_auth_field():
-    """Add a hidden auth_token field to Student (per-student login token). Safe to re-run."""
+    """Add the per-student auth_token + the student's grade band to Student. Safe to re-run."""
     st = frappe.get_doc("DocType", "Student")
-    if "auth_token" not in [x.fieldname for x in st.fields]:
+    have = [x.fieldname for x in st.fields]
+    changed = False
+    if "auth_token" not in have:
         st.append("fields", {"fieldname": "auth_token", "fieldtype": "Data", "label": "Auth token",
                              "hidden": 1, "no_copy": 1, "read_only": 1, "print_hide": 1})
+        changed = True
+    if "band" not in have:
+        st.append("fields", {"fieldname": "band", "fieldtype": "Link", "label": "Grade band",
+                             "options": "Grade Band", "in_list_view": 1})
+        changed = True
+    if changed:
         st.save()
         frappe.db.commit()
-    print("=== Student.auth_token ensured ===")
+    print("=== Student.auth_token + band ensured ===")
 
 
 def add_structure_fields():

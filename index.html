@@ -236,6 +236,13 @@
   .hint2 { color:var(--muted); font-size:12.5px; font-weight:600; margin:6px 2px 0; }
   .consent { display:flex; gap:10px; align-items:flex-start; margin:16px 2px 4px; font-weight:600; font-size:14px; color:var(--ink); cursor:pointer; }
   .consent input { width:20px; height:20px; margin-top:2px; flex:0 0 auto; accent-color:var(--grape); }
+  .bandpick { display:flex; flex-wrap:wrap; gap:8px; }
+  .bandchip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:2px solid var(--line); border-radius:14px; padding:8px 13px; font-weight:800; font-size:14px; cursor:pointer; color:var(--ink); box-shadow:0 3px 0 var(--line); }
+  .bandchip .iconsvg svg { width:1.3em; height:1.3em; }
+  .bandchip.sel { border-color:var(--grape); background:#efeaff; box-shadow:0 3px 0 #d9cffb; }
+  .seeother { margin-top:2px; }
+  [data-theme="dark"] .bandchip { background:#2a2240; color:var(--ink); border-color:var(--line); box-shadow:0 3px 0 #15101f; }
+  [data-theme="dark"] .bandchip.sel { background:#39314f; border-color:var(--grape); }
   .signup .searchbox { width:100%; margin:0; }
   .fieldlabel { display:block; font-weight:800; color:var(--muted); font-size:13px; margin:16px 2px 6px; }
   .avpick { display:flex; flex-wrap:wrap; gap:8px; }
@@ -438,8 +445,8 @@
     <div class="topbar">
       <div class="brand"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></div>
       <div class="stats">
-        <span class="pill star"><span class="staricon">★</span> <span id="totalStars">0</span></span>
-        <span class="pill coin">💎 <span id="coins">0</span></span>
+        <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
+        <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
         <button class="toggle on" id="soundToggle" title="Sound">🔊</button>
         <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
         <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
@@ -512,6 +519,13 @@ window.HIKMAT_ICONS = {
 
   "lang": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-lang-g" cx="26" cy="22" r="28" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#aee0ff"/><stop offset="1" stop-color="#6cb6ea"/></radialGradient></defs><circle cx="32" cy="32" r="22" fill="url(#hk-lang-g)" stroke="#00000026" stroke-width="1.6"/><g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".9"><ellipse cx="32" cy="32" rx="9" ry="22"/><path d="M10 32h44"/><path d="M14 21h36M14 43h36"/></g><path d="M20 18c4-3 8-4 12-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>`
 };
+
+window.HIKMAT_ICONS = Object.assign(window.HIKMAT_ICONS || {}, {
+  "sound-on": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sndon-sp" x1="12" y1="20" x2="34" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fc1f0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M12 26h8l12-10v32L20 38h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-sndon-sp)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 27l8-6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><path d="M40 24c3 5 3 11 0 16" fill="none" stroke="#f2b134" stroke-width="3" stroke-linecap="round"/><path d="M47 18c5 8 5 20 0 28" fill="none" stroke="#e8714f" stroke-width="3" stroke-linecap="round"/></svg>`,
+  "sound-off": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sndoff-sp" x1="12" y1="20" x2="34" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fc1f0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M12 26h8l12-10v32L20 38h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-sndoff-sp)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 27l8-6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><g stroke="#e8543a" stroke-width="3.6" stroke-linecap="round"><path d="M41 23l14 18"/><path d="M55 23L41 41"/></g></svg>`,
+  "theme-light": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-thl-c" cx="32" cy="30" r="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe79a"/><stop offset="1" stop-color="#f2b134"/></radialGradient></defs><g stroke="#e0951f" stroke-width="3.4" stroke-linecap="round"><path d="M32 6v7"/><path d="M32 51v7"/><path d="M6 32h7"/><path d="M51 32h7"/><path d="M13 13l5 5"/><path d="M46 46l5 5"/><path d="M51 13l-5 5"/><path d="M18 46l-5 5"/></g><circle cx="32" cy="32" r="13" fill="url(#hk-thl-c)" stroke="#d99a1f" stroke-width="1.6"/><path d="M26 26c2-2 5-3 8-3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".7"/></svg>`,
+  "theme-dark": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-thd-m" x1="16" y1="12" x2="46" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9b6fd9"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient></defs><path d="M40 10a23 23 0 1 0 14 41 18 18 0 0 1-14-41z" fill="url(#hk-thd-m)" stroke="#5a4bc4" stroke-width="1.6" stroke-linejoin="round"/><path d="M34 16a18 18 0 0 0-6 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".5"/><path d="M46 20l1.6 3.4L51 25l-3.4 1.6L46 30l-1.6-3.4L41 25l3.4-1.6z" fill="#ffe79a" stroke="#e0c24f" stroke-width="1" stroke-linejoin="round"/></svg>`
+});
 </script>
 <script>
 /* ============================================================
@@ -786,6 +800,7 @@ const root = $("#root");
 function tx(en, hi){ return state.lang === "hi" ? hi : en; }
 // pointer to re-render the current screen (so the language toggle updates live)
 let rerender = function(){};
+let showAllClasses = false;   // a logged-in student sees only their class group until they tap "See other classes"
 
 // ---------- Sonic identity: tiny offline Web-Audio sound kit ----------
 // One warm timbre + a major-pentatonic scale, so every cue is consonant and
@@ -985,7 +1000,9 @@ function refreshTop(){
   document.documentElement.lang = state.lang || "en";   // keep <html lang> in sync for screen readers
   const dark = state.theme === "dark";
   document.documentElement.dataset.theme = dark ? "dark" : "";
-  const tt = $("#themeToggle"); if(tt){ tt.textContent = dark ? "☀️" : "🌙"; tt.classList.toggle("on", dark); }
+  const tt = $("#themeToggle"); if(tt){ tt.innerHTML = dark ? iconFor("theme-light","☀️") : iconFor("theme-dark","🌙"); tt.classList.toggle("on", dark); }
+  const si = $("#starIcon"); if(si) si.innerHTML = iconFor("star","★");
+  const ci = $("#coinIcon"); if(ci) ci.innerHTML = iconFor("gem","💎");
   const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
   const lg = $("#brandLogo");
   if(lg){                                   // build via DOM + scheme-check so a hostile logo URL can't break out / run javascript:
@@ -1002,9 +1019,9 @@ function refreshTop(){
   ht.classList.toggle("on", state.hindi);
   ht.textContent = tx("Help","मदद") + ": " + (state.hindi ? tx("ON","चालू") : tx("OFF","बंद"));
   const lt = $("#langToggle");
-  if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.textContent = "🌐 " + (state.lang==="hi" ? "हिं" : "EN"); }
+  if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.innerHTML = iconFor("lang","🌐") + " " + (state.lang==="hi" ? "हिं" : "EN"); }
   const st = $("#soundToggle");
-  if(st){ const on = state.sound !== false; st.classList.toggle("on", on); st.textContent = on ? "🔊" : "🔇"; }
+  if(st){ const on = state.sound !== false; st.classList.toggle("on", on); st.innerHTML = on ? iconFor("sound-on","🔊") : iconFor("sound-off","🔇"); }
 }
 $("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop(); updateHiLine(); };
 $("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
@@ -1101,13 +1118,16 @@ function renderHome(){
   root.innerHTML = "";
   setBack(null);
   const guest = !currentStudent;
-  // Build the grade-band cards first so the hero copy can adapt to whether groups exist.
-  const bands = BANDS.map(bandCard).filter(Boolean);
+  // Which grade bands actually have content; and the student's own band (if logged in).
+  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const haveBands = bandList.length > 0;
+  const myBand = (currentStudent && currentStudent.band) || "";
+  const hasMy = haveBands && bandList.some(b => b.key === myBand);
   const heroH1 = guest
-    ? (bands.length ? tx("Choose your class group ✨", "अपनी कक्षा का समूह चुनो ✨")
-                    : tx("Welcome to "+SETTINGS.appName+"! ✨", SETTINGS.appName+" में आपका स्वागत है! ✨"))
+    ? (haveBands ? tx("Choose your class group ✨", "अपनी कक्षा का समूह चुनो ✨")
+                 : tx("Welcome to "+SETTINGS.appName+"! ✨", SETTINGS.appName+" में आपका स्वागत है! ✨"))
     : tx("Welcome back, "+currentStudent.name+"! ✨", "वापसी पर स्वागत है, "+currentStudent.name+"! ✨");
-  const heroP = bands.length
+  const heroP = haveBands
     ? tx("Pick your class, then choose a subject to start.", "अपनी कक्षा चुनो, फिर विषय चुनकर शुरू करो।")
     : tx("Pick a place to explore and learn.", "सीखने के लिए कोई जगह चुनो।");
   const s = el(`<div class="screen">
@@ -1121,16 +1141,28 @@ function renderHome(){
   root.appendChild(s);
   profileChip($("#profileRow"));
   const host = $("#homeSections");
-  // By Class — the primary call to action: choose your class group, then a subject
-  if(bands.length){
-    host.appendChild(el(`<div class="sectionhead">${tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
-    const grid = el(`<div class="themes"></div>`); bands.forEach(b=>grid.appendChild(b)); host.appendChild(grid);
+  const seeBtn = (label, fn) => { const b = el(`<button class="btn ghost seeother">${label}</button>`); b.onclick = () => { sfx.tap(); fn(); }; const c = el(`<div class="center" style="margin:2px 0 4px"></div>`); c.appendChild(b); host.appendChild(c); };
+  // By Class — a logged-in student sees ONLY their class group (+ a way to peek at the others)
+  if(haveBands){
+    if(hasMy && !showAllClasses){
+      host.appendChild(el(`<div class="sectionhead">${tx("📚 Your class","📚 तुम्हारी कक्षा")}</div>`));
+      const grid = el(`<div class="themes"></div>`);
+      bandList.filter(b => b.key === myBand).forEach(b => grid.appendChild(bandCard(b)));
+      host.appendChild(grid);
+      seeBtn(tx("See other classes →","दूसरी कक्षाएँ देखो →"), () => { showAllClasses = true; renderHome(); });
+    } else {
+      host.appendChild(el(`<div class="sectionhead">${tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
+      const grid = el(`<div class="themes"></div>`);
+      bandList.forEach(b => grid.appendChild(bandCard(b)));
+      host.appendChild(grid);
+      if(hasMy && showAllClasses) seeBtn(tx("← Show only my class","← सिर्फ़ मेरी कक्षा"), () => { showAllClasses = false; renderHome(); });
+    }
   }
   // Life Skills (the original thematic tracks)
   const life = lifeSkillsTracks();
   if(life.length){
     const grid = el(`<div class="themes"></div>`);
-    if(bands.length){
+    if(haveBands){
       // class bands present → collapse the 4 thematic tracks into ONE "Life Skills" card to keep Home tidy
       host.appendChild(el(`<div class="sectionhead">${tx("🌼 Life Skills","🌼 जीवन कौशल")}</div>`));
       grid.appendChild(lifeSkillsCard());
@@ -1854,6 +1886,7 @@ window.addEventListener("online", syncAttempts);
 // ---------- identity & login (only when served from Frappe; offline = guest) ----------
 function setStudent(stu){
   currentStudent = stu || null;
+  showAllClasses = false;               // a fresh login starts focused on the student's own class
   if(stu) localStorage.setItem("hikmat_current", JSON.stringify(stu));
   else localStorage.removeItem("hikmat_current");
   state = loadState();                  // swap to this identity's saved progress
@@ -1872,7 +1905,7 @@ const AVATARS = ["🙂","👧","🧒","👩","😀","🦋","🌸","🌟","🐱",
 function renderSignup(){
   stopSpeech(); rerender = renderSignup; root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderLogin);
-  let avatar = AVATARS[0];
+  let avatar = AVATARS[0], band = "";
   root.appendChild(el(`<div class="screen">
     <div class="hero"><h1>${tx("Create your name ✨","अपना नाम बनाओ ✨")}</h1>
       <p>${tx("Make a profile so your stars are saved.","प्रोफ़ाइल बनाओ ताकि तुम्हारे सितारे सुरक्षित रहें।")}</p></div>
@@ -1881,6 +1914,8 @@ function renderSignup(){
       <input id="suName" class="searchbox" type="text" autocomplete="off" maxlength="40"
              placeholder="${tx('e.g. Asha, or a nickname','जैसे: आशा, या उपनाम')}">
       <div class="hint2">${tx("A first name or nickname is best — you don't need your full name.","पहला नाम या उपनाम काफ़ी है — पूरा नाम ज़रूरी नहीं।")}</div>
+      <label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
+      <div class="bandpick" id="bandpick"></div>
       <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
       <div class="avpick" id="avpick"></div>
       <label class="fieldlabel">${tx("PIN (optional)","पिन (वैकल्पिक)")}</label>
@@ -1903,20 +1938,27 @@ function renderSignup(){
     avwrap.appendChild(b);
   });
   const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr"), consent = $("#suConsent");
-  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked); };
+  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked && band); };
   name.oninput = () => { refreshGo(); err.textContent = ""; };
   consent.onchange = refreshGo;
+  const bandwrap = $("#bandpick");
+  BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length)).forEach(b => {
+    const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+    btn.onclick = () => { band = b.key; sfx.tap(); bandwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
+    bandwrap.appendChild(btn);
+  });
   setTimeout(() => name.focus(), 60);
   $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
   $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
+    if(!band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
     if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     const p = pin.value.trim();
     if(p && !/^\d{4,8}$/.test(p)){ err.textContent = tx("PIN must be 4–8 digits.","पिन 4–8 अंकों का हो।"); return; }
     go.disabled = true; err.textContent = "";
-    const r = await api("signup_student", { name:nm, avatar, pin:p }, true);
+    const r = await api("signup_student", { name:nm, avatar, pin:p, band }, true);
     if(r && r.ok){ finishLogin(r); }
     else { go.disabled = false; err.textContent = tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।"); }
   };
@@ -1967,7 +2009,7 @@ function renderLogin(){
 }
 async function finishLogin(stu){
   sfx.enter();
-  setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂", token: stu.token });
+  setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂", token: stu.token, band: stu.band || "" });
   await mergeServerProgress();
   renderHome();
 }

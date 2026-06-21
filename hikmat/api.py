@@ -368,7 +368,7 @@ def login_student(student, pin=None):
     if _int(c.get_value(fkey)) >= _MAX_PIN_TRIES:
         return {"ok": False, "error": "locked"}
     s = frappe.db.get_value("Student", student,
-                            ["student_name", "login_pin", "active", "avatar"], as_dict=True)
+                            ["student_name", "login_pin", "active", "avatar", "band"], as_dict=True)
     if not s or not s.active:
         return {"ok": False, "error": "not_found"}
     if s.login_pin and not _pin_ok(s.login_pin, pin):
@@ -383,9 +383,9 @@ def login_student(student, pin=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None):
+def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band=None):
     """Self-service signup: a learner creates their own profile and is logged straight in.
-    No email/password — just a name (+ optional avatar & PIN). Rate-limited per IP."""
+    No email/password — just a name (+ optional avatar, PIN, grade band). Rate-limited per IP."""
     if not _rate_ok("signup:" + _client_ip(), 60, 3600):   # generous for a classroom; stops spam faucets
         return {"ok": False, "error": "rate_limited"}
     name = "".join(ch for ch in (name or "").strip() if ch.isprintable())
@@ -396,6 +396,7 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None):
         return {"ok": False, "error": "bad_pin"}
     a = _int(age, None)
     age_val = a if (a is not None and 3 <= a <= 25) else None
+    band = band if (band and frappe.db.exists("Grade Band", band)) else None
 
     if not cohort:
         cohort = "New Learners"                            # self-signups isolated from facilitator centres
@@ -408,12 +409,12 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None):
     doc = frappe.get_doc({
         "doctype": "Student", "student_name": name, "avatar": avatar or "🙂",
         "cohort": cohort, "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
-        "age": age_val,
+        "age": age_val, "band": band,
     }).insert(ignore_permissions=True)
     token = _token_for(doc.name)
     frappe.db.commit()
     return {"ok": True, "id": doc.name, "name": doc.student_name,
-            "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token}
+            "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token, "band": band or ""}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -429,7 +430,7 @@ def login_by_name(name, pin=None):
     if _int(c.get_value(fkey)) >= _MAX_PIN_TRIES:
         return {"ok": False, "error": "locked"}
     cands = [s for s in frappe.get_all("Student", filters={"active": 1},
-                                       fields=["name", "student_name", "login_pin", "avatar"])
+                                       fields=["name", "student_name", "login_pin", "avatar", "band"])
              if (s.student_name or "").strip().lower() == key]
     match = next((s for s in cands if _pin_ok(s.login_pin, pin)), None)
     if not match:
@@ -440,7 +441,8 @@ def login_by_name(name, pin=None):
         frappe.db.set_value("Student", match.name, "login_pin", _hash_pin(str(match.login_pin)), update_modified=False)
     token = _token_for(match.name)
     frappe.db.commit()
-    return {"ok": True, "id": match.name, "name": match.student_name, "avatar": match.avatar or "🙂", "token": token}
+    return {"ok": True, "id": match.name, "name": match.student_name, "avatar": match.avatar or "🙂",
+            "token": token, "band": match.band or ""}
 
 
 # ---------------------------------------------------------------------------

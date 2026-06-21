@@ -14,7 +14,8 @@
   "login_pin",
   "avatar",
   "active",
-  "auth_token"
+  "auth_token",
+  "band"
  ],
  "fields": [
   {
@@ -67,12 +68,19 @@
    "no_copy": 1,
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "band",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Grade band",
+   "options": "Grade Band"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-21 20:58:01.921341",
+ "modified": "2026-06-21 21:57:04.590962",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Student",
