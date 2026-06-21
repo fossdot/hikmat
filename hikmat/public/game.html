@@ -32,6 +32,23 @@
     --bad-d: #c0282d;         /* AA on white + the #fff0f0 error tint (was #d83a40) */
     --r: 16px;
   }
+  /* ===== Dark theme (toggled via <html data-theme="dark">) ===== */
+  [data-theme="dark"]{
+    --bg:#171221; --bg2:#221a33; --card:#241d36; --ink:#f1ecfb; --muted:#b3abc9; --line:#39314f;
+    --good-d:#4ade80; --bad-d:#fb7185;
+  }
+  [data-theme="dark"] .topbar{ background:linear-gradient(90deg,#241d36,#1d1730); }
+  [data-theme="dark"] .opt,[data-theme="dark"] .tile,[data-theme="dark"] .bubble2,
+  [data-theme="dark"] .searchbox,[data-theme="dark"] .btn.ghost,[data-theme="dark"] .chiptab,
+  [data-theme="dark"] .profilebtn,[data-theme="dark"] .av,[data-theme="dark"] .backbtn,
+  [data-theme="dark"] .echip,[data-theme="dark"] .email,[data-theme="dark"] .pill,
+  [data-theme="dark"] .toggle,[data-theme="dark"] .speakbtn,[data-theme="dark"] .speakchip{
+    background:#2a2240; color:var(--ink); border-color:var(--line); box-shadow:0 4px 0 #15101f; }
+  [data-theme="dark"] .opt.correct{ background:#15341f; }
+  [data-theme="dark"] .opt.wrong{ background:#3a1622; }
+  [data-theme="dark"] .searchbox::placeholder{ color:var(--muted); }
+  [data-theme="dark"] .node .num{ background:#2a2240; color:var(--ink); }
+  [data-theme="dark"] .pininput{ background:#2a2240; color:var(--ink); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; }
   body {
@@ -214,7 +231,11 @@
   .quizopts { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); }
   .opt.quizopt { flex-direction:row; justify-content:center; text-align:center; padding:16px; font-size:17px; }
   /* Sign up */
-  .signup { max-width:440px; margin:0 auto; text-align:left; }
+  .signup, .authform { max-width:440px; margin:0 auto; text-align:left; }
+  .authform .searchbox { width:100%; margin:0; }
+  .hint2 { color:var(--muted); font-size:12.5px; font-weight:600; margin:6px 2px 0; }
+  .consent { display:flex; gap:10px; align-items:flex-start; margin:16px 2px 4px; font-weight:600; font-size:14px; color:var(--ink); cursor:pointer; }
+  .consent input { width:20px; height:20px; margin-top:2px; flex:0 0 auto; accent-color:var(--grape); }
   .signup .searchbox { width:100%; margin:0; }
   .fieldlabel { display:block; font-weight:800; color:var(--muted); font-size:13px; margin:16px 2px 6px; }
   .avpick { display:flex; flex-wrap:wrap; gap:8px; }
@@ -403,6 +424,11 @@
   }
   /* Screen-reader-only live region */
   .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+  /* Inline SVG icons (replace emoji on cards/headers); scale with the surrounding font-size */
+  .iconsvg { display:inline-flex; align-items:center; justify-content:center; line-height:0; vertical-align:middle; }
+  .iconsvg svg { width:1em; height:1em; display:block; }
+  .theme .big .iconsvg svg { width:46px; height:46px; }
+  .maphead h2 .iconsvg svg { width:30px; height:30px; }
 </style>
 </head>
 <body>
@@ -415,6 +441,7 @@
         <span class="pill star"><span class="staricon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin">💎 <span id="coins">0</span></span>
         <button class="toggle on" id="soundToggle" title="Sound">🔊</button>
+        <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
         <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
         <button class="toggle" id="hiToggle" title="Help">Help: OFF</button>
       </div>
@@ -424,6 +451,68 @@
   </div>
 </div>
 
+<script>
+/* Hikmat icon set — inline SVGs replacing emoji (consistent across all browsers). Generated. */
+window.HIKMAT_ICONS = {
+  "band:1-4": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-b14-leaf" x1="20" y1="14" x2="44" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d8f0d2"/></linearGradient><linearGradient id="hk-b14-soil" x1="32" y1="42" x2="32" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7ec"/><stop offset="1" stop-color="#f0dcc0"/></linearGradient></defs><path d="M14 46h36v6a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4z" fill="url(#hk-b14-soil)" stroke="#00000022" stroke-width="1.5"/><path d="M32 48V30" stroke="#7cc36a" stroke-width="3" stroke-linecap="round"/><path d="M32 34c-1-9-8-13-15-13 0 9 6 13 15 13z" fill="url(#hk-b14-leaf)" stroke="#00000022" stroke-width="1.5" stroke-linejoin="round"/><path d="M32 30c1-10 9-15 17-15 0 10-7 15-17 15z" fill="url(#hk-b14-leaf)" stroke="#00000022" stroke-width="1.5" stroke-linejoin="round"/><path d="M40 22c-4 2-6 5-7 8" fill="none" stroke="#9fd98c" stroke-width="1.4" stroke-linecap="round"/><circle cx="22" cy="24" r="2" fill="#fff" opacity=".7"/></svg>`,
+
+  "band:5-8": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-b58-core" cx="32" cy="30" r="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe7a8"/></radialGradient><linearGradient id="hk-b58-ray" x1="32" y1="6" x2="32" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffd36b"/></linearGradient></defs><g stroke="#00000018" stroke-width="1.2" stroke-linecap="round"><path d="M32 5l3 9-3-2-3 2z" fill="url(#hk-b58-ray)"/><path d="M52 12l-5 8 4-1 1-4z" fill="url(#hk-b58-ray)"/><path d="M12 12l5 8-4-1-1-4z" fill="url(#hk-b58-ray)"/><path d="M58 30l-9 2 4 2-1 3z" fill="url(#hk-b58-ray)"/><path d="M6 30l9 2-4 2 1 3z" fill="url(#hk-b58-ray)"/></g><path d="M32 12l5.5 11.5L50 25l-9 8.5L43 46l-11-6-11 6 2-12.5L14 25l12.5-1.5z" fill="url(#hk-b58-core)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M28 22l-6 3.5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/></svg>`,
+
+  "band:9-10": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-b910-cap" x1="14" y1="16" x2="50" y2="34" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e7ecf4"/></linearGradient><linearGradient id="hk-b910-base" x1="32" y1="30" x2="32" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs><path d="M32 34c7 0 12-1 12-1v9c0 3-5 6-12 6s-12-3-12-6v-9s5 1 12 1z" fill="url(#hk-b910-base)" stroke="#00000022" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 26l26-11 26 11-26 11z" fill="url(#hk-b910-cap)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 24l16 7 16-7" fill="none" stroke="#00000012" stroke-width="1.4"/><path d="M54 28v12" stroke="#ffd36b" stroke-width="2.4" stroke-linecap="round"/><circle cx="54" cy="42" r="3.2" fill="#ffce5a" stroke="#00000022" stroke-width="1.4"/><circle cx="22" cy="22" r="2" fill="#fff" opacity=".7"/></svg>`,
+
+  "subject:english": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-eng-a" x1="10" y1="28" x2="34" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe0d6"/></linearGradient><linearGradient id="hk-eng-b" x1="30" y1="20" x2="54" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient></defs><rect x="28" y="14" width="26" height="26" rx="6" fill="url(#hk-eng-b)" stroke="#00000022" stroke-width="1.6"/><text x="41" y="34" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="800" text-anchor="middle" fill="#4a90d9">B</text><rect x="10" y="28" width="26" height="26" rx="6" fill="url(#hk-eng-a)" stroke="#00000026" stroke-width="1.6"/><text x="23" y="48" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="800" text-anchor="middle" fill="#e8714f">A</text><rect x="14" y="31" width="8" height="3" rx="1.5" fill="#fff" opacity=".6"/></svg>`,
+
+  "subject:math": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-mth-bd" x1="14" y1="12" x2="50" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient></defs><rect x="12" y="12" width="40" height="40" rx="10" fill="url(#hk-mth-bd)" stroke="#00000022" stroke-width="1.6"/><g stroke-linecap="round"><path d="M22 24v8M18 28h8" stroke="#4a90d9" stroke-width="3.4"/><path d="M40 24l8 8M48 24l-8 8" stroke="#e8714f" stroke-width="3.4"/><circle cx="24" cy="42" r="1.8" fill="#7cc36a"/><circle cx="24" cy="48" r="1.8" fill="#7cc36a"/><path d="M18 45h12" stroke="#7cc36a" stroke-width="3"/><path d="M40 40v10M37 44.5h6" stroke="#f2b134" stroke-width="3.2"/></g><rect x="16" y="15" width="10" height="3" rx="1.5" fill="#fff" opacity=".6"/></svg>`,
+
+  "subject:science": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sci-fl" x1="22" y1="14" x2="42" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaf6ff"/></linearGradient><linearGradient id="hk-sci-liq" x1="32" y1="34" x2="32" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fd1c4"/><stop offset="1" stop-color="#46b29d"/></linearGradient></defs><path d="M27 12h10v3h-2v11l9 18a5 5 0 0 1-4.6 7H24.6A5 5 0 0 1 20 44l9-18V15h-2z" fill="url(#hk-sci-fl)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M23.5 36a4.5 4.5 0 0 0 4 5h9a4.5 4.5 0 0 0 4-5l-3.5-7h-10z" fill="url(#hk-sci-liq)"/><circle cx="30" cy="38" r="2" fill="#fff" opacity=".7"/><circle cx="36" cy="44" r="1.5" fill="#fff" opacity=".6"/><circle cx="33" cy="22" r="2" fill="#ffd36b" stroke="#00000018" stroke-width="1"/><rect x="29" y="14" width="6" height="2.4" rx="1.2" fill="#fff" opacity=".6"/></svg>`,
+
+  "subject:evs": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-evs-g" cx="26" cy="24" r="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#bfe6ff"/><stop offset="1" stop-color="#7fc1f0"/></radialGradient><linearGradient id="hk-evs-lf" x1="34" y1="10" x2="48" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cdeec1"/></linearGradient></defs><circle cx="32" cy="34" r="22" fill="url(#hk-evs-g)" stroke="#00000022" stroke-width="1.6"/><path d="M16 30c6 1 9 4 14 4 3 0 4-3 9-3 4 0 6 2 9 1M14 40c5-1 9 2 13 2 4 0 6-3 10-3 3 0 5 2 8 1" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".85"/><path d="M40 12c8-2 14 0 14 0s-1 12-9 14c-6 1.5-10-3-10-3s-3-9 5-11z" fill="url(#hk-evs-lf)" stroke="#00000022" stroke-width="1.5" stroke-linejoin="round"/><path d="M37 26c4-5 9-8 13-9" fill="none" stroke="#8fd17a" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="26" r="2.5" fill="#fff" opacity=".55"/></svg>`,
+
+  "subject:hindi": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-hin-pg" x1="32" y1="14" x2="32" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff1e0"/></linearGradient><linearGradient id="hk-hin-cv" x1="10" y1="44" x2="54" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0c277"/><stop offset="1" stop-color="#e0a84e"/></linearGradient></defs><path d="M32 18c-6-4-14-4-22-2v32c8-2 16-2 22 2 6-4 14-4 22-2V16c-8-2-16-2-22 2z" fill="url(#hk-hin-pg)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M32 18v32" stroke="#00000018" stroke-width="1.4"/><path d="M8 48c8-2 16-2 24 2 8-4 16-4 24-2l-2 6c-7-1.5-14-1.5-22 2-8-3.5-15-3.5-22-2z" fill="url(#hk-hin-cv)" stroke="#00000022" stroke-width="1.4" stroke-linejoin="round"/><g fill="none" stroke="#d36a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 24h13"/><path d="M22 27c-4 0-5 8 0 8 3 0 3-4 1-6"/><path d="M23 31c2-1 4 0 4 3 0 2 1 2 2 1"/><path d="M29 24v11"/></g><rect x="12" y="22" width="6" height="2.4" rx="1.2" fill="#fff" opacity=".6"/></svg>`,
+
+  "subject:sst": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sst-mp" x1="12" y1="14" x2="52" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3ec"/></linearGradient><radialGradient id="hk-sst-cp" cx="44" cy="42" r="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe2c0"/></radialGradient></defs><path d="M12 18l13-4 14 4 13-4v32l-13 4-14-4-13 4z" fill="url(#hk-sst-mp)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M25 14v32M39 18v32" stroke="#00000018" stroke-width="1.4"/><path d="M17 24c4 2 4 6 8 6M30 22c4 0 4 6 9 5M44 24c2 3 6 2 7 5" fill="none" stroke="#9cc47e" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><circle cx="44" cy="42" r="11" fill="url(#hk-sst-cp)" stroke="#00000026" stroke-width="1.6"/><path d="M44 35l3 7-3 7-3-7z" fill="#e8714f" stroke="#00000018" stroke-width="1"/><path d="M44 35l-3 7 3 7" fill="#fff"/><circle cx="44" cy="42" r="1.6" fill="#fff" stroke="#00000022" stroke-width="1"/></svg>`,
+
+  "subject:computer": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-cmp-bd" x1="10" y1="14" x2="54" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient><linearGradient id="hk-cmp-scr" x1="32" y1="18" x2="32" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fc8f0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><rect x="10" y="14" width="44" height="32" rx="7" fill="url(#hk-cmp-bd)" stroke="#00000026" stroke-width="1.6"/><rect x="15" y="19" width="34" height="20" rx="3" fill="url(#hk-cmp-scr)"/><circle cx="26" cy="28" r="2.6" fill="#fff"/><circle cx="38" cy="28" r="2.6" fill="#fff"/><path d="M27 33c2 2 8 2 10 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="24" y="46" width="16" height="5" rx="2" fill="#cdd6e2" stroke="#00000022" stroke-width="1.4"/><rect x="18" y="50" width="28" height="4" rx="2" fill="#dde4ee" stroke="#00000022" stroke-width="1.4"/><rect x="16" y="21" width="9" height="3" rx="1.5" fill="#fff" opacity=".4"/></svg>`,
+
+  "track:bazaar": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-baz-bk" x1="14" y1="26" x2="50" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f4e6cf"/></linearGradient></defs><circle cx="26" cy="32" r="6" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><circle cx="38" cy="32" r="6" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><path d="M30 26c2-5 6-5 6-5" fill="none" stroke="#7cc36a" stroke-width="2.4" stroke-linecap="round"/><path d="M14 28h36l-3 22a5 5 0 0 1-5 4.4H22a5 5 0 0 1-5-4.4z" fill="url(#hk-baz-bk)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 28h36" stroke="#00000026" stroke-width="1.6"/><path d="M22 28l3-7h14l3 7" fill="none" stroke="#00000022" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#c9a86a" stroke-width="1.8" opacity=".7"><path d="M24 34l-1 16M32 34v16M40 34l1 16"/></g><rect x="18" y="31" width="7" height="3" rx="1.5" fill="#fff" opacity=".5"/></svg>`,
+
+  "track:home": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-hom-wl" x1="32" y1="28" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fbeede"/></linearGradient><linearGradient id="hk-hom-rf" x1="10" y1="10" x2="54" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f59b6f"/><stop offset="1" stop-color="#e8714f"/></linearGradient></defs><path d="M14 54V28h36v26a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="url(#hk-hom-wl)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 30L32 10l24 20a2.5 2.5 0 0 1-1.6 4.4H9.6A2.5 2.5 0 0 1 8 30z" fill="url(#hk-hom-rf)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><rect x="27" y="40" width="10" height="17" rx="2" fill="#e8a24f" stroke="#00000022" stroke-width="1.4"/><circle cx="34" cy="49" r="1.2" fill="#fff"/><rect x="18" y="34" width="9" height="9" rx="2" fill="#bfe6ff" stroke="#00000022" stroke-width="1.4"/><path d="M22.5 34v9M18 38.5h9" stroke="#00000018" stroke-width="1.2"/><path d="M16 26L32 13l4 3.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>`,
+
+  "track:school": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sch-bd" x1="32" y1="24" x2="32" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaf0f7"/></linearGradient><linearGradient id="hk-sch-rf" x1="12" y1="14" x2="52" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#6fb0e0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M32 8v8" stroke="#00000026" stroke-width="1.6" stroke-linecap="round"/><path d="M32 9l9 2.5-9 2.5z" fill="#e8714f" stroke="#00000018" stroke-width="1"/><path d="M14 56V26h36v30a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2z" fill="url(#hk-sch-bd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 26L32 16l22 10z" fill="url(#hk-sch-rf)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><circle cx="32" cy="34" r="5.5" fill="#fff" stroke="#00000022" stroke-width="1.4"/><path d="M32 31v3l2 2" fill="none" stroke="#4a90d9" stroke-width="1.8" stroke-linecap="round"/><path d="M26 44h12v14H26z" fill="#bfe6ff" stroke="#00000022" stroke-width="1.4"/><path d="M32 44v14" stroke="#00000018" stroke-width="1.2"/><rect x="18" y="46" width="6" height="6" rx="1.5" fill="#bfe6ff" stroke="#00000022" stroke-width="1.2"/><rect x="40" y="46" width="6" height="6" rx="1.5" fill="#bfe6ff" stroke="#00000022" stroke-width="1.2"/></svg>`,
+
+  "track:work": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-wrk-bd" x1="10" y1="22" x2="54" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e8e0d2"/></linearGradient><linearGradient id="hk-wrk-hd" x1="24" y1="12" x2="40" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f0e3cf"/></linearGradient></defs><path d="M24 16h16a3 3 0 0 1 3 3v5H21v-5a3 3 0 0 1 3-3z" fill="url(#hk-wrk-hd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><rect x="28" y="13" width="8" height="6" rx="2" fill="none" stroke="#00000026" stroke-width="1.6"/><rect x="10" y="22" width="44" height="30" rx="6" fill="url(#hk-wrk-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M10 34c8 4 14 5 22 5s14-1 22-5" fill="none" stroke="#00000018" stroke-width="1.6"/><rect x="27" y="34" width="10" height="7" rx="2" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><rect x="14" y="25" width="10" height="3" rx="1.5" fill="#fff" opacity=".5"/></svg>`,
+
+  "lifeskills": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-lfs-c" cx="32" cy="26" r="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7d6"/><stop offset="1" stop-color="#f2b134"/></radialGradient><linearGradient id="hk-lfs-p" x1="32" y1="14" x2="32" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe0ec"/></linearGradient></defs><path d="M32 50V34" stroke="#7cc36a" stroke-width="3" stroke-linecap="round"/><path d="M32 42c-6 0-11-3-11-3s3 6 11 6" fill="#8fd17a" stroke="#00000018" stroke-width="1.2" stroke-linejoin="round"/><g stroke="#00000022" stroke-width="1.5" stroke-linejoin="round"><path d="M32 26c-3-6-1-12-1-12s5 3 6 8z" fill="url(#hk-lfs-p)"/><path d="M32 26c3-6 1-12 1-12s-5 3-6 8z" fill="url(#hk-lfs-p)"/><path d="M32 26c6-3 12-1 12-1s-3 5-8 6z" fill="url(#hk-lfs-p)"/><path d="M32 26c-6-3-12-1-12-1s3 5 8 6z" fill="url(#hk-lfs-p)"/><path d="M32 26c-2 6-7 9-7 9s-1-6 3-10z" fill="url(#hk-lfs-p)"/><path d="M32 26c2 6 7 9 7 9s1-6-3-10z" fill="url(#hk-lfs-p)"/></g><circle cx="32" cy="26" r="5.5" fill="url(#hk-lfs-c)" stroke="#00000022" stroke-width="1.5"/><circle cx="30" cy="24" r="1.5" fill="#fff" opacity=".8"/></svg>`,
+
+  "brand": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-brand-fl" cx="32" cy="22" r="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7d6"/><stop offset=".5" stop-color="#ffc24d"/><stop offset="1" stop-color="#f2882d"/></radialGradient><linearGradient id="hk-brand-bw" x1="14" y1="38" x2="50" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb15a"/><stop offset="1" stop-color="#d4762b"/></linearGradient><radialGradient id="hk-brand-gl" cx="32" cy="24" r="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe08a" stop-opacity=".7"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/></radialGradient></defs><circle cx="32" cy="26" r="20" fill="url(#hk-brand-gl)"/><path d="M32 8c-2 6-6 8-6 14a6 6 0 0 0 12 0c0-6-4-8-6-14z" fill="url(#hk-brand-fl)" stroke="#d4762b" stroke-width="1.2" stroke-linejoin="round"/><path d="M32 16c-1 3-3 4-3 7a3 3 0 0 0 6 0c0-3-2-4-3-7z" fill="#fff7d6" opacity=".9"/><path d="M14 40h36c0 6-8 10-18 10S14 46 14 40z" fill="url(#hk-brand-bw)" stroke="#a85a1e" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 41c5-1 9-1 12 1-3 3-7 3-11 2z" fill="url(#hk-brand-bw)" stroke="#a85a1e" stroke-width="1.4" stroke-linejoin="round"/><path d="M18 42c6 3 22 3 28 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg>`,
+
+  "act:learn": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-lrn-pg" x1="32" y1="16" x2="32" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient><linearGradient id="hk-lrn-sp" x1="32" y1="18" x2="32" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9fc6ee"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M32 18c-6-4-15-4-23-2v32c8-2 17-2 23 2 6-4 15-4 23-2V16c-8-2-17-2-23 2z" fill="url(#hk-lrn-pg)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 18c1 1 2 1 2 2v30c0 1-1 1-2 0z" fill="url(#hk-lrn-sp)"/><g stroke="#9fb6d4" stroke-width="1.8" stroke-linecap="round" opacity=".8"><path d="M14 24h12M14 30h12M14 36h9"/><path d="M38 24h12M38 30h12M38 36h9"/></g><rect x="12" y="21" width="8" height="2.6" rx="1.3" fill="#fff" opacity=".5"/></svg>`,
+
+  "act:listen": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-lis-ear" x1="18" y1="12" x2="36" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe6da"/></linearGradient></defs><path d="M30 12c-9 0-16 7-16 16 0 6 3 8 3 13 0 6 4 9 9 9 4 0 6-3 6-7 0-3 2-4 4-6 4-3 6-6 6-12 0-7-5-13-12-13z" fill="url(#hk-lis-ear)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 26a7 7 0 0 1 12 4c0 4-4 4-4 8" fill="none" stroke="#e8714f" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="44" r="1.8" fill="#e8714f"/><g fill="none" stroke="#f2b134" stroke-width="2.6" stroke-linecap="round"><path d="M46 22c3 4 3 12 0 18"/><path d="M52 16c5 8 5 22 0 30"/></g></svg>`,
+
+  "act:spell": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-spl-a" x1="8" y1="20" x2="28" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe0d6"/></linearGradient><linearGradient id="hk-spl-b" x1="22" y1="28" x2="44" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient><linearGradient id="hk-spl-c" x1="40" y1="18" x2="58" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff2d6"/></linearGradient></defs><rect x="7" y="22" width="20" height="20" rx="5" fill="url(#hk-spl-a)" stroke="#00000026" stroke-width="1.6" transform="rotate(-8 17 32)"/><rect x="37" y="20" width="20" height="20" rx="5" fill="url(#hk-spl-c)" stroke="#00000026" stroke-width="1.6" transform="rotate(7 47 30)"/><rect x="22" y="28" width="22" height="22" rx="6" fill="url(#hk-spl-b)" stroke="#00000026" stroke-width="1.6"/><text x="17" y="38" font-family="Arial,sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="#e8714f" transform="rotate(-8 17 33)">C</text><text x="33" y="46" font-family="Arial,sans-serif" font-size="14" font-weight="800" text-anchor="middle" fill="#4a90d9">A</text><text x="47" y="36" font-family="Arial,sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="#6fae4f" transform="rotate(7 47 31)">T</text></svg>`,
+
+  "act:phrase": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-phr-a" x1="8" y1="22" x2="26" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe2d2"/></linearGradient><linearGradient id="hk-phr-b" x1="24" y1="22" x2="42" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d8eafc"/></linearGradient><linearGradient id="hk-phr-c" x1="40" y1="22" x2="58" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff2d4"/></linearGradient></defs><path d="M9 25h12a3.4 3.4 0 0 1 0 6 3.4 3.4 0 0 0 0 6H9z" fill="url(#hk-phr-a)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M21 25h7a3.4 3.4 0 0 1 6 0h7v6a3.4 3.4 0 0 0 0 6H34a3.4 3.4 0 0 1-6 0h-7a3.4 3.4 0 0 0 0-6 3.4 3.4 0 0 1 0-6z" fill="url(#hk-phr-b)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M40 31a3.4 3.4 0 0 1 0-6h15v12H40a3.4 3.4 0 0 1 0-6z" fill="url(#hk-phr-c)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><rect x="12" y="28" width="5" height="2.4" rx="1.2" fill="#fff" opacity=".5"/></svg>`,
+
+  "act:talk": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-tlk-a" x1="8" y1="12" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient><linearGradient id="hk-tlk-b" x1="30" y1="26" x2="58" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7ec"/><stop offset="1" stop-color="#ffe0c0"/></linearGradient></defs><path d="M10 14h26a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5H22l-8 7 1-7a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5z" fill="url(#hk-tlk-a)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g fill="#4a90d9"><circle cx="19" cy="23" r="2"/><circle cx="26" cy="23" r="2"/><circle cx="33" cy="23" r="2"/></g><path d="M54 30H36a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h12l6 5-1-5a4 4 0 0 0 1-9z" fill="url(#hk-tlk-b)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M40 37h10M40 41h6" stroke="#e8a24f" stroke-width="2" stroke-linecap="round"/></svg>`,
+
+  "act:quiz": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-qz-bd" x1="14" y1="10" x2="50" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#efe6fb"/></linearGradient></defs><path d="M32 8l6 4 7-1 2 7 6 4-3 6 3 6-6 4-2 7-7-1-6 4-6-4-7 1-2-7-6-4 3-6-3-6 6-4 2-7 7 1z" fill="url(#hk-qz-bd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M27 27a5.5 5.5 0 0 1 8.5-4.6c2.8 1.8 2.5 5-0.5 7-2 1.3-3 2-3 4.6" fill="none" stroke="#9b6fd9" stroke-width="3.4" stroke-linecap="round"/><circle cx="32" cy="43" r="2.6" fill="#9b6fd9"/><path d="M22 16c2-2 5-3 8-3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg>`,
+
+  "act:code": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-cod-bd" x1="10" y1="14" x2="54" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e7eef0"/></linearGradient></defs><rect x="10" y="12" width="44" height="40" rx="9" fill="url(#hk-cod-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M10 21a9 9 0 0 1 9-9h26a9 9 0 0 1 9 9z" fill="#46b29d" opacity=".18"/><g fill="#46b29d"><circle cx="17" cy="17" r="1.6"/><circle cx="22" cy="17" r="1.6"/><circle cx="27" cy="17" r="1.6"/></g><g fill="none" stroke="#46b29d" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 28l-7 6 7 6"/><path d="M40 28l7 6-7 6"/></g><path d="M35 26l-6 16" stroke="#e8714f" stroke-width="3" stroke-linecap="round"/></svg>`,
+
+  "act:fix": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-fix-bg" cx="26" cy="28" r="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff8a6e"/><stop offset="1" stop-color="#e8543a"/></radialGradient><linearGradient id="hk-fix-gl" x1="38" y1="34" x2="56" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs><g stroke="#00000026" stroke-width="1.6" stroke-linecap="round"><path d="M18 22l-7-5M34 22l7-5M14 30H7M38 30h7M16 40l-7 6M36 40l7 6"/></g><ellipse cx="26" cy="30" rx="13" ry="15" fill="url(#hk-fix-bg)" stroke="#00000026" stroke-width="1.6"/><path d="M26 15v30" stroke="#00000026" stroke-width="1.6"/><circle cx="22" cy="20" r="2.2" fill="#fff"/><circle cx="30" cy="20" r="2.2" fill="#fff"/><g fill="#fff"><circle cx="20" cy="29" r="2.4"/><circle cx="32" cy="29" r="2.4"/><circle cx="22" cy="38" r="2.2"/><circle cx="30" cy="38" r="2.2"/></g><circle cx="46" cy="42" r="9" fill="url(#hk-fix-gl)" fill-opacity=".5" stroke="#00000026" stroke-width="1.6"/><path d="M52 48l6 6" stroke="#00000026" stroke-width="3.4" stroke-linecap="round"/></svg>`,
+
+  "act:email": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-eml-bd" x1="8" y1="16" x2="56" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient><linearGradient id="hk-eml-fl" x1="32" y1="18" x2="32" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4edf8"/></linearGradient></defs><rect x="8" y="16" width="48" height="34" rx="7" fill="url(#hk-eml-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M10 20l22 17 22-17" fill="none" stroke="#00000022" stroke-width="1.6"/><path d="M8 22l22 16a4 4 0 0 0 4 0l22-16v-2a4 4 0 0 0-4-4H12a4 4 0 0 0-4 4z" fill="url(#hk-eml-fl)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 19l22 16 22-16" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="44" r="6" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M43 44l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
+  "gem": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-gem-t" x1="20" y1="14" x2="44" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9be9ff"/><stop offset="1" stop-color="#4ec8e8"/></linearGradient><linearGradient id="hk-gem-b" x1="14" y1="24" x2="40" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3fb6e0"/><stop offset="1" stop-color="#2c84c4"/></linearGradient></defs><path d="M20 12h24l10 14-22 26L12 26z" fill="url(#hk-gem-b)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 12h24l-3 14H23z" fill="url(#hk-gem-t)" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 12l10 14H41zM20 12L12 26h11z" fill="#6fd6f0" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M23 26h18l-9 26z" fill="#5cc6ea"/><path d="M23 26l9 26-20-26zM41 26l-9 26 22-26z" fill="#4ab6df"/><path d="M27 16l-4 8" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>`,
+
+  "star": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-star-g" x1="32" y1="8" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff2bd"/><stop offset="1" stop-color="#f5b730"/></linearGradient></defs><path d="M32 8c1.6 0 3 .9 3.7 2.4l5.2 10.6 11.7 1.7c3.4.5 4.8 4.7 2.3 7.1l-8.5 8.3 2 11.6c.6 3.4-3 6-6 4.4L32 49.1l-10.4 5.5c-3 1.6-6.6-1-6-4.4l2-11.6-8.5-8.3c-2.5-2.4-1.1-6.6 2.3-7.1l11.7-1.7 5.2-10.6A4 4 0 0 1 32 8z" fill="url(#hk-star-g)" stroke="#d99a1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 18l-6 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="32" r="2" fill="#fff" opacity=".5"/></svg>`,
+
+  "sound": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-snd-sp" x1="12" y1="20" x2="34" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient></defs><path d="M12 26h8l12-10v32L20 38h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-snd-sp)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g fill="none" stroke="#4a90d9" stroke-width="2.8" stroke-linecap="round"><path d="M40 24c3 5 3 11 0 16"/><path d="M46 19c5 8 5 18 0 26"/></g><path d="M16 27l8-6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>`,
+
+  "lang": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-lang-g" cx="26" cy="22" r="28" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#aee0ff"/><stop offset="1" stop-color="#6cb6ea"/></radialGradient></defs><circle cx="32" cy="32" r="22" fill="url(#hk-lang-g)" stroke="#00000026" stroke-width="1.6"/><g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".9"><ellipse cx="32" cy="32" rx="9" ry="22"/><path d="M10 32h44"/><path d="M14 21h36M14 43h36"/></g><path d="M20 18c4-3 8-4 12-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></svg>`
+};
+</script>
 <script>
 /* ============================================================
    Hikmat Bazaar — offline functional-English game (pilot)
@@ -612,9 +701,23 @@ if (window.speechSynthesis){
   loadVoices();
   speechSynthesis.onvoiceschanged = loadVoices;
 }
+// Preferred voices in priority order, so we pick the best AVAILABLE voice rather than a
+// random first one — as consistent as speechSynthesis allows. (True uniformity across all
+// browsers needs pre-recorded audio clips; this is the best-effort fallback.)
+const VOICE_PREF = {
+  en: ["Google US English","Samantha","Microsoft Aria Online (Natural) - English (United States)",
+       "Microsoft Zira - English (United States)","Karen","Daniel","Aria","Zira"],
+  hi: ["Google हिन्दी","Lekha","Microsoft Swara Online (Natural) - Hindi (India)","Kiyara","Hindi (India)"],
+};
 function pickVoice(lang){
-  const v = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(lang));
-  return v[0] || null;
+  const want = lang === "hi" ? "hi" : "en";
+  const pool = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(want));
+  if(!pool.length) return null;
+  for(const name of (VOICE_PREF[want] || [])){
+    const m = pool.find(v => v.name === name) || pool.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
+    if(m) return m;
+  }
+  return pool.find(v => v.localService) || pool[0];   // prefer an offline voice for consistency + offline use
 }
 let audioHintShown = false;
 let speechEverStarted = false;   // becomes true the first time audio actually plays
@@ -752,6 +855,13 @@ function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,
 function escAttr(s){ return esc(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 // only let a content-supplied colour into a style attribute if it's a plain hex (else it could break out of the attribute)
 function col(c){ return /^#[0-9a-fA-F]{3,8}$/.test(String(c||"")) ? c : "#6c5ce7"; }
+// Return the inline SVG icon for a key (or the first matching key of an array); falls back to the
+// emoji when no custom icon exists (e.g. the standalone offline file, or an un-iconed academic track).
+function iconFor(keys, fallback){
+  const set = window.HIKMAT_ICONS;
+  if(set){ for(const k of (Array.isArray(keys) ? keys : [keys])){ if(set[k]) return `<span class="iconsvg">${set[k]}</span>`; } }
+  return esc(fallback || "");
+}
 // Screen-reader live announcement (the app's speech IS the main audio channel; this serves AT users).
 function srSay(msg){ const sr=document.getElementById("sr"); if(!sr) return; sr.textContent=""; setTimeout(()=>{ sr.textContent=msg; }, 40); }
 // Move keyboard/screen-reader focus to the new screen's heading so it isn't stranded on <body> after a re-render.
@@ -873,6 +983,9 @@ function setBack(label, fn){
 
 function refreshTop(){
   document.documentElement.lang = state.lang || "en";   // keep <html lang> in sync for screen readers
+  const dark = state.theme === "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "";
+  const tt = $("#themeToggle"); if(tt){ tt.textContent = dark ? "☀️" : "🌙"; tt.classList.toggle("on", dark); }
   const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
   const lg = $("#brandLogo");
   if(lg){                                   // build via DOM + scheme-check so a hostile logo URL can't break out / run javascript:
@@ -881,7 +994,7 @@ function refreshTop(){
       const img = document.createElement("img");
       img.className = "logoimg"; img.src = SETTINGS.logo; img.alt = SETTINGS.appName || "";
       lg.appendChild(img);
-    } else { lg.textContent = "🪔"; }
+    } else { lg.innerHTML = iconFor("brand","🪔"); }
   }
   $("#totalStars").textContent = totalStars();
   $("#coins").textContent = state.coins;
@@ -896,6 +1009,7 @@ function refreshTop(){
 $("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop(); updateHiLine(); };
 $("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
 $("#soundToggle").onclick = () => { state.sound = state.sound===false; save(); refreshTop(); if(state.sound) sfx.enter(); };
+$("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; save(); refreshTop(); sfx.tap(); };
 
 // ============================================================
 //  SCREENS
@@ -919,7 +1033,7 @@ function trackCard(course, back){
   const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
       style="${locked?"":`background:linear-gradient(160deg,${col(course.color)}dd,${col(course.color)})`}">
     ${locked ? `<span class="lock">🔒</span>` : ""}
-    <div class="big">${esc(course.icon)}</div>
+    <div class="big">${iconFor(["track:"+course.key, "subject:"+course.subject], course.icon)}</div>
     <h3>${esc(tx(course.title, course.titleHi))}</h3>
     <small>${locked ? tx("Coming soon","जल्द आ रहा है")
                     : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : esc(tx(course.blurb, course.blurbHi)))}</small>
@@ -933,7 +1047,7 @@ function bandCard(band){
   if(!tracks.length) return null;
   const {earned, max} = progressOf(tracks);
   const node = el(`<button class="theme band" style="background:linear-gradient(160deg,${col(band.color)}dd,${col(band.color)})">
-    <div class="big">${esc(band.icon)}</div>
+    <div class="big">${iconFor("band:"+band.key, band.icon)}</div>
     <h3>${esc(tx(band.title, band.titleHi))}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : esc(tx(band.subtitle, band.subtitleHi))}</small>
   </button>`);
@@ -946,11 +1060,25 @@ function subjectCard(band, subj){
   const {earned, max} = progressOf(tracks);
   const lessons = tracks.reduce((a,c)=>a+c.lessons.length,0);
   const node = el(`<button class="theme" style="background:linear-gradient(160deg,${col(subj.color)}dd,${col(subj.color)})">
-    <div class="big">${esc(subj.icon)}</div>
+    <div class="big">${iconFor("subject:"+subj.key, subj.icon)}</div>
     <h3>${esc(tx(subj.title, subj.titleHi))}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(lessons+" lessons", lessons+" पाठ")}</small>
   </button>`);
   node.onclick = () => { sfx.enter(); renderSubject(band, subj); };
+  return node;
+}
+
+// The original thematic tracks, collapsed into ONE "Life Skills" card (parallels the band cards).
+function lifeSkillsCard(){
+  const tracks = lifeSkillsTracks();
+  if(!tracks.length) return null;
+  const {earned, max} = progressOf(tracks);
+  const node = el(`<button class="theme" style="background:linear-gradient(160deg,#fb7185dd,#e11d48)">
+    <div class="big">${iconFor("lifeskills","🌼")}</div>
+    <h3>${tx("Life Skills","जीवन कौशल")}</h3>
+    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx("Everyday English for home, market, school & work","घर, बाज़ार, स्कूल और काम की अंग्रेज़ी")}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); renderLifeSkills(); };
   return node;
 }
 
@@ -1001,8 +1129,16 @@ function renderHome(){
   // Life Skills (the original thematic tracks)
   const life = lifeSkillsTracks();
   if(life.length){
-    if(bands.length) host.appendChild(el(`<div class="sectionhead">${tx("🌼 Life Skills","🌼 जीवन कौशल")}</div>`));
-    const grid = el(`<div class="themes"></div>`); life.forEach(c=>grid.appendChild(trackCard(c))); host.appendChild(grid);
+    const grid = el(`<div class="themes"></div>`);
+    if(bands.length){
+      // class bands present → collapse the 4 thematic tracks into ONE "Life Skills" card to keep Home tidy
+      host.appendChild(el(`<div class="sectionhead">${tx("🌼 Life Skills","🌼 जीवन कौशल")}</div>`));
+      grid.appendChild(lifeSkillsCard());
+    } else {
+      // standalone / no class bands → show the tracks directly (nothing to declutter)
+      life.forEach(c => grid.appendChild(trackCard(c)));
+    }
+    host.appendChild(grid);
   }
   refreshTop();
 }
@@ -1014,7 +1150,7 @@ function renderBand(band){
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead"><div>
-      <h2>${esc(band.icon)} ${esc(tx(band.title, band.titleHi))}</h2>
+      <h2>${iconFor("band:"+band.key, band.icon)} ${esc(tx(band.title, band.titleHi))}</h2>
       <div class="sub">${tx("Choose a subject","कोई विषय चुनो")}</div></div>
     </div>
     <div class="center" id="profileRow" style="margin:2px 0 16px"></div>
@@ -1038,7 +1174,7 @@ function renderSubject(band, subj){
   const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key);
   const s = el(`<div class="screen">
     <div class="maphead"><div>
-      <h2>${esc(subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
+      <h2>${iconFor("subject:"+subj.key, subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
       <div class="sub">${esc(tx(band.title, band.titleHi))} · ${tx("Choose a topic","कोई विषय-वस्तु चुनो")}</div></div>
     </div>
     <div class="themes" id="tracks"></div>
@@ -1051,6 +1187,26 @@ function renderSubject(band, subj){
   refreshTop();
 }
 
+// LIFE SKILLS screen — the original thematic tracks (Bazaar / At Home / At School / At Work).
+function renderLifeSkills(){
+  stopSpeech();
+  rerender = renderLifeSkills;
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>${iconFor("lifeskills","🌼")} ${tx("Life Skills","जीवन कौशल")}</h2>
+      <div class="sub">${tx("Everyday English for home, market, school & work","घर, बाज़ार, स्कूल और काम की अंग्रेज़ी")}</div></div>
+    </div>
+    <div class="themes" id="tracks"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack(tx("← Home","← घर"), renderHome);
+  const back = { label: "← " + tx("Life Skills","जीवन कौशल"), fn: renderLifeSkills };
+  const wrap = $("#tracks");
+  lifeSkillsTracks().forEach(c => wrap.appendChild(trackCard(c, back)));
+  refreshTop();
+}
+
 // TRACK screen — the lessons inside a track. `back` = button target (Home, or the subject screen).
 function renderTrack(course, back){
   back = back || { label: tx("← Home","← घर"), fn: renderHome };
@@ -1059,7 +1215,7 @@ function renderTrack(course, back){
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
-      <div><h2>${esc(course.icon)} ${esc(tx(course.title, course.titleHi))}</h2>
+      <div><h2>${iconFor(["track:"+course.key, "subject:"+course.subject], course.icon)} ${esc(tx(course.title, course.titleHi))}</h2>
       <div class="sub">${tx("Choose a lesson","कोई पाठ चुनो")}</div></div>
     </div>
     <div class="path" id="path"></div>
@@ -1667,7 +1823,7 @@ function _saveQueue(q){ try { localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify
 function recordAttempt(a){
   if(!currentStudent) return;            // guest / not signed in → local progress only
   const q = _readQueue();
-  q.push({ ...a, student: currentStudent.id });
+  q.push({ ...a, student: currentStudent.id, token: currentStudent.token || "" });
   _saveQueue(q);
   syncAttempts();
 }
@@ -1704,7 +1860,7 @@ function setStudent(stu){
 }
 async function mergeServerProgress(){
   if(!currentStudent) return;
-  const res = await api("get_progress", { student: currentStudent.id });
+  const res = await api("get_progress", { student: currentStudent.id, token: currentStudent.token || "" });
   const p = res && res.progress;
   if(!p) return;
   for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]) setStars(ck, lk, aid, p[ck][lk][aid]);
@@ -1721,14 +1877,17 @@ function renderSignup(){
     <div class="hero"><h1>${tx("Create your name ✨","अपना नाम बनाओ ✨")}</h1>
       <p>${tx("Make a profile so your stars are saved.","प्रोफ़ाइल बनाओ ताकि तुम्हारे सितारे सुरक्षित रहें।")}</p></div>
     <div class="signup">
-      <label class="fieldlabel">${tx("Your name","तुम्हारा नाम")}</label>
+      <label class="fieldlabel">${tx("First name or nickname","पहला नाम या उपनाम")}</label>
       <input id="suName" class="searchbox" type="text" autocomplete="off" maxlength="40"
-             placeholder="${tx('Type your name…','अपना नाम लिखो…')}">
+             placeholder="${tx('e.g. Asha, or a nickname','जैसे: आशा, या उपनाम')}">
+      <div class="hint2">${tx("A first name or nickname is best — you don't need your full name.","पहला नाम या उपनाम काफ़ी है — पूरा नाम ज़रूरी नहीं।")}</div>
       <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
       <div class="avpick" id="avpick"></div>
       <label class="fieldlabel">${tx("PIN (optional)","पिन (वैकल्पिक)")}</label>
       <input id="suPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
-             placeholder="${tx('3–8 digits — keeps your progress safe','3–8 अंक — प्रगति सुरक्षित रखे')}">
+             placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
+      <label class="consent"><input type="checkbox" id="suConsent">
+        <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
       <div class="feedback bad" id="suErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
@@ -1743,16 +1902,19 @@ function renderSignup(){
     b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
     avwrap.appendChild(b);
   });
-  const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr");
-  name.oninput = () => { go.disabled = !name.value.trim(); err.textContent = ""; };
+  const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr"), consent = $("#suConsent");
+  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked); };
+  name.oninput = () => { refreshGo(); err.textContent = ""; };
+  consent.onchange = refreshGo;
   setTimeout(() => name.focus(), 60);
   $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
   $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
+    if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     const p = pin.value.trim();
-    if(p && !/^\d{3,8}$/.test(p)){ err.textContent = tx("PIN must be 3–8 digits.","पिन 3–8 अंकों का हो।"); return; }
+    if(p && !/^\d{4,8}$/.test(p)){ err.textContent = tx("PIN must be 4–8 digits.","पिन 4–8 अंकों का हो।"); return; }
     go.disabled = true; err.textContent = "";
     const r = await api("signup_student", { name:nm, avatar, pin:p }, true);
     if(r && r.ok){ finishLogin(r); }
@@ -1764,92 +1926,48 @@ function renderSignup(){
   refreshTop();
 }
 
+// LOG IN — type your name + PIN (no roster shown: cleaner, and never broadcasts other kids' names)
 function renderLogin(){
   stopSpeech(); rerender = renderLogin; root.innerHTML = ""; setBack(null);
   root.appendChild(el(`<div class="screen">
-    <div class="hero"><h1>${tx("Who is playing? 🙋‍♀️","कौन खेल रहा है? 🙋‍♀️")}</h1>
-      <p>${tx("Tap your name to start.","शुरू करने के लिए अपना नाम चुनो।")}</p></div>
-    <div class="center" id="cohortRow" style="margin-bottom:12px"></div>
-    <input id="studentSearch" class="searchbox" type="text" autocomplete="off"
-           placeholder="${tx('🔎 Type your name…','🔎 अपना नाम लिखो…')}">
-    <div class="themes" id="studentGrid"></div>
-    <div class="center" style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
-      <button class="btn primary" id="signupBtn">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
-      <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+    <div class="hero"><h1>${tx("Log in 🙋‍♀️","लॉग इन 🙋‍♀️")}</h1>
+      <p>${tx("Type your name and PIN to continue.","अपना नाम और पिन डालकर आगे बढ़ो।")}</p></div>
+    <div class="authform">
+      <label class="fieldlabel">${tx("Your name","तुम्हारा नाम")}</label>
+      <input id="loginName" class="searchbox" type="text" autocomplete="username" maxlength="40"
+             placeholder="${tx('e.g. Asha','जैसे: आशा')}">
+      <label class="fieldlabel">${tx("PIN","पिन")}</label>
+      <input id="loginPin" class="searchbox" type="password" inputmode="numeric" maxlength="8" autocomplete="current-password"
+             placeholder="${tx('Leave blank if you have no PIN','पिन नहीं है तो खाली छोड़ो')}">
+      <div class="feedback bad" id="loginErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="loginGo">${tx("Log in →","लॉग इन →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="toSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
+        <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+      </div>
     </div>
   </div>`));
-  $("#signupBtn").onclick = () => { sfx.tap(); renderSignup(); };
+  const name = $("#loginName"), pin = $("#loginPin"), err = $("#loginErr");
+  setTimeout(() => name.focus(), 60);
+  $("#toSignup").onclick = () => { sfx.tap(); renderSignup(); };
   $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
-  loadLogin();
-  refreshTop();
-}
-async function loadLogin(){
-  const cohorts = (await api("get_cohorts")) || [];
-  let selected = cohorts.length ? cohorts[0].name : null;
-  let allStudents = [];
-  const cohortRow = $("#cohortRow");
-  const grid = $("#studentGrid");
-  const search = $("#studentSearch");
-
-  function drawCohorts(){
-    cohortRow.innerHTML = "";
-    if(cohorts.length <= 1) return;          // one centre → no chips, just search + names
-    cohorts.forEach(c => {
-      const b = el(`<button class="chiptab ${c.name===selected?'on':''}">${esc(c.cohort_name)}</button>`);
-      b.onclick = () => { selected = c.name; sfx.tap(); drawCohorts(); loadStudents(); };
-      cohortRow.appendChild(b);
-    });
-  }
-  function renderGrid(){
-    const q = (search.value || "").trim().toLowerCase();
-    grid.innerHTML = "";
-    if(!allStudents.length){ grid.innerHTML = `<div class="muted center">${tx("No students yet — ask your teacher.","अभी कोई छात्र नहीं — शिक्षक से पूछें।")}</div>`; return; }
-    const list = q ? allStudents.filter(s => s.name.toLowerCase().includes(q)) : allStudents;
-    if(!list.length){ grid.innerHTML = `<div class="muted center">${tx("No name found — keep typing or ask your teacher.","कोई नाम नहीं मिला — और लिखो या शिक्षक से पूछो।")}</div>`; return; }
-    list.forEach(stu => {
-      const card = el(`<button class="theme" style="background:linear-gradient(160deg,#8a7bf0,#6c5ce7)">
-        <div class="big">${esc(stu.avatar||"🙂")}</div><h3>${esc(stu.name)}</h3>${stu.hasPin?`<small>🔒 ${tx("PIN","पिन")}</small>`:""}</button>`);
-      card.onclick = () => pickStudent(stu);
-      grid.appendChild(card);
-    });
-  }
-  async function loadStudents(){
-    grid.innerHTML = `<div class="muted center">${tx("Loading…","लोड हो रहा है…")}</div>`;
-    allStudents = (await api("get_students", selected ? { cohort: selected } : null)) || [];
-    renderGrid();
-  }
-  search.oninput = renderGrid;
-  drawCohorts(); loadStudents();
-}
-function pickStudent(stu){ sfx.tap(); if(stu.hasPin) askPin(stu); else finishLogin(stu); }
-function askPin(stu){
-  const ov = el(`<div class="pinov"><div class="pincard">
-    <div class="big">${esc(stu.avatar||"🙂")}</div><div class="pinname">${esc(stu.name)}</div>
-    <div class="pinlabel">${tx("Enter your PIN","अपना पिन डालो")}</div>
-    <input id="pinInput" type="password" inputmode="numeric" maxlength="8" class="pininput">
-    <div class="feedback bad" id="pinErr" style="min-height:18px"></div>
-    <div class="actionrow"><button class="btn ghost" id="pinCancel">${tx("Cancel","रद्द")}</button>
-      <button class="btn primary" id="pinOk">${tx("OK","ठीक")}</button></div>
-  </div></div>`);
-  document.body.appendChild(ov);
-  const inp = ov.querySelector("#pinInput"); setTimeout(() => inp.focus(), 50);
   const submit = async () => {
-    const r = await api("login_student", { student: stu.id, pin: inp.value }, true);
-    if(r && r.ok){ ov.remove(); finishLogin(r); }
-    else {
-      const msg = (r && r.error==="locked")
-        ? tx("Too many tries — wait a few minutes.","बहुत बार कोशिश — कुछ मिनट रुको।")
-        : tx("Wrong PIN — try again","ग़लत पिन — फिर कोशिश करो");
-      ov.querySelector("#pinErr").textContent = msg; inp.value=""; inp.focus();
-    }
+    const nm = name.value.trim();
+    if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); name.focus(); return; }
+    err.textContent = tx("Checking…","जाँच रहे हैं…");
+    const r = await api("login_by_name", { name: nm, pin: pin.value }, true);
+    if(r && r.ok){ finishLogin(r); }
+    else if(r && r.error === "locked"){ err.textContent = tx("Too many tries — wait a few minutes.","बहुत बार कोशिश — कुछ मिनट रुको।"); }
+    else { err.textContent = tx("Wrong name or PIN — try again.","ग़लत नाम या पिन — फिर कोशिश करो।"); pin.value=""; pin.focus(); }
   };
-  ov.querySelector("#pinCancel").onclick = () => { sfx.back(); ov.remove(); };
-  ov.querySelector("#pinOk").onclick = submit;
-  inp.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+  $("#loginGo").onclick = submit;
+  name.onkeydown = (e) => { if(e.key === "Enter") pin.focus(); };
+  pin.onkeydown  = (e) => { if(e.key === "Enter") submit(); };
+  refreshTop();
 }
 async function finishLogin(stu){
   sfx.enter();
-  setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂" });
+  setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂", token: stu.token });
   await mergeServerProgress();
   renderHome();
 }
@@ -1859,14 +1977,13 @@ state.progress = state.progress || {};
 state.hindi = state.hindi===true;
 state.lang = state.lang || "en";
 state.sound = state.sound!==false;
+state.theme = state.theme || "light";
 renderHome();          // instant: bundled or cached content, fully offline
 syncAttempts();        // flush any progress queued while offline
 loadFromBackend().then(async ok => {
   backendLive = ok;
-  if(ok && !currentStudent){
-    const r = await api("has_students");                                // bool only — don't enumerate minors on boot
-    if(r && r.any){ renderLogin(); refreshTop(); return; }              // served + roster exists → pick your name
-  }
+  // No forced login wall — everyone lands on Home (playable); the guest sees clear
+  // "Log in" / "Sign up" buttons and chooses when to sign in.
   if(ok && currentStudent) await mergeServerProgress();
   if(document.getElementById("homeSections")) renderHome();   // refresh home in place once live content + structure arrive
   refreshTop();

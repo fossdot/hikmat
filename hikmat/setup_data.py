@@ -212,6 +212,17 @@ def create_doctypes():
     print("=== create_doctypes done ===")
 
 
+def add_auth_field():
+    """Add a hidden auth_token field to Student (per-student login token). Safe to re-run."""
+    st = frappe.get_doc("DocType", "Student")
+    if "auth_token" not in [x.fieldname for x in st.fields]:
+        st.append("fields", {"fieldname": "auth_token", "fieldtype": "Data", "label": "Auth token",
+                             "hidden": 1, "no_copy": 1, "read_only": 1, "print_hide": 1})
+        st.save()
+        frappe.db.commit()
+    print("=== Student.auth_token ensured ===")
+
+
 def add_structure_fields():
     """Add band+subject Link fields to Track and a quiz Table to Lesson.
     Mirrors add_attempt_fields() — safe to re-run (skips fields that exist)."""

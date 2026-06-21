@@ -18,6 +18,7 @@ import json
 
 import frappe
 from frappe import _
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # ---------------------------------------------------------------------------
 # Caching (content is read far more than it changes)
@@ -74,6 +75,46 @@ def _rate_ok(bucket, limit, seconds):
 
 def _client_ip():
     return getattr(frappe.local, "request_ip", None) or "unknown"
+
+
+# ---------------------------------------------------------------------------
+# Auth helpers — PIN hashing (with legacy-plaintext upgrade) + per-student tokens
+# ---------------------------------------------------------------------------
+def _hash_pin(pin):
+    return generate_password_hash(str(pin), method="pbkdf2:sha256") if pin else ""
+
+
+def _looks_hashed(stored):
+    return str(stored or "").startswith(("pbkdf2:", "scrypt:"))
+
+
+def _pin_ok(stored, pin):
+    """Verify a PIN. Hashed values use a constant-time hash check; legacy plaintext
+    (pre-hashing) still verifies so existing logins keep working until upgraded."""
+    if not stored:
+        return True                       # no PIN set → open profile
+    if _looks_hashed(stored):
+        return check_password_hash(str(stored), str(pin or ""))
+    return hmac.compare_digest(str(stored), str(pin or ""))   # legacy plaintext
+
+
+def _token_for(student_name):
+    """Stable per-student token: reuse if present, else mint + store. Returned to the
+    client at login/signup and required on writes/reads so a guest can't act as a student."""
+    tok = frappe.db.get_value("Student", student_name, "auth_token")
+    if not tok:
+        tok = frappe.generate_hash(length=40)
+        frappe.db.set_value("Student", student_name, "auth_token", tok, update_modified=False)
+    return tok
+
+
+def _token_ok(student_name, token):
+    """Graceful enforcement: if the student has a token, require a match; a legacy student
+    who hasn't logged in since tokens shipped (no token yet) is allowed until their next login."""
+    stored = frappe.db.get_value("Student", student_name, "auth_token")
+    if not stored:
+        return True
+    return hmac.compare_digest(str(stored), str(token or ""))
 
 
 # ---------------------------------------------------------------------------
@@ -252,11 +293,12 @@ def _build_settings():
 # Progress write (untrusted input — validate + clamp + flood-cap)
 # ---------------------------------------------------------------------------
 @frappe.whitelist(allow_guest=True)
-def submit_attempt(student=None, track=None, lesson=None, activity=None,
+def submit_attempt(student=None, token=None, track=None, lesson=None, activity=None,
                    stars=0, score=0, total=0, coins=0):
     """Record one finished activity. Called by the game on the result screen.
     Everything here is attacker-controllable, so: verify the student exists & is
-    active, clamp every number to sane bounds, and cap write volume per IP."""
+    active, require the student's login token (no forging attempts for others),
+    clamp every number to sane bounds, and cap write volume per IP."""
     if not _rate_ok("submit:" + _client_ip(), 3000, 3600):   # flood ceiling; well above a real classroom
         return {"ok": False, "error": "rate_limited"}
     if not student:
@@ -264,6 +306,8 @@ def submit_attempt(student=None, track=None, lesson=None, activity=None,
     sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
     if not sinfo or not sinfo.active:
         return {"ok": False, "error": "unknown_student"}
+    if not _token_ok(student, token):
+        return {"ok": False, "error": "auth"}
 
     total = max(0, _int(total))
     score = max(0, _int(score))
@@ -327,11 +371,15 @@ def login_student(student, pin=None):
                             ["student_name", "login_pin", "active", "avatar"], as_dict=True)
     if not s or not s.active:
         return {"ok": False, "error": "not_found"}
-    if s.login_pin and not hmac.compare_digest(str(s.login_pin), str(pin or "")):
+    if s.login_pin and not _pin_ok(s.login_pin, pin):
         c.set_value(fkey, _int(c.get_value(fkey)) + 1, expires_in_sec=_LOCKOUT_SECONDS)
         return {"ok": False, "error": "wrong_pin"}
     c.delete_value(fkey)                                # reset the counter on success
-    return {"ok": True, "id": student, "name": s.student_name, "avatar": s.avatar or "🙂"}
+    if s.login_pin and not _looks_hashed(s.login_pin):  # upgrade a legacy plaintext PIN to a hash on login
+        frappe.db.set_value("Student", student, "login_pin", _hash_pin(str(s.login_pin)), update_modified=False)
+    token = _token_for(student)
+    frappe.db.commit()
+    return {"ok": True, "id": student, "name": s.student_name, "avatar": s.avatar or "🙂", "token": token}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -359,12 +407,40 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None):
                 pass
     doc = frappe.get_doc({
         "doctype": "Student", "student_name": name, "avatar": avatar or "🙂",
-        "cohort": cohort, "login_pin": pin, "active": 1, "gender": "Other",
+        "cohort": cohort, "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
         "age": age_val,
     }).insert(ignore_permissions=True)
+    token = _token_for(doc.name)
     frappe.db.commit()
     return {"ok": True, "id": doc.name, "name": doc.student_name,
-            "avatar": doc.avatar or "🙂", "hasPin": bool(doc.login_pin)}
+            "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token}
+
+
+@frappe.whitelist(allow_guest=True)
+def login_by_name(name, pin=None):
+    """Log in by typing your name + PIN — NO roster is shown (cleaner, and doesn't broadcast
+    minors' names). The PIN disambiguates if a name repeats. Generic error (never reveals
+    whether a name exists). Rate-limited + locked out per name+IP."""
+    key = (name or "").strip().lower()
+    if not key:
+        return {"ok": False, "error": "bad_login"}
+    c = frappe.cache()
+    fkey = "hikmat:loginfail:name:" + _client_ip() + ":" + key
+    if _int(c.get_value(fkey)) >= _MAX_PIN_TRIES:
+        return {"ok": False, "error": "locked"}
+    cands = [s for s in frappe.get_all("Student", filters={"active": 1},
+                                       fields=["name", "student_name", "login_pin", "avatar"])
+             if (s.student_name or "").strip().lower() == key]
+    match = next((s for s in cands if _pin_ok(s.login_pin, pin)), None)
+    if not match:
+        c.set_value(fkey, _int(c.get_value(fkey)) + 1, expires_in_sec=_LOCKOUT_SECONDS)
+        return {"ok": False, "error": "bad_login"}
+    c.delete_value(fkey)
+    if match.login_pin and not _looks_hashed(match.login_pin):
+        frappe.db.set_value("Student", match.name, "login_pin", _hash_pin(str(match.login_pin)), update_modified=False)
+    token = _token_for(match.name)
+    frappe.db.commit()
+    return {"ok": True, "id": match.name, "name": match.student_name, "avatar": match.avatar or "🙂", "token": token}
 
 
 # ---------------------------------------------------------------------------
@@ -385,11 +461,12 @@ def average_stars():
 
 
 @frappe.whitelist(allow_guest=True)
-def get_progress(student):
+def get_progress(student, token=None):
     """Best stars per track/lesson/activity for one student — so progress follows the
-    girl across shared laptops. Aggregated in SQL so the response is one row per
-    (track,lesson,activity) regardless of how many times an activity was replayed."""
-    if not student:
+    girl across shared laptops. Requires the student's login token (no reading another
+    child's progress by guessing an id). Aggregated in SQL so the response is one row
+    per (track,lesson,activity) regardless of how many times an activity was replayed."""
+    if not student or not _token_ok(student, token):
         return {"progress": {}}
     rows = frappe.db.sql(
         """select track, lesson, activity, max(stars) as stars
@@ -400,3 +477,17 @@ def get_progress(student):
     for r in rows:
         prog.setdefault(r.track, {}).setdefault(r.lesson, {})[r.activity] = r.stars or 0
     return {"progress": prog}
+
+
+@frappe.whitelist()   # NOT allow_guest → requires a logged-in Desk user (facilitator / System Manager)
+def delete_student(student):
+    """Erase a child's record and ALL their attempts (right-to-erasure for minors' data).
+    Facilitator-only. Use from Desk or a trusted admin tool."""
+    if not frappe.db.exists("Student", student):
+        return {"ok": False, "error": "not_found"}
+    name = frappe.db.get_value("Student", student, "student_name")
+    for att in frappe.get_all("Lesson Attempt", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Lesson Attempt", att, force=1, ignore_permissions=True)
+    frappe.delete_doc("Student", student, force=1, ignore_permissions=True)
+    frappe.db.commit()
+    return {"ok": True, "deleted": name}

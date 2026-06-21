@@ -63,6 +63,15 @@ repos:
                 hikmat/public/js/lib/.*
             )$
 
+  - repo: local
+    hooks:
+      - id: game-copies-in-sync
+        name: "Game copies in sync (index.html == hikmat/public/game.html)"
+        entry: bash -c 'diff -q index.html hikmat/public/game.html >/dev/null || { echo "index.html and hikmat/public/game.html differ — run ./sync-game.sh and re-stage"; exit 1; }'
+        language: system
+        pass_filenames: false
+        files: '(^index\.html$|^hikmat/public/game\.html$)'
+
 ci:
     autoupdate_schedule: weekly
     skip: []
