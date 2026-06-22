@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-06-22 12:46:26.767847",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "cohort",
+  "track",
+  "lesson",
+  "activity",
+  "question",
+  "lang",
+  "client_id",
+  "raised_on",
+  "resolved"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Cohort",
+   "options": "Cohort"
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Track key"
+  },
+  {
+   "fieldname": "lesson",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Lesson key"
+  },
+  {
+   "fieldname": "activity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Activity"
+  },
+  {
+   "fieldname": "question",
+   "fieldtype": "Small Text",
+   "label": "What she was stuck on"
+  },
+  {
+   "fieldname": "lang",
+   "fieldtype": "Data",
+   "label": "UI language"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client id (idempotency)",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "raised_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Raised on"
+  },
+  {
+   "default": "0",
+   "fieldname": "resolved",
+   "fieldtype": "Check",
+   "label": "Resolved by facilitator"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-22 12:46:26.767847",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Lesson Doubt",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name"
+}

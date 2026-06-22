@@ -338,6 +338,52 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
 
 
 # ---------------------------------------------------------------------------
+# "Roshni, mujhe doubt hai" — a learner taps for help; we log it for the
+# facilitator confusion heatmap. Untrusted input → validate, clamp, flood-cap.
+# Guests may raise doubts too (anonymous confusion data is still useful to a
+# teacher watching the room), so a student id is optional here.
+# ---------------------------------------------------------------------------
+@frappe.whitelist(allow_guest=True)
+def report_doubt(student=None, token=None, track=None, lesson=None, activity=None,
+                 question=None, lang=None, client_id=None):
+    """Record one 'I'm stuck' tap. Idempotent on client_id so the offline queue can
+    retry safely. A logged-in student must present their token (no forging for others);
+    an anonymous/guest doubt is accepted with no student attached."""
+    if not _rate_ok("doubt:" + _client_ip(), 2000, 3600):   # generous ceiling; never trips real classroom use
+        return {"ok": False, "error": "rate_limited"}
+    if client_id:                                            # already logged this tap? done.
+        existing = frappe.db.get_value("Lesson Doubt", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "name": existing, "dedup": True}
+
+    sname, cohort = None, None
+    if student:
+        sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
+        if not sinfo or not sinfo.active:
+            return {"ok": False, "error": "unknown_student"}
+        if not _token_ok(student, token):
+            return {"ok": False, "error": "auth"}
+        sname, cohort = sinfo.get("student_name"), sinfo.get("cohort")
+
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Lesson Doubt", "client_id": client_id or None,
+            "student": student or None, "student_name": sname, "cohort": cohort,
+            "track": (track or "")[:140], "lesson": (lesson or "")[:140],
+            "activity": (activity or "")[:140],
+            "question": (question or "")[:500],
+            "lang": (lang or "")[:10],
+            "raised_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with another retry of the same client_id
+        frappe.db.rollback()
+        existing = frappe.db.get_value("Lesson Doubt", {"client_id": client_id}, "name")
+        return {"ok": True, "name": existing, "dedup": True}
+    frappe.db.commit()
+    return {"ok": True, "name": doc.name}
+
+
+# ---------------------------------------------------------------------------
 # Student login (facilitator-managed or self-signup; no email/password)
 # ---------------------------------------------------------------------------
 @frappe.whitelist(allow_guest=True)

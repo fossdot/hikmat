@@ -17,8 +17,8 @@
    "label": "Attempts by Student"
   }
  ],
- "content": "[{\"id\": \"h3679\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\udcca At a glance</span>\", \"col\": 12}}, {\"id\": \"nc0\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Attempts\", \"col\": 4}}, {\"id\": \"nc1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Activities Passed\", \"col\": 4}}, {\"id\": \"nc2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Average Stars\", \"col\": 4}}, {\"id\": \"nc3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Students\", \"col\": 4}}, {\"id\": \"nc4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Students Enrolled\", \"col\": 4}}, {\"id\": \"h8618\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\udcc8 Activity</span>\", \"col\": 12}}, {\"id\": \"ch0\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts Over Time\", \"col\": 6}}, {\"id\": \"ch1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts by Track\", \"col\": 6}}, {\"id\": \"ch2\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Average Stars by Activity\", \"col\": 6}}, {\"id\": \"ch3\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts by Student\", \"col\": 6}}, {\"id\": \"h2039\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\uddc2\\ufe0f Manage content & students</span>\", \"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Student Progress\", \"col\": 3}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Tracks\", \"col\": 3}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Lessons\", \"col\": 3}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dialogues\", \"col\": 3}}, {\"id\": \"sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Students\", \"col\": 3}}, {\"id\": \"sc5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Cohorts\", \"col\": 3}}, {\"id\": \"sc6\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Attempts\", \"col\": 3}}, {\"id\": \"sc7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 3}}]",
- "creation": "2026-06-17 11:04:39.060311",
+ "content": "[{\"id\": \"h2403\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\udcca At a glance</span>\", \"col\": 12}}, {\"id\": \"nc0\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Attempts\", \"col\": 4}}, {\"id\": \"nc1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Activities Passed\", \"col\": 4}}, {\"id\": \"nc2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Average Stars\", \"col\": 4}}, {\"id\": \"nc3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Students\", \"col\": 4}}, {\"id\": \"nc4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Students Enrolled\", \"col\": 4}}, {\"id\": \"h7789\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\udcc8 Activity</span>\", \"col\": 12}}, {\"id\": \"ch0\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts Over Time\", \"col\": 6}}, {\"id\": \"ch1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts by Track\", \"col\": 6}}, {\"id\": \"ch2\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Average Stars by Activity\", \"col\": 6}}, {\"id\": \"ch3\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Attempts by Student\", \"col\": 6}}, {\"id\": \"h2677\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\">\\ud83d\\uddc2\\ufe0f Manage content & students</span>\", \"col\": 12}}, {\"id\": \"sc0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Student Progress\", \"col\": 3}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Confusion Heatmap\", \"col\": 3}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Tracks\", \"col\": 3}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Lessons\", \"col\": 3}}, {\"id\": \"sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dialogues\", \"col\": 3}}, {\"id\": \"sc5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Students\", \"col\": 3}}, {\"id\": \"sc6\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Cohorts\", \"col\": 3}}, {\"id\": \"sc7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Attempts\", \"col\": 3}}, {\"id\": \"sc8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Doubts\", \"col\": 3}}, {\"id\": \"sc9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 3}}]",
+ "creation": "2026-06-22 12:46:27.255273",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -29,7 +29,7 @@
  "is_hidden": 0,
  "label": "Hikmat",
  "links": [],
- "modified": "2026-06-17 11:04:39.060311",
+ "modified": "2026-06-22 12:46:27.255273",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Hikmat",
@@ -70,6 +70,13 @@
   },
   {
    "doc_view": "",
+   "label": "Confusion Heatmap",
+   "link_to": "Confusion Heatmap",
+   "report_ref_doctype": "Lesson Doubt",
+   "type": "Report"
+  },
+  {
+   "doc_view": "",
    "label": "Tracks",
    "link_to": "Track",
    "type": "DocType"
@@ -102,6 +109,12 @@
    "doc_view": "",
    "label": "Attempts",
    "link_to": "Lesson Attempt",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "",
+   "label": "Doubts",
+   "link_to": "Lesson Doubt",
    "type": "DocType"
   },
   {

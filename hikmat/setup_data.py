@@ -199,6 +199,22 @@ def create_doctypes():
         f("attempted_on", "Datetime", "Attempted on"),
     ], autoname="hash", title_field="student")
 
+    # "Roshni, mujhe doubt hai" — every time a learner taps for help, one row lands here.
+    # The facilitator confusion heatmap (Layer 2) reads from this DocType.
+    _mk("Lesson Doubt", [
+        f("student", "Link", "Student", options="Student", in_list_view=1),
+        f("student_name", "Data", "Student name", in_list_view=1),
+        f("cohort", "Link", "Cohort", options="Cohort", in_list_view=1),
+        f("track", "Data", "Track key", in_list_view=1),
+        f("lesson", "Data", "Lesson key", in_list_view=1),
+        f("activity", "Data", "Activity", in_list_view=1),
+        f("question", "Small Text", "What she was stuck on"),
+        f("lang", "Data", "UI language"),
+        f("client_id", "Data", "Client id (idempotency)", unique=1, no_copy=1),
+        f("raised_on", "Datetime", "Raised on", in_list_view=1),
+        f("resolved", "Check", "Resolved by facilitator"),
+    ], autoname="hash", title_field="student_name")
+
     _mk("Hikmat Settings", [
         f("app_name", "Data", "App name", default="Hikmat"),
         f("logo", "Attach Image", "Logo (replaces the diya 🪔 in the game header)"),
@@ -624,6 +640,33 @@ def setup_student_report():
     print("=== report 'Student Progress' ready ===")
 
 
+def setup_doubt_report():
+    """The facilitator CONFUSION HEATMAP: which lessons/activities make learners tap
+    'Roshni, mujhe doubt hai' the most — so a teacher knows where to step in. Sorted by
+    doubt volume, so the hottest spots float to the top."""
+    name = "Confusion Heatmap"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        d.track          AS "Track::130",
+        d.lesson         AS "Lesson::130",
+        d.activity       AS "Activity::120",
+        COUNT(*)                                              AS "Doubts:Int:90",
+        COUNT(DISTINCT d.student)                             AS "Learners:Int:90",
+        SUM(CASE WHEN d.resolved = 0 THEN 1 ELSE 0 END)       AS "Open:Int:80",
+        MAX(d.raised_on)                                      AS "Last Raised:Datetime:160"
+    FROM `tabLesson Doubt` d
+    GROUP BY d.track, d.lesson, d.activity
+    ORDER BY COUNT(*) DESC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Doubt",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Confusion Heatmap' ready ===")
+
+
 def setup_analytics():
     charts = [
         _chart("Attempts Over Time", chart_type="Count", based_on="attempted_on",
@@ -654,6 +697,19 @@ def setup_analytics():
     frappe.db.commit()
     print("=== dashboard 'Hikmat Analytics' ready:", len(charts), "charts,", len(cards), "cards ===")
     setup_student_report()
+    setup_doubt_report()
+
+    # confusion chart — doubts grouped by lesson (the heatmap, visualised)
+    if frappe.db.exists("Dashboard Chart", "Doubts by Lesson"):
+        frappe.delete_doc("Dashboard Chart", "Doubts by Lesson", force=1, ignore_permissions=1)
+    frappe.get_doc({
+        "doctype": "Dashboard Chart", "chart_name": "Doubts by Lesson", "chart_type": "Group By",
+        "document_type": "Lesson Doubt", "group_by_based_on": "lesson", "group_by_type": "Count",
+        "type": "Bar", "is_public": 1, "timeseries": 0, "filters_json": "[]",
+    }).insert(ignore_permissions=1)
+    frappe.db.set_value("Dashboard Chart", "Doubts by Lesson", "currency", "")
+    frappe.db.commit()
+
     setup_workspace(cards, charts)
 
 
@@ -662,15 +718,19 @@ def setup_workspace(cards=None, charts=None):
     cards = cards or ["Total Attempts", "Activities Passed", "Average Stars", "Active Students", "Students Enrolled"]
     charts = charts or ["Attempts Over Time", "Attempts by Track", "Average Stars by Activity", "Attempts by Student"]
     shortcuts = [("Student Progress", "Student Progress", "Report"),
+                 ("Confusion Heatmap", "Confusion Heatmap", "Report"),
                  ("Tracks", "Track", "DocType"), ("Lessons", "Lesson", "DocType"),
                  ("Dialogues", "Dialogue", "DocType"), ("Students", "Student", "DocType"),
                  ("Cohorts", "Cohort", "DocType"), ("Attempts", "Lesson Attempt", "DocType"),
+                 ("Doubts", "Lesson Doubt", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]
+    # report → its ref doctype (a Report shortcut needs report_ref_doctype set)
+    _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt"}
 
     def _sc(lbl, link, typ):
         d = {"label": lbl, "link_to": link, "type": typ}
         if typ == "Report":
-            d["report_ref_doctype"] = "Lesson Attempt"
+            d["report_ref_doctype"] = _report_ref.get(link, "Lesson Attempt")
         return d
 
     def hdr(t): return {"id": "h" + str(abs(hash(t)) % 9999), "type": "header",

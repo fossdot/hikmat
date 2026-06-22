@@ -135,6 +135,36 @@
   .maphead h2 { margin:0; font-size:24px; font-weight:900; }
   .maphead .sub { color:var(--muted); font-size:14px; font-weight:700; }
 
+  /* "Roshni, mujhe doubt hai" — always-there help button during gameplay */
+  .doubtbtn { margin-left:auto; background:var(--grape); color:#fff; border:none;
+    border-radius:999px; padding:10px 16px; font-weight:900; font-size:14px; cursor:pointer;
+    box-shadow:0 4px 0 var(--grape-d); white-space:nowrap; min-height:44px; }
+  .doubtbtn:active { transform:translateY(2px); box-shadow:0 2px 0 var(--grape-d); }
+  @media (max-width:420px){ .doubtbtn{ padding:10px 13px; font-size:13px; } }
+
+  .sheetwrap { position:fixed; inset:0; z-index:60; background:rgba(20,14,33,.5);
+    display:flex; align-items:flex-end; justify-content:center; padding:0;
+    animation:fadeIn .18s ease; }
+  @keyframes fadeIn { from{ opacity:0; } to{ opacity:1; } }
+  .sheet { width:100%; max-width:560px; background:var(--card); color:var(--ink);
+    border-radius:24px 24px 0 0; padding:22px 22px calc(22px + env(safe-area-inset-bottom));
+    box-shadow:0 -10px 40px rgba(20,14,33,.3); animation:sheetUp .26s cubic-bezier(.2,.9,.3,1); }
+  @keyframes sheetUp { from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+  @media (prefers-reduced-motion:reduce){ .sheetwrap,.sheet{ animation:none; } }
+  .doubthead { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .doubthead .mascot.small { width:64px; height:64px; flex:0 0 64px; }
+  .doubtq { font-size:20px; font-weight:900; }
+  .doubtsub { color:var(--muted); font-weight:700; font-size:14px; margin-top:3px; }
+  .doubtopts { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  @media (max-width:420px){ .doubtopts{ grid-template-columns:1fr; } }
+  .doubtopt { display:flex; align-items:center; gap:12px; text-align:left;
+    background:var(--bg2); border:2px solid var(--line); border-radius:16px;
+    padding:16px; font-weight:800; font-size:16px; color:var(--ink); cursor:pointer; min-height:44px; }
+  .doubtopt:active { transform:translateY(2px); }
+  .doubtopt .di { font-size:26px; line-height:1; }
+  .doubtopt.done { background:#eafaf2; border-color:var(--good); color:var(--good-d); }
+  .btn.wide { width:100%; }
+
   .path { position:relative; max-width:540px; margin: 16px auto 30px; }
   .cpath { position:absolute; left:0; top:0; z-index:0; pointer-events:none; }   /* the winding trail */
   .step { position:absolute; left:0; right:0; z-index:1; }                        /* top + height set inline */
@@ -461,7 +491,6 @@
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
         <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
-        <button class="toggle on" id="soundToggle" title="Sound effects">🔊</button>
         <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
         <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
         <button class="toggle" id="hiToggle" title="Help">Help: OFF</button>
@@ -761,12 +790,12 @@ function showAudioHint(){
 let speechQ = [];
 let speaking = false;
 let playTimer = null;
-function buildUtterance(text, lang){
+function buildUtterance(text, lang, rate){
   const u = new SpeechSynthesisUtterance(text);
   const v = pickVoice(lang === "hi" ? "hi" : "en");
   if(v) u.voice = v;
   u.lang = lang === "hi" ? "hi-IN" : "en-US";
-  u.rate = lang === "hi" ? 0.95 : 0.85;
+  u.rate = rate || (lang === "hi" ? 0.95 : 0.85);
   u.onstart = () => { speechEverStarted = true; document.body.classList.add("speaking"); };
   u.onend   = () => { document.body.classList.remove("speaking"); speaking = false; playNext(); };
   u.onerror = () => { document.body.classList.remove("speaking"); speaking = false; playNext(); };
@@ -780,7 +809,7 @@ function playNext(){
   if(item.gap && !item._waited){ item._waited = true; setTimeout(playNext, item.gap); return; }
   speechQ.shift();
   speaking = true;
-  try { speechSynthesis.speak(buildUtterance(item.text, item.lang)); speechSynthesis.resume(); }
+  try { speechSynthesis.speak(buildUtterance(item.text, item.lang, item.rate)); speechSynthesis.resume(); }
   catch(e){ speaking = false; showAudioHint(); return; }
   setTimeout(() => { if(!speechEverStarted) showAudioHint(); }, 1200);
 }
@@ -799,7 +828,7 @@ function speak(text, lang="en", opts){
   try {
     if(!window.speechSynthesis){ showAudioHint(); return; }
     if(!(opts && opts.queue)) stopSpeech();
-    speechQ.push({ text, lang, gap: (opts && opts.gap) || 0 });
+    speechQ.push({ text, lang, gap: (opts && opts.gap) || 0, rate: (opts && opts.rate) || 0 });
     if(playTimer) return;            // batch same-tick calls (e.g. word + Hindi line)
     playTimer = setTimeout(() => { playTimer = null; playNext(); }, 130);
   } catch(e){ showAudioHint(); }
@@ -941,8 +970,10 @@ function mascotSVG(){ return `<svg viewBox="0 0 120 142" xmlns="http://www.w3.or
 </svg>`; }
 
 let lastHi = "";   // the Hindi help line for the current prompt
+let lastQ = "", lastHint = "";   // current prompt + sub-instruction, for the doubt panel to replay
 function head(q, hint, hi){
   lastHi = hi || "";
+  lastQ = q || ""; lastHint = hint || "";
   const hindiLine = (state.hindi && lastHi) ? `<div class="hiLine">🔊 ${esc(lastHi)}</div>` : "";
   return `<div class="mascotrow">
     <div class="mascot" id="mascot">${mascotSVG()}</div>
@@ -1050,12 +1081,9 @@ function refreshTop(){
   ht.textContent = tx("Help","मदद") + ": " + (state.hindi ? tx("ON","चालू") : tx("OFF","बंद"));
   const lt = $("#langToggle");
   if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.innerHTML = iconFor("lang","🌐") + " " + (state.lang==="hi" ? "हिं" : "EN"); }
-  const st = $("#soundToggle");
-  if(st){ const on = state.sound !== false; st.classList.toggle("on", on); st.innerHTML = on ? iconFor("sound-on","🔊") : iconFor("sound-off","🔇"); }
 }
 $("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop(); updateHiLine(); };
 $("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
-$("#soundToggle").onclick = () => { state.sound = state.sound===false; save(); refreshTop(); if(state.sound) sfx.enter(); };
 $("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; save(); refreshTop(); sfx.tap(); };
 $("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); };
 
@@ -1363,7 +1391,9 @@ function startLevel(course, lesson, lv, back){
   function header(){
     return `<div class="screen gameplay">
       <div class="maphead">
-        <div><div style="font-weight:800;font-size:20px">${lv.ico} ${tx(lv.name, lv.nameHi)}</div></div></div>
+        <div><div style="font-weight:800;font-size:20px">${lv.ico} ${tx(lv.name, lv.nameHi)}</div></div>
+        <button class="doubtbtn" id="doubtBtn" title="${tx('Ask Roshni for help','रोशनी से मदद माँगो')}">🙋 ${tx("Doubt hai","doubt है")}</button>
+      </div>
       <div class="progress"><div id="bar" style="width:${(idx/rounds.length)*100}%"></div></div>
       <div id="body" class="gamebody"></div>
       <div class="gamefooter" id="footer"></div>
@@ -1371,9 +1401,11 @@ function startLevel(course, lesson, lv, back){
   }
   function mount(bodyHTML){
     clearAnnounce();
+    doubtCtx = { course, lesson, lv, idx };   // Layer 1/2: what the girl is looking at right now
     root.innerHTML="";
     root.appendChild(el(header()));
     setBack(backLbl, backToLesson);
+    const db = $("#doubtBtn"); if(db) db.onclick = () => openDoubt();
     $("#body").innerHTML = bodyHTML;
     const bar=$("#bar"); if(bar && bar.parentElement){ const pb=bar.parentElement; pb.setAttribute("role","progressbar"); pb.setAttribute("aria-valuemin","0"); pb.setAttribute("aria-valuemax",String(rounds.length)); pb.setAttribute("aria-valuenow",String(idx)); }
     moveFocusToTop();   // land focus on the new question, not <body>
@@ -1733,6 +1765,7 @@ function startLevel(course, lesson, lv, back){
   // --- finish: award stars
   function finish(){
     clearAnnounce();
+    doubtCtx = null;     // left gameplay — no round on screen to ask about
     const pct = rounds.length ? score/rounds.length : 0;   // guard: admin lesson could yield 0 rounds
     const stars = pct>=0.99?3 : pct>=0.6?2 : pct>=0.3?1 : 0;
     setStars(course.key, lesson.key, lv.id, stars); state.coins += stars*10; save(); refreshTop();
@@ -1840,6 +1873,7 @@ function buildRounds(lv, lesson){
 const CACHE_KEY = "hikmat_courses_cache";
 const STRUCT_KEY = "hikmat_structure_cache";
 const ATTEMPT_QUEUE = "hikmat_attempt_queue";
+const DOUBT_QUEUE = "hikmat_doubt_queue";
 let backendLive = false;   // true once we've reached the Frappe server
 
 function apiURL(m){ return "/api/method/hikmat.api." + m; }
@@ -1939,6 +1973,93 @@ async function syncAttempts(){
   } finally { _syncing = false; }
 }
 window.addEventListener("online", syncAttempts);
+
+// ---------- FLAGSHIP: "Roshni, mujhe doubt hai" — tap when you're stuck ----------
+// Layer 1: in-the-moment self-help right where she is (hear again / slowly / in Hindi),
+//          with a reassuring Roshni so asking never feels like failing.
+// Layer 2: each doubt is logged (track/lesson/activity) and synced so a facilitator
+//          can see a confusion heatmap — which topics need a human, live.
+let doubtCtx = null;          // {course, lesson, lv, idx} of the round on screen
+function openDoubt(){
+  if(!doubtCtx) return;
+  sfx.tap(); stopSpeech(); setMood("happy");
+  const q = lastQ, hint = lastHint, hi = lastHi;
+  const replayEn = [q, hint].filter(Boolean).join(". ");
+  // Roshni warmly invites the doubt — having one is a good thing.
+  const roshniLine = tx("Doubt hona acchi baat hai! Main samjhaati hoon.",
+                        "Doubt होना अच्छी बात है! मैं समझाती हूँ।");
+  const sheet = el(`<div class="sheetwrap" id="doubtWrap">
+    <div class="sheet doubtsheet" role="dialog" aria-modal="true" aria-label="${tx('Help from Roshni','रोशनी से मदद')}">
+      <div class="doubthead">
+        <div class="mascot small m-happy">${mascotSVG()}</div>
+        <div class="doubttitle">
+          <div class="doubtq">${tx("What do you need? 💛","तुम्हें क्या चाहिए? 💛")}</div>
+          <div class="doubtsub">${esc(roshniLine)}</div>
+        </div>
+      </div>
+      <div class="doubtopts">
+        <button class="doubtopt" id="dAgain"><span class="di">🔊</span><span>${tx("Hear it again","फिर से सुनो")}</span></button>
+        <button class="doubtopt" id="dSlow"><span class="di">🐢</span><span>${tx("Say it slowly","धीरे से कहो")}</span></button>
+        ${hi ? `<button class="doubtopt" id="dHindi"><span class="di">🇮🇳</span><span>${tx("Explain in Hindi","हिंदी में समझाओ")}</span></button>` : ""}
+        <button class="doubtopt" id="dTeacher"><span class="di">🧑‍🏫</span><span>${tx("Tell the teacher","टीचर को बताओ")}</span></button>
+      </div>
+      <button class="btn ghost wide" id="dClose">${tx("I'm okay now →","अब समझ गई →")}</button>
+    </div>
+  </div>`);
+  document.body.appendChild(sheet);
+  // Layer 2: log the doubt the moment she opens for help (once per open).
+  reportDoubt({ track: doubtCtx.course.key, lesson: doubtCtx.lesson.key,
+                activity: doubtCtx.lv.id, question: replayEn.slice(0, 280) });
+  const close = () => { sheet.remove(); };
+  sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
+  $("#dClose").onclick = () => { sfx.tap(); close(); };
+  $("#dAgain").onclick = () => { sfx.tap(); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en"); };
+  $("#dSlow").onclick  = () => { sfx.tap(); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en", { rate:0.55 }); };
+  const dh = $("#dHindi"); if(dh) dh.onclick = () => { sfx.tap(); if(hi) speak(hi, "hi", { rate:0.8 }); };
+  $("#dTeacher").onclick = () => {
+    sfx.tap();
+    // already logged on open; acknowledge so she knows help is coming
+    $("#dTeacher").classList.add("done");
+    $("#dTeacher").querySelector("span:last-child").textContent = tx("Teacher will help 💛","टीचर मदद करेंगी 💛");
+    speak(tx("I told your teacher. Help is coming.","मैंने टीचर को बता दिया। मदद आ रही है।"),
+          state.lang==="hi"?"hi":"en");
+  };
+  // auto-read the warm invite so the audio-first child hears the offer
+  speak(roshniLine, state.lang==="hi"?"hi":"en");
+}
+
+function _readDoubts(){ try { return JSON.parse(localStorage.getItem(DOUBT_QUEUE)) || []; } catch(e){ return []; } }
+function _saveDoubts(q){ try { localStorage.setItem(DOUBT_QUEUE, JSON.stringify(q)); } catch(e){} }
+function reportDoubt(d){
+  const q = _readDoubts();
+  q.push({ ...d,
+           student: currentStudent ? currentStudent.id : "",
+           token: currentStudent ? (currentStudent.token || "") : "",
+           lang: state.lang, client_id: uid() });
+  _saveDoubts(q);
+  syncDoubts();
+}
+let _syncingDoubts = false;
+async function syncDoubts(){
+  if(_syncingDoubts) return;
+  const q = _readDoubts();
+  if(!q.length) return;
+  _syncingDoubts = true;
+  const remaining = [];
+  try {
+    for(const d of q){
+      try {
+        const r = await fetch(apiURL("report_doubt"), { method:"POST", body:new URLSearchParams(d) });
+        if(!r.ok){ remaining.push(d); continue; }   // network/HTTP error → retry later
+        // success, or a permanent rejection → drop (don't loop forever)
+      } catch(e){ remaining.push(d); }              // offline → keep for next time
+    }
+    const seen = new Set(q.map(x => JSON.stringify(x)));
+    _readDoubts().forEach(x => { if(!seen.has(JSON.stringify(x))) remaining.push(x); });
+    _saveDoubts(remaining);
+  } finally { _syncingDoubts = false; }
+}
+window.addEventListener("online", syncDoubts);
 
 // ---------- identity & login (only when served from Frappe; offline = guest) ----------
 function setStudent(stu){
@@ -2081,6 +2202,7 @@ state.sound = state.sound!==false;
 state.theme = state.theme || "light";
 renderHome();          // instant: bundled or cached content, fully offline
 syncAttempts();        // flush any progress queued while offline
+syncDoubts();          // flush any doubts logged while offline
 loadFromBackend().then(async ok => {
   backendLive = ok;
   // No forced login wall — everyone lands on Home (playable); the guest sees clear
