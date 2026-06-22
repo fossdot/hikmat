@@ -251,6 +251,19 @@
   .av:active { transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
   .av.sel { border-color:var(--grape); background:#efeaff; box-shadow:0 3px 0 #d9cffb; }
   .profilebtn.signup { background:var(--primary); color:#fff; border-color:var(--primary); }
+  /* Tap-to-hear button — primary-tinted so it reads as "play", distinct from the mute toggle */
+  .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
+  .toggle.hearbtn .iconsvg svg, .toggle.hearbtn svg { filter:brightness(0) invert(1); }
+  [data-theme="dark"] .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
+  /* "Saved on this device" reassurance chip on the result screen */
+  .savechip { display:inline-flex; align-items:center; gap:6px; margin:8px auto 0; background:#eafaf2; color:var(--good-d); border:1px solid #c6efd9; border-radius:999px; padding:5px 13px; font-weight:800; font-size:13px; }
+  [data-theme="dark"] .savechip { background:#15341f; border-color:#1e5638; }
+  /* Roshni guide strip in the home hero */
+  .hero-guide { display:flex; align-items:center; gap:16px; justify-content:center; }
+  .hero-guide .roshni { width:62px; height:62px; flex:0 0 auto; }
+  .hero-guide .roshni svg { width:100%; height:100%; }
+  .hero-guide .herotext { text-align:left; }
+  @media(max-width:520px){ .hero-guide{ flex-direction:column; gap:8px; } .hero-guide .herotext{ text-align:center; } }
 
   /* tiles for spelling / phrase */
   .tray { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; min-height:62px; align-items:center;
@@ -447,7 +460,8 @@
       <div class="stats">
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
-        <button class="toggle on" id="soundToggle" title="Sound">🔊</button>
+        <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
+        <button class="toggle on" id="soundToggle" title="Sound effects">🔊</button>
         <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
         <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
         <button class="toggle" id="hiToggle" title="Help">Help: OFF</button>
@@ -792,6 +806,19 @@ function speak(text, lang="en", opts){
 }
 function sayHi(text){ if(state.hindi) speak(text, "hi", { queue:true }); }
 
+// ---------- Audio-first shell: tap-to-hear narration of the current screen ----------
+// A non-reader (or non-reading parent) navigates by tapping the 🔊 button to hear the screen.
+// Auto-narrate only inside an installed phone PWA — NEVER auto-blast across 30 shared laptops.
+let narration = { en: "", hi: "" };
+function isStandalone(){ try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch(e){ return false; } }
+function setNarration(en, hi){
+  narration = { en: en || "", hi: hi || "" };
+  if(isStandalone() && narration.en) hearNarration();
+}
+function hearNarration(){
+  if(narration.en) speak(tx(narration.en, narration.hi || narration.en), state.lang === "hi" ? "hi" : "en");
+}
+
 // ---------- Helpers ----------
 const $ = sel => document.querySelector(sel);
 const root = $("#root");
@@ -862,6 +889,8 @@ const sfx = {
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function pick(arr,n){ return shuffle(arr).slice(0,n); }
 function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstChild; }
+// stable per-attempt id (minted once, persisted in the queue) so a retry can't double-record
+function uid(){ try { return crypto.randomUUID(); } catch(e){ return "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); } }
 // HTML-escape any value before injecting it via innerHTML/template strings (XSS guard).
 // Content (words, dialogue, quizzes, student names, etc.) comes from the backend/admin/
 // self-signup and must never be trusted as markup. String() coerces undefined/numbers;
@@ -1003,6 +1032,7 @@ function refreshTop(){
   const tt = $("#themeToggle"); if(tt){ tt.innerHTML = dark ? iconFor("theme-light","☀️") : iconFor("theme-dark","🌙"); tt.classList.toggle("on", dark); }
   const si = $("#starIcon"); if(si) si.innerHTML = iconFor("star","★");
   const ci = $("#coinIcon"); if(ci) ci.innerHTML = iconFor("gem","💎");
+  const hb = $("#hearBtn"); if(hb) hb.innerHTML = iconFor("sound-on","🔊");
   const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
   const lg = $("#brandLogo");
   if(lg){                                   // build via DOM + scheme-check so a hostile logo URL can't break out / run javascript:
@@ -1027,6 +1057,7 @@ $("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop();
 $("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
 $("#soundToggle").onclick = () => { state.sound = state.sound===false; save(); refreshTop(); if(state.sound) sfx.enter(); };
 $("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; save(); refreshTop(); sfx.tap(); };
+$("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); };
 
 // ============================================================
 //  SCREENS
@@ -1131,14 +1162,15 @@ function renderHome(){
     ? tx("Pick your class, then choose a subject to start.", "अपनी कक्षा चुनो, फिर विषय चुनकर शुरू करो।")
     : tx("Pick a place to explore and learn.", "सीखने के लिए कोई जगह चुनो।");
   const s = el(`<div class="screen">
-    <div class="hero">
-      <h1>${esc(heroH1)}</h1>
-      <p>${esc(heroP)}</p>
+    <div class="hero hero-guide">
+      <div class="roshni">${mascotSVG()}</div>
+      <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
     </div>
     <div class="center" id="profileRow" style="margin:8px 0 20px"></div>
     <div id="homeSections"></div>
   </div>`);
   root.appendChild(s);
+  setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
   profileChip($("#profileRow"));
   const host = $("#homeSections");
   const seeBtn = (label, fn) => { const b = el(`<button class="btn ghost seeother">${label}</button>`); b.onclick = () => { sfx.tap(); fn(); }; const c = el(`<div class="center" style="margin:2px 0 4px"></div>`); c.appendChild(b); host.appendChild(c); };
@@ -1191,6 +1223,7 @@ function renderBand(band){
   root.appendChild(s);
   setBack(tx("← Home","← घर"), renderHome);
   profileChip($("#profileRow"));
+  setNarration(tx(band.title,band.titleHi)+". "+tx("Choose a subject.","कोई विषय चुनो।"), tx(band.title,band.titleHi)+". "+tx("Choose a subject.","कोई विषय चुनो।"));
   const wrap = $("#subjects");
   const subs = subjectsInBand(band.key);
   if(!subs.length) wrap.innerHTML = `<div class="muted center">${tx("No subjects yet.","अभी कोई विषय नहीं।")}</div>`;
@@ -1213,6 +1246,7 @@ function renderSubject(band, subj){
   </div>`);
   root.appendChild(s);
   setBack("← " + tx(band.title, band.titleHi), () => renderBand(band));
+  setNarration(tx(subj.title,subj.titleHi)+". "+tx("Choose a topic.","कोई विषय-वस्तु चुनो।"), tx(subj.title,subj.titleHi)+". "+tx("Choose a topic.","कोई विषय-वस्तु चुनो।"));
   const back = { label: "← " + tx(subj.title, subj.titleHi), fn: () => renderSubject(band, subj) };
   const wrap = $("#tracks");
   tracks.forEach(c => wrap.appendChild(trackCard(c, back)));
@@ -1233,6 +1267,7 @@ function renderLifeSkills(){
   </div>`);
   root.appendChild(s);
   setBack(tx("← Home","← घर"), renderHome);
+  setNarration(tx("Life Skills. Everyday English for home, market, school and work.","जीवन कौशल। घर, बाज़ार, स्कूल और काम की रोज़मर्रा अंग्रेज़ी।"), tx("Life Skills. Everyday English for home, market, school and work.","जीवन कौशल। घर, बाज़ार, स्कूल और काम की रोज़मर्रा अंग्रेज़ी।"));
   const back = { label: "← " + tx("Life Skills","जीवन कौशल"), fn: renderLifeSkills };
   const wrap = $("#tracks");
   lifeSkillsTracks().forEach(c => wrap.appendChild(trackCard(c, back)));
@@ -1254,6 +1289,7 @@ function renderTrack(course, back){
   </div>`);
   root.appendChild(s);
   setBack(back.label, back.fn);
+  setNarration(tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।"), tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।"));
   const wrap = $("#path");
   // a lesson is "complete" (green) once every one of its activities has at least 1 star
   const isComplete = ls => levelsFor(ls).every(lv => getStars(course.key, ls.key, lv.id) > 0);
@@ -1289,6 +1325,7 @@ function renderLessonMap(course, lesson, back){
   </div>`);
   root.appendChild(s);
   setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course, back));
+  setNarration(tx(lesson.title,lesson.titleHi)+". "+tx("Tap a step to start.","शुरू करने के लिए किसी पड़ाव पर टैप करो।"), tx(lesson.title,lesson.titleHi)+". "+tx("Tap a step to start.","शुरू करने के लिए किसी पड़ाव पर टैप करो।"));
   const wrap = $("#path");
   const ck = course.key, lk = lesson.key;
   const LV = levelsFor(lesson);
@@ -1569,25 +1606,44 @@ function startLevel(course, lesson, lv, back){
     setFooter("");
     announce(() => speak(tx(r.q, r.qHi || r.q), state.lang==="hi" ? "hi" : "en"));
     const opts = $("#opts");
+    let tries = 0, done = false;
+    const showTeach = () => {                              // the teach card doubles as the scaffolding hint / worked example
+      if(!r.teach) return;
+      const tb = $("#teach"); tb.style.display = "flex";
+      const main = tx(r.teach, r.teachHi || r.teach);
+      const alt = (state.hindi && state.lang!=="hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
+      tb.innerHTML = `💡 <span>${esc(main)}${alt}</span>`;
+      setNarration(main, main);                            // tap 🔊 re-hears the hint
+    };
     shuffle(r.choices.slice()).forEach(c => {
       const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
       b.onclick = () => {
-        const correct = c === r.answer;
-        document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
-        b.classList.add(correct ? "correct" : "wrong");
-        if(!correct) document.querySelectorAll(".quizopt").forEach(o => { if(o.textContent === r.answer) o.classList.add("correct"); });
-        setMood(correct ? "happy" : "sad");
-        (correct ? sfx.correct : sfx.wrong)();
+        if(done) return;
         const fb = $("#fb");
-        fb.textContent = correct ? tx("Correct! 🎉","सही! 🎉") : tx("Answer: ","सही जवाब: ") + r.answer;
-        fb.className = "feedback " + (correct ? "good" : "bad");
-        if(r.teach){
-          const tb = $("#teach"); tb.style.display = "flex";
-          const main = tx(r.teach, r.teachHi || r.teach);
-          const alt = (state.hindi && state.lang!=="hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
-          tb.innerHTML = `💡 <span>${esc(main)}${alt}</span>`;
+        if(c === r.answer){                                // right (even after a hint) → full credit, never penalise
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add("correct"); setMood("happy"); sfx.correct();
+          fb.textContent = tx("Correct! 🎉","सही! 🎉"); fb.className = "feedback good";
+          showTeach();
+          setTimeout(() => next(true), r.teach ? 1700 : 1000);
+          return;
         }
-        setTimeout(() => next(correct), r.teach ? 2200 : (correct ? 1000 : 1700));
+        // wrong
+        tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
+        if(tries === 1 && r.teach){
+          // SCAFFOLD: show the hint and let her try again — don't reveal the answer, keep other options live
+          fb.textContent = tx("Not quite — here's a hint, try again.","बिल्कुल नहीं — यह रहा संकेत, फिर कोशिश करो।");
+          fb.className = "feedback bad";
+          showTeach();
+        } else {
+          // second miss (or no hint to give): reveal & move on — never trap her
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => { o.classList.add("disabled"); if(o.textContent === r.answer) o.classList.add("correct"); });
+          fb.textContent = tx("Answer: ","सही जवाब: ") + r.answer; fb.className = "feedback bad";
+          showTeach();
+          setTimeout(() => next(false), r.teach ? 2200 : 1700);
+        }
       };
       opts.appendChild(b);
     });
@@ -1690,6 +1746,7 @@ function startLevel(course, lesson, lv, back){
       <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
       <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
       <div class="muted">+${score*5 + stars*10} ${tx("💎 gems","💎 रत्न")}</div>
+      ${currentStudent ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
       <div class="actionrow">
         <button class="btn ghost" id="again">${tx("Play again","फिर से खेलो")}</button>
         <button class="btn primary" id="map">${tx("Back to map →","नक्शे पर वापस →")}</button>
@@ -1855,7 +1912,7 @@ function _saveQueue(q){ try { localStorage.setItem(ATTEMPT_QUEUE, JSON.stringify
 function recordAttempt(a){
   if(!currentStudent) return;            // guest / not signed in → local progress only
   const q = _readQueue();
-  q.push({ ...a, student: currentStudent.id, token: currentStudent.token || "" });
+  q.push({ ...a, student: currentStudent.id, token: currentStudent.token || "", client_id: uid() });
   _saveQueue(q);
   syncAttempts();
 }
@@ -1931,6 +1988,7 @@ function renderSignup(){
       </div>
     </div>
   </div>`));
+  setNarration(tx("Create your name. Type a name, choose your class, and pick a picture.","अपना नाम बनाओ। नाम लिखो, अपनी कक्षा और एक तस्वीर चुनो।"), tx("Create your name. Type a name, choose your class, and pick a picture.","अपना नाम बनाओ। नाम लिखो, अपनी कक्षा और एक तस्वीर चुनो।"));
   const avwrap = $("#avpick");
   AVATARS.forEach((a,i) => {
     const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
@@ -1989,6 +2047,7 @@ function renderLogin(){
       </div>
     </div>
   </div>`));
+  setNarration(tx("Log in. Type your name and PIN to continue.","लॉग इन। अपना नाम और पिन डालकर आगे बढ़ो।"), tx("Log in. Type your name and PIN to continue.","लॉग इन। अपना नाम और पिन डालकर आगे बढ़ो।"));
   const name = $("#loginName"), pin = $("#loginPin"), err = $("#loginErr");
   setTimeout(() => name.focus(), 60);
   $("#toSignup").onclick = () => { sfx.tap(); renderSignup(); };

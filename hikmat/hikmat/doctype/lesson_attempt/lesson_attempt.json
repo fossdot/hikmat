@@ -17,7 +17,8 @@
   "coins",
   "attempted_on",
   "student_name",
-  "cohort"
+  "cohort",
+  "client_id"
  ],
  "fields": [
   {
@@ -83,12 +84,19 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Cohort"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client id",
+   "no_copy": 1,
+   "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-17 00:59:23.621045",
+ "modified": "2026-06-22 11:39:09.749972",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Lesson Attempt",

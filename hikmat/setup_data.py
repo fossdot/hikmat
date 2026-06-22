@@ -534,9 +534,12 @@ def add_attempt_fields():
         dt.append("fields", {"fieldname": "student_name", "fieldtype": "Data", "label": "Student name", "in_list_view": 1})
     if "cohort" not in have:
         dt.append("fields", {"fieldname": "cohort", "fieldtype": "Data", "label": "Cohort", "in_list_view": 1})
+    if "client_id" not in have:
+        # client-generated id so a retry after a partial success can't double-insert an attempt
+        dt.append("fields", {"fieldname": "client_id", "fieldtype": "Data", "label": "Client id", "unique": 1, "no_copy": 1})
     dt.save()
     frappe.db.commit()
-    print("=== Lesson Attempt: student_name + cohort added ===")
+    print("=== Lesson Attempt: student_name + cohort + client_id added ===")
 
 
 def demo_attempts():

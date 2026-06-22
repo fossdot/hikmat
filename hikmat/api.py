@@ -294,15 +294,21 @@ def _build_settings():
 # ---------------------------------------------------------------------------
 @frappe.whitelist(allow_guest=True)
 def submit_attempt(student=None, token=None, track=None, lesson=None, activity=None,
-                   stars=0, score=0, total=0, coins=0):
+                   stars=0, score=0, total=0, coins=0, client_id=None):
     """Record one finished activity. Called by the game on the result screen.
     Everything here is attacker-controllable, so: verify the student exists & is
     active, require the student's login token (no forging attempts for others),
-    clamp every number to sane bounds, and cap write volume per IP."""
+    clamp every number to sane bounds, and cap write volume per IP.
+    client_id makes the write idempotent — a retry after a partial success (the
+    classic offline-queue double-insert) returns the existing row instead of a copy."""
     if not _rate_ok("submit:" + _client_ip(), 3000, 3600):   # flood ceiling; well above a real classroom
         return {"ok": False, "error": "rate_limited"}
     if not student:
         return {"ok": False, "error": "unknown_student"}
+    if client_id:                                            # already recorded this exact attempt? done.
+        existing = frappe.db.get_value("Lesson Attempt", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "name": existing, "dedup": True}
     sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
     if not sinfo or not sinfo.active:
         return {"ok": False, "error": "unknown_student"}
@@ -313,15 +319,20 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
     score = max(0, _int(score))
     if total:
         score = min(score, total)
-    doc = frappe.get_doc({
-        "doctype": "Lesson Attempt",
-        "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
-        "track": track, "lesson": lesson, "activity": activity,
-        "stars": max(0, min(3, _int(stars))),          # an activity is worth 0–3 stars
-        "score": score, "total": total,
-        "coins": max(0, min(1000, _int(coins))),
-        "attempted_on": frappe.utils.now(),
-    }).insert(ignore_permissions=True)
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Lesson Attempt", "client_id": client_id or None,
+            "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
+            "track": track, "lesson": lesson, "activity": activity,
+            "stars": max(0, min(3, _int(stars))),          # an activity is worth 0–3 stars
+            "score": score, "total": total,
+            "coins": max(0, min(1000, _int(coins))),
+            "attempted_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with another submit of the same client_id
+        frappe.db.rollback()
+        existing = frappe.db.get_value("Lesson Attempt", {"client_id": client_id}, "name")
+        return {"ok": True, "name": existing, "dedup": True}
     frappe.db.commit()
     return {"ok": True, "name": doc.name}
 
