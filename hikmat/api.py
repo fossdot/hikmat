@@ -547,6 +547,10 @@ def delete_student(student):
     name = frappe.db.get_value("Student", student, "student_name")
     for att in frappe.get_all("Lesson Attempt", filters={"student": student}, pluck="name"):
         frappe.delete_doc("Lesson Attempt", att, force=1, ignore_permissions=True)
+    # Doubt rows carry the same student_name + free-text question as Attempt rows;
+    # right-to-erasure must remove them too.
+    for doubt in frappe.get_all("Lesson Doubt", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Lesson Doubt", doubt, force=1, ignore_permissions=True)
     frappe.delete_doc("Student", student, force=1, ignore_permissions=True)
     frappe.db.commit()
     return {"ok": True, "deleted": name}
