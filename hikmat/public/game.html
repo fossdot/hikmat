@@ -1736,10 +1736,10 @@ function startLevel(course, lesson, lv, back){
     function render(){
       emailEl.innerHTML =
         `<div class="erow"><span class="elabel">${tx("To","प्रति")}:</span> ${esc(r.to)}</div>` +
-        slots.map((s,si)=>`<div class="erow"><span class="elabel">${tx(s.label, s.labelHi || s.label)}:</span> <span class="eslot ${chosen[si]!=null?"set":""}" data-si="${si}">${lineFor(si)}</span></div>`).join("") +
+        slots.map((s,si)=>`<div class="erow"><span class="elabel">${esc(tx(s.label, s.labelHi || s.label))}:</span> <span class="eslot ${chosen[si]!=null?"set":""}" data-si="${si}">${lineFor(si)}</span></div>`).join("") +
         `<div class="erow esig">${esc(r.from)}</div>`;
       optsEl.innerHTML = slots.map((s,si)=>
-        `<div class="optgroup"><div class="oglabel">${tx(s.label, s.labelHi || s.label)}</div>` +
+        `<div class="optgroup"><div class="oglabel">${esc(tx(s.label, s.labelHi || s.label))}</div>` +
         s.options.map((o,oi)=>`<button class="echip ${chosen[si]===oi?"sel":""}" data-si="${si}" data-oi="${oi}">${esc(o.t)}${(state.hindi && o.hi)?`<small>${esc(o.hi)}</small>`:""}</button>`).join("") +
         `</div>`).join("");
       optsEl.querySelectorAll(".echip").forEach(b=> b.onclick=()=>{ chosen[+b.dataset.si]=+b.dataset.oi; sfx.tap(); render(); });
