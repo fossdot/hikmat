@@ -9,18 +9,24 @@ not escape. A malicious `spec_json` could inject <script> / <img onerror>
 / etc. that ran under the game's origin.
 
 The fix wraps both interpolations with `esc()`. These tests guard the
-fix in two layers:
+fix in three layers:
 
 1. Source-level regression — assert game.html contains the patched
    `esc(tx(s.label, ...))` form at the two known sites, and contains
    no remaining unescaped `tx(s.label, ...)` call. This is a cheap
-   grep-style guard against the wrapper being removed by a future
-   editor.
+   grep-style guard against the wrapper being removed.
 
-2. Behaviour — assert the `esc()` function (mirrored from game.html in
-   Python here for hermetic testing) neutralises the attack payloads
-   listed in the issue, and round-trips legitimate strings (English,
-   Hindi devanagari, mixed) unchanged.
+2. Detector self-tests — the source-level guard is only useful if it
+   accepts legitimate stylistic variation (whitespace, line breaks)
+   and rejects subtler bypasses (wrong wrapper name, identifier-prefix
+   tricks like `Xesc(`, partial fixes that escape one site but not
+   the other). We exercise the detector against synthetic source
+   strings so a future refactor doesn't silently weaken the guard.
+
+3. Behaviour — assert the `esc()` function (mirrored from game.html in
+   Python here for hermetic testing) neutralises the documented attack
+   payloads and round-trips legitimate strings (English, Hindi
+   devanagari, mixed) unchanged.
 
 Run with either:
     python -m unittest hikmat.test_xss_email_labels
@@ -31,6 +37,47 @@ import unittest
 from pathlib import Path
 
 GAME_HTML = Path(__file__).parent / "public" / "game.html"
+
+# Matches the curriculum-content interpolation that was vulnerable in
+# roundEmail(): tx(s.label, s.labelHi || s.label). Whitespace inside the
+# call is tolerated.
+_TX_SLOT_LABEL = re.compile(
+	r"tx\(s\.label,\s*s\.labelHi\s*\|\|\s*s\.label\)"
+)
+
+# JS identifier-continuation char (letters, digits, underscore, $). Used to
+# rule out wrapper names like `Xesc(`, `_esc(`, `$esc(`, etc., which would
+# otherwise satisfy a naive 4-byte "esc(" suffix check.
+_IDENT_CHAR = re.compile(r"[A-Za-z0-9_$]")
+
+
+def _find_unescaped_tx_label_sites(src):
+	"""Return [(match_start, surrounding_prefix), ...] for every
+	`tx(s.label, s.labelHi || s.label)` call in `src` that is NOT wrapped
+	by `esc(...)`.
+
+	The check walks left from each match start, skipping whitespace
+	(including newlines), and requires:
+
+	* the next four characters before the whitespace to be exactly `esc(`,
+	  AND
+	* the character before those four, if present, to NOT be an identifier
+	  character (so `Xesc(`, `_esc(`, `myEsc(` etc. are all rejected).
+
+	An empty return list means every interpolation is guarded.
+	"""
+	bad = []
+	for m in _TX_SLOT_LABEL.finditer(src):
+		i = m.start()
+		while i > 0 and src[i - 1].isspace():
+			i -= 1
+		prefix4 = src[max(0, i - 4):i]
+		preceding = src[i - 5] if i - 5 >= 0 else ""
+		ok = prefix4 == "esc(" and not (preceding and _IDENT_CHAR.match(preceding))
+		if not ok:
+			# Include 10 chars of left context so a failure message is debuggable.
+			bad.append((m.start(), src[max(0, i - 10):i]))
+	return bad
 
 
 def esc(s):
@@ -47,7 +94,7 @@ def esc(s):
 
 
 class TestPatchedTemplatePresence(unittest.TestCase):
-	"""Source-level guard: both interpolations must wrap with esc(...)."""
+	"""Source-level guard against the actual game.html shipped in this repo."""
 
 	def setUp(self):
 		self.src = GAME_HTML.read_text(encoding="utf-8")
@@ -64,21 +111,162 @@ class TestPatchedTemplatePresence(unittest.TestCase):
 		)
 
 	def test_no_unescaped_site_remains(self):
-		# Any tx(s.label, …) NOT preceded by `esc(` is a regression.
-		# Use a manual scan instead of variable-length lookbehind for portability.
-		for m in re.finditer(r"tx\(s\.label,\s*s\.labelHi\s*\|\|\s*s\.label\)", self.src):
-			start = m.start()
-			prefix = self.src[max(0, start - 4):start]
+		bad = _find_unescaped_tx_label_sites(self.src)
+		self.assertEqual(
+			bad, [],
+			f"Found {len(bad)} unescaped tx(s.label, …) site(s): {bad}",
+		)
+
+
+class TestUnescapedSiteDetector(unittest.TestCase):
+	"""Adversarial tests for `_find_unescaped_tx_label_sites` itself.
+
+	The source-level guard is only as good as its detector. These tests
+	pin the detector's accept / reject behaviour so a future refactor can't
+	silently weaken it.
+	"""
+
+	# ---- accepted: legitimate stylistic variation ----
+
+	def test_accepts_canonical(self):
+		self.assertEqual(
+			_find_unescaped_tx_label_sites("esc(tx(s.label, s.labelHi || s.label))"),
+			[],
+		)
+
+	def test_accepts_space_after_open_paren(self):
+		# The Copilot review's specific concern: `esc( tx(...))` is harmless.
+		self.assertEqual(
+			_find_unescaped_tx_label_sites("esc( tx(s.label, s.labelHi || s.label))"),
+			[],
+		)
+
+	def test_accepts_tab_after_open_paren(self):
+		self.assertEqual(
+			_find_unescaped_tx_label_sites("esc(\ttx(s.label, s.labelHi || s.label))"),
+			[],
+		)
+
+	def test_accepts_newline_after_open_paren(self):
+		# Multi-line wrapping is common when reformatting.
+		self.assertEqual(
+			_find_unescaped_tx_label_sites(
+				"esc(\n\ttx(s.label, s.labelHi || s.label))"
+			),
+			[],
+		)
+
+	def test_accepts_multiple_sites(self):
+		src = (
+			"esc(tx(s.label, s.labelHi || s.label)) AND "
+			"esc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(_find_unescaped_tx_label_sites(src), [])
+
+	def test_accepts_no_occurrences(self):
+		# A source with no tx(s.label, …) at all is vacuously clean.
+		self.assertEqual(_find_unescaped_tx_label_sites("nothing to see here"), [])
+
+	def test_accepts_leading_whitespace_before_esc(self):
+		# `esc(...)` at position 0 with leading spaces in a multi-line template.
+		self.assertEqual(
+			_find_unescaped_tx_label_sites(
+				"  esc(tx(s.label, s.labelHi || s.label))"
+			),
+			[],
+		)
+
+	# ---- rejected: missing / wrong wrapper ----
+
+	def test_rejects_bare_tx(self):
+		out = _find_unescaped_tx_label_sites("tx(s.label, s.labelHi || s.label)")
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_wrong_wrapper_escAttr(self):
+		# escAttr exists in the codebase for attribute contexts; it is the
+		# wrong tool for these two text-context sites and the test must flag it.
+		out = _find_unescaped_tx_label_sites(
+			"escAttr(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_arbitrary_wrappers(self):
+		for wrapper in ("identity", "JSON.stringify", "foo", "bar", "escape"):
+			src = f"{wrapper}(tx(s.label, s.labelHi || s.label))"
+			out = _find_unescaped_tx_label_sites(src)
 			self.assertEqual(
-				prefix, "esc(",
-				f"Unescaped tx(s.label, …) at byte {start}: prefix was {prefix!r}.",
+				len(out), 1,
+				f"detector should reject `{wrapper}(tx(...))`; got {out!r}",
 			)
+
+	def test_rejects_identifier_prefix_X_esc(self):
+		# `Xesc(` happens to end in the same 4 bytes `esc(` as a real wrapper.
+		# Must NOT pass — `Xesc` is a different function name.
+		out = _find_unescaped_tx_label_sites(
+			"Xesc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_identifier_prefix_underscore(self):
+		out = _find_unescaped_tx_label_sites(
+			"_esc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_identifier_prefix_dollar(self):
+		# `$` is a valid JS identifier character.
+		out = _find_unescaped_tx_label_sites(
+			"$esc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_camelcase_my_esc(self):
+		out = _find_unescaped_tx_label_sites(
+			"myEsc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_dot_access(self):
+		# `esc.tx(...)` is method-call syntax, not the escape wrapper.
+		out = _find_unescaped_tx_label_sites(
+			"esc.tx(s.label, s.labelHi || s.label)"
+		)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_concatenation_bypass(self):
+		# An adversary who has read the Copilot review's count-equality
+		# suggestion (b) might try `esc(other) + tx(s.label, …)` — the
+		# counts of `tx(s.label, …)` and `esc(tx(s.label, …))` can be made
+		# to look balanced, but this site is still unescaped. Our detector
+		# binds each tx() to its own wrapper, so it catches it.
+		src = "esc(other) + tx(s.label, s.labelHi || s.label)"
+		out = _find_unescaped_tx_label_sites(src)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_partial_fix_one_of_two(self):
+		# Two sites — one escaped, one missed. The detector must flag exactly
+		# the missed one.
+		src = (
+			"esc(tx(s.label, s.labelHi || s.label)) AND "
+			"tx(s.label, s.labelHi || s.label)"
+		)
+		out = _find_unescaped_tx_label_sites(src)
+		self.assertEqual(len(out), 1, out)
+
+	def test_rejects_case_variant_Esc(self):
+		# JS is case-sensitive; `Esc(` is a different function. The test
+		# being case-sensitive also forces a future rename of esc() to
+		# update the test in lockstep.
+		out = _find_unescaped_tx_label_sites(
+			"Esc(tx(s.label, s.labelHi || s.label))"
+		)
+		self.assertEqual(len(out), 1, out)
 
 
 class TestEscFunction(unittest.TestCase):
 	"""Behaviour guard: esc() must neutralise the documented attack payloads."""
 
-	# --- documented attack payloads ---
+	# ---- documented attack payloads ----
 
 	def test_neutralises_script_tag(self):
 		out = esc("<script>alert(1)</script>")
@@ -101,7 +289,7 @@ class TestEscFunction(unittest.TestCase):
 		self.assertNotIn("<iframe", out)
 		self.assertNotIn("</iframe>", out)
 
-	# --- edge cases ---
+	# ---- edge cases ----
 
 	def test_passes_through_safe_english(self):
 		for safe in ("Greeting", "From — sender", "Hello world", "Subject line"):
