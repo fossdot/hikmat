@@ -1,0 +1,160 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-06-28 12:50:48.508768",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "conversation",
+  "student",
+  "cohort",
+  "track",
+  "lesson",
+  "activity",
+  "prompt",
+  "reply",
+  "lang",
+  "model_version",
+  "prompt_version",
+  "latency_ms",
+  "was_canned",
+  "redaction_applied",
+  "asr_confidence",
+  "flagged",
+  "client_turn_id",
+  "created_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "conversation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Conversation",
+   "options": "AI Conversation"
+  },
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student",
+   "options": "Student"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Link",
+   "label": "Cohort",
+   "options": "Cohort"
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "label": "Track key"
+  },
+  {
+   "fieldname": "lesson",
+   "fieldtype": "Data",
+   "label": "Lesson key"
+  },
+  {
+   "fieldname": "activity",
+   "fieldtype": "Data",
+   "label": "Activity"
+  },
+  {
+   "fieldname": "prompt",
+   "fieldtype": "Small Text",
+   "label": "Doubt (redacted)"
+  },
+  {
+   "fieldname": "reply",
+   "fieldtype": "Small Text",
+   "label": "Roshni's reply"
+  },
+  {
+   "fieldname": "lang",
+   "fieldtype": "Data",
+   "label": "UI language"
+  },
+  {
+   "fieldname": "model_version",
+   "fieldtype": "Data",
+   "label": "Model version"
+  },
+  {
+   "fieldname": "prompt_version",
+   "fieldtype": "Data",
+   "label": "Prompt version"
+  },
+  {
+   "fieldname": "latency_ms",
+   "fieldtype": "Int",
+   "label": "Latency (ms)"
+  },
+  {
+   "default": "0",
+   "fieldname": "was_canned",
+   "fieldtype": "Check",
+   "label": "Canned (not generated)"
+  },
+  {
+   "default": "0",
+   "fieldname": "redaction_applied",
+   "fieldtype": "Check",
+   "label": "Redaction applied"
+  },
+  {
+   "fieldname": "asr_confidence",
+   "fieldtype": "Float",
+   "label": "ASR confidence (voice)"
+  },
+  {
+   "default": "0",
+   "fieldname": "flagged",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Flagged"
+  },
+  {
+   "fieldname": "client_turn_id",
+   "fieldtype": "Data",
+   "label": "Client turn id (idempotency)",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "created_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Created on"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-28 12:50:48.508768",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "AI Conversation Turn",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "conversation"
+}

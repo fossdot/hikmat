@@ -1,0 +1,150 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-06-28 12:50:47.836462",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "cohort",
+  "track",
+  "lesson",
+  "activity",
+  "conversation_id",
+  "lang",
+  "model",
+  "flagged",
+  "flag_reason",
+  "escalated",
+  "acknowledged_by",
+  "reviewed",
+  "helpful",
+  "started_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Cohort",
+   "options": "Cohort"
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "label": "Track key"
+  },
+  {
+   "fieldname": "lesson",
+   "fieldtype": "Data",
+   "label": "Lesson key"
+  },
+  {
+   "fieldname": "activity",
+   "fieldtype": "Data",
+   "label": "Activity"
+  },
+  {
+   "fieldname": "conversation_id",
+   "fieldtype": "Data",
+   "label": "Conversation id (idempotency)",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "lang",
+   "fieldtype": "Data",
+   "label": "UI language"
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model"
+  },
+  {
+   "default": "0",
+   "fieldname": "flagged",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Flagged"
+  },
+  {
+   "fieldname": "flag_reason",
+   "fieldtype": "Data",
+   "label": "Flag reason"
+  },
+  {
+   "default": "0",
+   "fieldname": "escalated",
+   "fieldtype": "Check",
+   "label": "Escalated"
+  },
+  {
+   "fieldname": "acknowledged_by",
+   "fieldtype": "Data",
+   "label": "Acknowledged by"
+  },
+  {
+   "default": "0",
+   "fieldname": "reviewed",
+   "fieldtype": "Check",
+   "label": "Reviewed by facilitator"
+  },
+  {
+   "fieldname": "helpful",
+   "fieldtype": "Select",
+   "label": "Helpful?",
+   "options": "\nyes\nno"
+  },
+  {
+   "fieldname": "started_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Started on"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-28 12:50:47.836462",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "AI Conversation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name"
+}
