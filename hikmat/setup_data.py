@@ -171,9 +171,19 @@ def create_doctypes():
         f("replies", "Table", "Replies", options="Dialogue Reply"),
     ], autoname="hash", title_field="line")
 
+    # Controlled list of intake dates — Cohort.start_date is a dropdown over these,
+    # so batches can only start on dates the admin has explicitly planned.
+    _mk("Cohort Start Date", [
+        f("start_date", "Date", "Start date", reqd=1, in_list_view=1),
+    ], autoname="format:{start_date}", title_field="start_date")
+
     _mk("Cohort", [
         f("cohort_name", "Data", "Cohort name", reqd=1, unique=1, in_list_view=1),
-        f("center", "Data", "Center / location", in_list_view=1),
+        f("mode", "Select", "Mode", options="\nOffline\nOnline", default="Offline",
+          reqd=1, in_list_view=1),
+        f("start_date", "Link", "Start date", options="Cohort Start Date",
+          mandatory_depends_on='eval:doc.mode=="Offline"', in_list_view=1),
+        f("center", "Data", "Center / location"),
         f("facilitator", "Data", "Facilitator"),
     ], autoname="field:cohort_name", title_field="cohort_name")
 
@@ -215,6 +225,102 @@ def create_doctypes():
         f("resolved", "Check", "Resolved by facilitator"),
     ], autoname="hash", title_field="student_name")
 
+    # Learning events — the fine-grained analytics stream. One row per notable moment;
+    # kind="wrong_answer" today (question + what she picked vs the right answer), so a
+    # facilitator can see WHICH question breaks down, not just the final score.
+    _mk("Learning Event", [
+        f("student", "Link", "Student", options="Student", in_list_view=1),
+        f("student_name", "Data", "Student name", in_list_view=1),
+        f("cohort", "Link", "Cohort", options="Cohort"),
+        f("kind", "Data", "Event kind", in_list_view=1),
+        f("track", "Data", "Track key", in_list_view=1),
+        f("lesson", "Data", "Lesson key", in_list_view=1),
+        f("activity", "Data", "Activity", in_list_view=1),
+        f("question", "Data", "Question / prompt", in_list_view=1),
+        f("chosen", "Data", "What she picked"),
+        f("answer", "Data", "Correct answer"),
+        f("lang", "Data", "UI language"),
+        f("client_id", "Data", "Client id (idempotency)", unique=1, no_copy=1),
+        f("occurred_on", "Datetime", "Occurred on", in_list_view=1),
+    ], autoname="hash", title_field="question")
+
+    # Milestone "belt" gates — admin-configurable star thresholds. When a girl's total
+    # stars cross a threshold, new content locks until a facilitator evaluates her
+    # in person and marks the Evaluation Passed (online-first clearing; the client only
+    # DETECTS the gate locally — clearing is server-authoritative).
+    _mk("Hikmat Milestone", [
+        f("milestone_key", "Data", "Key", reqd=1, unique=1, in_list_view=1),
+        f("title", "Data", "Title", reqd=1, in_list_view=1),
+        f("title_hi", "Data", "Title (Hindi)"),
+        f("icon", "Data", "Icon (emoji)"),
+        f("threshold_gems", "Int", "Threshold (total gems 💎)", reqd=1, in_list_view=1),
+        f("sort_order", "Int", "Sort order"),
+        f("active", "Check", "Active", default="1", in_list_view=1),
+    ], autoname="field:milestone_key", title_field="title")
+
+    # One row per (student, milestone) — created Pending by submit_attempt when the
+    # threshold is crossed; the facilitator fills in the rubric outcome in Desk.
+    # autoname format makes student+milestone unique at the DB level.
+    _mk("Evaluation", [
+        f("student", "Link", "Student", options="Student", reqd=1, in_list_view=1),
+        f("student_name", "Data", "Student name", in_list_view=1),
+        f("cohort", "Link", "Cohort", options="Cohort"),
+        f("campus", "Link", "Campus", options="Campus"),
+        f("milestone", "Link", "Milestone", options="Hikmat Milestone", reqd=1, in_list_view=1),
+        f("threshold_gems", "Int", "Threshold when reached"),
+        f("gems_at_reach", "Int", "Gems when reached"),
+        f("status", "Select", "Status", options="Pending\nPassed\nNeeds Practice",
+          default="Pending", reqd=1, in_list_view=1),
+        f("score", "Int", "Rubric score"),
+        f("rubric_notes", "Small Text", "Rubric notes (speak / read / write)"),
+        f("evaluated_by", "Link", "Evaluated by", options="User"),
+        f("evaluated_on", "Datetime", "Evaluated on"),
+        f("reached_on", "Datetime", "Reached on", in_list_view=1),
+    ], autoname="format:EV-{student}-{milestone}", title_field="student_name")
+
+    # Roshni AI — one row per tutoring SESSION (parent). Turns link back to it so the
+    # facilitator review queue and confusion mining can GROUP BY turn.
+    _mk("AI Conversation", [
+        f("student", "Link", "Student", options="Student", in_list_view=1),
+        f("student_name", "Data", "Student name", in_list_view=1),
+        f("cohort", "Link", "Cohort", options="Cohort", in_list_view=1),
+        f("track", "Data", "Track key"),
+        f("lesson", "Data", "Lesson key"),
+        f("activity", "Data", "Activity"),
+        f("conversation_id", "Data", "Conversation id (idempotency)", unique=1, no_copy=1),
+        f("lang", "Data", "UI language"),
+        f("model", "Data", "Model"),
+        f("flagged", "Check", "Flagged", in_list_view=1),
+        f("flag_reason", "Data", "Flag reason"),
+        f("escalated", "Check", "Escalated"),
+        f("acknowledged_by", "Data", "Acknowledged by"),
+        f("reviewed", "Check", "Reviewed by facilitator"),
+        f("helpful", "Select", "Helpful?", options="\nyes\nno"),
+        f("started_on", "Datetime", "Started on", in_list_view=1),
+    ], autoname="hash", title_field="student_name")
+
+    # ...one row per TURN: a child's redacted doubt + Roshni's reply + telemetry.
+    _mk("AI Conversation Turn", [
+        f("conversation", "Link", "Conversation", options="AI Conversation", in_list_view=1),
+        f("student", "Link", "Student", options="Student"),
+        f("cohort", "Link", "Cohort", options="Cohort"),
+        f("track", "Data", "Track key"),
+        f("lesson", "Data", "Lesson key"),
+        f("activity", "Data", "Activity"),
+        f("prompt", "Small Text", "Doubt (redacted)"),
+        f("reply", "Small Text", "Roshni's reply"),
+        f("lang", "Data", "UI language"),
+        f("model_version", "Data", "Model version"),
+        f("prompt_version", "Data", "Prompt version"),
+        f("latency_ms", "Int", "Latency (ms)"),
+        f("was_canned", "Check", "Canned (not generated)"),
+        f("redaction_applied", "Check", "Redaction applied"),
+        f("asr_confidence", "Float", "ASR confidence (voice)"),
+        f("flagged", "Check", "Flagged", in_list_view=1),
+        f("client_turn_id", "Data", "Client turn id (idempotency)", unique=1, no_copy=1),
+        f("created_on", "Datetime", "Created on", in_list_view=1),
+    ], autoname="hash", title_field="conversation")
+
     _mk("Hikmat Settings", [
         f("app_name", "Data", "App name", default="Hikmat"),
         f("logo", "Attach Image", "Logo (replaces the diya 🪔 in the game header)"),
@@ -222,6 +328,19 @@ def create_doctypes():
         f("tagline_hi", "Data", "Tagline (Hindi)"),
         f("default_language", "Select", "Default language", options="en\nhi", default="en"),
         f("help_default_on", "Check", "Hindi help on by default"),
+        f("default_theme", "Select", "Default theme", options="light\ndark", default="light"),
+        f("default_sound", "Check", "Sound on by default", default="1"),
+        f("sec_ai", "Section Break", "Roshni AI (local Ollama tutor)"),
+        f("ai_enabled", "Check", "Enable Roshni AI"),
+        f("ai_model", "Data", "Ollama model", default="gemma4:12b-mlx"),
+        f("ai_endpoint", "Data", "Ollama endpoint", default="http://localhost:11434"),
+        f("ai_system_prompt", "Long Text", "Roshni system prompt (Hindi) — blank uses the built-in default"),
+        f("ai_crisis_reply", "Small Text", "Crisis safe reply (Hindi) — blank uses the built-in default"),
+        f("sec_voice", "Section Break", "Roshni voice (local Whisper STT + Piper TTS)"),
+        f("voice_enabled", "Check", "Enable voice (mic in + neural Hindi voice out)"),
+        f("stt_endpoint", "Data", "Whisper STT endpoint (local)", default="http://127.0.0.1:8080"),
+        f("tts_endpoint", "Data", "Piper TTS endpoint (local)", default="http://127.0.0.1:5000"),
+        f("tts_voice", "Data", "Piper Hindi voice", default="hi_IN-priyamvada-medium"),
     ], issingle=1)
 
     frappe.db.commit()
@@ -237,6 +356,11 @@ def add_auth_field():
         st.append("fields", {"fieldname": "auth_token", "fieldtype": "Data", "label": "Auth token",
                              "hidden": 1, "no_copy": 1, "read_only": 1, "print_hide": 1})
         changed = True
+    if "token_issued_on" not in have:
+        st.append("fields", {"fieldname": "token_issued_on", "fieldtype": "Datetime",
+                             "label": "Token issued on",
+                             "hidden": 1, "no_copy": 1, "read_only": 1, "print_hide": 1})
+        changed = True
     if "band" not in have:
         st.append("fields", {"fieldname": "band", "fieldtype": "Link", "label": "Grade band",
                              "options": "Grade Band", "in_list_view": 1})
@@ -245,6 +369,31 @@ def add_auth_field():
         st.save()
         frappe.db.commit()
     print("=== Student.auth_token + band ensured ===")
+
+
+def update_cohort_fields():
+    """Cohort = an Online batch (invite-code signup, start date optional) or an Offline
+    campus batch (start date REQUIRED). Start date becomes a controlled dropdown over
+    the Cohort Start Date doctype. Safe to re-run."""
+    ct = frappe.get_doc("DocType", "Cohort")
+    have = {x.fieldname: x for x in ct.fields}
+    changed = False
+    if "mode" not in have:
+        ct.append("fields", {"fieldname": "mode", "fieldtype": "Select", "label": "Mode",
+                             "options": "\nOffline\nOnline", "default": "Offline",
+                             "reqd": 1, "in_list_view": 1})
+        changed = True
+    sd = have.get("start_date")
+    if sd is not None and (sd.fieldtype != "Link" or not sd.mandatory_depends_on):
+        sd.fieldtype = "Link"
+        sd.options = "Cohort Start Date"
+        sd.mandatory_depends_on = 'eval:doc.mode=="Offline"'
+        sd.in_list_view = 1
+        changed = True
+    if changed:
+        ct.save()
+        frappe.db.commit()
+    print("=== Cohort.mode + start_date dropdown ensured ===")
 
 
 def add_structure_fields():
@@ -271,6 +420,38 @@ def add_structure_fields():
     ls.save()
     frappe.db.commit()
     print("=== Track: band+subject added; Lesson: quiz table added ===")
+
+
+def add_ai_fields():
+    """Add the newer config fields (game defaults + Roshni-AI) to the EXISTING Hikmat Settings
+    single (create_doctypes skips doctypes that already exist, so a live site needs this).
+    Safe to re-run."""
+    hs = frappe.get_doc("DocType", "Hikmat Settings")
+    have = [x.fieldname for x in hs.fields]
+    additions = [
+        ("default_theme", {"fieldtype": "Select", "label": "Default theme", "options": "light\ndark", "default": "light"}),
+        ("default_sound", {"fieldtype": "Check", "label": "Sound on by default", "default": "1"}),
+        ("sec_ai", {"fieldtype": "Section Break", "label": "Roshni AI (local Ollama tutor)"}),
+        ("ai_enabled", {"fieldtype": "Check", "label": "Enable Roshni AI"}),
+        ("ai_model", {"fieldtype": "Data", "label": "Ollama model", "default": "gemma4:12b-mlx"}),
+        ("ai_endpoint", {"fieldtype": "Data", "label": "Ollama endpoint", "default": "http://localhost:11434"}),
+        ("ai_system_prompt", {"fieldtype": "Long Text", "label": "Roshni system prompt (Hindi) — blank uses the built-in default"}),
+        ("ai_crisis_reply", {"fieldtype": "Small Text", "label": "Crisis safe reply (Hindi) — blank uses the built-in default"}),
+        ("sec_voice", {"fieldtype": "Section Break", "label": "Roshni voice (local Whisper STT + Piper TTS)"}),
+        ("voice_enabled", {"fieldtype": "Check", "label": "Enable voice (mic in + neural Hindi voice out)"}),
+        ("stt_endpoint", {"fieldtype": "Data", "label": "Whisper STT endpoint (local)", "default": "http://127.0.0.1:8080"}),
+        ("tts_endpoint", {"fieldtype": "Data", "label": "Piper TTS endpoint (local)", "default": "http://127.0.0.1:5000"}),
+        ("tts_voice", {"fieldtype": "Data", "label": "Piper Hindi voice", "default": "hi_IN-priyamvada-medium"}),
+    ]
+    changed = False
+    for fn, spec in additions:
+        if fn not in have:
+            hs.append("fields", {"fieldname": fn, **spec})
+            changed = True
+    if changed:
+        hs.save()
+        frappe.db.commit()
+    print("=== Hikmat Settings: AI fields ensured ===")
 
 
 # the three grade bands and the subject palette (icons/colours used by the game)
@@ -316,6 +497,142 @@ def seed_structure():
         doc.save(ignore_permissions=1)
     frappe.db.commit()
     print("=== seeded", len(GRADE_BANDS), "bands +", len(SUBJECTS), "subjects ===")
+
+
+# Milestone belts — CONFIGURABLE thresholds, never hardcoded in the client. Measured in
+# GEMS 💎 (the game's earned currency: score*5 + stars*10 per attempt) — unlike stars,
+# gems keep accumulating on replays, so practice counts toward the next belt.
+MILESTONES = [
+    {"key": "belt_1", "title": "Level 1 Belt", "titleHi": "स्तर 1 बेल्ट", "icon": "🟡", "threshold": 1000},
+    {"key": "belt_2", "title": "Level 2 Belt", "titleHi": "स्तर 2 बेल्ट", "icon": "🟢", "threshold": 2500},
+    {"key": "belt_3", "title": "Level 3 Belt", "titleHi": "स्तर 3 बेल्ट", "icon": "🔵", "threshold": 5000},
+    {"key": "belt_4", "title": "Level 4 Belt", "titleHi": "स्तर 4 बेल्ट", "icon": "⚫", "threshold": 10000},
+]
+
+
+def seed_milestones():
+    """Create/refresh the belt milestones (idempotent — updates thresholds if they exist)."""
+    for i, m in enumerate(MILESTONES):
+        doc = frappe.get_doc("Hikmat Milestone", m["key"]) if frappe.db.exists("Hikmat Milestone", m["key"]) \
+            else frappe.new_doc("Hikmat Milestone")
+        doc.update({"milestone_key": m["key"], "title": m["title"], "title_hi": m["titleHi"],
+                    "icon": m["icon"], "threshold_gems": m["threshold"],
+                    "sort_order": i, "active": 1})
+        doc.save(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== seeded", len(MILESTONES), "milestones ===")
+
+
+def setup_evaluation_report():
+    """Facilitator 'Pending Evaluations' list: who reached a belt and is waiting for an
+    in-person rubric evaluation — oldest wait first, so nobody is left locked."""
+    name = "Pending Evaluations"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        e.name           AS "Evaluation:Link/Evaluation:160",
+        e.student_name   AS "Student::140",
+        e.cohort         AS "Cohort::120",
+        e.campus         AS "Campus::140",
+        e.milestone      AS "Milestone::110",
+        e.threshold_gems AS "Threshold:Int:100",
+        e.gems_at_reach  AS "Gems:Int:90",
+        e.reached_on     AS "Reached:Datetime:160"
+    FROM `tabEvaluation` e
+    WHERE e.status = 'Pending'
+    ORDER BY e.reached_on ASC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Evaluation",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Pending Evaluations' ready ===")
+
+
+def setup_trouble_report():
+    """THE teaching-triage report: every lesson-activity ranked by how much students
+    struggle with it — success rate, failed attempts, wrong answers, doubts — worst
+    first. This is the 'which lesson do I fix / re-teach?' list."""
+    name = "Lesson Trouble Spots"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        a.track    AS "Track::110",
+        a.lesson   AS "Lesson::110",
+        a.activity AS "Activity::100",
+        COUNT(*)                                                   AS "Attempts:Int:80",
+        COUNT(DISTINCT a.student)                                  AS "Learners:Int:80",
+        ROUND(100 * AVG(CASE WHEN a.total > 0
+                             THEN a.score / a.total END))          AS "Success %%:Int:90",
+        SUM(CASE WHEN a.stars = 0 THEN 1 ELSE 0 END)               AS "Failed (0★):Int:100",
+        (SELECT COUNT(*) FROM `tabLearning Event` e
+          WHERE e.kind='wrong_answer' AND e.track=a.track
+            AND e.lesson=a.lesson AND e.activity=a.activity)       AS "Wrong Answers:Int:120",
+        (SELECT COUNT(*) FROM `tabLesson Doubt` d
+          WHERE d.track=a.track AND d.lesson=a.lesson
+            AND d.activity=a.activity)                             AS "Doubts:Int:80",
+        MAX(a.attempted_on)                                        AS "Last Played:Datetime:150"
+    FROM `tabLesson Attempt` a
+    GROUP BY a.track, a.lesson, a.activity
+    ORDER BY ROUND(100 * AVG(CASE WHEN a.total > 0 THEN a.score / a.total END)) ASC,
+             SUM(CASE WHEN a.stars = 0 THEN 1 ELSE 0 END) DESC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Attempt",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Lesson Trouble Spots' ready ===")
+
+
+def setup_hard_questions_report():
+    """Question-level drill-down: the exact questions students get wrong, how many
+    girls, and WHICH wrong answer they pick most (a shared wrong pick usually means a
+    misleading distractor or a concept that needs re-teaching, not a careless slip)."""
+    name = "Hardest Questions"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        e.question AS "Question::260",
+        e.track    AS "Track::100",
+        e.lesson   AS "Lesson::100",
+        e.activity AS "Activity::90",
+        COUNT(*)                       AS "Times Wrong:Int:100",
+        COUNT(DISTINCT e.student)      AS "Learners:Int:80",
+        (SELECT e2.chosen FROM `tabLearning Event` e2
+          WHERE e2.kind='wrong_answer' AND e2.question=e.question
+            AND e2.track=e.track AND e2.lesson=e.lesson AND e2.activity=e.activity
+          GROUP BY e2.chosen ORDER BY COUNT(*) DESC LIMIT 1) AS "Most-picked Wrong::170",
+        MAX(e.answer)                  AS "Correct Answer::150",
+        MAX(e.occurred_on)             AS "Last Seen:Datetime:150"
+    FROM `tabLearning Event` e
+    WHERE e.kind = 'wrong_answer'
+    GROUP BY e.track, e.lesson, e.activity, e.question
+    ORDER BY COUNT(*) DESC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Learning Event",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Hardest Questions' ready ===")
+
+
+def setup_drilldown_report():
+    """Register the 'Activity Drill-down' SCRIPT report (code lives in
+    hikmat/hikmat/report/activity_drill_down/) — the expandable per-student view
+    behind every dashboard bar: filter by track/lesson/activity/student."""
+    name = "Activity Drill-down"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Attempt",
+        "report_type": "Script Report", "is_standard": "Yes", "module": MODULE,
+        "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Activity Drill-down' ready ===")
 
 
 def export_offline_curriculum():
@@ -511,10 +828,15 @@ def seed_content():
 
 def demo_students():
     """A small demo roster for testing the student login."""
-    coh = frappe.db.exists("Cohort", "Bettiah Center")
+    if not frappe.db.exists("Cohort Start Date", "2026-09-01"):
+        frappe.get_doc({"doctype": "Cohort Start Date",
+                        "start_date": "2026-09-01"}).insert(ignore_permissions=True)
+    coh = frappe.db.exists("Cohort", "NGHS Sept-2026")
     if not coh:
-        coh = frappe.get_doc({"doctype": "Cohort", "cohort_name": "Bettiah Center",
-                              "center": "Bettiah, West Champaran", "facilitator": "Asha Devi"}).insert(ignore_permissions=True).name
+        coh = frappe.get_doc({"doctype": "Cohort", "cohort_name": "NGHS Sept-2026",
+                              "mode": "Offline", "start_date": "2026-09-01",
+                              "center": "Noor Girls High School",
+                              "facilitator": "Asha Devi"}).insert(ignore_permissions=True).name
     roster = [("Asha", 13, "👧", ""), ("Priya", 14, "🧒", ""),
               ("Sunita", 13, "👩", "1234"), ("Rekha", 15, "🙂", "")]
     for nm, age, av, pin in roster:
@@ -522,10 +844,10 @@ def demo_students():
             frappe.get_doc({"doctype": "Student", "student_name": nm, "age": age, "gender": "Female",
                             "cohort": coh, "avatar": av, "login_pin": pin, "active": 1}).insert(ignore_permissions=True)
     frappe.db.commit()
-    print("=== demo students ready in 'Bettiah Center' (Sunita has PIN 1234) ===")
+    print("=== demo students ready in 'NGHS Sept-2026' (Sunita has PIN 1234) ===")
 
 
-def single_center(keep="Bettiah Center"):
+def single_center(keep="NGHS Sept-2026"):
     """Collapse to one centre — remove all other cohorts, their students & attempts."""
     for c in frappe.get_all("Cohort", pluck="name"):
         if c == keep:
@@ -619,7 +941,6 @@ def setup_student_report():
     if frappe.db.exists("Report", name):
         frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
     query = """SELECT
-        la.student        AS "Student:Link/Student:150",
         la.student_name   AS "Name::140",
         la.cohort         AS "Cohort::130",
         COUNT(*)                                           AS "Attempts:Int:90",
@@ -627,7 +948,7 @@ def setup_student_report():
         COUNT(DISTINCT CONCAT(la.track, '/', la.lesson))   AS "Lessons:Int:90",
         ROUND(AVG(la.stars), 2)                            AS "Avg Stars:Float:95",
         SUM(la.coins)                                      AS "Coins:Int:90",
-        MAX(la.attempted_on)                               AS "Last Active:Datetime:160"
+        DATE_FORMAT(MAX(la.attempted_on), '%%d-%%m-%%y %%H:%%i') AS "Last Active::130"
     FROM `tabLesson Attempt` la
     GROUP BY la.student, la.student_name, la.cohort
     ORDER BY COUNT(*) DESC"""
@@ -667,6 +988,32 @@ def setup_doubt_report():
     print("=== report 'Confusion Heatmap' ready ===")
 
 
+def setup_ai_report():
+    """Facilitator REVIEW QUEUE for Roshni-AI: flagged + unreviewed conversations float to
+    the top, then most recent. Opens the conversation to read the (Desk-only) transcript."""
+    name = "AI Review Queue"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        c.name           AS "Conversation:Link/AI Conversation:150",
+        c.student_name   AS "Name::130",
+        c.cohort         AS "Cohort::120",
+        c.lesson         AS "Lesson::110",
+        c.flagged        AS "Flagged:Check:70",
+        c.flag_reason    AS "Reason::110",
+        c.reviewed       AS "Reviewed:Check:80",
+        c.started_on     AS "When:Datetime:160"
+    FROM `tabAI Conversation` c
+    ORDER BY c.flagged DESC, c.reviewed ASC, c.started_on DESC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "AI Conversation",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'AI Review Queue' ready ===")
+
+
 def setup_analytics():
     charts = [
         _chart("Attempts Over Time", chart_type="Count", based_on="attempted_on",
@@ -676,6 +1023,8 @@ def setup_analytics():
         _chart("Average Stars by Activity", chart_type="Group By", group_by_based_on="activity",
                group_by_type="Average", aggregate_function_based_on="stars", type="Bar"),
         _chart("Attempts by Student", chart_type="Group By", group_by_based_on="student_name",
+               group_by_type="Count", type="Bar"),
+        _chart("Attempts by Cohort", chart_type="Group By", group_by_based_on="cohort",
                group_by_type="Count", type="Bar"),
     ]
     cards = [
@@ -698,6 +1047,11 @@ def setup_analytics():
     print("=== dashboard 'Hikmat Analytics' ready:", len(charts), "charts,", len(cards), "cards ===")
     setup_student_report()
     setup_doubt_report()
+    setup_ai_report()
+    setup_evaluation_report()
+    setup_trouble_report()
+    setup_hard_questions_report()
+    setup_drilldown_report()
 
     # confusion chart — doubts grouped by lesson (the heatmap, visualised)
     if frappe.db.exists("Dashboard Chart", "Doubts by Lesson"):
@@ -716,16 +1070,27 @@ def setup_analytics():
 def setup_workspace(cards=None, charts=None):
     """Backoffice landing page in Desk: stats + shortcuts to all the records."""
     cards = cards or ["Total Attempts", "Activities Passed", "Average Stars", "Active Students", "Students Enrolled"]
-    charts = charts or ["Attempts Over Time", "Attempts by Track", "Average Stars by Activity", "Attempts by Student"]
-    shortcuts = [("Student Progress", "Student Progress", "Report"),
+    charts = charts or ["Attempts Over Time", "Attempts by Track", "Average Stars by Activity",
+                        "Attempts by Student", "Attempts by Cohort"]
+    shortcuts = [("Lesson Trouble Spots", "Lesson Trouble Spots", "Report"),
+                 ("Hardest Questions", "Hardest Questions", "Report"),
+                 ("Activity Drill-down", "Activity Drill-down", "Report"),
+                 ("Student Progress", "Student Progress", "Report"),
                  ("Confusion Heatmap", "Confusion Heatmap", "Report"),
                  ("Tracks", "Track", "DocType"), ("Lessons", "Lesson", "DocType"),
                  ("Dialogues", "Dialogue", "DocType"), ("Students", "Student", "DocType"),
                  ("Cohorts", "Cohort", "DocType"), ("Attempts", "Lesson Attempt", "DocType"),
                  ("Doubts", "Lesson Doubt", "DocType"),
+                 ("Pending Evaluations", "Pending Evaluations", "Report"),
+                 ("Milestones", "Hikmat Milestone", "DocType"),
+                 ("AI Review Queue", "AI Review Queue", "Report"),
+                 ("AI Chats", "AI Conversation", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]
     # report → its ref doctype (a Report shortcut needs report_ref_doctype set)
-    _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt"}
+    _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt",
+                   "AI Review Queue": "AI Conversation", "Pending Evaluations": "Evaluation",
+                   "Lesson Trouble Spots": "Lesson Attempt", "Hardest Questions": "Learning Event",
+                   "Activity Drill-down": "Lesson Attempt"}
 
     def _sc(lbl, link, typ):
         d = {"label": lbl, "link_to": link, "type": typ}
@@ -735,15 +1100,15 @@ def setup_workspace(cards=None, charts=None):
 
     def hdr(t): return {"id": "h" + str(abs(hash(t)) % 9999), "type": "header",
                         "data": {"text": '<span class="h4">' + t + "</span>", "col": 12}}
-    content = [hdr("📊 At a glance")]
+    content = [hdr("🗂️ Manage content & students")]
+    content += [{"id": "sc" + str(i), "type": "shortcut", "data": {"shortcut_name": lbl, "col": 3}}
+                for i, (lbl, link, typ) in enumerate(shortcuts)]
+    content.append(hdr("📊 At a glance"))
     content += [{"id": "nc" + str(i), "type": "number_card", "data": {"number_card_name": c, "col": 4}}
                 for i, c in enumerate(cards)]
     content.append(hdr("📈 Activity"))
     content += [{"id": "ch" + str(i), "type": "chart", "data": {"chart_name": c, "col": 6}}
                 for i, c in enumerate(charts)]
-    content.append(hdr("🗂️ Manage content & students"))
-    content += [{"id": "sc" + str(i), "type": "shortcut", "data": {"shortcut_name": lbl, "col": 3}}
-                for i, (lbl, link, typ) in enumerate(shortcuts)]
 
     if frappe.db.exists("Workspace", "Hikmat"):
         frappe.delete_doc("Workspace", "Hikmat", force=1, ignore_permissions=1)

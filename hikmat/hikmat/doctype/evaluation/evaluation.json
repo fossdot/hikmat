@@ -1,0 +1,135 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:EV-{student}-{milestone}",
+ "creation": "2026-07-05 14:40:55.717009",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "cohort",
+  "campus",
+  "milestone",
+  "threshold_gems",
+  "gems_at_reach",
+  "status",
+  "score",
+  "rubric_notes",
+  "evaluated_by",
+  "evaluated_on",
+  "reached_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Link",
+   "label": "Cohort",
+   "options": "Cohort"
+  },
+  {
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus",
+   "options": "Campus"
+  },
+  {
+   "fieldname": "milestone",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Milestone",
+   "options": "Hikmat Milestone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "threshold_gems",
+   "fieldtype": "Int",
+   "label": "Threshold when reached"
+  },
+  {
+   "fieldname": "gems_at_reach",
+   "fieldtype": "Int",
+   "label": "Gems when reached"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nPassed\nNeeds Practice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "score",
+   "fieldtype": "Int",
+   "label": "Rubric score"
+  },
+  {
+   "fieldname": "rubric_notes",
+   "fieldtype": "Small Text",
+   "label": "Rubric notes (speak / read / write)"
+  },
+  {
+   "fieldname": "evaluated_by",
+   "fieldtype": "Link",
+   "label": "Evaluated by",
+   "options": "User"
+  },
+  {
+   "fieldname": "evaluated_on",
+   "fieldtype": "Datetime",
+   "label": "Evaluated on"
+  },
+  {
+   "fieldname": "reached_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Reached on"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-05 14:40:55.717009",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Evaluation",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name"
+}

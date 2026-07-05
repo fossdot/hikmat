@@ -165,6 +165,19 @@
   .doubtopt.done { background:#eafaf2; border-color:var(--good); color:var(--good-d); }
   .btn.wide { width:100%; }
 
+  /* Floating Roshni voice assistant */
+  .roshnifab { position:fixed; right:16px; bottom:16px; z-index:9000; width:64px; height:64px;
+    border-radius:50%; border:none; background:var(--grape); box-shadow:0 8px 22px rgba(0,0,0,.32);
+    cursor:pointer; padding:6px; display:grid; place-items:center; }
+  .roshnifab .rfabm, .roshnifab .rfabm svg { width:100%; height:100%; }
+  .roshnifab:active { transform:translateY(2px); box-shadow:0 4px 12px rgba(0,0,0,.3); }
+  body.speaking .roshnifab { animation: rfabpulse 1s ease-in-out infinite; }
+  @keyframes rfabpulse { 0%,100%{ box-shadow:0 8px 22px rgba(108,92,231,.4); } 50%{ box-shadow:0 8px 30px rgba(108,92,231,.85); } }
+  .rmic.rec { background:var(--bad); box-shadow:0 6px 0 var(--bad-d); }
+  .rok, .rno { border:none; border-radius:8px; padding:5px 11px; font-weight:800; margin-left:6px; cursor:pointer; }
+  .rok { background:var(--good); color:#fff; } .rno { background:var(--line); color:var(--ink); }
+  @media (max-width:420px){ .roshnifab{ width:56px; height:56px; right:12px; bottom:12px; } }
+
   .path { position:relative; max-width:540px; margin: 16px auto 30px; }
   .cpath { position:absolute; left:0; top:0; z-index:0; pointer-events:none; }   /* the winding trail */
   .step { position:absolute; left:0; right:0; z-index:1; }                        /* top + height set inline */
@@ -280,7 +293,23 @@
         cursor:pointer; box-shadow:0 3px 0 var(--line); transition:transform .06s, box-shadow .06s; }
   .av:active { transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
   .av.sel { border-color:var(--grape); background:#efeaff; box-shadow:0 3px 0 #d9cffb; }
-  .profilebtn.signup { background:var(--primary); color:#fff; border-color:var(--primary); }
+  /* Campus roster login — tap-your-name grid */
+  .rostergrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:12px; margin-top:8px; }
+  .rostercard { display:flex; flex-direction:column; align-items:center; gap:6px; background:#fff; border:2px solid var(--line);
+        border-radius:16px; padding:14px 10px; cursor:pointer; box-shadow:0 3px 0 var(--line); color:var(--ink); font-weight:800; }
+  .rostercard:active { transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+  .rostercard .ra { font-size:34px; line-height:1; }
+  .rostercard .rn { font-size:15px; text-align:center; }
+  [data-theme="dark"] .rostercard { background:#2a2240; border-color:var(--line); box-shadow:0 3px 0 #15101f; }
+  /* "🙋 Help Needed" top-bar button + its confirmation toast */
+  .toggle.helpneed { background:var(--grape); color:#fff; border-color:var(--grape); font-weight:900; }
+  .toggle.helpneed:hover { filter:brightness(1.06); }
+  #hkToast { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:9999; background:#2c2440; color:#fff;
+             border-radius:999px; padding:11px 18px; font-weight:800; font-size:14px; max-width:90%; text-align:center;
+             box-shadow:0 6px 20px rgba(0,0,0,.25); transition:opacity .4s; }
+  #hkToast.out { opacity:0; }
+  .profilebtn.primary, .profilebtn.signup { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .profilerow { display:flex; gap:2px; justify-content:center; align-items:center; flex-wrap:wrap; }
   /* Tap-to-hear button — primary-tinted so it reads as "play", distinct from the mute toggle */
   .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
   .toggle.hearbtn .iconsvg svg, .toggle.hearbtn svg { filter:brightness(0) invert(1); }
@@ -493,7 +522,8 @@
         <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
         <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
         <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
-        <button class="toggle" id="hiToggle" title="Help">Help: OFF</button>
+        <button class="toggle" id="hiToggle" title="Show the Hindi guide / हिंदी गाइड दिखाओ">Guide</button>
+        <button class="toggle helpneed" id="helpNeedBtn" title="Help Needed / मदद चाहिए">🙋 Help</button>
       </div>
     </div>
     <div id="root"></div>
@@ -582,6 +612,12 @@ const SETTINGS = {
   appName: "Hikmat",
   logo: "",                                   // image URL from Hikmat Settings; empty = the diya 🪔
   tagline: { en: "Learn  by playing", hi: "खेल-खेल में सीखो" },
+  aiEnabled: false,                           // Roshni AI tutor — on only when the backend says so
+  voiceEnabled: false,                        // mic + neural Hindi voice — on only when the backend says so
+  milestones: [],                             // belt gates [{key,title,titleHi,icon,threshold}] from the backend; empty = no gates (standalone/offline-fresh)
+  // Admin-set defaults for a NEW/untouched user (applied in applyServerDefaults; a user's own
+  // toggle wins thereafter via state.prefsTouched).
+  defaultLanguage: "en", helpDefaultOn: false, defaultTheme: "light", defaultSound: true,
 };
 
 // ---------- Class 1–10 structure (grade bands + subjects) ----------
@@ -1077,15 +1113,27 @@ function refreshTop(){
   $("#totalStars").textContent = totalStars();
   $("#coins").textContent = state.coins;
   const ht = $("#hiToggle");
-  ht.classList.toggle("on", state.hindi);
-  ht.textContent = tx("Help","मदद") + ": " + (state.hindi ? tx("ON","चालू") : tx("OFF","बंद"));
+  if(ht){ ht.classList.toggle("on", state.hindi); ht.textContent = tx("Guide","गाइड") + (state.hindi ? " ✓" : ""); ht.title = tx("Show the Hindi guide","हिंदी गाइड दिखाओ"); }
+  const hn = $("#helpNeedBtn");
+  if(hn) hn.textContent = "🙋 " + tx("Help Needed","मदद चाहिए");
   const lt = $("#langToggle");
   if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.innerHTML = iconFor("lang","🌐") + " " + (state.lang==="hi" ? "हिं" : "EN"); }
+  mountRoshniFab();   // floating Roshni voice assistant — appears once AI is on + a student is logged in
 }
-$("#hiToggle").onclick = () => { state.hindi=!state.hindi; save(); refreshTop(); updateHiLine(); };
-$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; save(); refreshTop(); rerender(); };
-$("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; save(); refreshTop(); sfx.tap(); };
+$("#hiToggle").onclick = () => {
+  state.hindi=!state.hindi; state.prefsTouched=true; save(); refreshTop(); updateHiLine();
+  sfx.tap();
+  // Outside gameplay there's no hint bubble to change, so confirm the switch explicitly —
+  // otherwise the tap looks like it did nothing.
+  const msg = state.hindi ? tx("Guide ON — words will also show their Hindi meaning.","गाइड चालू — शब्दों का हिंदी मतलब भी दिखेगा।")
+                          : tx("Guide OFF.","गाइड बंद।");
+  flashToast(msg); srSay(msg);
+  if(state.hindi) sayHi("हिंदी गाइड चालू");
+};
+$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save(); refreshTop(); rerender(); };
+$("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); };
 $("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); };
+$("#helpNeedBtn").onclick = () => helpNeeded();
 
 // ============================================================
 //  SCREENS
@@ -1161,11 +1209,14 @@ function lifeSkillsCard(){
 function profileChip(host){
   if(currentStudent){
     const b = el(`<button class="profilebtn">${esc(currentStudent.avatar||"🙂")} ${esc(currentStudent.name)} · ${tx("Switch","बदलें")}</button>`);
-    b.onclick = () => { sfx.tap(); renderLogin(); }; host.appendChild(b);
-  } else if(backendLive){
-    const login = el(`<button class="profilebtn">${tx("Log in","लॉग इन")}</button>`);
-    login.onclick = () => { sfx.tap(); renderLogin(); }; host.appendChild(login);
-    const signup = el(`<button class="profilebtn signup">${tx("✨ Sign up","✨ साइन अप")}</button>`);
+    b.onclick = () => { sfx.tap(); startLogin(); }; host.appendChild(b);
+  } else {
+    // Login/signup are always offered, even offline: signup falls back to a local-only profile,
+    // and campus-mode login verifies the PIN on-device — so both work without a backend.
+    host.classList.add("profilerow");           // flex row: aligned, small even gap
+    const login = el(`<button class="profilebtn primary">${tx("Log in","लॉग इन")}</button>`);
+    login.onclick = () => { sfx.tap(); startLogin(); }; host.appendChild(login);
+    const signup = el(`<button class="profilebtn">${tx("✨ Sign up","✨ साइन अप")}</button>`);
     signup.onclick = () => { sfx.tap(); renderSignup(); }; host.appendChild(signup);
   }
 }
@@ -1194,7 +1245,7 @@ function renderHome(){
       <div class="roshni">${mascotSVG()}</div>
       <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
     </div>
-    <div class="center" id="profileRow" style="margin:8px 0 20px"></div>
+    <div class="center" id="profileRow" style="margin:8px 0 20px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
     <div id="homeSections"></div>
   </div>`);
   root.appendChild(s);
@@ -1245,7 +1296,7 @@ function renderBand(band){
       <h2>${iconFor("band:"+band.key, band.icon)} ${esc(tx(band.title, band.titleHi))}</h2>
       <div class="sub">${tx("Choose a subject","कोई विषय चुनो")}</div></div>
     </div>
-    <div class="center" id="profileRow" style="margin:2px 0 16px"></div>
+    <div class="center" id="profileRow" style="margin:2px 0 16px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
     <div class="themes" id="subjects"></div>
   </div>`);
   root.appendChild(s);
@@ -1303,6 +1354,120 @@ function renderLifeSkills(){
 }
 
 // TRACK screen — the lessons inside a track. `back` = button target (Home, or the subject screen).
+// ---------- Guest preview wall ----------
+// A not-signed-in "viewer" gets GUEST_FREE_PER_GROUP free lessons in EACH group
+// (grade-band "class" courses vs Life-Skills), counted separately; opening one more asks
+// them to make a profile. Signed-in learners are never walled, and signing up/in carries
+// the guest's earned stars over (see migrateGuestProgress).
+const GUEST_FREE_PER_GROUP = 2;
+function lessonGroup(course){ return course && course.band ? "class" : "life"; }
+function guestOpenedList(g){ state.guestLessons = state.guestLessons || {}; return (state.guestLessons[g] = state.guestLessons[g] || []); }
+function guestGate(course, lesson, back){
+  if(currentStudent) return true;                       // signed in → no wall
+  const g = lessonGroup(course), key = course.key + "/" + lesson.key, opened = guestOpenedList(g);
+  if(opened.includes(key)) return true;                 // already one of their free lessons
+  if(opened.length >= GUEST_FREE_PER_GROUP){ renderGuestWall(g, () => renderTrack(course, back)); return false; }
+  opened.push(key); save();
+  return true;
+}
+function snapshotGuestProgress(){
+  if(currentStudent) return null;                       // only a guest has stars to carry over
+  try { return JSON.parse(JSON.stringify(state.progress || {})); } catch(e){ return null; }
+}
+function migrateGuestProgress(snap){
+  if(!snap) return;                                     // called AFTER setStudent(newIdentity)
+  let any = false;
+  for(const ck in snap) for(const lk in snap[ck]) for(const aid in snap[ck][lk]){
+    const s = snap[ck][lk][aid];
+    if(s > 0){ setStars(ck, lk, aid, s); recordAttempt({ track: ck, lesson: lk, activity: aid, stars: s, score: 0, total: 0, coins: 0 }); any = true; }
+  }
+  if(any) save();
+}
+function renderGuestWall(group, backFn){
+  stopSpeech(); rerender = () => renderGuestWall(group, backFn);
+  root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), backFn || renderHome);
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("You've learned 2 lessons! ✨","तुमने 2 पाठ सीख लिए! ✨")}</h1>
+      <p>${tx("Make a profile to save your stars and keep learning.","अपने सितारे सुरक्षित रखने और आगे सीखने के लिए प्रोफ़ाइल बनाओ।")}</p></div>
+    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px">
+      <button class="btn primary" id="gwSignup">${tx("✨ Sign up","✨ साइन अप")}</button>
+      <button class="btn ghost" id="gwLogin">${tx("Log in","लॉग इन")}</button>
+    </div>
+    <div class="center" style="margin-top:14px">
+      <button class="btn ghost" id="gwBack">${tx("← Keep looking around","← और देखते रहो")}</button>
+    </div>
+  </div>`));
+  const narr = tx("You've learned two lessons. Make a profile to save your stars and keep learning.","तुमने दो पाठ सीख लिए। सितारे सुरक्षित रखने के लिए प्रोफ़ाइल बनाओ।");
+  setNarration(narr, narr);
+  $("#gwSignup").onclick = () => { sfx.tap(); renderSignup(); };
+  $("#gwLogin").onclick  = () => { sfx.tap(); renderLogin(); };
+  $("#gwBack").onclick   = () => { sfx.back(); (backFn || renderHome)(); };
+  refreshTop();
+}
+
+// ---------- Milestone "belt" gates ----------
+// Thresholds come from the backend (SETTINGS.milestones) so detection works OFFLINE;
+// clearing is server-authoritative: a facilitator marks the Evaluation "Passed" in Desk
+// and it syncs down as state.gates via get_progress. Belts are measured in GEMS 💎
+// (state.coins ≡ the server's SUM of attempt coins) — gems keep growing on replays, so
+// practice counts toward the next belt. Soft-hard lock: NEW lessons (zero stars) are
+// locked while a gate is pending, but everything already played stays replayable —
+// she's never left idle waiting for her evaluation.
+function sortedMilestones(){ return (SETTINGS.milestones||[]).slice().sort((a,b)=>a.threshold-b.threshold); }
+function gateStatus(key){ return ((state.gates||{})[key]) || ""; }
+function activeGate(){
+  const t = state.coins || 0;
+  for(const m of sortedMilestones()){
+    if(t >= m.threshold && gateStatus(m.key) !== "Passed") return m;
+  }
+  return null;
+}
+// milestone newly crossed by going from prevGems → newGems 💎 (for the celebration)
+function crossedMilestone(prevGems, newGems){
+  return sortedMilestones().find(m => prevGems < m.threshold && newGems >= m.threshold) || null;
+}
+function gateGate(course, lesson, back){
+  const m = activeGate();
+  if(!m) return true;
+  if(lessonEarned(course.key, lesson.key) > 0) return true;   // already-played lesson → replay freely
+  renderGateWall(m, () => renderTrack(course, back));
+  return false;
+}
+function renderGateWall(m, backFn){
+  stopSpeech(); rerender = () => renderGateWall(m, backFn);
+  root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), backFn || renderHome);
+  const title = esc(tx(m.title, m.titleHi || m.title));
+  root.appendChild(el(`<div class="screen">
+    <div class="hero">
+      <div class="mascot big m-happy">${mascotSVG()}</div>
+      <h1>${esc(m.icon||"🏅")} ${tx("You reached the "+m.title+"!", "तुम "+(m.titleHi||m.title)+" तक पहुँच गई!")} 🎉</h1>
+      <p>${tx("Amazing work — "+(state.coins||0)+" 💎 gems! Your teacher will now check your speaking, reading and writing. New lessons unlock after that.",
+              "कमाल का काम — "+(state.coins||0)+" 💎 रत्न! अब तुम्हारी टीचर तुम्हारी बोलने, पढ़ने और लिखने की जाँच करेंगी। उसके बाद नए पाठ खुलेंगे।")}</p>
+    </div>
+    <div class="center" style="margin-top:10px">
+      <div class="savechip">🧑‍🏫 ${tx("Waiting for your teacher's evaluation","टीचर की जाँच का इंतज़ार है")}</div>
+    </div>
+    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px">
+      <button class="btn primary" id="gateReplay">${tx("⭐ Practice earlier lessons","⭐ पुराने पाठ दोहराओ")}</button>
+      <button class="btn ghost" id="gateCheck">${tx("🔄 Check again","🔄 फिर से देखो")}</button>
+    </div>
+  </div>`));
+  const narr = tx("Wonderful! You reached the "+m.title+". Your teacher will evaluate you, then new lessons open. Until then you can practice earlier lessons.",
+                  "बहुत बढ़िया! तुम "+(m.titleHi||m.title)+" तक पहुँच गई। टीचर तुम्हारी जाँच करेंगी, फिर नए पाठ खुलेंगे। तब तक पुराने पाठ दोहरा सकती हो।");
+  setNarration(narr, narr);
+  $("#gateReplay").onclick = () => { sfx.tap(); (backFn || renderHome)(); };
+  $("#gateCheck").onclick  = async () => {
+    sfx.tap();
+    await mergeServerProgress();                 // pulls state.gates; no-op offline/guest
+    if(activeGate() && activeGate().key === m.key){
+      flashToast(tx("Not cleared yet — ask your teacher 💛","अभी जाँच बाकी है — टीचर से पूछो 💛"));
+    } else { sfx.complete(); (backFn || renderHome)(); }
+  };
+  refreshTop();
+}
+
 function renderTrack(course, back){
   back = back || { label: tx("← Home","← घर"), fn: renderHome };
   stopSpeech();
@@ -1332,7 +1497,7 @@ function renderTrack(course, back){
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(ls.title, ls.titleHi),
       sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
-      onClick: () => { sfx.enter(); renderLessonMap(course, ls, back); },
+      onClick: () => { if(!guestGate(course, ls, back)) return; if(!gateGate(course, ls, back)) return; sfx.enter(); renderLessonMap(course, ls, back); },
     };
   });
   renderPath(items);
@@ -1392,7 +1557,6 @@ function startLevel(course, lesson, lv, back){
     return `<div class="screen gameplay">
       <div class="maphead">
         <div><div style="font-weight:800;font-size:20px">${lv.ico} ${tx(lv.name, lv.nameHi)}</div></div>
-        <button class="doubtbtn" id="doubtBtn" title="${tx('Ask Roshni for help','रोशनी से मदद माँगो')}">🙋 ${tx("Doubt hai","doubt है")}</button>
       </div>
       <div class="progress"><div id="bar" style="width:${(idx/rounds.length)*100}%"></div></div>
       <div id="body" class="gamebody"></div>
@@ -1405,7 +1569,6 @@ function startLevel(course, lesson, lv, back){
     root.innerHTML="";
     root.appendChild(el(header()));
     setBack(backLbl, backToLesson);
-    const db = $("#doubtBtn"); if(db) db.onclick = () => openDoubt();
     $("#body").innerHTML = bodyHTML;
     const bar=$("#bar"); if(bar && bar.parentElement){ const pb=bar.parentElement; pb.setAttribute("role","progressbar"); pb.setAttribute("aria-valuemin","0"); pb.setAttribute("aria-valuemax",String(rounds.length)); pb.setAttribute("aria-valuenow",String(idx)); }
     moveFocusToTop();   // land focus on the new question, not <body>
@@ -1415,6 +1578,13 @@ function startLevel(course, lesson, lv, back){
     idx++; save(); refreshTop();
     if(idx>=rounds.length) finish();
     else runRound();
+  }
+  // one line per wrong pick → the facilitator's "Hardest Questions" report
+  function logWrong(question, chosen, answer){
+    recordEvent({ kind:"wrong_answer", track:course.key, lesson:lesson.key, activity:lv.id,
+                  question:String(question||"").slice(0,140),
+                  chosen:String(chosen||"").slice(0,140),
+                  answer:String(answer||"").slice(0,140) });
   }
   function runRound(){
     const r = rounds[idx];
@@ -1464,7 +1634,8 @@ function startLevel(course, lesson, lv, back){
         (correct?sfx.correct:sfx.wrong)();
         const fb=$("#fb");
         if(correct){ fb.textContent=tx("Correct! 🎉","सही! 🎉"); fb.className="feedback good"; }
-        else { fb.textContent=tx("Try to remember: ","याद रखो: ")+r.answer.en; fb.className="feedback bad";
+        else { logWrong(r.answer.en, c.en, r.answer.en);
+               fb.textContent=tx("Try to remember: ","याद रखो: ")+r.answer.en; fb.className="feedback bad";
                document.querySelectorAll(".opt").forEach(o=>{ if(o.dataset.en===r.answer.en) o.classList.add("correct"); }); }
         setTimeout(()=>next(correct), correct?900:1600);
       };
@@ -1502,7 +1673,8 @@ function startLevel(course, lesson, lv, back){
       (ok?sfx.correct:sfx.wrong)();
       const fb=$("#fb");
       if(ok){ fb.textContent=tx("Perfect! ⭐","बढ़िया! ⭐"); fb.className="feedback good"; speak(it.en); setTimeout(()=>next(true),1000); }
-      else { fb.textContent=tx("Not yet — the word is ","अभी नहीं — शब्द है ")+"\""+it.en+"\""; fb.className="feedback bad"; setTimeout(()=>next(false),1700); }
+      else { logWrong(it.en, built.join(""), it.en);
+             fb.textContent=tx("Not yet — the word is ","अभी नहीं — शब्द है ")+"\""+it.en+"\""; fb.className="feedback bad"; setTimeout(()=>next(false),1700); }
     };
     redraw();
   }
@@ -1535,7 +1707,8 @@ function startLevel(course, lesson, lv, back){
       (ok?sfx.correct:sfx.wrong)();
       const fb=$("#fb");
       if(ok){ fb.textContent=tx("Great sentence! 🎉","बढ़िया वाक्य! 🎉"); fb.className="feedback good"; speak(r.words.join(" ")); setTimeout(()=>next(true),1200); }
-      else { fb.textContent=tx("Right answer: ","सही जवाब: ")+'"'+r.words.join(" ")+'"'; fb.className="feedback bad"; speak(r.words.join(" ")); setTimeout(()=>next(false),2000); }
+      else { logWrong(r.words.join(" "), built.join(" "), r.words.join(" "));
+             fb.textContent=tx("Right answer: ","सही जवाब: ")+'"'+r.words.join(" ")+'"'; fb.className="feedback bad"; speak(r.words.join(" ")); setTimeout(()=>next(false),2000); }
     };
     redraw();
   }
@@ -1577,6 +1750,7 @@ function startLevel(course, lesson, lv, back){
           }, 1000);
         } else {
           // wrong: gentle nudge, let them try again — no rushing ahead
+          logWrong(r.line, rep.text, ((r.replies.find(x=>x.ok))||{}).text);
           b.classList.add("wrong");
           setMood("sad");
           sfx.wrong();
@@ -1622,7 +1796,8 @@ function startLevel(course, lesson, lv, back){
       (ok?sfx.correct:sfx.wrong)();
       const fb=$("#fb");
       if(ok){ fb.textContent=tx("Correct! 🎉","सही! 🎉"); fb.className="feedback good"; setTimeout(()=>next(true),1100); }
-      else { fb.textContent=tx('Answer: ','सही जवाब: ')+'"'+r.answer+'"'; fb.className="feedback bad"; setTimeout(()=>next(false),1900); }
+      else { logWrong(r.prompt, filled, r.answer);
+             fb.textContent=tx('Answer: ','सही जवाब: ')+'"'+r.answer+'"'; fb.className="feedback bad"; setTimeout(()=>next(false),1900); }
     };
     renderCode();
   }
@@ -1662,6 +1837,7 @@ function startLevel(course, lesson, lv, back){
           return;
         }
         // wrong
+        logWrong(r.q, c, r.answer);
         tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
         if(tries === 1 && r.teach){
           // SCAFFOLD: show the hint and let her try again — don't reveal the answer, keep other options live
@@ -1708,6 +1884,7 @@ function startLevel(course, lesson, lv, back){
           setFooter(`<button class="btn primary" id="next">${tx("Continue →","आगे बढ़ो →")}</button>`);
           $("#next").onclick=()=>{ sfx.next(); next(true); };
         } else {
+          logWrong(r.sentence, tok, r.wrongWord);
           chip.classList.add("shake"); setMood("sad"); sfx.wrong();
           const fb=$("#fb"); fb.textContent=tx("Not the bug — try again.","यह गलती नहीं — फिर कोशिश करो।"); fb.className="feedback bad";
           setTimeout(()=>{ chip.classList.remove("shake"); fb.textContent=""; }, 800);
@@ -1755,7 +1932,9 @@ function startLevel(course, lesson, lv, back){
         setTimeout(()=>next(true),1400);
       } else {
         setMood("sad"); sfx.wrong();
-        slots.forEach((s,si)=>{ if(!(s.options[chosen[si]] && s.options[chosen[si]].ok)){ const e=emailEl.querySelector(`.eslot[data-si="${si}"]`); if(e) e.classList.add("bad"); } });
+        slots.forEach((s,si)=>{ if(!(s.options[chosen[si]] && s.options[chosen[si]].ok)){
+          logWrong(r.scenario + " — " + s.label, (s.options[chosen[si]]||{}).t, ((s.options.find(o=>o.ok))||{}).t);
+          const e=emailEl.querySelector(`.eslot[data-si="${si}"]`); if(e) e.classList.add("bad"); } });
         fb.textContent=tx("Some lines are wrong — fix the red ones.","कुछ पंक्तियाँ गलत हैं — लाल को ठीक करो।"); fb.className="feedback bad";
         setTimeout(()=>{ emailEl.querySelectorAll(".eslot.bad").forEach(e=>e.classList.remove("bad")); fb.textContent=""; }, 1700);
       }
@@ -1768,7 +1947,9 @@ function startLevel(course, lesson, lv, back){
     doubtCtx = null;     // left gameplay — no round on screen to ask about
     const pct = rounds.length ? score/rounds.length : 0;   // guard: admin lesson could yield 0 rounds
     const stars = pct>=0.99?3 : pct>=0.6?2 : pct>=0.3?1 : 0;
+    const prevGems = (state.coins||0) - score*5;              // gems before this attempt (in-round +5s already added)
     setStars(course.key, lesson.key, lv.id, stars); state.coins += stars*10; save(); refreshTop();
+    const belt = crossedMilestone(prevGems, state.coins||0);  // did this attempt's gems cross a belt threshold?
     recordAttempt({ track: course.key, lesson: lesson.key, activity: lv.id,
                     stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5 });
     if(stars>=1) sfx.complete(); else sfx.wrong();
@@ -1779,13 +1960,16 @@ function startLevel(course, lesson, lv, back){
       <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
       <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
       <div class="muted">+${score*5 + stars*10} ${tx("💎 gems","💎 रत्न")}</div>
+      ${belt ? `<div class="savechip" style="font-size:1.05em">${esc(belt.icon||"🏅")} ${esc(tx("You reached the "+belt.title+"!","तुम "+(belt.titleHi||belt.title)+" तक पहुँच गई!"))} 🎉</div>` : ""}
       ${currentStudent ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
       <div class="actionrow">
         <button class="btn ghost" id="again">${tx("Play again","फिर से खेलो")}</button>
         <button class="btn primary" id="map">${tx("Back to map →","नक्शे पर वापस →")}</button>
       </div>
     </div>`));
-    speak(stars>=2?"Shabash! Well done":"Good try");
+    if(belt) speak(tx("Shabash! You reached the "+belt.title+"! Your teacher will evaluate you soon.",
+                      "शाबाश! तुम "+(belt.titleHi||belt.title)+" तक पहुँच गई! जल्द ही टीचर तुम्हारी जाँच करेंगी।"), state.lang==="hi"?"hi":"en");
+    else speak(stars>=2?"Shabash! Well done":"Good try");
     srSay(tx("You got "+score+" of "+rounds.length+", "+stars+" stars", rounds.length+" में से "+score+" सही, "+stars+" सितारे"));
     const rh=root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try{ rh.focus({preventScroll:true}); }catch(e){} }
     $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv, back); };
@@ -1877,9 +2061,21 @@ const DOUBT_QUEUE = "hikmat_doubt_queue";
 let backendLive = false;   // true once we've reached the Frappe server
 
 function apiURL(m){ return "/api/method/hikmat.api." + m; }
+// The game page is static, but the browser may carry a logged-in Frappe session (a
+// facilitator with Desk open, or an online student) — Frappe then REJECTS POSTs that
+// lack the session's CSRF token (400). We fetch the token once (GET, same-origin) and
+// attach it to every POST; guests get "" and are never CSRF-checked.
+let CSRF_TOKEN = "";
+function postHeaders(){ return CSRF_TOKEN ? { "X-Frappe-CSRF-Token": CSRF_TOKEN } : {}; }
+async function refreshCsrf(){
+  try {
+    const r = await fetch(apiURL("get_csrf"), { headers:{ Accept:"application/json" } });
+    if(r.ok) CSRF_TOKEN = ((await r.json()).message || {}).token || "";
+  } catch(e){}
+}
 async function api(method, params, post){
   try {
-    const opts = post ? { method:"POST", body:new URLSearchParams(params||{}) }
+    const opts = post ? { method:"POST", headers: postHeaders(), body:new URLSearchParams(params||{}) }
                       : { headers:{ Accept:"application/json" } };
     const url = apiURL(method) + (!post && params ? "?" + new URLSearchParams(params) : "");
     const r = await fetch(url, opts);
@@ -1894,7 +2090,7 @@ async function loadFromBackend(){
   try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); if(Array.isArray(c) && c.length){ COURSES = c; haveCache = true; } } catch(e){}
   try { const st = JSON.parse(localStorage.getItem(STRUCT_KEY)); if(st && st.bands && st.bands.length){ BANDS = st.bands; SUBJECTS = st.subjects || SUBJECTS; } } catch(e){}
   try { const s = JSON.parse(localStorage.getItem("hikmat_settings_cache"));
-        if(s && s.appName){ SETTINGS.appName = s.appName; SETTINGS.logo = s.logo || ""; if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn; if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi; } } catch(e){}
+        if(s && s.appName){ SETTINGS.appName = s.appName; SETTINGS.logo = s.logo || ""; if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn; if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi; SETTINGS.aiEnabled = !!s.aiEnabled; SETTINGS.voiceEnabled = !!s.voiceEnabled; if(Array.isArray(s.milestones)) SETTINGS.milestones = s.milestones; applySettingsDefaults(s); } } catch(e){}
   // 1b) durable offline baseline: the full curriculum shipped as a static file (precached by the
   //     service worker). Without this, a first-ever-offline launch or a localStorage wipe would fall
   //     back to the tiny bundled COURSES (4 tracks) instead of all lessons.
@@ -1932,10 +2128,18 @@ async function loadFromBackend(){
         SETTINGS.logo = s.logo || "";
         if(s.taglineEn) SETTINGS.tagline.en = s.taglineEn;
         if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi;
+        SETTINGS.aiEnabled = !!s.aiEnabled;
+        SETTINGS.voiceEnabled = !!s.voiceEnabled;
+        if(Array.isArray(s.milestones)) SETTINGS.milestones = s.milestones;
+        applySettingsDefaults(s);
         try { localStorage.setItem("hikmat_settings_cache", JSON.stringify(s)); } catch(e){}
       }
     }
-    return true;
+    // "live" means the Frappe API actually answered — NOT merely that fetch didn't throw.
+    // A static host (python http.server, file://) returns 404 for these endpoints: fetch still
+    // resolves, so returning true here would wrongly flag the backend as reachable and block the
+    // offline signup fallback. Require at least one whitelisted method to have responded ok.
+    return cr.ok || sr.ok || xr.ok;
   } catch(e){ return false; }   // offline / file:// — keep bundled or cached data
 }
 
@@ -1959,7 +2163,7 @@ async function syncAttempts(){
   try {
     for(const a of q){
       try {
-        const r = await fetch(apiURL("submit_attempt"), {method:"POST", body:new URLSearchParams(a)});
+        const r = await fetch(apiURL("submit_attempt"), {method:"POST", headers: postHeaders(), body:new URLSearchParams(a)});
         if(!r.ok){ remaining.push(a); continue; }                  // HTTP/network error → retry later
         let body = null; try { body = (await r.json()).message; } catch(e){}
         if(body && body.ok === false && body.error === "rate_limited") remaining.push(a);  // transient → retry
@@ -1982,8 +2186,12 @@ window.addEventListener("online", syncAttempts);
 let doubtCtx = null;          // {course, lesson, lv, idx} of the round on screen
 function openDoubt(){
   if(!doubtCtx) return;
+  const _ex = $("#doubtWrap"); if(_ex) _ex.remove();   // never stack two doubt sheets (would duplicate ids)
   sfx.tap(); stopSpeech(); setMood("happy");
   const q = lastQ, hint = lastHint, hi = lastHi;
+  const ctxSnap = doubtCtx;                        // freeze context for the async AI flow (globals change each round)
+  const aiOn = backendLive && SETTINGS.aiEnabled && !!currentStudent;   // Roshni-AI: online + enabled + logged-in
+  const convoId = uid();                           // one AI conversation per doubt-sheet open
   const replayEn = [q, hint].filter(Boolean).join(". ");
   // Roshni warmly invites the doubt — having one is a good thing.
   const roshniLine = tx("Doubt hona acchi baat hai! Main samjhaati hoon.",
@@ -2002,7 +2210,13 @@ function openDoubt(){
         <button class="doubtopt" id="dSlow"><span class="di">🐢</span><span>${tx("Say it slowly","धीरे से कहो")}</span></button>
         ${hi ? `<button class="doubtopt" id="dHindi"><span class="di">🇮🇳</span><span>${tx("Explain in Hindi","हिंदी में समझाओ")}</span></button>` : ""}
         <button class="doubtopt" id="dTeacher"><span class="di">🧑‍🏫</span><span>${tx("Tell the teacher","टीचर को बताओ")}</span></button>
+        ${aiOn ? `<button class="doubtopt" id="dAsk"><span class="di">✨</span><span>${tx("Ask Roshni","रोशनी से पूछो")}</span></button>` : ""}
       </div>
+      ${aiOn ? `<div id="aiBox" style="display:none;margin:2px 0 14px;">
+        <textarea id="aiInput" rows="2" aria-label="${escAttr(tx('Ask Roshni your question','रोशनी से अपना सवाल पूछो'))}" style="width:100%;font-size:16px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-family:inherit;resize:none;" placeholder="${escAttr(tx('Type your question in Hindi…','अपना सवाल हिंदी में लिखो…'))}"></textarea>
+        <button class="btn primary wide" id="aiSend" style="margin-top:8px;">✨ ${tx("Ask Roshni","पूछो")}</button>
+        <div id="aiAnswer" class="teachbox" style="display:none;margin-top:12px;"></div>
+      </div>` : ""}
       <button class="btn ghost wide" id="dClose">${tx("I'm okay now →","अब समझ गई →")}</button>
     </div>
   </div>`);
@@ -2024,9 +2238,83 @@ function openDoubt(){
     speak(tx("I told your teacher. Help is coming.","मैंने टीचर को बता दिया। मदद आ रही है।"),
           state.lang==="hi"?"hi":"en");
   };
+  // Roshni AI — typed doubt → local Ollama → spoken Hindi reply. Purely additive: the
+  // four scripted buttons above always work, so any failure here never strands the child.
+  if(aiOn){
+    const box = $("#aiBox"), input = $("#aiInput"), sendBtn = $("#aiSend"), ans = $("#aiAnswer");
+    $("#dAsk").onclick = () => {
+      sfx.tap();
+      box.style.display = "block";
+      try { input.focus(); } catch(e){}
+      speak(tx("Ask me. Type your question.","मुझसे पूछो। अपना सवाल लिखो।"), state.lang==="hi"?"hi":"en");
+    };
+    sendBtn.onclick = async () => {
+      const text = (input.value || "").trim();
+      if(!text){ speak(tx("Type your question first.","पहले अपना सवाल लिखो।"), state.lang==="hi"?"hi":"en"); return; }
+      sfx.tap(); stopSpeech();
+      sendBtn.disabled = true;
+      ans.style.display = "block";
+      ans.innerHTML = "💭 " + esc(tx("Roshni is thinking…","रोशनी सोच रही है…"));
+      speak(tx("Let me think.","ज़रा सोचती हूँ।"), state.lang==="hi"?"hi":"en");
+      const r = await api("ai_ask", {
+        student: currentStudent.id, token: currentStudent.token || "",
+        track: ctxSnap.course.key, lesson: ctxSnap.lesson.key, activity: ctxSnap.lv.id,
+        prompt: text, lang: state.lang, conversation_id: convoId, client_turn_id: uid()
+      }, true);
+      if(!sheet.isConnected) return;                 // she closed/changed screen mid-call — don't speak a stale answer
+      sendBtn.disabled = false;
+      if(r && r.ok && r.reply){
+        ans.innerHTML = "💬 " + esc(r.reply);
+        setMood("happy");
+        speak(r.reply, "hi");                        // Roshni answers in Hindi (Hindi-primary, audio-first)
+      } else {
+        const m = tx("I couldn't answer just now. Tap 'Tell the teacher', or try again.",
+                     "अभी जवाब नहीं दे पाई। 'टीचर को बताओ' दबाओ, या फिर से कोशिश करो।");
+        ans.innerHTML = "💛 " + esc(m);
+        speak(m, state.lang==="hi"?"hi":"en");       // a non-reader must always HEAR the outcome
+      }
+    };
+  }
   // auto-read the warm invite so the audio-first child hears the offer
   speak(roshniLine, state.lang==="hi"?"hi":"en");
 }
+
+// ---------- Learning-event stream (analytics Layer 1: wrong answers) ----------
+// Every wrong pick is queued offline (like doubts) and synced to log_event, so the
+// facilitator's "Hardest Questions" report can show WHICH question broke down and
+// what the girls picked instead — the final score alone can't tell you that.
+const EVENT_QUEUE = "hikmat_event_queue";
+function _readEvents(){ try { return JSON.parse(localStorage.getItem(EVENT_QUEUE)) || []; } catch(e){ return []; } }
+function _saveEvents(q){ try { localStorage.setItem(EVENT_QUEUE, JSON.stringify(q.slice(-400))) ; } catch(e){} }  // cap: never blow localStorage
+function recordEvent(ev){
+  const q = _readEvents();
+  q.push({ ...ev,
+           student: currentStudent ? currentStudent.id : "",
+           token: currentStudent ? (currentStudent.token || "") : "",
+           lang: state.lang, client_id: uid() });
+  _saveEvents(q);
+  syncEvents();
+}
+let _syncingEvents = false;
+async function syncEvents(){
+  if(_syncingEvents) return;
+  const q = _readEvents();
+  if(!q.length) return;
+  _syncingEvents = true;
+  const remaining = [];
+  try {
+    for(const ev of q){
+      try {
+        const r = await fetch(apiURL("log_event"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(ev) });
+        if(!r.ok){ remaining.push(ev); continue; }
+      } catch(e){ remaining.push(ev); }
+    }
+    const seen = new Set(q.map(x => JSON.stringify(x)));
+    _readEvents().forEach(x => { if(!seen.has(JSON.stringify(x))) remaining.push(x); });
+    _saveEvents(remaining);
+  } finally { _syncingEvents = false; }
+}
+window.addEventListener("online", syncEvents);
 
 function _readDoubts(){ try { return JSON.parse(localStorage.getItem(DOUBT_QUEUE)) || []; } catch(e){ return []; } }
 function _saveDoubts(q){ try { localStorage.setItem(DOUBT_QUEUE, JSON.stringify(q)); } catch(e){} }
@@ -2039,6 +2327,30 @@ function reportDoubt(d){
   _saveDoubts(q);
   syncDoubts();
 }
+
+// "🙋 Help Needed" — a top-bar tool that raises a help request from ANY screen. It logs a
+// doubt (with the current lesson context if in gameplay) which notifies the facilitators'
+// Desk (report_doubt → _notify_facilitators). Works offline: the doubt queues and syncs later.
+function helpNeeded(){
+  sfx.tap();
+  const ctx = doubtCtx || {};
+  reportDoubt({
+    track: ctx.course ? ctx.course.key : "",
+    lesson: ctx.lesson ? ctx.lesson.key : "",
+    activity: ctx.lv ? ctx.lv.id : "",
+    question: ("Help needed" + (lastQ ? (": " + lastQ) : "")).slice(0, 490),
+  });
+  const msg = tx("Your teacher has been told — help is coming! 🙋","शिक्षक को बता दिया — मदद आ रही है! 🙋");
+  srSay(msg);
+  try { speak(msg, state.lang, {}); } catch(e){}
+  flashToast(msg);
+}
+function flashToast(msg){
+  const ex = document.getElementById("hkToast"); if(ex) ex.remove();
+  const t = el(`<div id="hkToast" role="status">${esc(msg)}</div>`);
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 400); }, 2600);
+}
 let _syncingDoubts = false;
 async function syncDoubts(){
   if(_syncingDoubts) return;
@@ -2049,7 +2361,7 @@ async function syncDoubts(){
   try {
     for(const d of q){
       try {
-        const r = await fetch(apiURL("report_doubt"), { method:"POST", body:new URLSearchParams(d) });
+        const r = await fetch(apiURL("report_doubt"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(d) });
         if(!r.ok){ remaining.push(d); continue; }   // network/HTTP error → retry later
         // success, or a permanent rejection → drop (don't loop forever)
       } catch(e){ remaining.push(d); }              // offline → keep for next time
@@ -2075,6 +2387,8 @@ async function mergeServerProgress(){
   const p = res && res.progress;
   if(!p) return;
   for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]) setStars(ck, lk, aid, p[ck][lk][aid]);
+  if(res.gates) state.gates = res.gates;   // server-authoritative belt clearing syncs down here
+  if(typeof res.gems === "number") state.coins = Math.max(state.coins||0, res.gems);  // gem total follows her across laptops
   save();
 }
 
@@ -2084,6 +2398,12 @@ function renderSignup(){
   stopSpeech(); rerender = renderSignup; root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderLogin);
   let avatar = AVATARS[0], band = "";
+  // Only offer a class picker when grade-band content actually exists (backend / curriculum.json
+  // loaded). Standalone or offline the bundled fallback is Life-Skills only (no band-tagged tracks),
+  // so bandTracks() is empty for every band → skip the picker entirely rather than showing an empty,
+  // un-selectable field that leaves "Create & start" permanently disabled. Mirrors renderHome.
+  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const haveBands = bandList.length > 0;
   root.appendChild(el(`<div class="screen">
     <div class="hero"><h1>${tx("Create your name ✨","अपना नाम बनाओ ✨")}</h1>
       <p>${tx("Make a profile so your stars are saved.","प्रोफ़ाइल बनाओ ताकि तुम्हारे सितारे सुरक्षित रहें।")}</p></div>
@@ -2092,11 +2412,11 @@ function renderSignup(){
       <input id="suName" class="searchbox" type="text" autocomplete="off" maxlength="40"
              placeholder="${tx('e.g. Asha, or a nickname','जैसे: आशा, या उपनाम')}">
       <div class="hint2">${tx("A first name or nickname is best — you don't need your full name.","पहला नाम या उपनाम काफ़ी है — पूरा नाम ज़रूरी नहीं।")}</div>
-      <label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
-      <div class="bandpick" id="bandpick"></div>
+      ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
+      <div class="bandpick" id="bandpick"></div>` : ``}
       <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
       <div class="avpick" id="avpick"></div>
-      <label class="fieldlabel">${tx("PIN (optional)","पिन (वैकल्पिक)")}</label>
+      <label class="fieldlabel">${tx("Choose a PIN","एक पिन चुनो")}</label>
       <input id="suPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="suConsent">
@@ -2105,11 +2425,15 @@ function renderSignup(){
       <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
         <button class="btn ghost" id="suLogin">${tx("Already have a name? Log in","पहले से नाम है? लॉग इन")}</button>
+        <button class="btn ghost" id="suOnline">${tx("🌐 Invite code? Sign up online","🌐 इनवाइट कोड? ऑनलाइन साइन अप")}</button>
         <button class="btn ghost" id="suGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
       </div>
     </div>
   </div>`));
-  setNarration(tx("Create your name. Type a name, choose your class, and pick a picture.","अपना नाम बनाओ। नाम लिखो, अपनी कक्षा और एक तस्वीर चुनो।"), tx("Create your name. Type a name, choose your class, and pick a picture.","अपना नाम बनाओ। नाम लिखो, अपनी कक्षा और एक तस्वीर चुनो।"));
+  const suNarr = haveBands
+    ? tx("Create your name. Type a name, choose your class, and pick a picture.","अपना नाम बनाओ। नाम लिखो, अपनी कक्षा और एक तस्वीर चुनो।")
+    : tx("Create your name. Type a name and pick a picture.","अपना नाम बनाओ। नाम लिखो और एक तस्वीर चुनो।");
+  setNarration(suNarr, suNarr);
   const avwrap = $("#avpick");
   AVATARS.forEach((a,i) => {
     const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
@@ -2117,29 +2441,46 @@ function renderSignup(){
     avwrap.appendChild(b);
   });
   const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr"), consent = $("#suConsent");
-  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked && band); };
+  const pinOK = () => /^\d{4,8}$/.test(pin.value.trim());   // PIN is now required (4–8 digits)
+  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked && pinOK() && (!haveBands || band)); };
   name.oninput = () => { refreshGo(); err.textContent = ""; };
+  pin.oninput = () => { refreshGo(); err.textContent = ""; };
   consent.onchange = refreshGo;
-  const bandwrap = $("#bandpick");
-  BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length)).forEach(b => {
-    const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
-    btn.onclick = () => { band = b.key; sfx.tap(); bandwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
-    bandwrap.appendChild(btn);
-  });
+  if(haveBands){
+    const bandwrap = $("#bandpick");
+    bandList.forEach(b => {
+      const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+      btn.onclick = () => { band = b.key; sfx.tap(); bandwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
+      bandwrap.appendChild(btn);
+    });
+  }
   setTimeout(() => name.focus(), 60);
   $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
+  $("#suOnline").onclick = () => { sfx.tap(); renderOnlineSignup(); };
   $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
-    if(!band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
+    if(haveBands && !band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
     if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     const p = pin.value.trim();
-    if(p && !/^\d{4,8}$/.test(p)){ err.textContent = tx("PIN must be 4–8 digits.","पिन 4–8 अंकों का हो।"); return; }
+    if(!/^\d{4,8}$/.test(p)){ err.textContent = tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।"); return; }
     go.disabled = true; err.textContent = "";
     const r = await api("signup_student", { name:nm, avatar, pin:p, band }, true);
-    if(r && r.ok){ finishLogin(r); }
-    else { go.disabled = false; err.textContent = tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।"); }
+    if(r && r.ok){ finishLogin(r); return; }
+    if(r == null && !backendLive){
+      // No server was ever reached (file:// / standalone / offline). Create a local-only profile so
+      // the learner can start playing right now; progress is saved per-id in localStorage. If a
+      // backend later appears, a fresh sign-up there will register them — this local profile just
+      // stays on the device (same reach as guest play, but named and star-tracked).
+      sfx.enter();
+      const guestSnap = snapshotGuestProgress();
+      setStudent({ id: uid(), name: nm, avatar, token: "", band, local: true });
+      migrateGuestProgress(guestSnap);
+      renderHome();
+      return;
+    }
+    go.disabled = false; err.textContent = tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।");
   };
   go.onclick = submit;
   name.onkeydown = (e) => { if(e.key==="Enter" && name.value.trim()) submit(); };
@@ -2164,7 +2505,9 @@ function renderLogin(){
       <div class="center"><button class="btn primary" id="loginGo">${tx("Log in →","लॉग इन →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
         <button class="btn ghost" id="toSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
+        <button class="btn ghost" id="toOnline">${tx("🌐 Online? Use your username","🌐 ऑनलाइन? यूज़रनेम से")}</button>
         <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+        <button class="btn ghost" id="toSetup">${tx("⚙️ Set up this laptop","⚙️ यह लैपटॉप सेट करो")}</button>
       </div>
     </div>
   </div>`));
@@ -2172,7 +2515,9 @@ function renderLogin(){
   const name = $("#loginName"), pin = $("#loginPin"), err = $("#loginErr");
   setTimeout(() => name.focus(), 60);
   $("#toSignup").onclick = () => { sfx.tap(); renderSignup(); };
+  $("#toOnline").onclick = () => { sfx.tap(); renderOnlineLogin(); };
   $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+  $("#toSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); name.focus(); return; }
@@ -2187,11 +2532,513 @@ function renderLogin(){
   pin.onkeydown  = (e) => { if(e.key === "Enter") submit(); };
   refreshTop();
 }
+// ONLINE auth — remote learners are real Frappe Website Users (username + PIN, no email).
+// Login goes through Frappe's own /api/method/login (sets the session cookie), then we load
+// the linked Student via get_my_student. Signup goes through hikmat.signup_online (invite code).
+async function frappeLogin(usr, pwd){
+  try {
+    const r = await fetch("/api/method/login", {
+      method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", ...postHeaders() },
+      body: new URLSearchParams({ usr, pwd }),
+    });
+    if(r.ok) await refreshCsrf();                  // new session → new CSRF token for our POSTs
+    return r.ok;                                   // 200 = logged in (cookie set); 401 = bad creds
+  } catch(e){ return false; }                      // offline / no backend
+}
+
+function renderOnlineLogin(){
+  stopSpeech(); rerender = renderOnlineLogin; root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), renderLogin);
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Log in 🌐","लॉग इन 🌐")}</h1>
+      <p>${tx("Type your username and PIN.","अपना यूज़रनेम और पिन डालो।")}</p></div>
+    <div class="authform">
+      <label class="fieldlabel">${tx("Username","यूज़रनेम")}</label>
+      <input id="olUser" class="searchbox" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30"
+             placeholder="${tx('e.g. asha01','जैसे: asha01')}">
+      <label class="fieldlabel">${tx("PIN","पिन")}</label>
+      <input id="olPin" class="searchbox" type="password" inputmode="numeric" maxlength="8" autocomplete="current-password"
+             placeholder="${tx('4–8 digits','4–8 अंक')}">
+      <div class="feedback bad" id="olErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="olGo">${tx("Log in →","लॉग इन →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="olToSignup">${tx("✨ Have an invite code? Sign up","✨ इनवाइट कोड है? साइन अप")}</button>
+        <button class="btn ghost" id="olToName">${tx("Use name + PIN instead","नाम + पिन से")}</button>
+      </div>
+    </div>
+  </div>`));
+  const narr = tx("Log in with your username and PIN.","अपने यूज़रनेम और पिन से लॉग इन करो।");
+  setNarration(narr, narr);
+  const u = $("#olUser"), p = $("#olPin"), err = $("#olErr");
+  setTimeout(() => u.focus(), 60);
+  $("#olToSignup").onclick = () => { sfx.tap(); renderOnlineSignup(); };
+  $("#olToName").onclick   = () => { sfx.back(); renderLogin(); };
+  const submit = async () => {
+    const un = u.value.trim().toLowerCase(), pin = p.value.trim();
+    if(!un || !pin){ err.textContent = tx("Type your username and PIN.","यूज़रनेम और पिन डालो।"); return; }
+    err.textContent = tx("Checking…","जाँच रहे हैं…");
+    if(!(await frappeLogin(un, pin))){
+      err.textContent = tx("Wrong username or PIN — try again.","ग़लत यूज़रनेम या पिन — फिर कोशिश करो।");
+      p.value = ""; p.focus(); return;
+    }
+    const r = await api("get_my_student");
+    if(r && r.ok){ finishLogin(r); }
+    else { err.textContent = tx("Logged in, but no learner profile was found.","लॉग इन हुआ, पर प्रोफ़ाइल नहीं मिली।"); }
+  };
+  $("#olGo").onclick = submit;
+  u.onkeydown = (e) => { if(e.key==="Enter") p.focus(); };
+  p.onkeydown = (e) => { if(e.key==="Enter") submit(); };
+  refreshTop();
+}
+
+function renderOnlineSignup(){
+  stopSpeech(); rerender = renderOnlineSignup; root.innerHTML = "";
+  setBack(tx("← Log in","← लॉग इन"), renderOnlineLogin);
+  let avatar = AVATARS[0], band = "";
+  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const haveBands = bandList.length > 0;
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Sign up online 🌐","ऑनलाइन साइन अप 🌐")}</h1>
+      <p>${tx("Use the invite code from your teacher.","अपने शिक्षक से मिला इनवाइट कोड डालो।")}</p></div>
+    <div class="signup">
+      <label class="fieldlabel">${tx("Invite code","इनवाइट कोड")}</label>
+      <input id="osCode" class="searchbox" type="text" autocapitalize="characters" spellcheck="false" maxlength="40"
+             placeholder="${tx('from your teacher','शिक्षक से मिला')}">
+      <label class="fieldlabel">${tx("Choose a username","यूज़रनेम चुनो")}</label>
+      <input id="osUser" class="searchbox" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="30"
+             placeholder="${tx('letters & numbers, e.g. asha01','अक्षर और अंक, जैसे: asha01')}">
+      <label class="fieldlabel">${tx("Your name or nickname","तुम्हारा नाम या उपनाम")}</label>
+      <input id="osName" class="searchbox" type="text" autocomplete="off" maxlength="40"
+             placeholder="${tx('e.g. Asha','जैसे: आशा')}">
+      ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
+      <div class="bandpick" id="osBand"></div>` : ``}
+      <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
+      <div class="avpick" id="osAv"></div>
+      <label class="fieldlabel">${tx("Choose a PIN","एक पिन चुनो")}</label>
+      <input id="osPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
+             placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
+      <label class="consent"><input type="checkbox" id="osConsent">
+        <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      <div class="feedback bad" id="osErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
+      <div class="center" style="margin-top:14px"><button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button></div>
+    </div>
+  </div>`));
+  const narr = tx("Sign up online. Enter your invite code, choose a username and a PIN.","ऑनलाइन साइन अप। इनवाइट कोड डालो, यूज़रनेम और पिन चुनो।");
+  setNarration(narr, narr);
+  const avwrap = $("#osAv");
+  AVATARS.forEach((a,i) => {
+    const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
+    b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
+    avwrap.appendChild(b);
+  });
+  const code = $("#osCode"), user = $("#osUser"), nm = $("#osName"), pin = $("#osPin"),
+        go = $("#osGo"), err = $("#osErr"), consent = $("#osConsent");
+  const userOK = () => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(user.value.trim().toLowerCase());
+  const pinOK  = () => /^\d{4,8}$/.test(pin.value.trim());
+  const refreshGo = () => { go.disabled = !(code.value.trim() && userOK() && pinOK() && consent.checked && (!haveBands || band)); };
+  [code, user, pin].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
+  consent.onchange = refreshGo;
+  if(haveBands){
+    const bw = $("#osBand");
+    bandList.forEach(b => {
+      const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+      btn.onclick = () => { band = b.key; sfx.tap(); bw.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
+      bw.appendChild(btn);
+    });
+  }
+  setTimeout(() => code.focus(), 60);
+  $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+  const submit = async () => {
+    const un = user.value.trim().toLowerCase();
+    if(!userOK()){ err.textContent = tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -"); return; }
+    if(!pinOK()){ err.textContent = tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।"); return; }
+    if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
+    go.disabled = true; err.textContent = tx("Creating…","बना रहे हैं…");
+    const r = await api("signup_online",
+      { username: un, pin: pin.value.trim(), invite_code: code.value.trim(),
+        name: nm.value.trim(), avatar, band }, true);
+    if(r && r.ok){ finishLogin(r); return; }
+    go.disabled = false;
+    const e = r && r.error;
+    err.textContent =
+      e==="bad_invite" ? tx("That invite code isn't right.","इनवाइट कोड सही नहीं है।") :
+      e==="username_taken" ? tx("That username is taken — try another.","यह यूज़रनेम लिया जा चुका — दूसरा चुनो।") :
+      e==="bad_username" ? tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -") :
+      e==="bad_pin" ? tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।") :
+      e==="rate_limited" ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
+      tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।");
+  };
+  go.onclick = submit;
+  refreshGo();
+  refreshTop();
+}
+
+// ---------- CAMPUS device: offline roster login ----------
+// A campus laptop is provisioned once (renderDeviceSetup) by a facilitator: it caches the
+// campus roster (names + avatars + PIN hashes + tokens). Girls then tap their name and type a
+// PIN verified ON-DEVICE against the cached werkzeug hash, so login works with no network.
+// Attempts sync when the laptop is next online (the cached token authorises them).
+const DEVICE_MODE_KEY = "hikmat_device_mode";       // "campus" | "" (online/personal — the default)
+const CAMPUS_ROSTER_KEY = "hikmat_campus_roster";   // { campus, ts, students:[{id,name,avatar,pinHash,token,band}] }
+function deviceMode(){ try { return localStorage.getItem(DEVICE_MODE_KEY) || ""; } catch(e){ return ""; } }
+function campusRoster(){ try { return JSON.parse(localStorage.getItem(CAMPUS_ROSTER_KEY)); } catch(e){ return null; } }
+function setCampusDevice(campus, students){
+  try {
+    localStorage.setItem(CAMPUS_ROSTER_KEY, JSON.stringify({ campus, ts: Date.now(), students: students || [] }));
+    localStorage.setItem(DEVICE_MODE_KEY, "campus");
+  } catch(e){}
+}
+function clearCampusDevice(){ try { localStorage.removeItem(CAMPUS_ROSTER_KEY); localStorage.removeItem(DEVICE_MODE_KEY); } catch(e){} }
+function startLogin(){ deviceMode()==="campus" ? renderCampusLogin() : renderLogin(); }   // route by device
+
+// Verify a PIN against werkzeug's "pbkdf2:sha256:<iters>$<salt>$<hex>" hash entirely in-browser
+// (validated to match werkzeug's output). Constant-time-ish hex compare.
+async function pbkdf2Verify(stored, pin){
+  try {
+    const m = /^pbkdf2:sha256:(\d+)\$([^$]+)\$([0-9a-f]+)$/.exec(stored || "");
+    if(!m) return false;
+    const iters = parseInt(m[1], 10), salt = m[2], expected = m[3], enc = new TextEncoder();
+    const key = await crypto.subtle.importKey("raw", enc.encode(pin), { name: "PBKDF2" }, false, ["deriveBits"]);
+    const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode(salt), iterations: iters, hash: "SHA-256" }, key, 256);
+    const hex = [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, "0")).join("");
+    if(hex.length !== expected.length) return false;
+    let diff = 0; for(let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ expected.charCodeAt(i);
+    return diff === 0;
+  } catch(e){ return false; }
+}
+async function frappeLogout(){ try { await fetch("/api/method/logout"); } catch(e){} CSRF_TOKEN = ""; }
+
+function renderCampusLogin(){
+  stopSpeech(); rerender = renderCampusLogin; root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), renderHome);
+  const roster = campusRoster();
+  if(!roster || !roster.students || !roster.students.length){
+    root.appendChild(el(`<div class="screen">
+      <div class="hero"><h1>${tx("No class list yet","अभी कोई सूची नहीं")}</h1>
+        <p>${tx("Ask your teacher to set up this laptop.","शिक्षक से यह लैपटॉप सेट करने को कहो।")}</p></div>
+      <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="clName">${tx("Log in with name + PIN","नाम + पिन से लॉग इन")}</button>
+        <button class="btn ghost" id="clSetup">${tx("⚙️ Set up this laptop","⚙️ यह लैपटॉप सेट करो")}</button>
+      </div></div>`));
+    setNarration(tx("No class list yet. Ask your teacher to set up this laptop.","अभी सूची नहीं। शिक्षक से सेट करने को कहो।"), "");
+    $("#clName").onclick = () => { sfx.tap(); renderLogin(); };
+    $("#clSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
+    refreshTop(); return;
+  }
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Tap your name 👋","अपने नाम पर टैप करो 👋")}</h1><p>${esc(roster.campus)}</p></div>
+    <div class="rostergrid" id="rosterGrid"></div>
+    <div class="center" style="margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+      <button class="btn ghost" id="clGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+      <button class="btn ghost" id="clSetup">${tx("⚙️ Set up","⚙️ सेट अप")}</button>
+    </div>
+  </div>`));
+  setNarration(tx("Tap your name to log in.","लॉग इन करने के लिए अपने नाम पर टैप करो।"), "");
+  const grid = $("#rosterGrid");
+  roster.students.forEach(s => {
+    const c = el(`<button class="rostercard"><span class="ra">${esc(s.avatar || "🙂")}</span><span class="rn">${esc(s.name)}</span></button>`);
+    c.onclick = () => { sfx.tap(); campusPinPrompt(s); };
+    grid.appendChild(c);
+  });
+  $("#clGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+  $("#clSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
+  refreshTop();
+}
+
+function campusPinPrompt(s){
+  stopSpeech(); rerender = () => campusPinPrompt(s); root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), renderCampusLogin);
+  root.appendChild(el(`<div class="screen"><div class="authform">
+    <div class="hero"><h1>${esc(s.avatar || "🙂")} ${esc(s.name)}</h1><p>${tx("Type your PIN","अपना पिन डालो")}</p></div>
+    <input id="clPin" class="searchbox" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="${tx('4–8 digits','4–8 अंक')}">
+    <div class="feedback bad" id="clErr" style="min-height:18px"></div>
+    <div class="center"><button class="btn primary" id="clGo">${tx("Log in →","लॉग इन →")}</button></div>
+  </div></div>`));
+  setNarration(tx("Type your PIN to log in.","लॉग इन करने के लिए अपना पिन डालो।"), "");
+  const p = $("#clPin"), err = $("#clErr");
+  setTimeout(() => p.focus(), 60);
+  const submit = async () => {
+    const pin = p.value.trim();
+    if(!/^\d{4,8}$/.test(pin)){ err.textContent = tx("Enter your PIN.","अपना पिन डालो।"); return; }
+    err.textContent = tx("Checking…","जाँच रहे हैं…");
+    if(!(await pbkdf2Verify(s.pinHash, pin))){ err.textContent = tx("Wrong PIN — try again.","ग़लत पिन — फिर कोशिश करो।"); p.value = ""; p.focus(); return; }
+    finishLogin({ id: s.id, name: s.name, avatar: s.avatar, token: s.token, band: s.band || "" });
+  };
+  $("#clGo").onclick = submit;
+  p.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+  refreshTop();
+}
+
+// Facilitator provisions THIS laptop for a campus: sign in (online) → pick campus → cache roster.
+function renderDeviceSetup(){
+  stopSpeech(); rerender = renderDeviceSetup; root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), renderHome);
+  const provisioned = deviceMode() === "campus";
+  root.appendChild(el(`<div class="screen"><div class="authform">
+    <div class="hero"><h1>${tx("Set up this laptop 🏫","यह लैपटॉप सेट करो 🏫")}</h1>
+      <p>${tx("Teacher: sign in and choose the campus. This saves the class list on this laptop for offline login.","शिक्षक: साइन इन करके कैंपस चुनो। सूची इस लैपटॉप पर सहेजी जाएगी।")}</p></div>
+    <label class="fieldlabel">${tx("Teacher username or email","शिक्षक यूज़रनेम या ईमेल")}</label>
+    <input id="dsUser" class="searchbox" type="text" autocapitalize="none" spellcheck="false" autocomplete="username">
+    <label class="fieldlabel">${tx("Password","पासवर्ड")}</label>
+    <input id="dsPass" class="searchbox" type="password" autocomplete="current-password">
+    <div id="dsCampusWrap" style="display:none; margin-top:10px">
+      <label class="fieldlabel">${tx("Campus","कैंपस")}</label>
+      <div class="bandpick" id="dsCampus"></div>
+    </div>
+    <div class="feedback bad" id="dsErr" style="min-height:18px"></div>
+    <div class="center"><button class="btn primary" id="dsGo">${tx("Sign in →","साइन इन →")}</button></div>
+    ${provisioned ? `<div class="center" style="margin-top:12px"><button class="btn ghost" id="dsClear">${tx("Remove campus setup from this laptop","इस लैपटॉप से कैंपस सेटअप हटाओ")}</button></div>` : ``}
+  </div></div>`));
+  setNarration(tx("Set up this laptop for the campus.","इस लैपटॉप को कैंपस के लिए सेट करो।"), "");
+  const err = $("#dsErr");
+  let chosen = "";
+  $("#dsGo").onclick = async () => {
+    if(!chosen){
+      const un = $("#dsUser").value.trim(), pw = $("#dsPass").value;
+      if(!un || !pw){ err.textContent = tx("Enter the teacher login.","शिक्षक लॉगिन डालो।"); return; }
+      err.textContent = tx("Signing in…","साइन इन हो रहा है…");
+      if(!(await frappeLogin(un, pw))){ err.textContent = tx("Wrong login.","ग़लत लॉगिन।"); return; }
+      const list = await api("get_campuses");
+      const campuses = Array.isArray(list) ? list : [];
+      if(!campuses.length){ err.textContent = tx("No campuses found.","कोई कैंपस नहीं मिला।"); return; }
+      const wrap = $("#dsCampusWrap"), cg = $("#dsCampus"); wrap.style.display = "block"; cg.innerHTML = "";
+      campuses.forEach(c => {
+        const b = el(`<button class="bandchip">${esc(c.name)}</button>`);
+        b.onclick = () => { chosen = c.name; cg.querySelectorAll(".bandchip").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); err.textContent = ""; };
+        cg.appendChild(b);
+      });
+      err.textContent = tx("Pick the campus, then tap again.","कैंपस चुनो, फिर टैप करो।");
+      $("#dsGo").textContent = tx("Save class list →","सूची सहेजो →");
+      return;
+    }
+    err.textContent = tx("Saving class list…","सूची सहेज रहे हैं…");
+    const rr = await api("get_campus_roster", { campus: chosen });
+    if(!Array.isArray(rr)){ err.textContent = tx("Could not load the class list.","सूची लोड नहीं हुई।"); return; }
+    setCampusDevice(chosen, rr);
+    await frappeLogout();     // never leave the teacher's session on a shared laptop
+    sfx.enter();
+    renderCampusLogin();
+  };
+  const dc = $("#dsClear"); if(dc) dc.onclick = () => { sfx.tap(); clearCampusDevice(); renderHome(); };
+  refreshTop();
+}
+
 async function finishLogin(stu){
   sfx.enter();
+  const guestSnap = snapshotGuestProgress();     // capture any preview stars BEFORE we swap identity
   setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂", token: stu.token, band: stu.band || "" });
+  migrateGuestProgress(guestSnap);               // carry the guest's stars into this profile (+ queue to server)
   await mergeServerProgress();
   renderHome();
+}
+
+// ============================================================
+//  Roshni voice assistant — floating mic + local Whisper(STT)/Piper(TTS) via Frappe.
+//  All calls go same-origin through api()/fetch to the Frappe proxies (no CORS; the model
+//  daemons stay bound to 127.0.0.1). Graceful: degrades to typed input + speechSynthesis if
+//  voice is off or a daemon is down. Single-flight (Whisper shares the GPU with the LLM).
+//  Audio never leaves the Mac; only the transcript is logged (server-side, via ai_ask).
+// ============================================================
+let roshniBusy = false;                 // single-flight: one STT or LLM turn at a time
+let _recorder = null, _mediaStream = null, _recChunks = [];
+
+// ---- TTS: Piper via Frappe, cached in IndexedDB so each phrase is synthesized once ----
+let _ttsDB = null;
+function ttsDB(){
+  return new Promise(res => {
+    if(_ttsDB) return res(_ttsDB);
+    try {
+      const rq = indexedDB.open("hikmat_tts", 1);
+      rq.onupgradeneeded = () => { try { rq.result.createObjectStore("wav"); } catch(e){} };
+      rq.onsuccess = () => { _ttsDB = rq.result; res(_ttsDB); };
+      rq.onerror = () => res(null);
+    } catch(e){ res(null); }
+  });
+}
+function ttsCacheGet(key){
+  return new Promise(async res => {
+    const db = await ttsDB(); if(!db) return res(null);
+    try { const t = db.transaction("wav","readonly").objectStore("wav").get(key);
+          t.onsuccess = () => res(t.result || null); t.onerror = () => res(null); }
+    catch(e){ res(null); }
+  });
+}
+function ttsCachePut(key, blob){
+  ttsDB().then(db => { if(db){ try { db.transaction("wav","readwrite").objectStore("wav").put(blob, key); } catch(e){} } });
+}
+// Speak a Hindi line the natural way (Piper) when voice is on; else the built-in voice.
+// Always resolves (never throws) so a caller can await it safely.
+async function ttsPlay(text){
+  if(!text) return;
+  if(!(SETTINGS.voiceEnabled && currentStudent)){ speak(text, "hi"); return; }
+  const key = "v1:" + text;
+  let blob = await ttsCacheGet(key);
+  if(!blob){
+    try {
+      const r = await fetch(apiURL("ai_tts"), { method:"POST", headers: postHeaders(),
+        body: new URLSearchParams({ student: currentStudent.id, token: currentStudent.token || "", text }) });
+      const ct = (r.headers.get("content-type") || "");
+      if(r.ok && ct.indexOf("json") < 0){ blob = await r.blob(); if(blob && blob.size) ttsCachePut(key, blob); else blob = null; }
+    } catch(e){ blob = null; }
+  }
+  if(!blob){ speak(text, "hi"); return; }      // Piper down → instant browser-voice fallback (no dead air)
+  try {
+    stopSpeech();
+    const url = URL.createObjectURL(blob), a = new Audio(url);
+    document.body.classList.add("speaking");
+    await new Promise(done => { a.onended = a.onerror = () => { document.body.classList.remove("speaking"); URL.revokeObjectURL(url); done(); }; a.play().catch(() => done()); });
+  } catch(e){ speak(text, "hi"); }
+}
+
+// ---- STT: push-to-talk → downsample to 16kHz mono WAV in-browser → ai_transcribe ----
+async function startRec(){
+  _recChunks = [];
+  _mediaStream = await navigator.mediaDevices.getUserMedia({ audio:true });
+  _recorder = new MediaRecorder(_mediaStream);
+  _recorder.ondataavailable = e => { if(e.data && e.data.size) _recChunks.push(e.data); };
+  _recorder.start();
+}
+function stopRec(){
+  return new Promise(res => {
+    if(!_recorder){ res(null); return; }
+    _recorder.onstop = () => {
+      try { _mediaStream.getTracks().forEach(t => t.stop()); } catch(e){}
+      const blob = new Blob(_recChunks, { type: (_recorder && _recorder.mimeType) || "audio/webm" });
+      _recorder = null; _mediaStream = null; res(blob);
+    };
+    try { _recorder.stop(); } catch(e){ res(null); }
+  });
+}
+async function toWav16k(blob){
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const decoded = await ac.decodeAudioData(await blob.arrayBuffer());
+  try { ac.close(); } catch(e){}
+  const off = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * 16000)), 16000);
+  const src = off.createBufferSource(); src.buffer = decoded; src.connect(off.destination); src.start();
+  const rendered = await off.startRendering();
+  const s = rendered.getChannelData(0), n = s.length, b = new ArrayBuffer(44 + n*2), v = new DataView(b);
+  const W = (o, str) => { for(let i=0;i<str.length;i++) v.setUint8(o+i, str.charCodeAt(i)); };
+  W(0,"RIFF"); v.setUint32(4, 36+n*2, true); W(8,"WAVE"); W(12,"fmt "); v.setUint32(16,16,true);
+  v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,16000,true); v.setUint32(28,32000,true);
+  v.setUint16(32,2,true); v.setUint16(34,16,true); W(36,"data"); v.setUint32(40, n*2, true);
+  let o = 44; for(let i=0;i<n;i++){ let x = Math.max(-1, Math.min(1, s[i])); v.setInt16(o, x<0 ? x*0x8000 : x*0x7FFF, true); o += 2; }
+  return new Blob([b], { type:"audio/wav" });
+}
+async function transcribe(wavBlob){
+  const fd = new FormData();
+  fd.append("audio", wavBlob, "clip.wav");
+  fd.append("student", currentStudent.id); fd.append("token", currentStudent.token || ""); fd.append("lang", "hi");
+  try {
+    const r = await fetch(apiURL("ai_transcribe"), { method:"POST", headers: postHeaders(), body: fd });
+    if(!r.ok) return null;
+    const m = (await r.json()).message;
+    return (m && m.ok) ? (m.text || "") : null;
+  } catch(e){ return null; }
+}
+
+// ---- The floating button + the voice panel ----
+function mountRoshniFab(){
+  const show = SETTINGS.aiEnabled && !!currentStudent && backendLive;
+  let fab = document.getElementById("roshniFab");
+  if(!show){ if(fab) fab.remove(); return; }
+  if(fab) return;
+  fab = el(`<button id="roshniFab" class="roshnifab" aria-label="${escAttr(tx('Ask Roshni','रोशनी से पूछो'))}" title="${escAttr(tx('Ask Roshni','रोशनी से पूछो'))}"><span class="rfabm">${mascotSVG()}</span></button>`);
+  fab.onclick = openRoshni;
+  document.body.appendChild(fab);
+}
+function openRoshni(){
+  if(!(SETTINGS.aiEnabled && currentStudent) || document.getElementById("roshniWrap")) return;
+  sfx.tap(); stopSpeech(); setMood("happy");
+  const voice = !!SETTINGS.voiceEnabled, convoId = uid();
+  const sheet = el(`<div class="sheetwrap" id="roshniWrap">
+    <div class="sheet doubtsheet" role="dialog" aria-modal="true" aria-label="${tx('Roshni','रोशनी')}">
+      <div class="doubthead">
+        <div class="mascot small m-happy">${mascotSVG()}</div>
+        <div class="doubttitle">
+          <div class="doubtq">${tx("Ask Roshni 💛","रोशनी से पूछो 💛")}</div>
+          <div class="doubtsub">${voice ? tx("Tap the mic and speak in Hindi.","माइक दबाओ और हिंदी में बोलो।") : tx("Type your question in Hindi.","अपना सवाल हिंदी में लिखो।")}</div>
+        </div>
+      </div>
+      ${voice ? `<button class="btn primary wide rmic" id="rMic">🎤 ${tx("Tap to speak","बोलने के लिए दबाओ")}</button>` : ""}
+      <div id="rHeard" class="teachbox" style="display:none"></div>
+      <div id="rAnswer" class="teachbox" style="display:none"></div>
+      <textarea id="rType" rows="2" aria-label="${escAttr(tx('Type your question','अपना सवाल लिखो'))}" style="width:100%;font-size:16px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-family:inherit;resize:none;margin-top:10px;" placeholder="${escAttr(voice ? tx('…or type here','…या यहाँ लिखो') : tx('Type your question…','अपना सवाल लिखो…'))}"></textarea>
+      <button class="btn ghost wide" id="rSend" style="margin-top:8px;">✨ ${tx("Ask","पूछो")}</button>
+      <button class="btn ghost wide" id="rClose" style="margin-top:8px;">${tx("Close","बंद करो")}</button>
+    </div>
+  </div>`);
+  document.body.appendChild(sheet);
+  const close = () => { try { stopRec(); } catch(e){} sheet.remove(); };
+  sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
+  $("#rClose").onclick = () => { sfx.tap(); close(); };
+  const heard = $("#rHeard"), ans = $("#rAnswer");
+
+  async function ask(text){
+    if(!text || roshniBusy) return;
+    roshniBusy = true;
+    ans.style.display = "block"; ans.innerHTML = "💭 " + esc(tx("Roshni is thinking…","रोशनी सोच रही है…"));
+    const r = await api("ai_ask", { student: currentStudent.id, token: currentStudent.token || "",
+      track: (doubtCtx&&doubtCtx.course?doubtCtx.course.key:""), lesson: (doubtCtx&&doubtCtx.lesson?doubtCtx.lesson.key:""),
+      activity: (doubtCtx&&doubtCtx.lv?doubtCtx.lv.id:""), prompt: text, lang: state.lang,
+      conversation_id: convoId, client_turn_id: uid() }, true);
+    roshniBusy = false;
+    if(!sheet.isConnected) return;
+    if(r && r.ok && r.reply){ ans.innerHTML = "💬 " + esc(r.reply); setMood("happy"); await ttsPlay(r.reply); }
+    else { const m = tx("I couldn't answer just now. Try again.","अभी जवाब नहीं दे पाई। फिर कोशिश करो।"); ans.innerHTML = "💛 " + esc(m); await ttsPlay(m); }
+  }
+
+  $("#rSend").onclick = () => { const t = ($("#rType").value || "").trim(); if(t) ask(t); else speak(tx("Type your question first.","पहले सवाल लिखो।"), state.lang==="hi"?"hi":"en"); };
+
+  const mic = $("#rMic");
+  if(mic){
+    let recording = false;
+    mic.onclick = async () => {
+      if(roshniBusy && !recording) return;             // a turn is mid-flight
+      if(!recording){
+        try { await startRec(); }
+        catch(e){ ans.style.display="block"; ans.innerHTML = "🎤 " + esc(tx("Mic not available — type instead.","माइक नहीं चला — लिखकर पूछो।")); speak(tx("Type your question instead.","लिखकर पूछो।"), state.lang==="hi"?"hi":"en"); return; }
+        recording = true; mic.classList.add("rec"); mic.textContent = "⏺ " + tx("Listening… tap to stop","सुन रही हूँ… रोकने को दबाओ");
+      } else {
+        recording = false; roshniBusy = true; mic.textContent = "⏳ " + tx("Got it…","सुन लिया…");
+        const blob = await stopRec();
+        let text = null;
+        try { if(blob){ text = await transcribe(await toWav16k(blob)); } } catch(e){ text = null; }
+        roshniBusy = false;
+        mic.classList.remove("rec"); mic.textContent = "🎤 " + tx("Tap to speak","बोलने के लिए दबाओ");
+        if(!sheet.isConnected) return;
+        if(text){
+          heard.style.display = "block";
+          heard.innerHTML = "🗣️ " + esc(text) + ` <button class="rok" id="rYes">✓ ${tx("Yes","हाँ")}</button> <button class="rno" id="rNo">✗ ${tx("Again","फिर")}</button>`;
+          $("#rYes").onclick = () => { heard.style.display = "none"; ask(text); };
+          $("#rNo").onclick  = () => { heard.style.display = "none"; };
+        } else {
+          heard.style.display = "block"; heard.innerHTML = "🎤 " + esc(tx("I didn't catch that — try again or type.","समझ नहीं पाई — फिर बोलो या लिखो।"));
+          speak(tx("I didn't catch that. Try again.","समझ नहीं पाई। फिर बोलो।"), state.lang==="hi"?"hi":"en");
+        }
+      }
+    };
+  }
+  speak(tx("Ask me anything about your lesson.","अपने पाठ के बारे में कुछ भी पूछो।"), state.lang==="hi"?"hi":"en");
+}
+
+// Admin-set defaults from Hikmat Settings: copy the payload into SETTINGS, then (for a user
+// who hasn't toggled anything themselves) seed state from them. A user's own choice wins via
+// state.prefsTouched, set in the toggle handlers.
+function applySettingsDefaults(s){
+  if(!s) return;
+  if(s.defaultLanguage) SETTINGS.defaultLanguage = s.defaultLanguage;
+  if(typeof s.helpDefaultOn === "boolean") SETTINGS.helpDefaultOn = s.helpDefaultOn;
+  if(s.defaultTheme) SETTINGS.defaultTheme = s.defaultTheme;
+  if(typeof s.defaultSound === "boolean") SETTINGS.defaultSound = s.defaultSound;
+}
+function applyServerDefaults(){
+  if(state.prefsTouched) return;                  // respect the user's own toggles
+  if(SETTINGS.defaultLanguage) state.lang = SETTINGS.defaultLanguage;
+  state.hindi = !!SETTINGS.helpDefaultOn;
+  if(SETTINGS.defaultTheme) state.theme = SETTINGS.defaultTheme;
+  state.sound = SETTINGS.defaultSound !== false;
+  save();
 }
 
 // ---------- boot ----------
@@ -2201,10 +3048,14 @@ state.lang = state.lang || "en";
 state.sound = state.sound!==false;
 state.theme = state.theme || "light";
 renderHome();          // instant: bundled or cached content, fully offline
-syncAttempts();        // flush any progress queued while offline
-syncDoubts();          // flush any doubts logged while offline
+refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 400 our POSTs without it
+  syncAttempts();            // flush any progress queued while offline
+  syncDoubts();              // flush any doubts logged while offline
+  syncEvents();              // flush any wrong-answer events queued while offline
+});
 loadFromBackend().then(async ok => {
   backendLive = ok;
+  applyServerDefaults();   // apply admin defaults (theme/sound/lang/help) for an untouched user
   // No forced login wall — everyone lands on Home (playable); the guest sees clear
   // "Log in" / "Sign up" buttons and chooses when to sign in.
   if(ok && currentStudent) await mergeServerProgress();

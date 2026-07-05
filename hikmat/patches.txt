@@ -4,3 +4,8 @@
 
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
+hikmat.patches.v0_harden_auth
+hikmat.patches.v1_intake_model
+hikmat.patches.v2_online_auth
+hikmat.patches.v3_cohort_intake
+hikmat.patches.v4_two_cohorts

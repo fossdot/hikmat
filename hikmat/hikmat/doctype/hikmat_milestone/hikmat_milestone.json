@@ -1,70 +1,73 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:cohort_name",
- "creation": "2026-06-17 00:06:13.203385",
+ "autoname": "field:milestone_key",
+ "creation": "2026-07-05 14:40:55.289931",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "cohort_name",
-  "start_date",
-  "invite_code",
-  "center",
-  "facilitator",
-  "mode"
+  "milestone_key",
+  "title",
+  "title_hi",
+  "icon",
+  "threshold_gems",
+  "sort_order",
+  "active"
  ],
  "fields": [
   {
-   "fieldname": "cohort_name",
+   "fieldname": "milestone_key",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Cohort name",
+   "label": "Key",
    "reqd": 1,
    "unique": 1
   },
   {
-   "fieldname": "start_date",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Start date",
-   "mandatory_depends_on": "eval:doc.mode==\"Offline\"",
-   "options": "Cohort Start Date"
-  },
-  {
-   "fieldname": "invite_code",
-   "fieldtype": "Data",
-   "label": "Invite code",
-   "unique": 1
-  },
-  {
-   "fieldname": "center",
+   "fieldname": "title",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Center / location"
-  },
-  {
-   "fieldname": "facilitator",
-   "fieldtype": "Data",
-   "label": "Facilitator"
-  },
-  {
-   "default": "Offline",
-   "fieldname": "mode",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Mode",
-   "options": "\nOffline\nOnline",
+   "label": "Title",
    "reqd": 1
+  },
+  {
+   "fieldname": "title_hi",
+   "fieldtype": "Data",
+   "label": "Title (Hindi)"
+  },
+  {
+   "fieldname": "icon",
+   "fieldtype": "Data",
+   "label": "Icon (emoji)"
+  },
+  {
+   "fieldname": "threshold_gems",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Threshold (total gems \ud83d\udc8e)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort order"
+  },
+  {
+   "default": "1",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-05 15:16:40.790098",
+ "modified": "2026-07-05 14:40:55.289931",
  "modified_by": "Administrator",
  "module": "Hikmat",
- "name": "Cohort",
+ "name": "Hikmat Milestone",
  "owner": "Administrator",
  "permissions": [
   {
@@ -85,5 +88,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "cohort_name"
+ "title_field": "title"
 }

@@ -11,7 +11,20 @@
   "tagline_en",
   "tagline_hi",
   "default_language",
-  "help_default_on"
+  "help_default_on",
+  "sec_ai",
+  "ai_enabled",
+  "ai_model",
+  "ai_endpoint",
+  "ai_system_prompt",
+  "ai_crisis_reply",
+  "default_theme",
+  "default_sound",
+  "sec_voice",
+  "voice_enabled",
+  "stt_endpoint",
+  "tts_endpoint",
+  "tts_voice"
  ],
  "fields": [
   {
@@ -48,13 +61,88 @@
    "fieldname": "help_default_on",
    "fieldtype": "Check",
    "label": "Hindi help on by default"
+  },
+  {
+   "fieldname": "sec_ai",
+   "fieldtype": "Section Break",
+   "label": "Roshni AI (local Ollama tutor)"
+  },
+  {
+   "default": "0",
+   "fieldname": "ai_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Roshni AI"
+  },
+  {
+   "default": "gemma4:12b-mlx",
+   "fieldname": "ai_model",
+   "fieldtype": "Data",
+   "label": "Ollama model"
+  },
+  {
+   "default": "http://localhost:11434",
+   "fieldname": "ai_endpoint",
+   "fieldtype": "Data",
+   "label": "Ollama endpoint"
+  },
+  {
+   "fieldname": "ai_system_prompt",
+   "fieldtype": "Long Text",
+   "label": "Roshni system prompt (Hindi) \u2014 blank uses the built-in default"
+  },
+  {
+   "fieldname": "ai_crisis_reply",
+   "fieldtype": "Small Text",
+   "label": "Crisis safe reply (Hindi) \u2014 blank uses the built-in default"
+  },
+  {
+   "default": "light",
+   "fieldname": "default_theme",
+   "fieldtype": "Select",
+   "label": "Default theme",
+   "options": "light\ndark"
+  },
+  {
+   "default": "1",
+   "fieldname": "default_sound",
+   "fieldtype": "Check",
+   "label": "Sound on by default"
+  },
+  {
+   "fieldname": "sec_voice",
+   "fieldtype": "Section Break",
+   "label": "Roshni voice (local Whisper STT + Piper TTS)"
+  },
+  {
+   "default": "0",
+   "fieldname": "voice_enabled",
+   "fieldtype": "Check",
+   "label": "Enable voice (mic in + neural Hindi voice out)"
+  },
+  {
+   "default": "http://127.0.0.1:8080",
+   "fieldname": "stt_endpoint",
+   "fieldtype": "Data",
+   "label": "Whisper STT endpoint (local)"
+  },
+  {
+   "default": "http://127.0.0.1:5000",
+   "fieldname": "tts_endpoint",
+   "fieldtype": "Data",
+   "label": "Piper TTS endpoint (local)"
+  },
+  {
+   "default": "hi_IN-priyamvada-medium",
+   "fieldname": "tts_voice",
+   "fieldtype": "Data",
+   "label": "Piper Hindi voice"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-06-17 00:06:13.476476",
+ "modified": "2026-06-28 13:27:40.552473",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Hikmat Settings",

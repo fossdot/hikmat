@@ -15,7 +15,11 @@
   "avatar",
   "active",
   "auth_token",
-  "band"
+  "token_issued_on",
+  "band",
+  "mode",
+  "campus",
+  "user"
  ],
  "fields": [
   {
@@ -23,7 +27,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Name",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "age",
@@ -70,11 +75,45 @@
    "read_only": 1
   },
   {
+   "fieldname": "token_issued_on",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Token issued on",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
    "fieldname": "band",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Grade band",
    "options": "Grade Band"
+  },
+  {
+   "default": "Campus",
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Mode",
+   "options": "Campus\nOnline"
+  },
+  {
+   "depends_on": "eval:doc.mode=='Campus'",
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus",
+   "options": "Campus"
+  },
+  {
+   "depends_on": "eval:doc.mode=='Online'",
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "Login user (online)",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1,
+   "unique": 1
   }
  ],
  "grid_page_length": 50,
