@@ -744,6 +744,24 @@ def setup_drilldown_report():
     print("=== report 'Activity Drill-down' ready ===")
 
 
+def setup_attendance_reports():
+    """Register the two attendance SCRIPT reports (code lives in
+    hikmat/hikmat/report/daily_attendance/ and attendance_summary/):
+    Daily Attendance = one row per student per day with a Present/Absent mark
+    against the 2.5h threshold; Attendance Summary = one row per student over
+    a range. Facilitator-only — the game never shows attendance to students."""
+    for name in ("Daily Attendance", "Attendance Summary"):
+        if frappe.db.exists("Report", name):
+            frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+        frappe.get_doc({
+            "doctype": "Report", "report_name": name, "ref_doctype": "Attendance Day",
+            "report_type": "Script Report", "is_standard": "Yes", "module": MODULE,
+            "roles": [{"role": "System Manager"}],
+        }).insert(ignore_permissions=1)
+        frappe.db.commit()
+        print(f"=== report '{name}' ready ===")
+
+
 def export_offline_curriculum():
     """Write the live get_courses() payload to public/curriculum.json — the static, SW-precached
     offline baseline the PWA falls back to on a first-ever-offline launch or after a localStorage
@@ -1162,6 +1180,7 @@ def setup_analytics():
     setup_hard_questions_report()
     setup_engagement_report()
     setup_drilldown_report()
+    setup_attendance_reports()
 
     # confusion chart — doubts grouped by lesson (the heatmap, visualised)
     if frappe.db.exists("Dashboard Chart", "Doubts by Lesson"):
@@ -1194,6 +1213,10 @@ def setup_workspace(cards=None, charts=None):
                  ("Doubts", "Lesson Doubt", "DocType"),
                  ("Pending Evaluations", "Pending Evaluations", "Report"),
                  ("Milestones", "Hikmat Milestone", "DocType"),
+                 ("Daily Attendance", "Daily Attendance", "Report"),
+                 ("Attendance Summary", "Attendance Summary", "Report"),
+                 ("Module Tests", "Module Test", "DocType"),
+                 ("Test Attempts", "Test Attempt", "DocType"),
                  ("AI Review Queue", "AI Review Queue", "Report"),
                  ("AI Chats", "AI Conversation", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]
@@ -1201,7 +1224,8 @@ def setup_workspace(cards=None, charts=None):
     _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt",
                    "AI Review Queue": "AI Conversation", "Pending Evaluations": "Evaluation",
                    "Lesson Trouble Spots": "Lesson Attempt", "Hardest Questions": "Learning Event",
-                   "Student Engagement": "Student", "Activity Drill-down": "Lesson Attempt"}
+                   "Student Engagement": "Student", "Activity Drill-down": "Lesson Attempt",
+                   "Daily Attendance": "Attendance Day", "Attendance Summary": "Attendance Day"}
 
     def _sc(lbl, link, typ):
         d = {"label": lbl, "link_to": link, "type": typ}

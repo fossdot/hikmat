@@ -149,6 +149,9 @@ doc_events = {
 	"Hikmat Settings": {"on_update": "hikmat.api.clear_content_cache"},
 	# Milestone thresholds ride in the cached settings payload → bust on edit.
 	"Hikmat Milestone": _bust,
+	# Module-test banks ride inside the cached courses payload → bust on edit.
+	# (Child-table question edits save the parent, so the parent hook covers them.)
+	"Module Test": _bust,
 	# Stamp who/when a facilitator recorded an evaluation outcome in Desk.
 	"Evaluation": {"before_save": "hikmat.api.stamp_evaluation"},
 	# Offline cohorts must carry a start date (server-side twin of mandatory_depends_on).
@@ -157,6 +160,14 @@ doc_events = {
 
 # Scheduled Tasks
 # ---------------
+
+# Raw attendance pings are an idempotency/audit ledger — the Day aggregates are the
+# permanent record. 90-day retention comfortably exceeds every client-side horizon.
+scheduler_events = {
+	"daily": [
+		"hikmat.api.prune_attendance_pings",
+	],
+}
 
 # scheduler_events = {
 # 	"all": [

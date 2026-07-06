@@ -17,7 +17,13 @@
   "sort_order",
   "published",
   "band",
-  "subject"
+  "subject",
+  "video",
+  "video_title",
+  "video_title_hi",
+  "video_duration_secs",
+  "video_captions",
+  "video_captions_hi"
  ],
  "fields": [
   {
@@ -84,6 +90,39 @@
    "in_list_view": 1,
    "label": "Subject",
    "options": "Subject"
+  },
+  {
+   "description": "Explainer video for this module (MP4/H.264 recommended, keep under ~50 MB). Must be a public file — students are not logged into Frappe. Streams online only; the game shows a friendly offline message otherwise.",
+   "fieldname": "video",
+   "fieldtype": "Attach",
+   "label": "Explainer video"
+  },
+  {
+   "fieldname": "video_title",
+   "fieldtype": "Data",
+   "label": "Video title (English)"
+  },
+  {
+   "fieldname": "video_title_hi",
+   "fieldtype": "Data",
+   "label": "Video title (Hindi)"
+  },
+  {
+   "description": "Optional — shown as \"N min\" on the video button.",
+   "fieldname": "video_duration_secs",
+   "fieldtype": "Int",
+   "label": "Video length (seconds)"
+  },
+  {
+   "description": "Optional WebVTT (.vtt) subtitles, English.",
+   "fieldname": "video_captions",
+   "fieldtype": "Attach",
+   "label": "Subtitles (English .vtt)"
+  },
+  {
+   "fieldname": "video_captions_hi",
+   "fieldtype": "Attach",
+   "label": "Subtitles (Hindi .vtt)"
   }
  ],
  "grid_page_length": 50,

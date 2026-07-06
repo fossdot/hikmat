@@ -262,3 +262,358 @@ class TestHikmatApi(FrappeTestCase):
 		self.assertTrue(r.get("ok"))
 		self.assertEqual(frappe.db.get_value("Lesson Attempt", {"client_id": "t-att-dur-1"},
 		                                     "duration_secs"), 7200)
+
+
+class TestModuleTests(FrappeTestCase):
+	"""Module-end tests: bank validation, curriculum export, submit_test hardening,
+	get_progress tests/testSeen. Mirrors TestHikmatApi's explicit-cleanup style."""
+
+	def _mk_student(self, name):
+		def _rm():
+			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
+				frappe.db.delete("Test Attempt", {"student": s})
+				frappe.db.delete("Student", {"name": s})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		return frappe.get_doc({"doctype": "Student", "student_name": name,
+		                       "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
+
+	def _mk_track(self, key="mt-track"):
+		def _rm():
+			frappe.db.delete("Module Test", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		if frappe.db.exists("Track", key):
+			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		return frappe.get_doc({"doctype": "Track", "track_key": key, "title": "MT Track",
+		                       "published": 1}).insert(ignore_permissions=True)
+
+	def _q(self, i):
+		return {"question": f"Q{i}?", "choices": "a\nb\nc", "answer": "a"}
+
+	def _mk_module_test(self, track, n_questions=10, per_paper=5, pass_pct=60):
+		mt = frappe.get_doc({"doctype": "Module Test", "track": track.name, "active": 1,
+		                     "questions_per_paper": per_paper, "pass_pct": pass_pct,
+		                     "time_limit_secs": 600,
+		                     "questions": [self._q(i) for i in range(n_questions)]})
+		mt.insert(ignore_permissions=True)
+		return mt
+
+	def test_module_test_rejects_answer_not_in_choices(self):
+		track = self._mk_track("mt-badq")
+		mt = frappe.get_doc({"doctype": "Module Test", "track": track.name,
+		                     "questions_per_paper": 1, "pass_pct": 60, "time_limit_secs": 600,
+		                     "questions": [{"question": "Q?", "choices": "a\nb", "answer": "zzz"}]})
+		self.assertRaises(frappe.ValidationError, mt.insert)
+
+	def test_module_test_rejects_bank_smaller_than_paper(self):
+		track = self._mk_track("mt-small")
+		mt = frappe.get_doc({"doctype": "Module Test", "track": track.name,
+		                     "questions_per_paper": 5, "pass_pct": 60, "time_limit_secs": 600,
+		                     "questions": [self._q(i) for i in range(3)]})
+		self.assertRaises(frappe.ValidationError, mt.insert)
+
+	def test_module_test_rejects_bad_config(self):
+		track = self._mk_track("mt-cfg")
+		base = {"doctype": "Module Test", "track": track.name,
+		        "questions": [self._q(i) for i in range(3)]}
+		for bad in ({"questions_per_paper": 0, "pass_pct": 60, "time_limit_secs": 600},
+		            {"questions_per_paper": 1, "pass_pct": 0, "time_limit_secs": 600},
+		            {"questions_per_paper": 1, "pass_pct": 101, "time_limit_secs": 600},
+		            {"questions_per_paper": 1, "pass_pct": 60, "time_limit_secs": 30}):
+			mt = frappe.get_doc({**base, **bad})
+			self.assertRaises(frappe.ValidationError, mt.insert)
+
+	def test_track_json_exports_bank_without_answkey_leaks(self):
+		track = self._mk_track("mt-export")
+		self._mk_module_test(track, n_questions=6, per_paper=5)
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == "mt-export")
+		self.assertIn("test", t)
+		self.assertEqual(t["test"]["questionsPerPaper"], 5)
+		self.assertEqual(t["test"]["passPct"], 60)
+		self.assertEqual(len(t["test"]["bank"]), 6)
+		for q in t["test"]["bank"]:
+			for key in ("id", "q", "choices", "answer"):
+				self.assertIn(key, q)
+			self.assertNotIn("teach", q)      # facilitator notes never ship in a test
+
+	def test_track_json_skips_inactive_test(self):
+		track = self._mk_track("mt-inactive")
+		mt = self._mk_module_test(track, n_questions=6, per_paper=5)
+		frappe.db.set_value("Module Test", mt.name, "active", 0)
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == "mt-inactive")
+		self.assertNotIn("test", t)
+
+	def test_submit_test_rejects_unknown_student_and_bad_token(self):
+		self.assertEqual(api.submit_test(student="nope-xyz", track="t",
+		                                 status="completed").get("error"), "unknown_student")
+		stu = self._mk_student("Test Auth Girl")
+		r = api.submit_test(student=stu.name, token="forged", track="t", status="completed")
+		self.assertEqual(r.get("error"), "auth")
+
+	def test_submit_test_rejects_bad_status(self):
+		stu = self._mk_student("Test Status Girl")
+		tok = api._token_for(stu.name)
+		r = api.submit_test(student=stu.name, token=tok, track="t", status="hacked")
+		self.assertEqual(r.get("error"), "bad_status")
+
+	def test_submit_test_idempotent_on_client_id(self):
+		stu = self._mk_student("Test Dedup Girl")
+		tok = api._token_for(stu.name)
+		kw = dict(student=stu.name, token=tok, track="t1", status="completed",
+		          score=4, total=5, client_id="t-test-1")
+		r1 = api.submit_test(**kw)
+		self.assertTrue(r1.get("ok"))
+		r2 = api.submit_test(**kw)
+		self.assertTrue(r2.get("dedup"))
+		self.assertEqual(frappe.db.count("Test Attempt", {"client_id": "t-test-1"}), 1)
+
+	def test_submit_test_exited_forces_zero(self):
+		stu = self._mk_student("Test Void Girl")
+		tok = api._token_for(stu.name)
+		r = api.submit_test(student=stu.name, token=tok, track="t1", status="exited",
+		                    exit_reason="hidden", score=9, total=10, client_id="t-test-void")
+		self.assertTrue(r.get("ok"))
+		self.assertFalse(r.get("passed"))
+		row = frappe.db.get_value("Test Attempt", {"client_id": "t-test-void"},
+		                          ["score", "pct", "passed", "status", "exit_reason"], as_dict=True)
+		self.assertEqual(row.score, 0)
+		self.assertEqual(row.pct, 0)
+		self.assertEqual(row.passed, 0)
+		self.assertEqual(row.status, "Exited")
+		self.assertEqual(row.exit_reason, "hidden")
+
+	def test_submit_test_pass_computed_server_side(self):
+		track = self._mk_track("mt-pass")
+		self._mk_module_test(track, n_questions=10, per_paper=10, pass_pct=60)
+		stu = self._mk_student("Test Pass Girl")
+		tok = api._token_for(stu.name)
+		r = api.submit_test(student=stu.name, token=tok, track="mt-pass", status="completed",
+		                    score=6, total=10, client_id="t-test-p1")
+		self.assertTrue(r.get("passed"))
+		r = api.submit_test(student=stu.name, token=tok, track="mt-pass", status="completed",
+		                    score=5, total=10, client_id="t-test-p2")
+		self.assertFalse(r.get("passed"))
+		# running out of time is not cheating — answered-so-far still counts
+		r = api.submit_test(student=stu.name, token=tok, track="mt-pass", status="timed_out",
+		                    score=7, total=10, client_id="t-test-p3")
+		self.assertTrue(r.get("passed"))
+
+	def test_submit_test_clamps_and_survives_bad_paper(self):
+		stu = self._mk_student("Test Clamp Girl")
+		tok = api._token_for(stu.name)
+		r = api.submit_test(student=stu.name, token=tok, track="t1", status="completed",
+		                    score=99, total=5, paper="not-json[", duration_secs=999999,
+		                    client_id="t-test-clamp")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Test Attempt", {"client_id": "t-test-clamp"},
+		                          ["score", "paper", "duration_secs", "attempted_on"], as_dict=True)
+		self.assertEqual(row.score, 5)              # clamped to total
+		self.assertEqual(row.paper, "[]")           # malformed paper never rejects the write
+		self.assertEqual(row.duration_secs, 7200)
+		self.assertTrue(row.attempted_on)           # first-exposure ordering depends on this
+
+	def test_get_progress_returns_tests_and_seen_union(self):
+		stu = self._mk_student("Test Seen Girl")
+		tok = api._token_for(stu.name)
+		api.submit_test(student=stu.name, token=tok, track="t1", status="completed",
+		                score=3, total=5, paper='["qa","qb"]', client_id="t-seen-1")
+		api.submit_test(student=stu.name, token=tok, track="t1", status="exited",
+		                exit_reason="blur", score=0, total=5, paper='["qb","qc"]',
+		                client_id="t-seen-2")
+		res = api.get_progress(student=stu.name, token=tok)
+		self.assertIn("t1", res.get("tests", {}))
+		self.assertEqual(res["tests"]["t1"]["attempts"], 2)
+		self.assertEqual(res["tests"]["t1"]["bestPct"], 60)
+		# voided papers still burn: the union is qa, qb, qc in first-exposure order
+		self.assertEqual(res.get("testSeen", {}).get("t1"), ["qa", "qb", "qc"])
+
+	def test_log_event_accepts_test_exit(self):
+		def _rm():
+			frappe.db.delete("Learning Event", {"client_id": "t-texit-1"})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		r = api.log_event(kind="test_exit", track="t1", activity="test", tool="hidden",
+		                  duration_secs=120, count=3, client_id="t-texit-1")
+		self.assertTrue(r.get("ok"))
+		self.assertEqual(api.log_event(kind="dance_party").get("error"), "bad_kind")
+
+	def test_delete_student_erases_test_attempts(self):
+		stu = self._mk_student("Test Erase Girl")
+		tok = api._token_for(stu.name)
+		api.submit_test(student=stu.name, token=tok, track="t1", status="completed",
+		                score=1, total=5, client_id="t-erase-1")
+		api.delete_student(stu.name)
+		self.assertEqual(frappe.db.count("Test Attempt", {"student": stu.name}), 0)
+
+
+class TestAttendance(FrappeTestCase):
+	"""log_attendance: auth, clamps, dedup, day upsert, thresholds, date window."""
+
+	def _mk_student(self, name):
+		def _rm():
+			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
+				frappe.db.delete("Attendance Ping", {"student": s})
+				frappe.db.delete("Attendance Day", {"student": s})
+				frappe.db.delete("Student", {"name": s})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		return frappe.get_doc({"doctype": "Student", "student_name": name,
+		                       "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
+
+	def test_log_attendance_rejects_unknown_student(self):
+		r = api.log_attendance(student="nope-xyz", date=frappe.utils.nowdate(), secs=60)
+		self.assertEqual(r.get("error"), "unknown_student")
+
+	def test_log_attendance_rejects_bad_token(self):
+		stu = self._mk_student("Att Auth Girl")
+		r = api.log_attendance(student=stu.name, token="forged",
+		                       date=frappe.utils.nowdate(), secs=60)
+		self.assertEqual(r.get("error"), "auth")
+
+	def test_log_attendance_clamps_secs(self):
+		stu = self._mk_student("Att Clamp Girl")
+		tok = api._token_for(stu.name)
+		r = api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                       secs=99999, client_id="t-att-c1")
+		self.assertTrue(r.get("ok"))
+		self.assertEqual(r.get("secs_today"), 900)   # one ping can never claim >15 min
+		r = api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                       secs=0, client_id="t-att-c2")
+		self.assertEqual(r.get("error"), "bad_secs")
+
+	def test_log_attendance_dedups_client_id(self):
+		stu = self._mk_student("Att Dedup Girl")
+		tok = api._token_for(stu.name)
+		kw = dict(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		          secs=300, client_id="t-att-d1")
+		self.assertTrue(api.log_attendance(**kw).get("ok"))
+		self.assertTrue(api.log_attendance(**kw).get("dedup"))
+		day = frappe.db.get_value("Attendance Day",
+		                          {"student": stu.name, "date": frappe.utils.nowdate()},
+		                          "active_secs")
+		self.assertEqual(day, 300)                   # the retry added nothing
+
+	def test_log_attendance_upserts_and_sums(self):
+		stu = self._mk_student("Att Sum Girl")
+		tok = api._token_for(stu.name)
+		api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                   secs=300, client_id="t-att-s1", device_id="dev-a")
+		api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                   secs=600, client_id="t-att-s2", device_id="dev-b")
+		rows = frappe.get_all("Attendance Day",
+		                      filters={"student": stu.name, "date": frappe.utils.nowdate()},
+		                      fields=["active_secs", "device_count", "first_ping", "last_ping"])
+		self.assertEqual(len(rows), 1)
+		self.assertEqual(rows[0].active_secs, 900)
+		self.assertEqual(rows[0].device_count, 2)
+		self.assertTrue(rows[0].first_ping <= rows[0].last_ping)
+
+	def test_log_attendance_rejects_out_of_range_dates(self):
+		stu = self._mk_student("Att Range Girl")
+		tok = api._token_for(stu.name)
+		too_old = frappe.utils.add_days(frappe.utils.nowdate(), -(api._ATT_PAST_WINDOW_DAYS + 1))
+		future = frappe.utils.add_days(frappe.utils.nowdate(), api._ATT_FUTURE_WINDOW_DAYS + 1)
+		self.assertEqual(api.log_attendance(student=stu.name, token=tok, date=too_old,
+		                                    secs=60).get("error"), "date_out_of_range")
+		self.assertEqual(api.log_attendance(student=stu.name, token=tok, date=future,
+		                                    secs=60).get("error"), "date_out_of_range")
+		ok_old = frappe.utils.add_days(frappe.utils.nowdate(), -api._ATT_PAST_WINDOW_DAYS)
+		self.assertTrue(api.log_attendance(student=stu.name, token=tok, date=ok_old,
+		                                   secs=60, client_id="t-att-r1").get("ok"))
+		self.assertEqual(api.log_attendance(student=stu.name, token=tok, date="garbage",
+		                                    secs=60).get("error"), "bad_date")
+
+	def test_present_flips_at_threshold(self):
+		stu = self._mk_student("Att Present Girl")
+		tok = api._token_for(stu.name)
+		# default threshold 150 min = 9000s; 900s/ping → 10 pings to Present
+		for i in range(9):
+			r = api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+			                       secs=900, client_id=f"t-att-p{i}")
+		self.assertFalse(r.get("present"))           # 8100s < 9000s
+		r = api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                       secs=900, client_id="t-att-p9")
+		self.assertTrue(r.get("present"))            # 9000s ≥ 9000s
+
+	def test_daily_attendance_report_marks_absent(self):
+		from hikmat.hikmat.report.daily_attendance.daily_attendance import execute
+		stu = self._mk_student("Att Report Girl")
+		today = frappe.utils.nowdate()
+		cols, rows, _msg, _chart, summary = execute(
+			{"from_date": today, "to_date": today, "student": stu.name})
+		mine = [r for r in rows if r["student"] == stu.name]
+		self.assertEqual(len(mine), 1)
+		self.assertEqual(mine[0]["status"], "Absent")   # no pings → explicit Absent row
+		tok = api._token_for(stu.name)
+		for i in range(10):
+			api.log_attendance(student=stu.name, token=tok, date=today, secs=900,
+			                   client_id=f"t-att-rep{i}")
+		_c, rows, _m, _ch, _s = execute({"from_date": today, "to_date": today, "student": stu.name})
+		mine = [r for r in rows if r["student"] == stu.name]
+		self.assertEqual(mine[0]["status"], "Present")
+		self.assertEqual(mine[0]["active_minutes"], 150)
+
+	def test_attendance_summary_report_aggregates(self):
+		from hikmat.hikmat.report.attendance_summary.attendance_summary import execute
+		stu = self._mk_student("Att Summary Girl")
+		tok = api._token_for(stu.name)
+		today = frappe.utils.nowdate()
+		for i in range(10):
+			api.log_attendance(student=stu.name, token=tok, date=today, secs=900,
+			                   client_id=f"t-att-sum{i}")
+		_c, rows, _m, _ch, _s = execute({"from_date": today, "to_date": today})
+		mine = [r for r in rows if r["student"] == stu.name]
+		self.assertEqual(len(mine), 1)
+		self.assertEqual(mine[0]["days_present"], 1)
+		self.assertEqual(mine[0]["total_active_hours"], 2.5)
+
+	def test_delete_student_erases_attendance(self):
+		stu = self._mk_student("Att Erase Girl")
+		tok = api._token_for(stu.name)
+		api.log_attendance(student=stu.name, token=tok, date=frappe.utils.nowdate(),
+		                   secs=300, client_id="t-att-e1")
+		api.delete_student(stu.name)
+		self.assertEqual(frappe.db.count("Attendance Ping", {"student": stu.name}), 0)
+		self.assertEqual(frappe.db.count("Attendance Day", {"student": stu.name}), 0)
+
+
+class TestTrackVideo(FrappeTestCase):
+	"""Track explainer-video fields: export shape + public-file validation."""
+
+	def _mk_track(self, key, **kw):
+		def _rm():
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		if frappe.db.exists("Track", key):
+			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		return frappe.get_doc({"doctype": "Track", "track_key": key, "title": "V Track",
+		                       "published": 1, **kw}).insert(ignore_permissions=True)
+
+	def test_get_courses_exposes_video_when_set(self):
+		self._mk_track("vid-set", video="/files/expl.mp4", video_title="Watch this",
+		               video_title_hi="यह देखो", video_duration_secs=180)
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == "vid-set")
+		self.assertEqual(t["videoUrl"], "/files/expl.mp4")
+		self.assertEqual(t["videoTitle"], "Watch this")
+		self.assertEqual(t["videoTitleHi"], "यह देखो")
+		self.assertEqual(t["videoDuration"], 180)
+
+	def test_get_courses_omits_video_keys_when_unset(self):
+		self._mk_track("vid-unset")
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == "vid-unset")
+		self.assertNotIn("videoUrl", t)
+		self.assertNotIn("videoDuration", t)
+
+	def test_track_rejects_private_video(self):
+		doc = frappe.get_doc({"doctype": "Track", "track_key": "vid-priv", "title": "P",
+		                      "published": 0, "video": "/private/files/x.mp4"})
+		self.assertRaises(frappe.ValidationError, doc.insert)

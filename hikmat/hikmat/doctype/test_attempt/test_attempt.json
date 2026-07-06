@@ -1,0 +1,144 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-07-06 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "track",
+  "status",
+  "score",
+  "total",
+  "pct",
+  "passed",
+  "exit_reason",
+  "duration_secs",
+  "attempted_on",
+  "paper",
+  "lang",
+  "student_name",
+  "cohort",
+  "client_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Track key"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Completed\nExited\nTimed Out"
+  },
+  {
+   "fieldname": "score",
+   "fieldtype": "Int",
+   "label": "Score"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Int",
+   "label": "Total"
+  },
+  {
+   "fieldname": "pct",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Percent"
+  },
+  {
+   "fieldname": "passed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Passed"
+  },
+  {
+   "description": "Why the test was voided: hidden / blur / fullscreen_exit / pagehide / stopped.",
+   "fieldname": "exit_reason",
+   "fieldtype": "Data",
+   "label": "Exit reason"
+  },
+  {
+   "fieldname": "duration_secs",
+   "fieldtype": "Int",
+   "label": "Time spent (secs)"
+  },
+  {
+   "fieldname": "attempted_on",
+   "fieldtype": "Datetime",
+   "label": "Attempted on"
+  },
+  {
+   "description": "JSON array of Module Test Question row ids shown on this paper (overlap audits).",
+   "fieldname": "paper",
+   "fieldtype": "Small Text",
+   "label": "Paper (question ids)"
+  },
+  {
+   "fieldname": "lang",
+   "fieldtype": "Data",
+   "label": "Language"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Data",
+   "label": "Cohort"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client id",
+   "no_copy": 1,
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-06 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Test Attempt",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student"
+}

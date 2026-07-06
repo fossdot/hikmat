@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-07-06 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "track",
+  "active",
+  "questions_per_paper",
+  "pass_pct",
+  "time_limit_secs",
+  "intro",
+  "intro_hi",
+  "questions"
+ ],
+ "fields": [
+  {
+   "fieldname": "track",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Track (module)",
+   "options": "Track",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "default": "10",
+   "description": "How many questions each student gets per attempt. Keep the bank at least 10× this size so two students' papers overlap ≤10%.",
+   "fieldname": "questions_per_paper",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Questions per paper"
+  },
+  {
+   "default": "60",
+   "fieldname": "pass_pct",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Pass %"
+  },
+  {
+   "default": "600",
+   "fieldname": "time_limit_secs",
+   "fieldtype": "Int",
+   "label": "Time limit (seconds)"
+  },
+  {
+   "description": "Optional note shown on the pre-test rules screen.",
+   "fieldname": "intro",
+   "fieldtype": "Small Text",
+   "label": "Intro note (English)"
+  },
+  {
+   "fieldname": "intro_hi",
+   "fieldtype": "Small Text",
+   "label": "Intro note (Hindi)"
+  },
+  {
+   "fieldname": "questions",
+   "fieldtype": "Table",
+   "label": "Question bank",
+   "options": "Module Test Question",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-06 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Module Test",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "track"
+}

@@ -24,7 +24,8 @@
   "voice_enabled",
   "stt_endpoint",
   "tts_endpoint",
-  "tts_voice"
+  "tts_voice",
+  "attendance_min_minutes"
  ],
  "fields": [
   {
@@ -136,6 +137,13 @@
    "fieldname": "tts_voice",
    "fieldtype": "Data",
    "label": "Piper Hindi voice"
+  },
+  {
+   "default": "150",
+   "description": "Active minutes per day for a Present mark — used by the Daily Attendance report only; students never see this.",
+   "fieldname": "attendance_min_minutes",
+   "fieldtype": "Int",
+   "label": "Attendance minimum (minutes/day)"
   }
  ],
  "grid_page_length": 50,

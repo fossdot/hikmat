@@ -198,7 +198,8 @@ def _build_courses():
     out = []
     published = frappe.get_all(
         "Track", filters={"published": 1},
-        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi", "band", "subject"],
+        fields=["name", "track_key", "title", "title_hi", "icon", "color", "blurb", "blurb_hi", "band", "subject",
+                "video", "video_title", "video_title_hi", "video_duration_secs", "video_captions", "video_captions_hi"],
         order_by="sort_order asc, creation asc",
     )
     for t in published:
@@ -254,6 +255,20 @@ def _track_json(t, with_content):
     }
     if not with_content:
         return track
+
+    # Explainer video (optional, streams online-only — the game shows a friendly
+    # offline card when unreachable). Keys are simply absent when no video is set,
+    # so old caches and the bundled fallback COURSES need no migration.
+    if (t.get("video") or "").strip():
+        track["videoUrl"] = t.video.strip()
+        track["videoTitle"] = t.get("video_title") or ""
+        track["videoTitleHi"] = t.get("video_title_hi") or ""
+        if _int(t.get("video_duration_secs")):
+            track["videoDuration"] = _int(t.get("video_duration_secs"))
+        if (t.get("video_captions") or "").strip():
+            track["videoCaptions"] = t.video_captions.strip()
+        if (t.get("video_captions_hi") or "").strip():
+            track["videoCaptionsHi"] = t.video_captions_hi.strip()
 
     lessons = frappe.get_all(
         "Lesson", filters={"track": t.name, "published": 1},
@@ -337,6 +352,28 @@ def _track_json(t, with_content):
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
             "email": email, "quiz": quiz,
         })
+
+    # Module test: the question bank ships WITH the curriculum so tests work fully
+    # offline (answers therefore exist in the client payload — accepted tradeoff: the
+    # audience is not dev-tools-savvy, and the anti-cheat targets the realistic threat
+    # of switching apps to ask/look up, not payload inspection). teach/teach_hi are
+    # deliberately NOT exported — no hints inside a test.
+    mt = frappe.db.get_value("Module Test", {"track": t.name, "active": 1},
+                             ["name", "questions_per_paper", "pass_pct", "time_limit_secs",
+                              "intro", "intro_hi"], as_dict=True)
+    if mt:
+        bank = [{"id": q.name, "q": q.question, "qHi": q.question_hi or "",
+                 "emoji": q.emoji or "", "choices": _split_lines(q.choices),
+                 "answer": (q.answer or "").strip()}
+                for q in frappe.get_all("Module Test Question", filters={"parent": mt.name},
+                                        fields=["name", "question", "question_hi", "emoji",
+                                                "choices", "answer"], order_by="idx asc")]
+        if bank:
+            track["test"] = {"questionsPerPaper": _int(mt.questions_per_paper) or 10,
+                             "passPct": _int(mt.pass_pct) or 60,
+                             "timeLimitSecs": _int(mt.time_limit_secs) or 600,
+                             "intro": mt.intro or "", "introHi": mt.intro_hi or "",
+                             "bank": bank}
     return track
 
 
@@ -422,6 +459,74 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
     if gate:
         out["milestone"] = gate
     return out
+
+
+_TEST_STATUS = {"completed": "Completed", "exited": "Exited", "timed_out": "Timed Out"}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_test(student=None, token=None, track=None, paper=None, score=0, total=0,
+                status=None, exit_reason=None, duration_secs=0, lang=None, client_id=None):
+    """Record one module-test attempt (the mandatory end-of-track test). Same
+    hardening as submit_attempt: rate cap, client_id idempotency, active-student +
+    token check, clamps. Two rules are SERVER-enforced so the client can't soften
+    them: an Exited (anti-cheat voided) attempt always scores 0, and pass/fail is
+    recomputed here against the Module Test's pass_pct — a timed-out paper still
+    counts what was answered (running out of time is not cheating)."""
+    if not _rate_ok("testsub:" + _client_ip(), 600, 3600):   # tests are ~10× rarer than activities
+        return {"ok": False, "error": "rate_limited"}
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if client_id:
+        existing = frappe.db.get_value("Test Attempt", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "name": existing, "dedup": True}
+    sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
+    if not sinfo or not sinfo.active:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+
+    st = _TEST_STATUS.get((status or "").strip().lower())
+    if not st:
+        return {"ok": False, "error": "bad_status"}
+    total = max(0, _int(total))
+    score = min(max(0, _int(score)), total)
+    if st == "Exited":                                       # voiding is not client-optional
+        score = 0
+    exit_reason = (exit_reason or "")[:40] if st == "Exited" else ""
+    try:
+        ids = json.loads(paper or "[]")
+        ids = [str(x)[:140] for x in ids[:100]] if isinstance(ids, list) else []
+    except Exception:
+        ids = []                                             # telemetry only — never reject the write
+
+    pass_pct = 60
+    track_doc = frappe.db.get_value("Track", {"track_key": (track or "")[:140]}, "name")
+    if track_doc:
+        pass_pct = _int(frappe.db.get_value("Module Test", {"track": track_doc}, "pass_pct")) or 60
+    pct = round(100 * score / total) if total else 0
+    passed = 1 if st in ("Completed", "Timed Out") and pct >= pass_pct else 0
+
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Test Attempt", "client_id": client_id or None,
+            "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
+            "track": (track or "")[:140], "paper": json.dumps(ids),
+            "score": score, "total": total, "pct": pct, "passed": passed,
+            "status": st, "exit_reason": exit_reason,
+            "duration_secs": max(0, min(7200, _int(duration_secs))),
+            "lang": (lang or "")[:10],
+            "attempted_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with a retry of the same client_id
+        frappe.db.rollback()
+        existing = frappe.db.get_value("Test Attempt", {"client_id": client_id}, "name")
+        return {"ok": True, "name": existing, "dedup": True}
+    frappe.db.commit()
+    return {"ok": True, "name": doc.name, "passed": bool(passed), "pct": pct}
 
 
 # ---------------------------------------------------------------------------
@@ -561,10 +666,13 @@ def log_event(student=None, token=None, kind=None, track=None, lesson=None, acti
       dwell        — time spent on an activity she LEFT without finishing (finished
                      time rides on Lesson Attempt.duration_secs); duration_secs
       tool_use     — batched taps of a UI tool (listen / lang_switch / replay …);
-                     tool + count, aggregated client-side per activity"""
+                     tool + count, aggregated client-side per activity
+      test_exit    — a module test was voided by the anti-cheat guard; tool carries
+                     the reason (hidden/blur/fullscreen_exit/pagehide/stopped),
+                     duration_secs = seconds into the test, count = question reached"""
     if not _rate_ok("event:" + _client_ip(), 6000, 3600):   # wrong answers come in bursts; keep the ceiling high
         return {"ok": False, "error": "rate_limited"}
-    if kind not in ("wrong_answer", "dwell", "tool_use"):
+    if kind not in ("wrong_answer", "dwell", "tool_use", "test_exit"):
         return {"ok": False, "error": "bad_kind"}
     duration_secs = max(0, min(7200, _int(duration_secs)))  # same 2h sanity cap as attempts
     count = max(1, min(1000, _int(count) or 1))
@@ -608,6 +716,118 @@ def log_event(student=None, token=None, kind=None, track=None, lesson=None, acti
         return {"ok": True, "name": existing, "dedup": True}
     frappe.db.commit()
     return {"ok": True, "name": doc.name}
+
+
+# ---------------------------------------------------------------------------
+# Attendance — the game banks a logged-in student's ACTIVE screen time on-device
+# and flushes it here in small deltas (offline-queued, idempotent). Two tiers:
+# Attendance Ping is the raw audit log (client_id-deduped), Attendance Day is the
+# per-(student, local-date) aggregate the facilitator reports read. Facilitator
+# report only — nothing about attendance is ever shown to students.
+# ---------------------------------------------------------------------------
+_ATT_PING_MAX_SECS = 900        # one ping can never claim more than 15 minutes
+_ATT_PAST_WINDOW_DAYS = 30      # matches the client's day store — a campus laptop
+                                # that stays offline for weeks must not lose real
+                                # attendance when it finally syncs
+_ATT_FUTURE_WINDOW_DAYS = 1     # tolerate a device clock slightly ahead
+
+
+@frappe.whitelist(allow_guest=True)
+def log_attendance(student=None, token=None, date=None, secs=0, client_id=None, device_id=None):
+    """Record one active-time delta. The client's LOCAL date is the day-of-record
+    (campus devices are offline; server date would misfile late-night syncs), and
+    received_on keeps the server-side audit anchor. The 900s per-ping cap means
+    forging a Present day (>=150 min) takes 10+ pings with unique client_ids —
+    visible in the audit trail — rather than one big number."""
+    if not _rate_ok("att:" + _client_ip(), 2000, 3600):     # a 30-laptop room ≈ 360/hr
+        return {"ok": False, "error": "rate_limited"}
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if client_id:
+        existing = frappe.db.get_value("Attendance Ping", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "dedup": True}
+    sinfo = frappe.db.get_value("Student", student,
+                                ["student_name", "cohort", "campus", "active"], as_dict=True)
+    if not sinfo or not sinfo.active:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+
+    try:
+        d = frappe.utils.getdate(date)
+    except Exception:
+        return {"ok": False, "error": "bad_date"}
+    today = frappe.utils.getdate()
+    if (today - d).days > _ATT_PAST_WINDOW_DAYS or (d - today).days > _ATT_FUTURE_WINDOW_DAYS:
+        return {"ok": False, "error": "date_out_of_range"}
+    secs = max(0, min(_ATT_PING_MAX_SECS, _int(secs)))
+    if secs <= 0:
+        return {"ok": False, "error": "bad_secs"}
+
+    # Upsert the Day aggregate FIRST, then insert the Ping. If the ping insert races
+    # a duplicate client_id, the rollback undoes the day increment too — so the
+    # dedup ledger (pings) and the aggregate can never drift apart. (Inserting the
+    # ping first would let a raced Day insert roll the ping away while keeping the
+    # seconds — the classic double-count on retry.)
+    min_minutes = _int(frappe.db.get_single_value("Hikmat Settings", "attendance_min_minutes")) or 150
+    now = frappe.utils.now()
+    for _attempt in range(2):
+        day_name = frappe.db.get_value("Attendance Day", {"student": student, "date": d}, "name")
+        try:
+            if day_name:
+                frappe.db.sql(
+                    """update `tabAttendance Day`
+                       set active_secs = active_secs + %s, last_ping = %s,
+                           present = (active_secs >= %s)
+                       where name = %s""",
+                    (secs, now, min_minutes * 60, day_name))
+            else:
+                frappe.get_doc({
+                    "doctype": "Attendance Day", "student": student,
+                    "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
+                    "campus": sinfo.get("campus"), "date": d,
+                    "active_secs": secs, "present": 1 if secs >= min_minutes * 60 else 0,
+                    "device_count": 1, "first_ping": now, "last_ping": now,
+                }).insert(ignore_permissions=True)
+            frappe.get_doc({
+                "doctype": "Attendance Ping", "client_id": client_id or None,
+                "student": student, "student_name": sinfo.get("student_name"),
+                "date": d, "secs": secs, "device_id": (device_id or "")[:60],
+                "received_on": now,
+            }).insert(ignore_permissions=True)
+            break
+        except frappe.DuplicateEntryError:
+            frappe.db.rollback()
+            # Either the same client_id landed twice (→ dedup, done) or two devices
+            # raced the first Day insert (→ retry once; the update path now wins).
+            if client_id and frappe.db.get_value("Attendance Ping", {"client_id": client_id}, "name"):
+                return {"ok": True, "dedup": True}
+    else:
+        return {"ok": False, "error": "conflict"}
+
+    # device_count from the audit trail (cheap: one day's pings for one student)
+    total, devices = frappe.db.sql(
+        """select coalesce(sum(secs), 0), count(distinct device_id)
+           from `tabAttendance Ping` where student=%s and date=%s""", (student, d))[0]
+    frappe.db.sql("update `tabAttendance Day` set device_count=%s where student=%s and date=%s",
+                  (max(1, _int(devices)), student, d))
+    frappe.db.commit()
+    return {"ok": True, "secs_today": _int(total), "present": _int(total) >= min_minutes * 60}
+
+
+def prune_attendance_pings():
+    """Daily housekeeping (hooks.py scheduler): raw pings older than 90 days are only
+    needed for client_id dedup and short-term audit — the client's own queue/day-store
+    horizon is 30 days, so a 90-day retention can never re-admit a replayed ping."""
+    try:
+        frappe.db.sql("delete from `tabAttendance Ping` where received_on < %s",
+                      frappe.utils.add_days(frappe.utils.now(), -90))
+        frappe.db.commit()
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "prune_attendance_pings")
 
 
 # ---------------------------------------------------------------------------
@@ -1195,7 +1415,28 @@ def get_progress(student=None, token=None):
         prog.setdefault(r.track, {}).setdefault(r.lesson, {})[r.activity] = r.stars or 0
     gates = {e.milestone: e.status for e in frappe.get_all(
         "Evaluation", filters={"student": student}, fields=["milestone", "status"])}
-    return {"progress": prog, "gates": gates, "gems": _total_gems(student)}
+    # Module tests: pass/best per track, plus the union of every question id this
+    # student has ever been served (ordered by first exposure) — so a girl on a NEW
+    # device keeps her no-repeat guarantee once she's online. Bounded by bank sizes.
+    tests = {}
+    for r in frappe.db.sql(
+            """select track, max(passed) as passed, max(pct) as best, count(*) as attempts
+               from `tabTest Attempt` where student=%s group by track""", student, as_dict=True):
+        tests[r.track] = {"passed": bool(r.passed), "bestPct": _int(r.best), "attempts": _int(r.attempts)}
+    test_seen = {}
+    if tests:
+        for a in frappe.get_all("Test Attempt", filters={"student": student},
+                                fields=["track", "paper"], order_by="attempted_on asc, creation asc"):
+            try:
+                ids = json.loads(a.paper or "[]")
+            except Exception:
+                ids = []
+            dst = test_seen.setdefault(a.track, [])
+            for qid in ids:
+                if qid not in dst:
+                    dst.append(qid)
+    return {"progress": prog, "gates": gates, "gems": _total_gems(student),
+            "tests": tests, "testSeen": test_seen}
 
 
 @frappe.whitelist()   # NOT allow_guest → requires a logged-in Desk user (facilitator / System Manager)
@@ -1215,6 +1456,14 @@ def delete_student(student):
         frappe.delete_doc("Lesson Doubt", d, force=1, ignore_permissions=True)
     for att in frappe.get_all("Lesson Attempt", filters={"student": student}, pluck="name"):
         frappe.delete_doc("Lesson Attempt", att, force=1, ignore_permissions=True)
+    for ta in frappe.get_all("Test Attempt", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Test Attempt", ta, force=1, ignore_permissions=True)
+    for ev in frappe.get_all("Learning Event", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Learning Event", ev, force=1, ignore_permissions=True)
+    for ap in frappe.get_all("Attendance Ping", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Attendance Ping", ap, force=1, ignore_permissions=True)
+    for ad in frappe.get_all("Attendance Day", filters={"student": student}, pluck="name"):
+        frappe.delete_doc("Attendance Day", ad, force=1, ignore_permissions=True)
     frappe.delete_doc("Student", student, force=1, ignore_permissions=True)
     frappe.db.commit()
     return {"ok": True, "deleted": name}

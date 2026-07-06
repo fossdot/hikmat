@@ -508,6 +508,25 @@
   .iconsvg svg { width:1em; height:1em; display:block; }
   .theme .big .iconsvg svg { width:46px; height:46px; }
   .maphead h2 .iconsvg svg { width:30px; height:30px; }
+
+  /* ---- Module test ---- */
+  .testhead { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .testtimer { font-weight:800; font-size:20px; font-variant-numeric:tabular-nums;
+               padding:6px 14px; border:2px solid var(--line); border-radius:999px;
+               background:var(--card); color:var(--ink); min-width:74px; text-align:center; }
+  /* urgent = last minute; #9d2929 on the light card / #ffb4ab on the dark card are both AA */
+  .testtimer.urgent { color:#9d2929; border-color:#9d2929; animation:tpulse 1s ease-in-out infinite; }
+  [data-theme="dark"] .testtimer.urgent { color:#ffb4ab; border-color:#ffb4ab; }
+  @keyframes tpulse { 50% { transform:scale(1.07); } }
+  .rulerow { display:flex; gap:12px; align-items:flex-start; background:var(--card);
+             border:2px solid var(--line); border-radius:14px; padding:12px 14px; margin:8px 0;
+             text-align:left; font-weight:700; }
+  .rulerow .ric { font-size:26px; line-height:1.1; }
+  .quizopt.sel { outline:3px solid var(--ink); font-weight:800; }
+  /* ---- Module explainer video ---- */
+  .videowrap { width:100%; background:#000; border:2px solid var(--line); border-radius:16px;
+               overflow:hidden; aspect-ratio:16/9; margin-top:10px; }
+  .videowrap video { width:100%; height:100%; display:block; }
 </style>
 </head>
 <body>
@@ -766,7 +785,7 @@ function levelsFor(lesson){
 let currentStudent = null;
 try { currentStudent = JSON.parse(localStorage.getItem("hikmat_current")) || null; } catch(e){}
 function stateKey(){ return "hikmat_state_" + (currentStudent ? currentStudent.id : "guest"); }
-function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true }; }
+function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true, testSeen:{}, testPassed:{}, videosSeen:{} }; }
 function loadState(){
   try { return JSON.parse(localStorage.getItem(stateKey())) || fresh(); }
   catch(e){ return fresh(); }
@@ -786,6 +805,62 @@ function lessonEarned(ck, lk){ const o=((state.progress||{})[ck]||{})[lk]||{}; l
 function lessonMax(lesson){ return levelsFor(lesson).length * 3; }                 // activities × 3 stars
 function trackEarned(ck){ const c=(state.progress||{})[ck]||{}; let t=0; for(const l in c) t+=lessonEarned(ck,l); return t; }
 function totalStars(){ let t=0; const p=state.progress||{}; for(const c in p) t+=trackEarned(c); return t; }
+
+// ---------- Module tests: per-student question-bank bookkeeping ----------
+// state.testSeen[trackKey]  = [questionId, ...] ordered by FIRST exposure (an LRU list:
+//                             re-served ids move to the back, so repeats are maximally spaced)
+// state.testPassed[trackKey] = { passed, bestPct, attempts }
+// (Writers must guard with `state.testSeen = state.testSeen || {}` — states saved before
+// this feature existed load without these keys.)
+function testPassedFor(ck){ const t = (state.testPassed||{})[ck]; return !!(t && t.passed); }
+// Tracks in the same (band, subject) group — Life Skills (no band) is its own group —
+// form a chain in COURSES order; used for "pass the test to open the next module".
+function trackGroup(course){
+  return COURSES.filter(c => (c.band||"")===(course.band||"") &&
+                             (c.subject||"")===(course.subject||"") &&
+                             c.published && c.lessons.length);
+}
+function nextTrackInGroup(course){
+  const g = trackGroup(course), i = g.findIndex(c => c.key===course.key);
+  return i>=0 ? (g[i+1] || null) : null;
+}
+// The earlier track whose unpassed test blocks `course` (null = nothing blocks).
+// Tracks without an active test never block; stale caches without `test` are fail-open.
+function prevTestBlocker(course){
+  const g = trackGroup(course), i = g.findIndex(c => c.key===course.key);
+  if(i <= 0) return null;
+  const prev = g[i-1];
+  return (prev.test && prev.test.bank && prev.test.bank.length && !testPassedFor(prev.key)) ? prev : null;
+}
+// Burn served question ids into the seen-list (LRU move-to-back). Voided papers burn
+// too — she saw those questions — which keeps this list identical to the server's
+// union-of-papers, so devices converge.
+function burnPaper(ck, ids){
+  state.testSeen = state.testSeen || {};
+  const list = state.testSeen[ck] = state.testSeen[ck] || [];
+  ids.forEach(id => { const i = list.indexOf(id); if(i >= 0) list.splice(i, 1); list.push(id); });
+}
+// Draw a fresh paper: random n questions the student has NOT seen, falling back to the
+// longest-ago-seen ones when the bank is nearly exhausted (no reset, no facilitator step).
+// Random sampling from a bank ≥10× the paper keeps two students' expected overlap ≤10%
+// (enforced softly by Desk validation on Module Test). Question order and choice order
+// are shuffled per paper and then FROZEN, so a language toggle can't reshuffle mid-test.
+function buildPaper(course){
+  const t = course.test;
+  const n = Math.min(t.bank.length, Math.max(1, t.questionsPerPaper || 10));
+  const seenArr = ((state.testSeen||{})[course.key]) || [];
+  const seenSet = new Set(seenArr);
+  const unseen = t.bank.filter(q => !seenSet.has(q.id));
+  let picked;
+  if(unseen.length >= n) picked = shuffle(unseen).slice(0, n);
+  else {
+    const byId = {}; t.bank.forEach(q => byId[q.id] = q);
+    const reuse = seenArr.map(id => byId[id]).filter(Boolean).slice(0, n - unseen.length);
+    picked = unseen.concat(reuse);
+  }
+  const qs = shuffle(picked).map(q => ({ ...q, choices: shuffle(q.choices) }));
+  return { clientId: uid(), qs, reused: unseen.length < n };
+}
 
 // ---------- Speech (offline, macOS voices) ----------
 let voices = [];
@@ -881,6 +956,8 @@ function setNarration(en, hi){
   if(isStandalone() && narration.en) hearNarration();
 }
 function hearNarration(){
+  // narration and a playing explainer video must not talk over each other on shared laptops
+  document.querySelectorAll("video").forEach(v => { try { v.pause(); } catch(e){} });
   if(narration.en) speak(tx(narration.en, narration.hi || narration.en), state.lang === "hi" ? "hi" : "en");
 }
 
@@ -1073,7 +1150,7 @@ function renderPath(items){
     const p = pts[i];
     const shape = NODE_SHAPES[i % NODE_SHAPES.length];
     const step = el(`<div class="step ${it.cls||''}" style="top:${TOP + i*ROW}px; height:${D}px">
-      <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${i+1}</span>${it.extras||""}</button>
+      <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${it.num != null ? esc(String(it.num)) : i+1}</span>${it.extras||""}</button>
       <div class="labelblock" style="left:${p.x + NR + LABELGAP}px; height:${D}px">
         <div class="label">${esc(it.label)}</div>
         <div class="ls">${it.sub||""}</div>
@@ -1154,15 +1231,23 @@ function progressOf(tracks){
 function trackCard(course, back){
   const earned = trackEarned(course.key), maxStars = trackMax(course);
   const locked = !course.published || course.lessons.length===0;
+  // module-test chain: a NEVER-played track stays behind the previous track's test;
+  // anything already started remains fully accessible (soft lock, like belt gates)
+  const blocker = (!locked && earned===0) ? prevTestBlocker(course) : null;
   const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
       style="${locked?"":`background:linear-gradient(160deg,${col(course.color)}dd,${col(course.color)})`}">
-    ${locked ? `<span class="lock">🔒</span>` : ""}
+    ${locked ? `<span class="lock">🔒</span>` : (blocker ? `<span class="lock">🔒</span>` : "")}
     <div class="big">${iconFor(["track:"+course.key, "subject:"+course.subject], course.icon)}</div>
     <h3>${esc(tx(course.title, course.titleHi))}</h3>
     <small>${locked ? tx("Coming soon","जल्द आ रहा है")
-                    : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : esc(tx(course.blurb, course.blurbHi)))}</small>
+                    : (blocker ? esc(tx("Pass the "+blocker.title+" test first","पहले "+(blocker.titleHi||blocker.title)+" की परीक्षा पास करो"))
+                    : (earned>0 ? `<span class="staricon">★</span> ${earned}/${maxStars}` : esc(tx(course.blurb, course.blurbHi))))}</small>
   </button>`);
-  if(!locked) node.onclick = () => { sfx.enter(); renderTrack(course, back); };
+  if(!locked) node.onclick = () => {
+    const b = trackEarned(course.key)===0 ? prevTestBlocker(course) : null;
+    if(b){ sfx.locked(); renderTestWall(b, course, back); return; }
+    sfx.enter(); renderTrack(course, back);
+  };
   return node;
 }
 // A grade-band card (1–4 / 5–8 / 9–10) → opens the subject grid. null if the band has no content.
@@ -1468,6 +1553,49 @@ function renderGateWall(m, backFn){
   refreshTop();
 }
 
+// ---------- Module-test gates ----------
+// Same soft-lock philosophy as the belt gates: NEW content waits behind the previous
+// module's test, but anything she has already played stays replayable. Detection is
+// client-side (works offline); a pass on another device syncs down via get_progress.
+function testGate(course, lesson, back){
+  const blocker = prevTestBlocker(course);
+  if(!blocker) return true;
+  if(lessonEarned(course.key, lesson.key) > 0) return true;   // already played → replay freely
+  renderTestWall(blocker, course, back);
+  return false;
+}
+function renderTestWall(prev, course, back){
+  stopSpeech(); rerender = () => renderTestWall(prev, course, back);
+  root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), () => renderHome());
+  const prevTitle = tx(prev.title, prev.titleHi || prev.title);
+  const nextTitle = tx(course.title, course.titleHi || course.title);
+  root.appendChild(el(`<div class="screen">
+    <div class="hero">
+      <div class="mascot big m-happy">${mascotSVG()}</div>
+      <h1>🏆 ${tx("One test to go!","बस एक परीक्षा बाकी!")}</h1>
+      <p>${esc(tx("Pass the "+prevTitle+" module test to open "+nextTitle+".",
+                  prevTitle+" की मॉड्यूल परीक्षा पास करो, फिर "+nextTitle+" खुलेगा।"))}</p>
+    </div>
+    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px">
+      <button class="btn primary" id="twGo">${tx("Go to the test →","परीक्षा पर जाओ →")}</button>
+      <button class="btn ghost" id="twCheck">${tx("🔄 Check again","🔄 फिर से देखो")}</button>
+    </div>
+  </div>`));
+  const narr = tx("Pass the "+prevTitle+" module test to open "+nextTitle+". Tap 'Go to the test'.",
+                  prevTitle+" की परीक्षा पास करो, फिर "+nextTitle+" खुलेगा। 'परीक्षा पर जाओ' दबाओ।");
+  setNarration(narr, narr); srSay(narr);
+  $("#twGo").onclick = () => { sfx.enter(); renderTrack(prev, back); };
+  $("#twCheck").onclick = async () => {
+    sfx.tap();
+    await mergeServerProgress();                 // a pass on another device unlocks here
+    if(prevTestBlocker(course)){
+      flashToast(tx("Not passed yet — you can do it! 💛","अभी पास नहीं हुई — तुम कर सकती हो! 💛"));
+    } else { sfx.complete(); renderTrack(course, back); }
+  };
+  moveFocusToTop(); refreshTop();
+}
+
 function renderTrack(course, back){
   back = back || { label: tx("← Home","← घर"), fn: renderHome };
   stopSpeech();
@@ -1482,7 +1610,6 @@ function renderTrack(course, back){
   </div>`);
   root.appendChild(s);
   setBack(back.label, back.fn);
-  setNarration(tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।"), tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।"));
   const wrap = $("#path");
   // a lesson is "complete" (green) once every one of its activities has at least 1 star
   const isComplete = ls => levelsFor(ls).every(lv => getStars(course.key, ls.key, lv.id) > 0);
@@ -1493,15 +1620,160 @@ function renderTrack(course, back){
     const cls = done ? "done" : (i===firstIncomplete ? "current" : "");
     return {
       cls,
+      num: i+1,               // keep lesson numbering stable even when a video node sits above
       face: done ? "✓" : "📚",
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(ls.title, ls.titleHi),
       sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
-      onClick: () => { if(!guestGate(course, ls, back)) return; if(!gateGate(course, ls, back)) return; sfx.enter(); renderLessonMap(course, ls, back); },
+      onClick: () => { if(!guestGate(course, ls, back)) return; if(!gateGate(course, ls, back)) return; if(!testGate(course, ls, back)) return; sfx.enter(); renderLessonMap(course, ls, back); },
     };
   });
+  let narr = tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।");
+  // 📺 optional explainer video sits at the TOP of the trail — never gates progress
+  if(course.videoUrl){
+    items.unshift({
+      cls: (state.videosSeen||{})[course.key] ? "done" : "",
+      num: "▶", face: "📺",
+      label: tx(course.videoTitle || "Watch the video", course.videoTitleHi || course.videoTitle || "वीडियो देखो"),
+      sub: videoNodeSub(course),
+      onClick: () => { sfx.enter(); renderVideo(course, back); },
+    });
+    narr += " " + tx("There is a video lesson at the top.","सबसे ऊपर एक वीडियो पाठ है।");
+  }
+  // 🏆 the module test closes the trail — unlocked once every lesson has ≥1 star everywhere
+  const hasTest = course.test && course.test.bank && course.test.bank.length;
+  if(hasTest){
+    const allDone = course.lessons.every(isComplete);
+    const tp = (state.testPassed||{})[course.key];
+    const tcls = !allDone ? "locked" : (tp && tp.passed ? "done" : "current");
+    items.push({
+      cls: tcls,
+      num: course.lessons.length + 1,
+      face: !allDone ? "🔒" : (tp && tp.passed ? "✓" : "🏆"),
+      extras: tcls==="current" ? `<span class="starttag">${tx("TEST","परीक्षा")}</span><span class="sparkle">✨</span>` : "",
+      label: tx("Module Test","मॉड्यूल परीक्षा"),
+      sub: !allDone ? tx("Finish all lessons first","पहले सभी पाठ पूरे करो")
+           : (tp && tp.passed ? esc(tx("Passed · best "+tp.bestPct+"%","पास · सर्वश्रेष्ठ "+tp.bestPct+"%"))
+                              : tx("Ready! Take the test","तैयार! परीक्षा दो")),
+      onClick: !allDone
+        ? (() => { sfx.locked(); const m = tx("Finish all lessons first.","पहले सभी पाठ पूरे करो।"); srSay(m); sayHi("पहले सभी पाठ पूरे करो"); })
+        : (() => {
+            // tests need a real profile: results must be saved and follow her across
+            // laptops, and a guest's pass would evaporate on signup (never via guestGate —
+            // that would burn a free-lesson slot on a non-lesson)
+            if(!currentStudent){ renderGuestWall(lessonGroup(course), () => renderTrack(course, back)); return; }
+            sfx.enter(); renderTestIntro(course, back);
+          }),
+    });
+    if(allDone && !(tp && tp.passed)) narr += " " + tx("All lessons done — the module test is open!","सभी पाठ पूरे — मॉड्यूल परीक्षा खुल गई है!");
+  }
+  setNarration(narr, narr);
   renderPath(items);
   refreshTop();
+}
+
+// ---------- 📺 Module explainer video (Frappe-hosted, streams ONLINE ONLY) ----------
+// The one deliberate exception to offline-first: long-form video is too heavy to bundle,
+// so offline it degrades to a warm "needs internet" card — never an error tone, and it
+// never gates progress. No autoplay (30 shared laptops must not blast audio).
+function canStreamVideo(){ return backendLive && navigator.onLine && location.protocol.indexOf("http") === 0; }
+function fmtMin(secs){ const m = Math.max(1, Math.round(secs/60)); return tx(m+" min", m+" मिनट"); }
+function videoNodeSub(course){
+  if(!canStreamVideo()) return tx("Needs internet","इंटरनेट चाहिए");
+  return course.videoDuration ? esc(fmtMin(course.videoDuration)) : tx("Video","वीडियो");
+}
+// Watch analytics: seconds actually watched, flushed ONCE per screen visit (module-scoped
+// so a rerender/pagehide can't lose or double-count them). Rides the existing tool_use
+// event kind — duration_secs carries the seconds (stored for any kind server-side).
+let _vid = null;          // {course, secs, lastT, flushed, played}
+let _vidWatchdog = null;  // stall watchdog for the CURRENT render only
+function flushVideoWatch(){
+  if(!_vid || _vid.flushed) return;
+  _vid.flushed = true;
+  if(_vid.secs >= 5)      // <5s = misclick, same rule as dwell events
+    recordEvent({ kind:"tool_use", tool:"video_watch", track:_vid.course.key, activity:"video",
+                  duration_secs: Math.min(7200, Math.round(_vid.secs)), count: 1 });
+}
+function renderVideo(course, back){
+  stopSpeech();
+  clearTimeout(_vidWatchdog); _vidWatchdog = null;   // a leftover watchdog must never fire into this render
+  flushVideoWatch();                                 // rerender (language toggle) flushes the previous visit
+  _vid = { course, secs: 0, lastT: null, flushed: false, played: false };
+  rerender = () => renderVideo(course, back);
+  root.innerHTML = "";
+  const title = tx(course.videoTitle || course.title, course.videoTitleHi || course.titleHi);
+  const goBack = () => { clearTimeout(_vidWatchdog); _vidWatchdog = null; flushVideoWatch(); renderTrack(course, back); };
+  const offlineCard = (broken) => `
+    <div class="hero">
+      <div class="mascot big m-happy">${mascotSVG()}</div>
+      <h1>☁️📺 ${broken ? tx("The video is not working","वीडियो चल नहीं रहा") : tx("This video needs the internet","यह वीडियो इंटरनेट से चलता है")}</h1>
+      <p>${broken ? tx("Tell didi — she can fix it. You can keep playing the lessons!","दीदी को बताओ — वे ठीक कर देंगी। तब तक पाठ खेलती रहो!")
+                  : tx("Ask didi to open it when the internet is on. You can keep playing the lessons!","जब इंटरनेट आए, तब दीदी से खोलने को कहो। तब तक पाठ खेलती रहो!")}</p>
+    </div>
+    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px">
+      <button class="btn primary" id="vRetry">🔄 ${tx("Check again","फिर से देखो")}</button>
+      <button class="btn ghost" id="vBack">← ${tx("Back","वापस")}</button>
+    </div>`;
+  const showFallback = (broken) => {
+    root.innerHTML = "";
+    root.appendChild(el(`<div class="screen"><div class="maphead"><div><h2>📺 ${esc(title)}</h2></div></div>${offlineCard(broken)}</div>`));
+    const narr2 = broken ? tx("The video could not play. Tell didi. You can keep playing the lessons.","वीडियो चल नहीं पाया। दीदी को बताओ। तब तक पाठ खेलती रहो।")
+                         : tx("This video needs the internet. Ask didi when the internet is on.","यह वीडियो इंटरनेट से चलता है। इंटरनेट आने पर दीदी से कहो।");
+    setNarration(narr2, narr2);
+    $("#vBack").onclick = () => { sfx.back(); goBack(); };
+    $("#vRetry").onclick = async () => {
+      sfx.tap();
+      const s = await api("get_settings");           // cheap reachability probe; also revives backendLive mid-session
+      if(s) backendLive = true;
+      if(canStreamVideo()){ renderVideo(course, back); }
+      else { const m = tx("Still no internet 💛","अभी भी इंटरनेट नहीं है 💛"); flashToast(m); srSay(m); }
+    };
+    moveFocusToTop(); refreshTop();
+  };
+  setBack("← " + tx(course.title, course.titleHi), goBack);
+  if(!canStreamVideo()){ showFallback(false); return; }
+  root.appendChild(el(`<div class="screen">
+    <div class="maphead"><div><h2>📺 ${esc(title)}</h2>
+      <div class="sub">${course.videoDuration ? esc(fmtMin(course.videoDuration)) : tx("Video lesson","वीडियो पाठ")}</div></div></div>
+    <div class="videowrap">
+      <video id="trackVideo" controls playsinline preload="metadata" aria-label="${escAttr(title)}">
+        <source src="${escAttr(course.videoUrl)}">
+        ${course.videoCaptionsHi ? `<track kind="subtitles" srclang="hi" label="हिन्दी" src="${escAttr(course.videoCaptionsHi)}" ${state.lang==="hi"?"default":""}>` : ""}
+        ${course.videoCaptions ? `<track kind="subtitles" srclang="en" label="English" src="${escAttr(course.videoCaptions)}" ${state.lang!=="hi"?"default":""}>` : ""}
+      </video>
+    </div>
+  </div>`));
+  const narr = tx(title+". This is a video lesson. Tap the big play button to watch.",
+                  title+". यह एक वीडियो पाठ है। देखने के लिए प्ले बटन पर टैप करो।");
+  setNarration(narr, narr);
+  const v = $("#trackVideo");
+  const broke = () => { clearTimeout(_vidWatchdog); _vidWatchdog = null;
+                        srSay(tx("The video could not load.","वीडियो चल नहीं पाया।")); showFallback(true); };
+  v.addEventListener("error", broke);
+  const lastSource = v.querySelector("source"); if(lastSource) lastSource.addEventListener("error", broke);
+  v.addEventListener("play", () => {
+    stopSpeech();                                     // narration must never talk over the video
+    if(_vid && !_vid.played){ _vid.played = true;
+      recordEvent({ kind:"tool_use", tool:"video_play", track:course.key, activity:"video", count:1 }); }
+    // stalled/waiting fire spuriously on slow links — instead: if nothing is buffered
+    // 20s after play, treat it as broken (cleared by timeupdate below)
+    clearTimeout(_vidWatchdog);
+    _vidWatchdog = setTimeout(() => { if(v.isConnected && v.readyState < 2) broke(); }, 20000);
+  });
+  v.addEventListener("timeupdate", () => {
+    clearTimeout(_vidWatchdog); _vidWatchdog = null;
+    if(typeof ATT !== "undefined" && ATT) ATT.lastActivity = Date.now();   // watching counts as active (attendance)
+    if(!_vid) return;
+    const t = v.currentTime;
+    if(_vid.lastT != null){ const d = t - _vid.lastT; if(d > 0 && d < 2) _vid.secs += d; }  // ignore seeks
+    _vid.lastT = t;
+  });
+  v.addEventListener("ended", () => {
+    state.videosSeen = state.videosSeen || {};
+    state.videosSeen[course.key] = 1; save();
+    flushVideoWatch();
+  });
+  moveFocusToTop(); refreshTop();
 }
 
 // LESSON screen — the 5 activities (the vertical path) for one lesson
@@ -1981,6 +2253,302 @@ function startLevel(course, lesson, lv, back){
   }
 }
 
+// ============================================================
+//  MODULE TEST — mandatory once a track's lessons are done.
+//  Anti-cheat contract (told to the child up front, in her language, out loud):
+//  leaving the screen ends the test and the attempt does not count. Signals:
+//  visibilitychange(hidden) — tab/app switch, minimize (primary, works everywhere)
+//  blur with a 1.5s refocus grace — window switch (grace absorbs stray OS popups)
+//  fullscreenchange exit — only after fullscreen was actually granted (iOS has none)
+//  pagehide — reload/close (the voided attempt is queued synchronously, so it survives)
+//  Plus: copy/paste/context-menu blocked, the Roshni AI overlay is hidden for the
+//  duration (it could answer the question!), and a voluntary "Stop the test" button
+//  exists so a stuck child is never trapped into "misbehaving" her way out.
+//  Timing out is NOT cheating: answered-so-far submits and can still pass.
+// ============================================================
+let TEST = null;   // {course, back, paper, idx, score, deadline, t0, timerIv, fsEntered, done, wake, _h, _blurT, _warned}
+
+function renderTestIntro(course, back){
+  stopSpeech(); rerender = () => renderTestIntro(course, back);
+  root.innerHTML = "";
+  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course, back));
+  const t = course.test;
+  const n = Math.min(t.bank.length, Math.max(1, t.questionsPerPaper || 10));
+  const mins = Math.max(1, Math.round((t.timeLimitSecs || 600) / 60));
+  const seenCount = (((state.testSeen||{})[course.key]) || []).length;
+  const willReuse = (t.bank.length - seenCount) < n;
+  const rules = [
+    ["⏱", tx("You have "+mins+" minutes.","तुम्हारे पास "+mins+" मिनट हैं।")],
+    ["❓", tx(n+" questions — no hints, no retries.",n+" सवाल — कोई संकेत नहीं, कोई दोबारा मौका नहीं।")],
+    ["🚪", tx("Do not leave this screen. If you switch apps or leave, the test ends and does not count.",
+              "यह स्क्रीन मत छोड़ो। अगर तुम ऐप बदलोगी या बाहर जाओगी, परीक्षा खत्म हो जाएगी और गिनी नहीं जाएगी।")],
+  ];
+  root.appendChild(el(`<div class="screen">
+    <div class="hero">
+      <h1>🏆 ${tx("Module Test","मॉड्यूल परीक्षा")}</h1>
+      <p>${esc(tx(course.title, course.titleHi))}</p>
+      ${t.intro || t.introHi ? `<p>${esc(tx(t.intro || t.introHi, t.introHi || t.intro))}</p>` : ""}
+    </div>
+    <div>${rules.map(r => `<div class="rulerow"><span class="ric">${r[0]}</span><span>${esc(r[1])}</span></div>`).join("")}</div>
+    ${willReuse ? `<div class="center" style="margin-top:6px"><div class="savechip">${tx("You have practiced a lot — some questions may repeat.","तुमने खूब अभ्यास किया है — कुछ सवाल दोहराए जा सकते हैं।")}</div></div>` : ""}
+    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px">
+      <button class="btn primary" id="tstart">${tx("Start the test →","परीक्षा शुरू करो →")}</button>
+      <button class="btn ghost" id="tback">← ${tx("Not yet","अभी नहीं")}</button>
+    </div>
+  </div>`));
+  const narr = rules.map(r => r[1]).join(" ") + " " +
+               tx("Keep the screen awake. Tap Start when you are ready.","स्क्रीन जगी रखना। तैयार होने पर 'शुरू करो' दबाओ।");
+  setNarration(narr, narr);
+  $("#tback").onclick = () => { sfx.back(); renderTrack(course, back); };
+  $("#tstart").onclick = () => {
+    sfx.enter();
+    // Fullscreen is best-effort hardening (iOS Safari has no requestFullscreen — the
+    // visibility/blur guards are the primary signal there). Guards arm after a beat so
+    // the fullscreen transition itself can't trip them.
+    try { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+          if(p && p.catch) p.catch(() => {}); } catch(e){}
+    setTimeout(() => startTest(course, back), 400);
+  };
+  moveFocusToTop(); refreshTop();
+}
+
+function startTest(course, back){
+  const paper = buildPaper(course);
+  TEST = { course, back, paper, idx: 0, score: 0, done: false,
+           deadline: Date.now() + (course.test.timeLimitSecs || 600) * 1000,
+           t0: Date.now(), timerIv: null, fsEntered: !!document.fullscreenElement,
+           wake: null, _h: null, _blurT: null, _warned: false };
+  try {   // keep the screen awake — an OS screen-blank mid-thought must not void her test
+    if(navigator.wakeLock && navigator.wakeLock.request)
+      navigator.wakeLock.request("screen").then(w => { if(TEST) TEST.wake = w; else w.release(); }).catch(() => {});
+  } catch(e){}
+  setBack(null);                       // no back button: finish, stop, or time-out are the exits
+  rerender = renderTestQ;              // language toggle re-renders the frozen question in place
+  armTestGuards();
+  if(document.hidden){ voidTest("hidden"); return; }   // never arm into an already-hidden tab
+  TEST.timerIv = setInterval(testTick, 500);
+  renderTestQ();
+}
+
+function testTick(){
+  const T = TEST; if(!T || T.done) return;
+  const left = Math.max(0, T.deadline - Date.now());
+  const tt = $("#ttimer");
+  if(tt){
+    const s = Math.ceil(left / 1000);
+    tt.textContent = Math.floor(s/60) + ":" + String(s%60).padStart(2, "0");
+    if(s <= 60 && !T._warned){
+      T._warned = true; tt.classList.add("urgent");
+      sfx.tap();                                        // a neutral cue — the "wrong" sound would read as blame
+      srSay(tx("One minute left","एक मिनट बचा"));
+    } else if(s <= 60){ tt.classList.add("urgent"); }
+  }
+  if(left <= 0) endTest("timed_out");
+}
+
+function renderTestQ(){
+  const T = TEST; if(!T || T.done) return;
+  const qs = T.paper.qs, n = qs.length;
+  let q = qs[T.idx];
+  // malformed row (bank imported past Desk validation): count it correct and move on —
+  // a scored, no-retry test must never show an unanswerable question (mirrors roundQuiz)
+  while(q && (!Array.isArray(q.choices) || !q.choices.includes(q.answer))){
+    T.score++; T.idx++;
+    if(T.idx >= n){ endTest("completed"); return; }
+    q = qs[T.idx];
+  }
+  if(!q){ endTest("completed"); return; }
+  stopSpeech();
+  root.innerHTML = "";
+  const qText = tx(q.q, q.qHi || q.q);
+  root.appendChild(el(`<div class="screen gameplay">
+    <div class="maphead testhead">
+      <div><h2>🏆 ${tx("Test","परीक्षा")}</h2>
+        <div class="sub">${esc(tx("Question "+(T.idx+1)+" of "+n, n+" में से सवाल "+(T.idx+1)))}</div></div>
+      <div class="testtimer" id="ttimer" role="timer"></div>
+    </div>
+    <div class="progress"><div id="bar" style="width:${(T.idx/n)*100}%"></div></div>
+    <div class="gamebody">
+      <div class="bubble2"><div class="q">${esc(qText)}</div></div>
+      ${q.emoji ? `<div class="quizemoji">${esc(q.emoji)}</div>` : ""}
+      <div class="options quizopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>
+    </div>
+    <div class="gamefooter"><button class="btn ghost" id="tstop">✋ ${tx("Stop the test","परीक्षा रोको")}</button></div>
+  </div>`));
+  setNarration(qText, q.qHi || q.q);                    // 🔊 re-reads THIS question, not stale rules
+  announce(() => speak(qText, state.lang==="hi" ? "hi" : "en"));
+  const opts = $("#opts");
+  let answered = false;
+  q.choices.forEach(c => {                              // frozen per-paper order — no reshuffle on rerender
+    const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+    b.onclick = () => {
+      if(answered || !TEST || TEST.done) return;
+      answered = true;
+      document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+      b.classList.add("sel");                           // neutral: nothing may leak right/wrong mid-test
+      sfx.tap();
+      const fb = $("#fb"); if(fb){ fb.textContent = tx("Saved ✓","दर्ज ✓"); fb.className = "feedback"; }
+      if(c === q.answer) TEST.score++;
+      setTimeout(() => {
+        if(!TEST || TEST.done) return;
+        TEST.idx++;
+        TEST.idx >= n ? endTest("completed") : renderTestQ();
+      }, 350);
+    };
+    opts.appendChild(b);
+  });
+  $("#tstop").onclick = () => { sfx.tap(); voidTest("stopped"); };
+  testTick();
+  moveFocusToTop(); refreshTop();
+}
+
+// ---- anti-cheat guards (armed only between Start and any terminal state) ----
+function armTestGuards(){
+  const T = TEST; if(!T) return;
+  const fab = document.getElementById("roshniFab"); if(fab) fab.remove();   // the AI tutor could answer the question
+  const h = T._h = {};
+  h.vis   = () => { if(document.hidden) voidTest("hidden"); };
+  h.blur  = () => { if(!TEST || TEST.done || TEST._blurT) return;
+                    TEST._blurT = setTimeout(() => { if(TEST && !TEST.done) voidTest("blur"); }, 1500); };
+  h.focus = () => { if(TEST && TEST._blurT){ clearTimeout(TEST._blurT); TEST._blurT = null; } };
+  h.fs    = () => { if(!TEST || TEST.done) return;
+                    if(document.fullscreenElement) TEST.fsEntered = true;
+                    else if(TEST.fsEntered) voidTest("fullscreen_exit"); };
+  h.hide  = () => voidTest("pagehide");
+  h.block = e => e.preventDefault();
+  document.addEventListener("visibilitychange", h.vis);
+  window.addEventListener("blur", h.blur);
+  window.addEventListener("focus", h.focus);
+  document.addEventListener("fullscreenchange", h.fs);
+  window.addEventListener("pagehide", h.hide);
+  ["contextmenu","copy","paste"].forEach(ev => document.addEventListener(ev, h.block));
+}
+function disarmTestGuards(){
+  const T = TEST; if(!T || !T._h) return;
+  const h = T._h;
+  if(T._blurT){ clearTimeout(T._blurT); T._blurT = null; }
+  document.removeEventListener("visibilitychange", h.vis);
+  window.removeEventListener("blur", h.blur);
+  window.removeEventListener("focus", h.focus);
+  document.removeEventListener("fullscreenchange", h.fs);
+  window.removeEventListener("pagehide", h.hide);
+  ["contextmenu","copy","paste"].forEach(ev => document.removeEventListener(ev, h.block));
+  T._h = null;
+}
+function _testTeardown(T){
+  disarmTestGuards();
+  clearInterval(T.timerIv);
+  try { if(T.wake) T.wake.release(); } catch(e){}
+  try { if(document.fullscreenElement) document.exitFullscreen(); } catch(e){}
+}
+function _testSeenIds(T){   // only the questions actually DISPLAYED burn / get recorded
+  return T.paper.qs.slice(0, Math.min(T.idx + 1, T.paper.qs.length)).map(q => q.id);
+}
+
+function voidTest(reason){
+  const T = TEST; if(!T || T.done) return;
+  T.done = true;
+  _testTeardown(T);
+  const n = T.paper.qs.length;
+  const seen = _testSeenIds(T);
+  const secs = Math.min(Math.round((Date.now() - T.t0) / 1000), 7200);
+  burnPaper(T.course.key, seen);                        // she saw them — a retake gets fresh ones
+  state.testPassed = state.testPassed || {};
+  const st = state.testPassed[T.course.key] || { passed:false, bestPct:0, attempts:0 };
+  st.attempts = (st.attempts||0) + 1;
+  state.testPassed[T.course.key] = st;
+  save();                                               // synchronous — survives pagehide
+  recordTest({ track: T.course.key, paper: JSON.stringify(seen), score: 0, total: n,
+               status: "exited", exit_reason: reason, duration_secs: secs }, T.paper.clientId);
+  recordEvent({ kind:"test_exit", track: T.course.key, activity: "test", tool: reason,
+                duration_secs: secs, count: T.idx + 1 });
+  const course = T.course, back = T.back;
+  TEST = null;
+  renderTestVoided(course, back, reason);
+}
+
+function endTest(status){
+  const T = TEST; if(!T || T.done) return;
+  T.done = true;
+  _testTeardown(T);
+  const n = T.paper.qs.length;
+  const pct = n ? Math.round(100 * T.score / n) : 0;
+  const passed = pct >= (T.course.test.passPct || 60);  // server recomputes authoritatively on sync
+  burnPaper(T.course.key, _testSeenIds(T));
+  state.testPassed = state.testPassed || {};
+  const st = state.testPassed[T.course.key] || { passed:false, bestPct:0, attempts:0 };
+  st.passed = st.passed || passed;
+  st.bestPct = Math.max(st.bestPct||0, pct);
+  st.attempts = (st.attempts||0) + 1;
+  state.testPassed[T.course.key] = st;
+  save();
+  recordTest({ track: T.course.key, paper: JSON.stringify(_testSeenIds(T)), score: T.score, total: n,
+               status, exit_reason: "", duration_secs: Math.min(Math.round((Date.now() - T.t0) / 1000), 7200) },
+             T.paper.clientId);
+  const course = T.course, back = T.back, score = T.score;
+  TEST = null;
+  renderTestResult(course, back, { pct, passed, score, n, timedOut: status === "timed_out" });
+}
+
+function renderTestVoided(course, back, reason){
+  stopSpeech(); rerender = () => renderTestVoided(course, back, reason);
+  root.innerHTML = "";
+  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course, back));
+  const stopped = reason === "stopped";
+  const bodyMsg = stopped
+    ? tx("You stopped the test, so it was not counted. Whenever you feel ready, take a new test with new questions.",
+         "तुमने परीक्षा रोक दी, इसलिए यह गिनी नहीं गई। जब तैयार महसूस करो, नए सवालों के साथ नई परीक्षा देना।")
+    : tx("The test ended because you left the screen, so your answers were not counted. You can take a new test with new questions — stay on the screen next time.",
+         "परीक्षा इसलिए खत्म हुई क्योंकि तुमने स्क्रीन छोड़ दी, इसलिए तुम्हारे उत्तर गिने नहीं गए। तुम नए सवालों के साथ फिर से परीक्षा दे सकती हो — अगली बार स्क्रीन पर ही रहना।");
+  root.appendChild(el(`<div class="screen result">
+    <div class="mascot big m-sad">${mascotSVG()}</div>
+    <h2>${stopped ? tx("Test stopped","परीक्षा रोक दी गई") : tx("The test ended","परीक्षा खत्म हो गई")}</h2>
+    <p class="muted" style="max-width:460px;margin:8px auto">${esc(bodyMsg)}</p>
+    <div class="actionrow">
+      <button class="btn primary" id="tretake">${tx("Take a new test","नई परीक्षा दो")}</button>
+      <button class="btn ghost" id="tvback">← ${tx("Back to lessons","पाठों पर वापस")}</button>
+    </div>
+  </div>`));
+  setNarration(bodyMsg, bodyMsg); srSay(bodyMsg);
+  const rh = root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try { rh.focus({preventScroll:true}); } catch(e){} }
+  $("#tretake").onclick = () => { sfx.restart(); renderTestIntro(course, back); };
+  $("#tvback").onclick  = () => { sfx.back(); renderTrack(course, back); };
+  refreshTop();
+}
+
+function renderTestResult(course, back, r){
+  stopSpeech(); rerender = () => renderTestResult(course, back, r);
+  root.innerHTML = "";
+  setBack("← " + tx(course.title, course.titleHi), () => renderTrack(course, back));
+  const nextT = nextTrackInGroup(course);
+  const passMsg = tx("You passed! 🏆","तुम पास हो गई! 🏆");
+  const failMsg = tx("Good try — you need "+(course.test.passPct||60)+"% to pass.",
+                     "अच्छी कोशिश — पास होने के लिए "+(course.test.passPct||60)+"% चाहिए।");
+  root.appendChild(el(`<div class="screen result">
+    <div class="mascot big ${r.passed?"m-happy":"m-sad"}">${mascotSVG()}</div>
+    <h2>${r.passed ? passMsg : failMsg}</h2>
+    <div class="earn pop">${r.pct}%</div>
+    <div class="muted">${tx("You got "+r.score+" of "+r.n, r.n+" में से "+r.score+" सही")}</div>
+    ${r.timedOut ? `<div class="muted">${tx("Time ran out — the answers you gave were counted.","समय खत्म हो गया — तुम्हारे दिए उत्तर गिने गए।")}</div>` : ""}
+    ${r.passed && nextT ? `<div class="savechip">🎉 ${esc(tx("The next module is now open: "+nextT.title,"अगला मॉड्यूल अब खुला है: "+(nextT.titleHi||nextT.title)))}</div>` : ""}
+    ${!r.passed ? `<div class="muted" style="margin-top:6px">${tx("Practice the lessons and try a new test.","पाठों का अभ्यास करो और नई परीक्षा दो।")}</div>` : ""}
+    <div class="actionrow">
+      ${r.passed ? `<button class="btn ghost" id="tagain">${tx("Take it again","फिर से दो")}</button>
+                    <button class="btn primary" id="tdone">${tx("Back to lessons →","पाठों पर वापस →")}</button>`
+                 : `<button class="btn ghost" id="tdone">← ${tx("Back to lessons","पाठों पर वापस")}</button>
+                    <button class="btn primary" id="tagain">${tx("Try a new test","नई परीक्षा दो")}</button>`}
+    </div>
+  </div>`));
+  if(r.passed) sfx.complete(); else sfx.wrong();
+  const narr = (r.passed ? passMsg : failMsg) + " " + tx("You got "+r.score+" of "+r.n+".", r.n+" में से "+r.score+" सही।");
+  setNarration(narr, narr); srSay(narr);
+  const rh = root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try { rh.focus({preventScroll:true}); } catch(e){} }
+  $("#tagain").onclick = () => { sfx.restart(); renderTestIntro(course, back); };
+  $("#tdone").onclick  = () => { sfx.back(); renderTrack(course, back); };
+  refreshTop();
+}
+
 // ---------- Type-aware sentence frames for "Build a Sentence" ----------
 // Each word carries a `type` (thing/mass/person/verb/adj/time/phrase). Frames are
 // chosen to fit the type, so we never generate nonsense like "How much is the mother?"
@@ -2181,6 +2749,51 @@ async function syncAttempts(){
   } finally { _syncing = false; }
 }
 window.addEventListener("online", syncAttempts);
+
+// ---------- Module-test attempts: same offline queue contract as attempts ----------
+const TEST_QUEUE = "hikmat_test_queue";
+function _readTests(){ try { return JSON.parse(localStorage.getItem(TEST_QUEUE)) || []; } catch(e){ return []; } }
+function _saveTests(q){ try { localStorage.setItem(TEST_QUEUE, JSON.stringify(q)); } catch(e){} }
+function recordTest(t, clientId){
+  if(!currentStudent || currentStudent.local) return;  // guests/local profiles: device-local only
+  const q = _readTests();
+  q.push({ ...t, lang: state.lang, student: currentStudent.id,
+           token: currentStudent.token || "", client_id: clientId || uid() });
+  _saveTests(q);
+  syncTests();
+}
+let _syncingTests = false;
+async function syncTests(){
+  if(_syncingTests) return;
+  const q = _readTests();
+  if(!q.length) return;
+  _syncingTests = true;
+  const remaining = [];
+  try {
+    for(const t of q){
+      try {
+        const r = await fetch(apiURL("submit_test"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(t) });
+        if(!r.ok){ remaining.push(t); continue; }
+        let body = null; try { body = (await r.json()).message; } catch(e){}
+        if(body && body.ok === false && body.error === "rate_limited"){ remaining.push(t); continue; }
+        // The server may pass a paper the client mis-scored (its pass_pct is authoritative).
+        // Credit it ONLY to the student who took it — a boot-time flush on a shared laptop
+        // can be shipping girl A's attempt while girl B is signed in.
+        if(body && body.ok && body.passed && currentStudent && currentStudent.id === t.student){
+          state.testPassed = state.testPassed || {};
+          const st = state.testPassed[t.track] || { passed:false, bestPct:0, attempts:0 };
+          st.passed = true;
+          state.testPassed[t.track] = st;
+          save();
+        }
+      } catch(e){ remaining.push(t); }
+    }
+    const seen = new Set(q.map(x => JSON.stringify(x)));
+    _readTests().forEach(x => { if(!seen.has(JSON.stringify(x))) remaining.push(x); });
+    _saveTests(remaining);
+  } finally { _syncingTests = false; }
+}
+window.addEventListener("online", syncTests);
 
 // ---------- FLAGSHIP: "Roshni, mujhe doubt hai" — tap when you're stuck ----------
 // Layer 1: in-the-moment self-help right where she is (hear again / slowly / in Hindi),
@@ -2434,13 +3047,166 @@ async function syncDoubts(){
 }
 window.addEventListener("online", syncDoubts);
 
+// ============================================================
+//  ATTENDANCE — the device banks a logged-in student's ACTIVE screen time and
+//  flushes small deltas to the server (offline-queued, idempotent). Facilitator
+//  report only: nothing about attendance is EVER shown to a student — no timers,
+//  no progress rings, no blocking. Guests and offline-local profiles are never
+//  tracked. "Active" = tab visible AND input (or video playback) within 3 minutes;
+//  a lid-closed laptop can't bank phantom hours (per-bank clamp), and a clock set
+//  backwards can't bank negative time.
+// ============================================================
+const ATT_QUEUE       = "hikmat_att_queue";   // ping queue (mirrors ATTEMPT_QUEUE)
+const ATT_STORE       = "hikmat_att_";        // per-student day store: hikmat_att_<id> = {"2026-07-06": {s, q}}
+const ATT_IDLE_MS     = 3 * 60 * 1000;        // no input for 3 min → the clock stops
+const ATT_TICK_MS     = 30 * 1000;            // bank every 30s (crash-safe, ≤30s midnight error)
+const ATT_FLUSH_SECS  = 5 * 60;               // enqueue a delta every ~5 active minutes
+const ATT_PING_MAX    = 900;                  // one ping ≤15 min (server clamps identically)
+const ATT_KEEP_DAYS   = 30;                   // day-store horizon (= the server's date window)
+let ATT = null;                               // {sid, t0, lastActivity} — running only while eligible
+let _attInterval = null;
+function attEligible(){
+  return !!(currentStudent && !currentStudent.local) && !document.hidden;
+}
+// local YYYY-MM-DD — NOT toISOString() (UTC), which would file IST mornings on yesterday
+function attToday(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function attDeviceId(){
+  let id = null;
+  try { id = localStorage.getItem("hikmat_device_id"); } catch(e){}
+  if(!id){ id = uid(); try { localStorage.setItem("hikmat_device_id", id); } catch(e){} }
+  return id;
+}
+function _attRead(sid){ try { return JSON.parse(localStorage.getItem(ATT_STORE + sid)) || {}; } catch(e){ return {}; } }
+function _attWrite(sid, obj){
+  try {
+    const keys = Object.keys(obj).sort();
+    while(keys.length > ATT_KEEP_DAYS) delete obj[keys.shift()];
+    localStorage.setItem(ATT_STORE + sid, JSON.stringify(obj));
+  } catch(e){}
+}
+function attResume(){
+  if(ATT || !attEligible()) return;
+  ATT = { sid: currentStudent.id, t0: Date.now(), lastActivity: Date.now() };
+  if(!_attInterval) _attInterval = setInterval(attTick, ATT_TICK_MS);
+}
+// Move elapsed time into the day store. Per-bank clamp = tick + 60s slack: an OS-sleep
+// gap (the interval doesn't fire while asleep) banks at most 90s on wake, not all night.
+function attBank(until){
+  if(!ATT) return;
+  const now = until || Date.now();
+  const secs = Math.max(0, Math.min(Math.round((now - ATT.t0) / 1000), ATT_TICK_MS/1000 + 60));
+  ATT.t0 = Math.max(ATT.t0, now);
+  if(secs <= 0) return;
+  const st = _attRead(ATT.sid), day = attToday();
+  st[day] = st[day] || { s: 0, q: 0 };
+  st[day].s += secs;
+  _attWrite(ATT.sid, st);
+}
+function attPause(until){
+  if(!ATT) return;
+  attBank(until);
+  const sid = ATT.sid;
+  ATT = null;
+  if(_attInterval){ clearInterval(_attInterval); _attInterval = null; }
+  attMaybeFlush(sid, true);
+}
+function attTick(){
+  if(!ATT) return;
+  if(document.hidden){ attPause(); return; }                   // hidden time is NEVER active time
+  if(Date.now() - ATT.lastActivity > ATT_IDLE_MS){
+    attPause(ATT.lastActivity + ATT_IDLE_MS);                  // credit the idle window once, then stop
+    return;
+  }
+  attBank();
+  attMaybeFlush(ATT.sid, false);
+}
+// Enqueue unsent deltas. Today's residue waits for the 5-minute threshold unless forced;
+// PREVIOUS days always flush from 5s up — an end-of-day tail must never age out unsent.
+function attMaybeFlush(sid, force){
+  if(!sid || !currentStudent || currentStudent.id !== sid) return;   // flush only under the owner's token
+  const st = _attRead(sid), today = attToday();
+  let changed = false;
+  for(const day in st){
+    const e = st[day];
+    let delta = (e.s || 0) - (e.q || 0);
+    const min = (day !== today || force) ? 5 : ATT_FLUSH_SECS;
+    while(delta >= min){
+      const send = Math.min(delta, ATT_PING_MAX);
+      const q = _readAtt();
+      q.push({ student: sid, token: currentStudent.token || "", date: day, secs: send,
+               device_id: attDeviceId(), client_id: uid() });
+      _saveAtt(q);
+      e.q = (e.q || 0) + send;
+      delta -= send;
+      changed = true;
+    }
+  }
+  if(changed){ _attWrite(sid, st); syncAttendance(); }
+}
+function _readAtt(){ try { return JSON.parse(localStorage.getItem(ATT_QUEUE)) || []; } catch(e){ return []; } }
+function _saveAtt(q){ try { localStorage.setItem(ATT_QUEUE, JSON.stringify(q.slice(-400))); } catch(e){} }
+let _syncingAtt = false;
+async function syncAttendance(){
+  if(_syncingAtt) return;
+  const q = _readAtt();
+  if(!q.length) return;
+  _syncingAtt = true;
+  const remaining = [];
+  try {
+    for(const p of q){
+      try {
+        const r = await fetch(apiURL("log_attendance"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
+        if(!r.ok){ remaining.push(p); continue; }               // network/HTTP error → retry later
+        let body = null; try { body = (await r.json()).message; } catch(e){}
+        if(body && body.ok === false && body.error === "rate_limited") remaining.push(p);
+        // success, or a permanent rejection (auth / date window / bad secs) → drop
+      } catch(e){ remaining.push(p); }
+    }
+    const seen = new Set(q.map(x => JSON.stringify(x)));
+    _readAtt().forEach(x => { if(!seen.has(JSON.stringify(x))) remaining.push(x); });
+    _saveAtt(remaining);
+  } finally { _syncingAtt = false; }
+}
+window.addEventListener("online", syncAttendance);
+// Best-effort last-gasp ship of the newest queued ping on pagehide. The entry stays
+// queued — server-side client_id dedup makes the inevitable double-send harmless.
+function attBeacon(){
+  try {
+    if(!("sendBeacon" in navigator) || !location.protocol.startsWith("http")) return;
+    const q = _readAtt();
+    if(!q.length) return;
+    navigator.sendBeacon(apiURL("log_attendance"),
+      new Blob([new URLSearchParams(q[q.length-1]).toString()], { type: "application/x-www-form-urlencoded" }));
+  } catch(e){}
+}
+// activity signals: passive capture-phase listeners — zero interference with game handlers
+["pointerdown","keydown","touchstart"].forEach(ev =>
+  document.addEventListener(ev, () => {
+    if(ATT) ATT.lastActivity = Date.now();
+    else if(attEligible()) attResume();
+  }, { capture: true, passive: true }));
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden) attPause();                              // pause — hidden must not bank
+  else attResume();
+});
+window.addEventListener("pagehide", () => { attPause(); attBeacon(); flushVideoWatch(); });
+function attInit(){
+  attResume();                                                 // reload-while-logged-in
+  if(currentStudent && !currentStudent.local) attMaybeFlush(currentStudent.id, true);  // last session's residue
+}
+
 // ---------- identity & login (only when served from Frappe; offline = guest) ----------
 function setStudent(stu){
+  attPause();                           // bank + flush the OUTGOING student under her own id/token
   currentStudent = stu || null;
   showAllClasses = false;               // a fresh login starts focused on the student's own class
   if(stu) localStorage.setItem("hikmat_current", JSON.stringify(stu));
   else localStorage.removeItem("hikmat_current");
   state = loadState();                  // swap to this identity's saved progress
+  attResume();                          // start the incoming student's clock (no-op for guests)
 }
 async function mergeServerProgress(){
   if(!currentStudent) return;
@@ -2450,6 +3216,23 @@ async function mergeServerProgress(){
   for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]) setStars(ck, lk, aid, p[ck][lk][aid]);
   if(res.gates) state.gates = res.gates;   // server-authoritative belt clearing syncs down here
   if(typeof res.gems === "number") state.coins = Math.max(state.coins||0, res.gems);  // gem total follows her across laptops
+  // Module tests: monotone unions, safe under any interleaving of devices and queues.
+  if(res.tests){
+    state.testPassed = state.testPassed || {};
+    for(const tk in res.tests){
+      const s = res.tests[tk], l = state.testPassed[tk] || { passed:false, bestPct:0, attempts:0 };
+      state.testPassed[tk] = { passed: l.passed || !!s.passed,
+                               bestPct: Math.max(l.bestPct||0, s.bestPct||0),
+                               attempts: Math.max(l.attempts||0, s.attempts||0) };
+    }
+  }
+  if(res.testSeen){                        // her no-repeat guarantee follows her to a NEW device
+    state.testSeen = state.testSeen || {};
+    for(const tk in res.testSeen){
+      const dst = state.testSeen[tk] = state.testSeen[tk] || [];
+      res.testSeen[tk].forEach(id => { if(!dst.includes(id)) dst.push(id); });
+    }
+  }
   save();
 }
 
@@ -3000,7 +3783,9 @@ async function transcribe(wavBlob){
 
 // ---- The floating button + the voice panel ----
 function mountRoshniFab(){
-  const show = SETTINGS.aiEnabled && !!currentStudent && backendLive;
+  // never during a module test — an in-page AI tutor overlay trips no anti-cheat guard
+  // and could answer the very question on screen (armTestGuards also removes it)
+  const show = SETTINGS.aiEnabled && !!currentStudent && backendLive && !TEST;
   let fab = document.getElementById("roshniFab");
   if(!show){ if(fab) fab.remove(); return; }
   if(fab) return;
@@ -3108,11 +3893,17 @@ state.hindi = state.hindi===true;
 state.lang = state.lang || "en";
 state.sound = state.sound!==false;
 state.theme = state.theme || "light";
+state.testSeen = state.testSeen || {};       // states saved before module tests existed
+state.testPassed = state.testPassed || {};
+state.videosSeen = state.videosSeen || {};
 renderHome();          // instant: bundled or cached content, fully offline
+attInit();             // attendance clock for an already-logged-in reload (no-op for guests)
 refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 400 our POSTs without it
   syncAttempts();            // flush any progress queued while offline
+  syncTests();               // flush any module-test attempts queued while offline
   syncDoubts();              // flush any doubts logged while offline
   syncEvents();              // flush any wrong-answer events queued while offline
+  syncAttendance();          // flush any attendance pings queued while offline
 });
 loadFromBackend().then(async ok => {
   backendLive = ok;
