@@ -685,9 +685,11 @@ def setup_hard_questions_report():
 def setup_engagement_report():
     """HOW each girl is learning, not just how well: minutes in the game (finished
     attempts + abandoned tries), replays (self-driven practice), listen taps (audio
-    reliance — expected for a non-reader, a flag for a reader), mid-activity
-    bail-outs (frustration), doubts, and when she was last seen. The 'who needs me
-    this week?' list — most recently active first, so the idle girls sink visibly."""
+    reliance — expected for a non-reader, a flag for a reader), language switches +
+    Hindi-guide taps (how often she reaches for Hindi support — a girl leaning hard
+    on Hindi may need more English scaffolding), mid-activity bail-outs (frustration),
+    doubts, and when she was last seen. The 'who needs me this week?' list — most
+    recently active first, so the idle girls sink visibly."""
     name = "Student Engagement"
     if frappe.db.exists("Report", name):
         frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
@@ -709,6 +711,12 @@ def setup_engagement_report():
           WHERE e.student = s.name AND e.kind = 'tool_use'
             AND e.tool IN ('listen_word','hear_screen','hear_again','hear_slow','hear_hindi'))
                                                            AS "Listen Taps:Int:95",
+        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
+          WHERE e.student = s.name AND e.kind = 'tool_use'
+            AND e.tool = 'lang_switch')                    AS "Lang Switches:Int:110",
+        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
+          WHERE e.student = s.name AND e.kind = 'tool_use'
+            AND e.tool = 'hindi_guide')                    AS "Hindi Guide:Int:105",
         (SELECT COUNT(*) FROM `tabLearning Event` e
           WHERE e.student = s.name AND e.kind = 'dwell')   AS "Bail-outs:Int:85",
         (SELECT COUNT(*) FROM `tabLesson Doubt` d
