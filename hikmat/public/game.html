@@ -273,6 +273,13 @@
   .quizemoji { font-size:52px; text-align:center; margin:2px 0 14px; line-height:1.1; }
   .quizopts { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); }
   .opt.quizopt { flex-direction:row; justify-content:center; text-align:center; padding:16px; font-size:17px; }
+  /* Read & Answer — a short passage the child reads (or hears via 🔊) before answering */
+  .readbox { background:var(--card); border:2px solid var(--line); border-radius:16px;
+             padding:15px 16px 14px; margin:4px 0 16px; box-shadow:0 4px 0 var(--line); text-align:left; }
+  .readbox .rdTitle { font-weight:900; font-size:16px; color:var(--ink); margin-bottom:8px; }
+  .readbox .rdText { font-size:19px; line-height:1.6; font-weight:700; color:var(--ink); margin:0; }
+  .readbox .rdHi { color:var(--muted); font-size:15px; font-weight:700; line-height:1.5; margin-top:9px; }
+  .readbox .speakbtn { margin-top:13px; }
   /* Sign up */
   .signup, .authform { max-width:440px; margin:0 auto; text-align:left; }
   .authform .searchbox { width:100%; margin:0; }
@@ -603,6 +610,8 @@ window.HIKMAT_ICONS = {
 
   "act:email": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-eml-bd" x1="8" y1="16" x2="56" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient><linearGradient id="hk-eml-fl" x1="32" y1="18" x2="32" y2="38" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4edf8"/></linearGradient></defs><rect x="8" y="16" width="48" height="34" rx="7" fill="url(#hk-eml-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M10 20l22 17 22-17" fill="none" stroke="#00000022" stroke-width="1.6"/><path d="M8 22l22 16a4 4 0 0 0 4 0l22-16v-2a4 4 0 0 0-4-4H12a4 4 0 0 0-4 4z" fill="url(#hk-eml-fl)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 19l22 16 22-16" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="44" r="6" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M43 44l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
+  "act:read": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-rd-pg" x1="16" y1="8" x2="48" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient></defs><path d="M16 8h20l12 12v34a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z" fill="url(#hk-rd-pg)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M36 8v12h12" fill="none" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g stroke="#9fb6d4" stroke-width="2" stroke-linecap="round" opacity=".85"><path d="M21 28h22M21 34h22M21 40h14"/></g><circle cx="43" cy="45" r="9" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M39 45l3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
   "gem": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-gem-t" x1="20" y1="14" x2="44" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9be9ff"/><stop offset="1" stop-color="#4ec8e8"/></linearGradient><linearGradient id="hk-gem-b" x1="14" y1="24" x2="40" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3fb6e0"/><stop offset="1" stop-color="#2c84c4"/></linearGradient></defs><path d="M20 12h24l10 14-22 26L12 26z" fill="url(#hk-gem-b)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 12h24l-3 14H23z" fill="url(#hk-gem-t)" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 12l10 14H41zM20 12L12 26h11z" fill="#6fd6f0" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M23 26h18l-9 26z" fill="#5cc6ea"/><path d="M23 26l9 26-20-26zM41 26l-9 26 22-26z" fill="#4ab6df"/><path d="M27 16l-4 8" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>`,
 
   "star": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-star-g" x1="32" y1="8" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff2bd"/><stop offset="1" stop-color="#f5b730"/></linearGradient></defs><path d="M32 8c1.6 0 3 .9 3.7 2.4l5.2 10.6 11.7 1.7c3.4.5 4.8 4.7 2.3 7.1l-8.5 8.3 2 11.6c.6 3.4-3 6-6 4.4L32 49.1l-10.4 5.5c-3 1.6-6.6-1-6-4.4l2-11.6-8.5-8.3c-2.5-2.4-1.1-6.6 2.3-7.1l11.7-1.7 5.2-10.6A4 4 0 0 1 32 8z" fill="url(#hk-star-g)" stroke="#d99a1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 18l-6 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="32" r="2" fill="#fff" opacity=".5"/></svg>`,
@@ -747,7 +756,267 @@ let COURSES = [
   },
   {
     key:"work", title:"At Work", titleHi:"काम पर", icon:"🧰", color:"#e0a800",
-    blurb:"Coming soon", blurbHi:"जल्द आ रहा है", published:false, lessons:[]
+    blurb:"Work & money words", blurbHi:"काम और पैसे के शब्द", published:true,
+    lessons:[
+      { key:"jobs", title:"Kinds of Work", titleHi:"काम के प्रकार",
+        words:[
+          { en:"teacher",    hi:"शिक्षिका",  pron:"टीचर",     emoji:"👩‍🏫", plural:"teachers",    use:"She is a teacher",     useHi:"वह एक शिक्षिका है" },
+          { en:"nurse",      hi:"नर्स",      pron:"नर्स",     emoji:"👩‍⚕️", plural:"nurses",      use:"She is a nurse",       useHi:"वह एक नर्स है" },
+          { en:"farmer",     hi:"किसान",     pron:"फ़ार्मर",   emoji:"👨‍🌾", plural:"farmers",     use:"He is a farmer",       useHi:"वह एक किसान है" },
+          { en:"tailor",     hi:"दर्ज़ी",     pron:"टेलर",     emoji:"🧵",   plural:"tailors",     use:"She is a tailor",      useHi:"वह एक दर्ज़ी है" },
+          { en:"shopkeeper", hi:"दुकानदार",  pron:"शॉपकीपर",  emoji:"🧑‍💼", plural:"shopkeepers", use:"He is a shopkeeper",   useHi:"वह एक दुकानदार है" },
+        ],
+        dialogues:[
+          { who:"🧑‍💼", line:"What work do you do?", lineHi:"आप क्या काम करती हैं?",
+            replies:[ {text:"I am a teacher.", textHi:"मैं एक शिक्षिका हूँ।", ok:true}, {text:"It is ten o'clock.", ok:false}, {text:"I want two bananas.", ok:false} ],
+            then:"That is good work!" },
+          { who:"👩", line:"Where does your sister work?", lineHi:"तुम्हारी बहन कहाँ काम करती है?",
+            replies:[ {text:"She works at the school.", textHi:"वह स्कूल में काम करती है।", ok:true}, {text:"I am fine, thank you.", ok:false}, {text:"It is raining today.", ok:false} ],
+            then:"A school is a nice place to work." },
+        ],
+        read:[
+          { title:"Meena's Work", titleHi:"मीना का काम", emoji:"👩‍⚕️",
+            text:"Meena is a nurse. She works at the clinic. She helps sick people every day.",
+            textHi:"मीना एक नर्स है। वह क्लिनिक में काम करती है। वह रोज़ बीमार लोगों की मदद करती है।",
+            q:"What is Meena's work?", qHi:"मीना का काम क्या है?",
+            choices:["A nurse","A teacher","A farmer"], answer:"A nurse",
+            teach:"The story says Meena is a nurse who helps sick people.", teachHi:"कहानी कहती है मीना एक नर्स है जो बीमार लोगों की मदद करती है।" },
+          { title:"The Busy Tailor", titleHi:"व्यस्त दर्ज़ी", emoji:"🧵",
+            text:"Ravi is a tailor. He makes shirts and dresses. People come to his shop to buy new clothes.",
+            textHi:"रवि एक दर्ज़ी है। वह कमीज़ और पोशाक बनाता है। लोग नए कपड़े खरीदने उसकी दुकान पर आते हैं।",
+            q:"What does Ravi make?", qHi:"रवि क्या बनाता है?",
+            choices:["Clothes","Food","Books"], answer:"Clothes",
+            teach:"Ravi is a tailor, so he makes clothes like shirts and dresses.", teachHi:"रवि एक दर्ज़ी है, इसलिए वह कमीज़ और पोशाक जैसे कपड़े बनाता है।" },
+        ] },
+      { key:"workplace", title:"At the Workplace", titleHi:"काम की जगह",
+        words:[
+          { en:"work",   hi:"काम",   pron:"वर्क",   emoji:"💼", uncount:true, type:"verb" },
+          { en:"money",  hi:"पैसा",  pron:"मनी",    emoji:"💰", uncount:true },
+          { en:"office", hi:"दफ़्तर", pron:"ऑफ़िस",   emoji:"🏢", plural:"offices", use:"I work in an office", useHi:"मैं एक दफ़्तर में काम करती हूँ" },
+          { en:"boss",   hi:"मालिक", pron:"बॉस",    emoji:"🧑‍💼", plural:"bosses", type:"person" },
+          { en:"help",   hi:"मदद",   pron:"हेल्प",   emoji:"🤝", uncount:true, type:"verb" },
+        ],
+        dialogues:[
+          { who:"🧑‍💼", line:"Can you help me today?", lineHi:"क्या तुम आज मेरी मदद कर सकती हो?",
+            replies:[ {text:"Yes, I can help you.", textHi:"हाँ, मैं आपकी मदद कर सकती हूँ।", ok:true}, {text:"I have two brothers.", ok:false}, {text:"The apple is red.", ok:false} ],
+            then:"Thank you very much!" },
+          { who:"👩", line:"What time do you start work?", lineHi:"तुम काम कब शुरू करती हो?",
+            replies:[ {text:"I start work at nine.", textHi:"मैं नौ बजे काम शुरू करती हूँ।", ok:true}, {text:"I like the colour green.", ok:false}, {text:"Goodbye, see you!", ok:false} ],
+            then:"Nine is a good time to start." },
+        ],
+        read:[
+          { title:"The First Day", titleHi:"पहला दिन", emoji:"🏢",
+            text:"Today is Sita's first day at work. She meets her boss and her team. Everyone is kind and helps her.",
+            textHi:"आज सीता के काम का पहला दिन है। वह अपने मालिक और अपनी टीम से मिलती है। सब दयालु हैं और उसकी मदद करते हैं।",
+            q:"Who does Sita meet at work?", qHi:"सीता काम पर किससे मिलती है?",
+            choices:["Her boss and team","Her mother","Her teacher"], answer:"Her boss and team",
+            teach:"On her first day, Sita meets her boss and her team.", teachHi:"अपने पहले दिन सीता अपने मालिक और अपनी टीम से मिलती है।" },
+          { title:"Saving Money", titleHi:"पैसे की बचत", emoji:"💰",
+            text:"Anita works hard every day. She earns money and saves some of it. She wants to buy a new cycle.",
+            textHi:"अनीता हर दिन मेहनत करती है। वह पैसे कमाती है और कुछ बचाती है। वह एक नई साइकिल खरीदना चाहती है।",
+            q:"What does Anita want to buy?", qHi:"अनीता क्या खरीदना चाहती है?",
+            choices:["A cycle","A house","A book"], answer:"A cycle",
+            teach:"Anita saves money because she wants to buy a new cycle.", teachHi:"अनीता पैसे बचाती है क्योंकि वह एक नई साइकिल खरीदना चाहती है।" },
+        ] },
+    ]
+  },
+  {
+    key:"health", title:"Health & Clinic", titleHi:"सेहत और क्लिनिक", icon:"🏥", color:"#ef476f",
+    blurb:"Body, doctor & staying well", blurbHi:"शरीर, डॉक्टर और सेहत", published:true,
+    lessons:[
+      { key:"body", title:"My Body", titleHi:"मेरा शरीर",
+        words:[
+          { en:"eye",  hi:"आँख", pron:"आई",    emoji:"👁️", plural:"eyes",  use:"I have two eyes",     useHi:"मेरी दो आँखें हैं" },
+          { en:"hand", hi:"हाथ", pron:"हैंड",  emoji:"✋",  plural:"hands", use:"I wash my hands",      useHi:"मैं अपने हाथ धोती हूँ" },
+          { en:"ear",  hi:"कान", pron:"ईयर",   emoji:"👂",  plural:"ears",  use:"I hear with my ears",  useHi:"मैं अपने कानों से सुनती हूँ" },
+          { en:"nose", hi:"नाक", pron:"नोज़",  emoji:"👃",  plural:"noses", use:"This is my nose",      useHi:"यह मेरी नाक है" },
+          { en:"leg",  hi:"टाँग", pron:"लेग",   emoji:"🦵",  plural:"legs",  use:"I have two legs",      useHi:"मेरी दो टाँगें हैं" },
+        ],
+        dialogues:[
+          { who:"👩‍⚕️", line:"How do you feel today?", lineHi:"आज तुम कैसा महसूस कर रही हो?",
+            replies:[ {text:"I feel fine, thank you.", textHi:"मैं ठीक महसूस करती हूँ, धन्यवाद।", ok:true}, {text:"I want two bananas.", ok:false}, {text:"It is on the table.", ok:false} ],
+            then:"That is good to hear." },
+          { who:"👩", line:"Wash your hands before you eat.", lineHi:"खाने से पहले अपने हाथ धो लो।",
+            replies:[ {text:"Okay, I will wash my hands.", textHi:"ठीक है, मैं अपने हाथ धो लूँगी।", ok:true}, {text:"The bus is late.", ok:false}, {text:"I am ten years old.", ok:false} ],
+            then:"Good. Clean hands keep you healthy." },
+        ],
+        read:[
+          { title:"Clean Hands", titleHi:"साफ़ हाथ", emoji:"✋",
+            text:"We use our hands every day. Dirty hands can make us sick. Always wash your hands with soap before you eat.",
+            textHi:"हम रोज़ अपने हाथों का इस्तेमाल करते हैं। गंदे हाथ हमें बीमार कर सकते हैं। खाने से पहले हमेशा साबुन से हाथ धोओ।",
+            q:"When should you wash your hands?", qHi:"तुम्हें हाथ कब धोने चाहिए?",
+            choices:["Before you eat","After you sleep","Before you sing"], answer:"Before you eat",
+            teach:"The story says to wash your hands with soap before you eat.", teachHi:"कहानी कहती है खाने से पहले साबुन से हाथ धोओ।" },
+          { title:"Two Eyes, Two Ears", titleHi:"दो आँखें, दो कान", emoji:"👀",
+            text:"We have two eyes to see. We have two ears to hear. We must keep our body clean and safe.",
+            textHi:"हमारे पास देखने के लिए दो आँखें हैं। हमारे पास सुनने के लिए दो कान हैं। हमें अपने शरीर को साफ़ और सुरक्षित रखना चाहिए।",
+            q:"What do we use to hear?", qHi:"हम सुनने के लिए क्या इस्तेमाल करते हैं?",
+            choices:["Our ears","Our eyes","Our hands"], answer:"Our ears",
+            teach:"We hear with our ears and see with our eyes.", teachHi:"हम कानों से सुनते हैं और आँखों से देखते हैं।" },
+        ] },
+      { key:"clinic", title:"At the Clinic", titleHi:"क्लिनिक में",
+        words:[
+          { en:"doctor",   hi:"डॉक्टर", pron:"डॉक्टर",   emoji:"👩‍⚕️", plural:"doctors", type:"person" },
+          { en:"medicine", hi:"दवा",    pron:"मेडिसिन",  emoji:"💊",   uncount:true },
+          { en:"fever",    hi:"बुखार",  pron:"फ़ीवर",    emoji:"🤒",   uncount:true, use:"I have a fever", useHi:"मुझे बुखार है" },
+          { en:"rest",     hi:"आराम",   pron:"रेस्ट",    emoji:"🛌",   uncount:true, type:"verb" },
+          { en:"clinic",   hi:"क्लिनिक", pron:"क्लिनिक",  emoji:"🏥",   plural:"clinics", use:"I go to the clinic", useHi:"मैं क्लिनिक जाती हूँ" },
+        ],
+        dialogues:[
+          { who:"👩‍⚕️", line:"What is the problem?", lineHi:"क्या तकलीफ़ है?",
+            replies:[ {text:"I have a fever.", textHi:"मुझे बुखार है।", ok:true}, {text:"I want to buy rice.", ok:false}, {text:"My name is Sita.", ok:false} ],
+            then:"Take this medicine and rest well." },
+          { who:"👩‍⚕️", line:"Take rest for two days.", lineHi:"दो दिन आराम करो।",
+            replies:[ {text:"Okay doctor, thank you.", textHi:"ठीक है डॉक्टर, धन्यवाद।", ok:true}, {text:"I have three pens.", ok:false}, {text:"The shop is open.", ok:false} ],
+            then:"Get well soon!" },
+        ],
+        read:[
+          { title:"A Visit to the Doctor", titleHi:"डॉक्टर के पास", emoji:"🩺",
+            text:"Priya has a fever. Her mother takes her to the clinic. The doctor gives her medicine and tells her to rest.",
+            textHi:"प्रिया को बुखार है। उसकी माँ उसे क्लिनिक ले जाती है। डॉक्टर उसे दवा देते हैं और आराम करने को कहते हैं।",
+            q:"Why does Priya go to the clinic?", qHi:"प्रिया क्लिनिक क्यों जाती है?",
+            choices:["She has a fever","She wants food","She wants a book"], answer:"She has a fever",
+            teach:"Priya goes to the clinic because she has a fever.", teachHi:"प्रिया क्लिनिक जाती है क्योंकि उसे बुखार है।" },
+          { title:"Take Your Medicine", titleHi:"अपनी दवा लो", emoji:"💊",
+            text:"The doctor gives Ali some medicine. He must take it two times a day. Soon Ali feels well again.",
+            textHi:"डॉक्टर अली को कुछ दवा देते हैं। उसे इसे दिन में दो बार लेना है। जल्द ही अली फिर से ठीक महसूस करता है।",
+            q:"How many times a day must Ali take the medicine?", qHi:"अली को दिन में कितनी बार दवा लेनी है?",
+            choices:["Two times","One time","Five times"], answer:"Two times",
+            teach:"The story says Ali must take the medicine two times a day.", teachHi:"कहानी कहती है अली को दवा दिन में दो बार लेनी है।" },
+        ] },
+    ]
+  },
+  {
+    key:"money", title:"Money & Bank", titleHi:"पैसा और बैंक", icon:"🏦", color:"#16a34a",
+    blurb:"Coins, notes & saving", blurbHi:"सिक्के, नोट और बचत", published:true,
+    lessons:[
+      { key:"coins", title:"Coins & Notes", titleHi:"सिक्के और नोट",
+        words:[
+          { en:"money",  hi:"पैसा",       pron:"मनी",    emoji:"💰", uncount:true },
+          { en:"coin",   hi:"सिक्का",      pron:"कॉइन",   emoji:"🪙", plural:"coins", type:"thing" },
+          { en:"note",   hi:"नोट",        pron:"नोट",    emoji:"💵", plural:"notes", type:"thing" },
+          { en:"price",  hi:"दाम",        pron:"प्राइस",  emoji:"🏷️", plural:"prices", use:"The price is ten rupees", useHi:"दाम दस रुपये है" },
+          { en:"change", hi:"बाक़ी पैसे",  pron:"चेंज",   emoji:"💱", uncount:true, use:"Here is your change", useHi:"यह रहा आपका बाक़ी पैसा" },
+        ],
+        dialogues:[
+          { who:"🧑‍💼", line:"The price is twenty rupees.", lineHi:"दाम बीस रुपये है।",
+            replies:[ {text:"Here is the money.", textHi:"यह रहे पैसे।", ok:true}, {text:"I am a teacher.", ok:false}, {text:"It is very hot.", ok:false} ],
+            then:"Thank you. Here is your change." },
+          { who:"🧑‍💼", line:"Do you have change for fifty?", lineHi:"क्या आपके पास पचास के खुल्ले हैं?",
+            replies:[ {text:"Yes, here are two notes.", textHi:"हाँ, ये रहे दो नोट।", ok:true}, {text:"I want to sleep.", ok:false}, {text:"The dog is black.", ok:false} ],
+            then:"Thank you very much." },
+        ],
+        read:[
+          { title:"Counting Coins", titleHi:"सिक्के गिनना", emoji:"🪙",
+            text:"Rina has ten coins in her hand. She wants to buy a pencil. The pencil costs five rupees, so she has enough money.",
+            textHi:"रीना के हाथ में दस सिक्के हैं। वह एक पेंसिल खरीदना चाहती है। पेंसिल पाँच रुपये की है, तो उसके पास काफ़ी पैसे हैं।",
+            q:"How much does the pencil cost?", qHi:"पेंसिल कितने की है?",
+            choices:["Five rupees","Ten rupees","Two rupees"], answer:"Five rupees",
+            teach:"The story says the pencil costs five rupees.", teachHi:"कहानी कहती है पेंसिल पाँच रुपये की है।" },
+          { title:"Getting Change", titleHi:"बाक़ी पैसे लेना", emoji:"💵",
+            text:"Mohan buys rice for thirty rupees. He gives the shopkeeper a fifty rupee note. The shopkeeper gives back twenty rupees as change.",
+            textHi:"मोहन तीस रुपये में चावल खरीदता है। वह दुकानदार को पचास रुपये का नोट देता है। दुकानदार बीस रुपये बाक़ी लौटाता है।",
+            q:"How much change does Mohan get back?", qHi:"मोहन को कितने पैसे बाक़ी मिलते हैं?",
+            choices:["Twenty rupees","Fifty rupees","Ten rupees"], answer:"Twenty rupees",
+            teach:"Fifty minus thirty is twenty, so the change is twenty rupees.", teachHi:"पचास में से तीस घटाओ तो बीस, तो बाक़ी बीस रुपये हैं।" },
+        ] },
+      { key:"bank", title:"At the Bank", titleHi:"बैंक में",
+        words:[
+          { en:"bank",    hi:"बैंक",  pron:"बैंक",    emoji:"🏦", plural:"banks", use:"I go to the bank", useHi:"मैं बैंक जाती हूँ" },
+          { en:"save",    hi:"बचाना", pron:"सेव",     emoji:"🐷", type:"verb" },
+          { en:"account", hi:"खाता",  pron:"अकाउंट",  emoji:"📒", plural:"accounts", use:"I have a bank account", useHi:"मेरा बैंक खाता है" },
+          { en:"card",    hi:"कार्ड",  pron:"कार्ड",    emoji:"💳", plural:"cards", type:"thing" },
+          { en:"form",    hi:"फ़ॉर्म",  pron:"फ़ॉर्म",   emoji:"📄", plural:"forms", use:"Please fill the form", useHi:"कृपया फ़ॉर्म भरें" },
+        ],
+        dialogues:[
+          { who:"🧑‍💼", line:"How can I help you?", lineHi:"मैं आपकी क्या मदद कर सकता हूँ?",
+            replies:[ {text:"I want to open an account.", textHi:"मैं एक खाता खोलना चाहती हूँ।", ok:true}, {text:"I have a red bag.", ok:false}, {text:"The tea is hot.", ok:false} ],
+            then:"Sure. Please fill this form." },
+          { who:"🧑‍💼", line:"Do you want to save this money?", lineHi:"क्या आप यह पैसा बचाना चाहती हैं?",
+            replies:[ {text:"Yes, please save it.", textHi:"हाँ, कृपया इसे बचा लें।", ok:true}, {text:"I can sing a song.", ok:false}, {text:"It is my birthday.", ok:false} ],
+            then:"Good idea. Your money is safe here." },
+        ],
+        read:[
+          { title:"Opening an Account", titleHi:"खाता खोलना", emoji:"🏦",
+            text:"Sunita goes to the bank. She wants to save her money. The clerk gives her a form and helps her open a new account.",
+            textHi:"सुनीता बैंक जाती है। वह अपना पैसा बचाना चाहती है। क्लर्क उसे एक फ़ॉर्म देता है और उसका नया खाता खोलने में मदद करता है।",
+            q:"Why does Sunita go to the bank?", qHi:"सुनीता बैंक क्यों जाती है?",
+            choices:["To save her money","To buy fruit","To meet a doctor"], answer:"To save her money",
+            teach:"Sunita goes to the bank to save her money in a new account.", teachHi:"सुनीता अपना पैसा नए खाते में बचाने के लिए बैंक जाती है।" },
+          { title:"Money is Safe", titleHi:"पैसा सुरक्षित है", emoji:"💳",
+            text:"It is not safe to keep all your money at home. A bank keeps your money safe. You can take it out when you need it.",
+            textHi:"अपना सारा पैसा घर पर रखना सुरक्षित नहीं है। बैंक आपके पैसे को सुरक्षित रखता है। ज़रूरत होने पर आप इसे निकाल सकती हैं।",
+            q:"Where is your money safe?", qHi:"आपका पैसा कहाँ सुरक्षित है?",
+            choices:["In a bank","On the road","In the market"], answer:"In a bank",
+            teach:"The story says a bank keeps your money safe.", teachHi:"कहानी कहती है बैंक आपके पैसे को सुरक्षित रखता है।" },
+        ] },
+    ]
+  },
+  {
+    key:"travel", title:"Travel & Directions", titleHi:"सफ़र और रास्ता", icon:"🚌", color:"#0ea5e9",
+    blurb:"Buses, tickets & the way", blurbHi:"बस, टिकट और रास्ता", published:true,
+    lessons:[
+      { key:"around", title:"Getting Around", titleHi:"आना-जाना",
+        words:[
+          { en:"bus",     hi:"बस",       pron:"बस",     emoji:"🚌", plural:"buses",    use:"I go by bus",            useHi:"मैं बस से जाती हूँ" },
+          { en:"train",   hi:"रेलगाड़ी",  pron:"ट्रेन",   emoji:"🚆", plural:"trains",   use:"The train is here",      useHi:"रेलगाड़ी आ गई है" },
+          { en:"ticket",  hi:"टिकट",     pron:"टिकट",    emoji:"🎫", plural:"tickets",  type:"thing" },
+          { en:"road",    hi:"सड़क",      pron:"रोड",     emoji:"🛣️", plural:"roads",    use:"Cross the road slowly",  useHi:"सड़क धीरे से पार करो" },
+          { en:"station", hi:"स्टेशन",    pron:"स्टेशन",  emoji:"🚉", plural:"stations", use:"I wait at the station",  useHi:"मैं स्टेशन पर इंतज़ार करती हूँ" },
+        ],
+        dialogues:[
+          { who:"🧑", line:"Where do you want to go?", lineHi:"आप कहाँ जाना चाहती हैं?",
+            replies:[ {text:"I want to go to the market.", textHi:"मैं बाज़ार जाना चाहती हूँ।", ok:true}, {text:"I have a blue pen.", ok:false}, {text:"She is my teacher.", ok:false} ],
+            then:"Okay. One ticket for the market." },
+          { who:"🧑", line:"The ticket is ten rupees.", lineHi:"टिकट दस रुपये का है।",
+            replies:[ {text:"Here is ten rupees.", textHi:"ये रहे दस रुपये।", ok:true}, {text:"I like to dance.", ok:false}, {text:"The door is open.", ok:false} ],
+            then:"Thank you. Please sit down." },
+        ],
+        read:[
+          { title:"The Morning Bus", titleHi:"सुबह की बस", emoji:"🚌",
+            text:"Kavita takes the bus to school every morning. The bus comes at seven o'clock. She buys a ticket and finds a seat.",
+            textHi:"कविता हर सुबह स्कूल जाने के लिए बस लेती है। बस सात बजे आती है। वह टिकट खरीदती है और एक सीट ढूँढती है।",
+            q:"When does the bus come?", qHi:"बस कब आती है?",
+            choices:["At seven o'clock","At night","At noon"], answer:"At seven o'clock",
+            teach:"The story says the bus comes at seven o'clock.", teachHi:"कहानी कहती है बस सात बजे आती है।" },
+          { title:"Crossing the Road", titleHi:"सड़क पार करना", emoji:"🚦",
+            text:"Always look left and right before you cross the road. Wait for the cars to stop. Then walk across slowly and safely.",
+            textHi:"सड़क पार करने से पहले हमेशा बाएँ और दाएँ देखो। गाड़ियों के रुकने का इंतज़ार करो। फिर धीरे और सुरक्षित चलकर पार करो।",
+            q:"What should you do before crossing the road?", qHi:"सड़क पार करने से पहले क्या करना चाहिए?",
+            choices:["Look left and right","Run fast","Close your eyes"], answer:"Look left and right",
+            teach:"The story says to look left and right before crossing the road.", teachHi:"कहानी कहती है सड़क पार करने से पहले बाएँ और दाएँ देखो।" },
+        ] },
+      { key:"directions", title:"Asking the Way", titleHi:"रास्ता पूछना",
+        words:[
+          { en:"left",  hi:"बाएँ", pron:"लेफ़्ट", emoji:"👈",  use:"Turn left here",        useHi:"यहाँ बाएँ मुड़ो" },
+          { en:"right", hi:"दाएँ", pron:"राइट",  emoji:"👉",  use:"Turn right at the shop", useHi:"दुकान पर दाएँ मुड़ो" },
+          { en:"near",  hi:"पास",  pron:"नियर",  emoji:"📍",  use:"The school is near",     useHi:"स्कूल पास है" },
+          { en:"far",   hi:"दूर",  pron:"फ़ार",  emoji:"🛣️",  use:"The market is far",      useHi:"बाज़ार दूर है" },
+          { en:"map",   hi:"नक्शा", pron:"मैप",   emoji:"🗺️",  plural:"maps", type:"thing" },
+        ],
+        dialogues:[
+          { who:"🧑", line:"Excuse me, where is the bank?", lineHi:"माफ़ कीजिए, बैंक कहाँ है?",
+            replies:[ {text:"Turn left at the shop.", textHi:"दुकान पर बाएँ मुड़ो।", ok:true}, {text:"I am eating rice.", ok:false}, {text:"It is my book.", ok:false} ],
+            then:"Thank you for your help!" },
+          { who:"🧑", line:"Is the market far from here?", lineHi:"क्या बाज़ार यहाँ से दूर है?",
+            replies:[ {text:"No, it is very near.", textHi:"नहीं, यह बहुत पास है।", ok:true}, {text:"I have two sisters.", ok:false}, {text:"The cat is sleeping.", ok:false} ],
+            then:"Oh good, I will walk there." },
+        ],
+        read:[
+          { title:"The Way to the Clinic", titleHi:"क्लिनिक का रास्ता", emoji:"🗺️",
+            text:"A woman asks Geeta where the clinic is. Geeta says, 'Go straight, then turn right. The clinic is near the big tree.'",
+            textHi:"एक महिला गीता से पूछती है कि क्लिनिक कहाँ है। गीता कहती है, 'सीधे जाओ, फिर दाएँ मुड़ो। क्लिनिक बड़े पेड़ के पास है।'",
+            q:"Which way is the clinic?", qHi:"क्लिनिक किस तरफ़ है?",
+            choices:["Turn right","Turn left","Go back"], answer:"Turn right",
+            teach:"Geeta says to go straight and then turn right.", teachHi:"गीता कहती है सीधे जाओ और फिर दाएँ मुड़ो।" },
+          { title:"Using a Map", titleHi:"नक्शे का उपयोग", emoji:"🗺️",
+            text:"A map shows us the way to a new place. It has roads and names on it. When you are lost, a map can help you find your way.",
+            textHi:"नक्शा हमें किसी नई जगह का रास्ता दिखाता है। इस पर सड़कें और नाम होते हैं। जब आप खो जाएँ, तो नक्शा आपको रास्ता ढूँढने में मदद कर सकता है।",
+            q:"How can a map help you?", qHi:"नक्शा आपकी कैसे मदद कर सकता है?",
+            choices:["Find your way","Cook food","Wash clothes"], answer:"Find your way",
+            teach:"A map helps you find your way when you are lost.", teachHi:"जब आप खो जाएँ तो नक्शा रास्ता ढूँढने में मदद करता है।" },
+        ] },
+    ]
   },
 ];
 
@@ -765,6 +1034,7 @@ const QUIZ_LEVEL  = { id:"quiz",  name:"Quiz",              nameHi:"प्रश
 const CODE_LEVEL  = { id:"code",  name:"Complete the Code", nameHi:"कोड पूरा करो", sub:"Fill the blank",    subHi:"खाली जगह भरो",   ico:"💻", type:"code" };
 const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती ढूँढो",  sub:"Spot the wrong word", subHi:"गलत शब्द पकड़ो", ico:"🐞", type:"fix" };
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
+const READ_LEVEL  = { id:"read",  name:"Read & Answer",     nameHi:"पढ़ो और बताओ",  sub:"Read, then answer", subHi:"पढ़ो, फिर उत्तर दो", ico:"📃", type:"read" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
@@ -772,6 +1042,7 @@ function levelsFor(lesson){
   const hasWords = !!(lesson && lesson.words && lesson.words.length);
   const hasTalk  = !!(lesson && lesson.dialogues && lesson.dialogues.length);
   let lv = LEVELS.filter(l => l.type==="talk" ? hasTalk : hasWords);
+  if(lesson && lesson.read  && lesson.read.length)  lv = lv.concat([READ_LEVEL]);
   if(lesson && lesson.quiz  && lesson.quiz.length)  lv = lv.concat([QUIZ_LEVEL]);
   if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
@@ -1871,6 +2142,7 @@ function startLevel(course, lesson, lv, back){
     if(lv.type==="code")   return roundCode(r);
     if(lv.type==="fix")    return roundFix(r);
     if(lv.type==="email")  return roundEmail(r);
+    if(lv.type==="read")   return roundRead(r);
   }
 
   // --- LEARN: flashcard, see + hear + Hindi, then "Got it"
@@ -2213,6 +2485,74 @@ function startLevel(course, lesson, lv, back){
         setTimeout(()=>{ emailEl.querySelectorAll(".eslot.bad").forEach(e=>e.classList.remove("bad")); fb.textContent=""; }, 1700);
       }
     };
+  }
+
+  // --- READ: read a short passage, then answer a comprehension question
+  // Reading is the one skill the word/sentence/talk activities don't build directly, so this
+  // shows a simple English story (with a 🔊 that reads the WHOLE passage for non-readers and an
+  // optional Hindi gloss when the Guide is on) and asks about it. Scaffolds like the quiz: a
+  // wrong pick reveals the hint and lets her re-read; a second miss reveals the answer.
+  function roundRead(r){
+    if(!Array.isArray(r.choices) || !r.choices.includes(r.answer)) return next(true);  // malformed content → skip, never trap the child
+    const gloss = (state.hindi && r.textHi) ? `<div class="rdHi">🔊 ${esc(r.textHi)}</div>` : "";
+    const ttl = r.title ? `<div class="rdTitle">${esc((r.emoji ? r.emoji+" " : "") + tx(r.title, r.titleHi || r.title))}</div>` : "";
+    mount(`${head(tx(r.q, r.qHi || r.q), tx("Read the story, then choose the answer","कहानी पढ़ो, फिर उत्तर चुनो"), r.qHi || "")}
+      <div class="readbox">
+        ${ttl}
+        <p class="rdText">${esc(r.text)}</p>
+        ${gloss}
+        <button class="speakbtn" id="rdsay">🔊 ${tx("Read it to me","पढ़कर सुनाओ")}</button>
+      </div>
+      <div class="options quizopts" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    $("#rdsay").onclick = () => speak(r.text);
+    // hear the whole passage first, then the question — so a non-reader gets the full item aloud
+    announce(() => { speak(r.text); speak(tx(r.q, r.qHi || r.q), state.lang==="hi" ? "hi" : "en", { queue:true, gap:700 }); });
+    const opts = $("#opts");
+    let tries = 0, done = false;
+    const showTeach = () => {                              // the teach card doubles as the re-reading hint
+      if(!r.teach) return;
+      const tb = $("#teach"); tb.style.display = "flex";
+      const main = tx(r.teach, r.teachHi || r.teach);
+      const alt = (state.hindi && state.lang!=="hi" && r.teachHi) ? `<br><i>${esc(r.teachHi)}</i>` : "";
+      tb.innerHTML = `💡 <span>${esc(main)}${alt}</span>`;
+      setNarration(main, main);                            // tap 🔊 re-hears the hint
+    };
+    shuffle(r.choices.slice()).forEach(c => {
+      const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+      b.onclick = () => {
+        if(done) return;
+        const fb = $("#fb");
+        if(c === r.answer){                                // right (even after a hint) → full credit
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add("correct"); setMood("happy"); sfx.correct();
+          fb.textContent = tx("Correct! 🎉","सही! 🎉"); fb.className = "feedback good";
+          showTeach();
+          setTimeout(() => next(true), r.teach ? 1700 : 1000);
+          return;
+        }
+        // wrong
+        logWrong(r.q, c, r.answer);
+        tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
+        if(tries === 1 && r.teach){
+          // SCAFFOLD: nudge her to re-read, show the hint, keep the other options live
+          fb.textContent = tx("Not quite — read again, here's a hint.","बिल्कुल नहीं — फिर से पढ़ो, यह रहा संकेत।");
+          fb.className = "feedback bad";
+          showTeach();
+        } else {
+          // second miss (or no hint): reveal & move on — never trap her
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => { o.classList.add("disabled"); if(o.textContent === r.answer) o.classList.add("correct"); });
+          fb.textContent = tx("Answer: ","सही जवाब: ") + r.answer; fb.className = "feedback bad";
+          showTeach();
+          setTimeout(() => next(false), r.teach ? 2200 : 1700);
+        }
+      };
+      opts.appendChild(b);
+    });
   }
 
   // --- finish: award stars
@@ -2619,6 +2959,7 @@ function buildRounds(lv, lesson){
   if(lv.type==="code") return (lesson.code||[]).slice();
   if(lv.type==="fix")  return (lesson.fix||[]).slice();
   if(lv.type==="email") return (lesson.email||[]).slice();
+  if(lv.type==="read") return (lesson.read||[]).slice();
   return [];
 }
 
