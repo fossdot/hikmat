@@ -215,3 +215,50 @@ class TestHikmatApi(FrappeTestCase):
 		r = api.log_event(kind="wrong_answer", student=stu.name, token="forged",
 		                  question="q", chosen="a", answer="b")
 		self.assertEqual(r.get("error"), "auth")
+
+	# ---------------- Learning-event stream (dwell + tool use) ----------------
+	def test_log_event_dwell_records_and_caps_duration(self):
+		def _rm():
+			frappe.db.delete("Learning Event", {"client_id": ("in", ["t-dw-1", "t-dw-2"])})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		r = api.log_event(kind="dwell", track="t1", lesson="l1", activity="spell",
+		                  duration_secs=95, client_id="t-dw-1")
+		self.assertTrue(r.get("ok"))
+		self.assertEqual(frappe.db.get_value("Learning Event", {"client_id": "t-dw-1"},
+		                                     "duration_secs"), 95)
+		# a left-open-overnight tab can't poison the time averages: hard 2h cap
+		r2 = api.log_event(kind="dwell", track="t1", lesson="l1", activity="spell",
+		                   duration_secs=999999, client_id="t-dw-2")
+		self.assertTrue(r2.get("ok"))
+		self.assertEqual(frappe.db.get_value("Learning Event", {"client_id": "t-dw-2"},
+		                                     "duration_secs"), 7200)
+
+	def test_log_event_dwell_requires_duration(self):
+		self.assertEqual(api.log_event(kind="dwell", track="t1").get("error"), "bad_duration")
+
+	def test_log_event_tool_use_batches_count(self):
+		def _rm():
+			frappe.db.delete("Learning Event", {"client_id": "t-tool-1"})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		r = api.log_event(kind="tool_use", tool="listen_word", track="t1", lesson="l1",
+		                  activity="learn", count=7, client_id="t-tool-1")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Learning Event", {"client_id": "t-tool-1"},
+		                          ["tool", "count"], as_dict=True)
+		self.assertEqual(row.tool, "listen_word")
+		self.assertEqual(row.count, 7)
+
+	def test_log_event_tool_use_requires_tool(self):
+		self.assertEqual(api.log_event(kind="tool_use", count=3).get("error"), "bad_tool")
+
+	def test_submit_attempt_stores_capped_duration(self):
+		stu = self._mk_student("Dwell Girl")
+		tok = api._token_for(stu.name)
+		r = api.submit_attempt(student=stu.name, token=tok, track="t1", lesson="l1",
+		                       activity="quiz", stars=2, score=4, total=5,
+		                       duration_secs=999999, client_id="t-att-dur-1")
+		self.assertTrue(r.get("ok"))
+		self.assertEqual(frappe.db.get_value("Lesson Attempt", {"client_id": "t-att-dur-1"},
+		                                     "duration_secs"), 7200)

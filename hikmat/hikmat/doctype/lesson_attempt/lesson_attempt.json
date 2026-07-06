@@ -15,6 +15,7 @@
   "score",
   "total",
   "coins",
+  "duration_secs",
   "attempted_on",
   "student_name",
   "cohort",
@@ -69,6 +70,11 @@
    "label": "Coins"
   },
   {
+   "fieldname": "duration_secs",
+   "fieldtype": "Int",
+   "label": "Time spent (secs)"
+  },
+  {
    "fieldname": "attempted_on",
    "fieldtype": "Datetime",
    "label": "Attempted on"
@@ -96,7 +102,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-22 11:39:09.749972",
+ "modified": "2026-07-06 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Lesson Attempt",

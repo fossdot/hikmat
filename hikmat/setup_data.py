@@ -610,8 +610,9 @@ def wipe_demo_data():
 
 def setup_trouble_report():
     """THE teaching-triage report: every lesson-activity ranked by how much students
-    struggle with it — success rate, failed attempts, wrong answers, doubts — worst
-    first. This is the 'which lesson do I fix / re-teach?' list."""
+    struggle with it — success rate, failed attempts, wrong answers, doubts, time
+    spent, mid-activity bail-outs — worst first. This is the 'which lesson do I fix /
+    re-teach?' list."""
     name = "Lesson Trouble Spots"
     if frappe.db.exists("Report", name):
         frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
@@ -630,6 +631,10 @@ def setup_trouble_report():
         (SELECT COUNT(*) FROM `tabLesson Doubt` d
           WHERE d.track=a.track AND d.lesson=a.lesson
             AND d.activity=a.activity)                             AS "Doubts:Int:80",
+        ROUND(AVG(NULLIF(a.duration_secs, 0)) / 60, 1)             AS "Avg mins:Float:90",
+        (SELECT COUNT(*) FROM `tabLearning Event` e
+          WHERE e.kind='dwell' AND e.track=a.track
+            AND e.lesson=a.lesson AND e.activity=a.activity)       AS "Bail-outs:Int:90",
         MAX(a.attempted_on)                                        AS "Last Played:Datetime:150"
     FROM `tabLesson Attempt` a
     GROUP BY a.track, a.lesson, a.activity
@@ -675,6 +680,52 @@ def setup_hard_questions_report():
     }).insert(ignore_permissions=1)
     frappe.db.commit()
     print("=== report 'Hardest Questions' ready ===")
+
+
+def setup_engagement_report():
+    """HOW each girl is learning, not just how well: minutes in the game (finished
+    attempts + abandoned tries), replays (self-driven practice), listen taps (audio
+    reliance — expected for a non-reader, a flag for a reader), mid-activity
+    bail-outs (frustration), doubts, and when she was last seen. The 'who needs me
+    this week?' list — most recently active first, so the idle girls sink visibly."""
+    name = "Student Engagement"
+    if frappe.db.exists("Report", name):
+        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
+    query = """SELECT
+        s.name           AS "Student:Link/Student:130",
+        s.student_name   AS "Name::130",
+        s.cohort         AS "Cohort::110",
+        COUNT(a.name)                                      AS "Attempts:Int:80",
+        COUNT(DISTINCT CONCAT(a.track, '/', a.lesson))     AS "Lessons:Int:80",
+        ROUND(AVG(a.stars), 2)                             AS "Avg Stars:Float:85",
+        ROUND((COALESCE(SUM(a.duration_secs), 0)
+             + (SELECT COALESCE(SUM(e.duration_secs), 0) FROM `tabLearning Event` e
+                 WHERE e.student = s.name AND e.kind = 'dwell')) / 60)
+                                                           AS "Minutes:Int:80",
+        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
+          WHERE e.student = s.name AND e.kind = 'tool_use'
+            AND e.tool = 'replay')                         AS "Replays:Int:80",
+        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
+          WHERE e.student = s.name AND e.kind = 'tool_use'
+            AND e.tool IN ('listen_word','hear_screen','hear_again','hear_slow','hear_hindi'))
+                                                           AS "Listen Taps:Int:95",
+        (SELECT COUNT(*) FROM `tabLearning Event` e
+          WHERE e.student = s.name AND e.kind = 'dwell')   AS "Bail-outs:Int:85",
+        (SELECT COUNT(*) FROM `tabLesson Doubt` d
+          WHERE d.student = s.name)                        AS "Doubts:Int:75",
+        MAX(a.attempted_on)                                AS "Last Active:Datetime:150"
+    FROM `tabStudent` s
+    LEFT JOIN `tabLesson Attempt` a ON a.student = s.name
+    WHERE s.active = 1
+    GROUP BY s.name, s.student_name, s.cohort
+    ORDER BY MAX(a.attempted_on) DESC"""
+    frappe.get_doc({
+        "doctype": "Report", "report_name": name, "ref_doctype": "Student",
+        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
+        "query": query, "roles": [{"role": "System Manager"}],
+    }).insert(ignore_permissions=1)
+    frappe.db.commit()
+    print("=== report 'Student Engagement' ready ===")
 
 
 def setup_drilldown_report():
@@ -1109,6 +1160,7 @@ def setup_analytics():
     setup_evaluation_report()
     setup_trouble_report()
     setup_hard_questions_report()
+    setup_engagement_report()
     setup_drilldown_report()
 
     # confusion chart — doubts grouped by lesson (the heatmap, visualised)
@@ -1132,6 +1184,7 @@ def setup_workspace(cards=None, charts=None):
                         "Attempts by Student", "Attempts by Cohort"]
     shortcuts = [("Lesson Trouble Spots", "Lesson Trouble Spots", "Report"),
                  ("Hardest Questions", "Hardest Questions", "Report"),
+                 ("Student Engagement", "Student Engagement", "Report"),
                  ("Activity Drill-down", "Activity Drill-down", "Report"),
                  ("Student Progress", "Student Progress", "Report"),
                  ("Confusion Heatmap", "Confusion Heatmap", "Report"),
@@ -1148,7 +1201,7 @@ def setup_workspace(cards=None, charts=None):
     _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt",
                    "AI Review Queue": "AI Conversation", "Pending Evaluations": "Evaluation",
                    "Lesson Trouble Spots": "Lesson Attempt", "Hardest Questions": "Learning Event",
-                   "Activity Drill-down": "Lesson Attempt"}
+                   "Student Engagement": "Student", "Activity Drill-down": "Lesson Attempt"}
 
     def _sc(lbl, link, typ):
         d = {"label": lbl, "link_to": link, "type": typ}

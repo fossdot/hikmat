@@ -374,7 +374,7 @@ def _build_settings():
 # ---------------------------------------------------------------------------
 @frappe.whitelist(allow_guest=True)
 def submit_attempt(student=None, token=None, track=None, lesson=None, activity=None,
-                   stars=0, score=0, total=0, coins=0, client_id=None):
+                   stars=0, score=0, total=0, coins=0, duration_secs=0, client_id=None):
     """Record one finished activity. Called by the game on the result screen.
     Everything here is attacker-controllable, so: verify the student exists & is
     active, require the student's login token (no forging attempts for others),
@@ -409,6 +409,7 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
             "stars": max(0, min(3, _int(stars))),          # an activity is worth 0–3 stars
             "score": score, "total": total,
             "coins": max(0, min(1000, _int(coins))),
+            "duration_secs": max(0, min(7200, _int(duration_secs))),   # 2h cap kills left-open-overnight noise
             "attempted_on": frappe.utils.now(),
         }).insert(ignore_permissions=True)
     except frappe.DuplicateEntryError:                       # raced with another submit of the same client_id
@@ -550,16 +551,27 @@ def report_doubt(student=None, token=None, track=None, lesson=None, activity=Non
 
 @frappe.whitelist(allow_guest=True)
 def log_event(student=None, token=None, kind=None, track=None, lesson=None, activity=None,
-              question=None, chosen=None, answer=None, lang=None, client_id=None):
-    """Record one fine-grained learning event (today: kind='wrong_answer' — the exact
-    question a learner missed and what she picked instead). Mirrors report_doubt:
-    idempotent on client_id, offline-queue friendly, guests allowed (anonymous wrong-
-    answer data still tells the teacher which QUESTION is broken). No notification —
-    this is a high-volume analytics stream, not an alert."""
+              question=None, chosen=None, answer=None, lang=None, client_id=None,
+              tool=None, duration_secs=None, count=None):
+    """Record one fine-grained learning event. Mirrors report_doubt: idempotent on
+    client_id, offline-queue friendly, guests allowed (anonymous data still tells the
+    teacher which QUESTION or ACTIVITY is broken). No notification — this is a
+    high-volume analytics stream, not an alert. Kinds:
+      wrong_answer — the exact question a learner missed and what she picked instead
+      dwell        — time spent on an activity she LEFT without finishing (finished
+                     time rides on Lesson Attempt.duration_secs); duration_secs
+      tool_use     — batched taps of a UI tool (listen / lang_switch / replay …);
+                     tool + count, aggregated client-side per activity"""
     if not _rate_ok("event:" + _client_ip(), 6000, 3600):   # wrong answers come in bursts; keep the ceiling high
         return {"ok": False, "error": "rate_limited"}
-    if kind not in ("wrong_answer",):                        # extensible: dwell/tool-use events later
+    if kind not in ("wrong_answer", "dwell", "tool_use"):
         return {"ok": False, "error": "bad_kind"}
+    duration_secs = max(0, min(7200, _int(duration_secs)))  # same 2h sanity cap as attempts
+    count = max(1, min(1000, _int(count) or 1))
+    if kind == "dwell" and duration_secs <= 0:
+        return {"ok": False, "error": "bad_duration"}
+    if kind == "tool_use" and not (tool or "").strip():
+        return {"ok": False, "error": "bad_tool"}
     if client_id:
         existing = frappe.db.get_value("Learning Event", {"client_id": client_id}, "name")
         if existing:
@@ -583,6 +595,8 @@ def log_event(student=None, token=None, kind=None, track=None, lesson=None, acti
             "kind": kind,
             "track": (track or "")[:140], "lesson": (lesson or "")[:140],
             "activity": (activity or "")[:140],
+            "tool": (tool or "")[:40],
+            "duration_secs": duration_secs, "count": count,
             "question": (question or "")[:140],
             "chosen": (chosen or "")[:140], "answer": (answer or "")[:140],
             "lang": (lang or "")[:10],

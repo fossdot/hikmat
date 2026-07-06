@@ -1122,7 +1122,7 @@ function refreshTop(){
 }
 $("#hiToggle").onclick = () => {
   state.hindi=!state.hindi; state.prefsTouched=true; save(); refreshTop(); updateHiLine();
-  sfx.tap();
+  sfx.tap(); logTool("hindi_guide");
   // Outside gameplay there's no hint bubble to change, so confirm the switch explicitly —
   // otherwise the tap looks like it did nothing.
   const msg = state.hindi ? tx("Guide ON — words will also show their Hindi meaning.","गाइड चालू — शब्दों का हिंदी मतलब भी दिखेगा।")
@@ -1130,9 +1130,9 @@ $("#hiToggle").onclick = () => {
   flashToast(msg); srSay(msg);
   if(state.hindi) sayHi("हिंदी गाइड चालू");
 };
-$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save(); refreshTop(); rerender(); };
-$("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); };
-$("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); };
+$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save(); refreshTop(); rerender(); logTool("lang_switch"); };
+$("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); logTool("theme"); };
+$("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); logTool("hear_screen"); };
 $("#helpNeedBtn").onclick = () => helpNeeded();
 
 // ============================================================
@@ -1547,7 +1547,9 @@ function renderLessonMap(course, lesson, back){
 function startLevel(course, lesson, lv, back){
   const rounds = buildRounds(lv, lesson);
   let idx = 0, score = 0;
-  const backToLesson = () => renderLessonMap(course, lesson, back);
+  actStart(course, lesson, lv);                                        // dwell clock starts
+  if(getStars(course.key, lesson.key, lv.id) > 0) logTool("replay");   // she's back for practice
+  const backToLesson = () => { actEnd(false); renderLessonMap(course, lesson, back); };
   const backLbl = "← " + tx(lesson.title, lesson.titleHi);
   setBack(backLbl, backToLesson);
   rerender = runRound;   // language toggle re-renders the current round in place
@@ -1945,13 +1947,15 @@ function startLevel(course, lesson, lv, back){
   function finish(){
     clearAnnounce();
     doubtCtx = null;     // left gameplay — no round on screen to ask about
+    const secs = actEnd(true);                             // completed: time rides on the attempt row
     const pct = rounds.length ? score/rounds.length : 0;   // guard: admin lesson could yield 0 rounds
     const stars = pct>=0.99?3 : pct>=0.6?2 : pct>=0.3?1 : 0;
     const prevGems = (state.coins||0) - score*5;              // gems before this attempt (in-round +5s already added)
     setStars(course.key, lesson.key, lv.id, stars); state.coins += stars*10; save(); refreshTop();
     const belt = crossedMilestone(prevGems, state.coins||0);  // did this attempt's gems cross a belt threshold?
     recordAttempt({ track: course.key, lesson: lesson.key, activity: lv.id,
-                    stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5 });
+                    stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5,
+                    duration_secs: secs });
     if(stars>=1) sfx.complete(); else sfx.wrong();
     root.innerHTML="";
     root.appendChild(el(`<div class="screen result">
@@ -2227,9 +2231,9 @@ function openDoubt(){
   const close = () => { sheet.remove(); };
   sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
   $("#dClose").onclick = () => { sfx.tap(); close(); };
-  $("#dAgain").onclick = () => { sfx.tap(); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en"); };
-  $("#dSlow").onclick  = () => { sfx.tap(); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en", { rate:0.55 }); };
-  const dh = $("#dHindi"); if(dh) dh.onclick = () => { sfx.tap(); if(hi) speak(hi, "hi", { rate:0.8 }); };
+  $("#dAgain").onclick = () => { sfx.tap(); logTool("hear_again"); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en"); };
+  $("#dSlow").onclick  = () => { sfx.tap(); logTool("hear_slow"); if(replayEn) speak(replayEn, state.lang==="hi"?"hi":"en", { rate:0.55 }); };
+  const dh = $("#dHindi"); if(dh) dh.onclick = () => { sfx.tap(); logTool("hear_hindi"); if(hi) speak(hi, "hi", { rate:0.8 }); };
   $("#dTeacher").onclick = () => {
     sfx.tap();
     // already logged on open; acknowledge so she knows help is coming
@@ -2315,6 +2319,63 @@ async function syncEvents(){
   } finally { _syncingEvents = false; }
 }
 window.addEventListener("online", syncEvents);
+
+// ---------- Learning-event stream (analytics Layer 2: dwell time + tool usage) ----------
+// Dwell: one timer per activity, paused while the tab is hidden. A FINISHED activity
+// ships its seconds on the Lesson Attempt itself; leaving mid-activity emits a
+// kind="dwell" event instead — the bail-out signal the attempt row can't carry.
+let ACT = null;   // {course, lesson, lv, t0, acc} — the activity being timed right now
+function actStart(course, lesson, lv){
+  actEnd(false);                       // leftover session (shouldn't happen) counts as abandoned
+  ACT = { course, lesson, lv, t0: Date.now(), acc: 0 };
+}
+function actSecs(){
+  if(!ACT) return 0;
+  return Math.round((ACT.acc + (document.hidden ? 0 : Date.now() - ACT.t0)) / 1000);
+}
+function actEnd(completed){
+  if(!ACT) return 0;
+  const secs = Math.min(actSecs(), 7200), a = ACT;
+  ACT = null;
+  flushTools();                        // ship this activity's tool taps alongside it
+  if(!completed && secs >= 5)          // <5s = misclick, not a bail-out
+    recordEvent({ kind:"dwell", track:a.course.key, lesson:a.lesson.key, activity:a.lv.id,
+                  duration_secs: secs });
+  return secs;
+}
+document.addEventListener("visibilitychange", () => {
+  if(!ACT) return;
+  if(document.hidden) ACT.acc += Date.now() - ACT.t0;   // pause: bank the visible time
+  else ACT.t0 = Date.now();                             // resume the clock
+});
+
+// Tool taps (🔊 listen, language switch, Hindi guide, replays …) are counted per
+// (tool, current activity) and flushed as ONE batched event — not one POST per tap.
+let TOOL_COUNTS = {};
+let _toolTimer = null;
+function logTool(tool){
+  const k = ACT ? [tool, ACT.course.key, ACT.lesson.key, ACT.lv.id].join("|")
+                : tool + "|||";
+  TOOL_COUNTS[k] = (TOOL_COUNTS[k] || 0) + 1;
+  clearTimeout(_toolTimer);
+  _toolTimer = setTimeout(flushTools, 15000);           // idle flush for taps outside gameplay
+}
+function flushTools(){
+  clearTimeout(_toolTimer); _toolTimer = null;
+  const counts = TOOL_COUNTS; TOOL_COUNTS = {};
+  for(const k in counts){
+    const p = k.split("|");
+    recordEvent({ kind:"tool_use", tool:p[0], track:p[1], lesson:p[2], activity:p[3],
+                  count: counts[k] });
+  }
+}
+// Leaving the page: bank everything into localStorage (recordEvent is synchronous)
+// so the next visit's boot flush ships it. flushTools too — actEnd no-ops outside gameplay.
+window.addEventListener("pagehide", () => { actEnd(false); flushTools(); });
+// One delegated listener catches every in-activity "hear it" button, current and future.
+root.addEventListener("click", e => {
+  if(e.target.closest && e.target.closest(".speakchip,.speakbtn,.tap-emoji")) logTool("listen_word");
+});
 
 function _readDoubts(){ try { return JSON.parse(localStorage.getItem(DOUBT_QUEUE)) || []; } catch(e){ return []; } }
 function _saveDoubts(q){ try { localStorage.setItem(DOUBT_QUEUE, JSON.stringify(q)); } catch(e){} }

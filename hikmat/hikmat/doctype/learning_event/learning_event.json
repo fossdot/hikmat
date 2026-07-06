@@ -14,6 +14,9 @@
   "track",
   "lesson",
   "activity",
+  "tool",
+  "duration_secs",
+  "count",
   "question",
   "chosen",
   "answer",
@@ -66,6 +69,23 @@
    "label": "Activity"
   },
   {
+   "fieldname": "tool",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tool (kind=tool_use)"
+  },
+  {
+   "fieldname": "duration_secs",
+   "fieldtype": "Int",
+   "label": "Duration secs (kind=dwell)"
+  },
+  {
+   "default": "1",
+   "fieldname": "count",
+   "fieldtype": "Int",
+   "label": "Count (batched tool taps)"
+  },
+  {
    "fieldname": "question",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -103,7 +123,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-05 15:02:14.389410",
+ "modified": "2026-07-06 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Learning Event",
