@@ -15,6 +15,11 @@ def after_install():
     # content: bands + subjects + the 14 tracks / 74 lessons / quiz + Hikmat Settings
     m.seed_content()
 
+    # belts + campus/cohorts/invite-code/login-settings — patches DON'T run on a fresh
+    # install (Frappe marks them completed), so everything they'd seed must happen here
+    m.seed_milestones()
+    m.seed_operational_defaults()
+
     # teacher backoffice (dashboard, charts, workspace) — best-effort, never block install
     try:
         m.setup_analytics()

@@ -64,6 +64,32 @@ limits, input validation, cached read APIs).
 - Keep a short **privacy notice** for parents/teachers describing what is stored
   (first name/nickname, avatar, progress) and how to request deletion.
 
+## Production cutover checklist (day-one, in order)
+
+A fresh install (`bench new-site` + `install-app hikmat`, or a Frappe Cloud deploy)
+runs `after_install` which seeds content, belts, the campus, the two cohorts
+(**Online** / **NGHS Sept-2026**), a **random invite code**, and the login System
+Settings (username login on, password policy off). Patches do NOT run on fresh
+installs — everything they seed is mirrored in `seed_operational_defaults()`.
+
+1. **Admin password**: set a strong, unique Administrator password; enable **2FA**
+   for every System Manager (Desk → Two Factor Authentication settings).
+2. **Invite code**: read the generated code from the *Online* cohort (Desk → Cohorts)
+   and share it only through the facilitator channel. Rotate it there any time it leaks.
+3. **Facilitator accounts**: one named Desk user per facilitator (System Manager for
+   now — a scoped role is future hardening); no shared logins.
+4. **Learner data**: if a copied/dev database is ever promoted, run
+   `bench --site <site> execute hikmat.setup_data.wipe_demo_data` so real analytics
+   start from zero (content, belts, cohorts and settings survive the wipe).
+5. **Campus laptop provisioning** (offline path): a facilitator opens the game →
+   ⚙️ Set-up → logs in → picks the campus → the roster caches on-device → log out.
+   Verify a girl can then log in by name + PIN with wifi OFF.
+6. **Smoke test** (5 min): guest plays a lesson → 2-lesson wall appears → online
+   signup with the invite code works → Desk shows the attempt, and the Trouble
+   Spots / Drill-down reports fill in.
+7. **Backups**: on Frappe Cloud they're automatic; self-hosted, schedule
+   `bench --site <site> backup` off-machine.
+
 ## Reporting
 
 Found a vulnerability? Email **vishal@fossunited.org** — please don't open a public

@@ -550,6 +550,64 @@ def setup_evaluation_report():
     print("=== report 'Pending Evaluations' ready ===")
 
 
+def seed_operational_defaults():
+    """Everything a FRESH site needs beyond content. Patches are marked complete —
+    NOT executed — when the app installs on a new site, so the records and System
+    Settings that dev picked up via patches v1–v4 must also be seeded here. Idempotent.
+    """
+    # the physical campus for the offline path
+    if frappe.db.exists("DocType", "Campus") and not frappe.db.exists("Campus", "Noor Girls High School"):
+        frappe.get_doc({"doctype": "Campus", "campus_name": "Noor Girls High School",
+                        "location": "Meghwal Mathia", "active": 1}).insert(ignore_permissions=True)
+
+    # the two-cohort model: Online (self-signup + invite) and the campus batch
+    if not frappe.db.exists("Cohort Start Date", "2026-09-01"):
+        frappe.get_doc({"doctype": "Cohort Start Date",
+                        "start_date": "2026-09-01"}).insert(ignore_permissions=True)
+    if not frappe.db.exists("Cohort", "Online"):
+        frappe.get_doc({"doctype": "Cohort", "cohort_name": "Online", "mode": "Online",
+                        "center": "Self sign-up"}).insert(ignore_permissions=True)
+    if not frappe.db.get_value("Cohort", "Online", "invite_code"):
+        # a fresh RANDOM invite code per deployment — never a known default; unambiguous
+        # alphabet (no 0/O/1/I/L) so it survives being read aloud or written on a slate
+        import secrets
+        code = "".join(secrets.choice("ABCDEFGHJKMNPQRSTUVWXYZ23456789") for _ in range(6))
+        frappe.db.set_value("Cohort", "Online", "invite_code", code, update_modified=False)
+    if not frappe.db.exists("Cohort", "NGHS Sept-2026"):
+        frappe.get_doc({"doctype": "Cohort", "cohort_name": "NGHS Sept-2026", "mode": "Offline",
+                        "start_date": "2026-09-01",
+                        "center": "Noor Girls High School"}).insert(ignore_permissions=True)
+
+    # online students log in by USERNAME + numeric PIN (mirrors patch v2)
+    ss = frappe.get_single("System Settings")
+    if not ss.allow_login_using_user_name or ss.enable_password_policy:
+        ss.allow_login_using_user_name = 1
+        ss.enable_password_policy = 0
+        ss.flags.ignore_mandatory = True
+        ss.save(ignore_permissions=True)
+    frappe.db.commit()
+    print("=== operational defaults ready (campus, cohorts, invite code, login settings) ===")
+
+
+def wipe_demo_data():
+    """Production-cutover reset: erase ALL learner data — students (and their linked
+    Website Users), attempts, doubts, learning events, evaluations, AI chats — while
+    keeping content, milestones, cohorts, campuses and settings untouched."""
+    for dt in ("AI Conversation Turn", "AI Conversation", "Learning Event",
+               "Lesson Doubt", "Lesson Attempt", "Evaluation"):
+        if frappe.db.exists("DocType", dt):
+            frappe.db.delete(dt)
+    users = [u for u in frappe.get_all("Student", filters={"user": ("!=", "")}, pluck="user") if u]
+    frappe.db.delete("Student")
+    frappe.db.commit()
+    for u in users:                    # synthetic *.hikmat.invalid Website Users ride along
+        if frappe.db.exists("User", u):
+            frappe.delete_doc("User", u, force=1, ignore_permissions=True, delete_permanently=True)
+    frappe.db.commit()
+    print("=== learner data wiped (content/config kept):",
+          frappe.db.count("Student"), "students remain ===")
+
+
 def setup_trouble_report():
     """THE teaching-triage report: every lesson-activity ranked by how much students
     struggle with it — success rate, failed attempts, wrong answers, doubts — worst
