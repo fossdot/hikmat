@@ -8267,5 +8267,816 @@
     ]
    }
   ]
+ },
+ {
+  "key": "health",
+  "title": "Health & Clinic",
+  "titleHi": "सेहत और क्लिनिक",
+  "icon": "🏥",
+  "color": "#ef476f",
+  "blurb": "Body, doctor & staying well",
+  "blurbHi": "शरीर, डॉक्टर और सेहत",
+  "published": true,
+  "lessons": [
+   {
+    "key": "body",
+    "title": "My Body",
+    "titleHi": "मेरा शरीर",
+    "words": [
+     {
+      "en": "eye",
+      "hi": "आँख",
+      "pron": "आई",
+      "emoji": "👁️",
+      "plural": "eyes",
+      "use": "I have two eyes",
+      "useHi": "मेरी दो आँखें हैं"
+     },
+     {
+      "en": "hand",
+      "hi": "हाथ",
+      "pron": "हैंड",
+      "emoji": "✋",
+      "plural": "hands",
+      "use": "I wash my hands",
+      "useHi": "मैं अपने हाथ धोती हूँ"
+     },
+     {
+      "en": "ear",
+      "hi": "कान",
+      "pron": "ईयर",
+      "emoji": "👂",
+      "plural": "ears",
+      "use": "I hear with my ears",
+      "useHi": "मैं अपने कानों से सुनती हूँ"
+     },
+     {
+      "en": "nose",
+      "hi": "नाक",
+      "pron": "नोज़",
+      "emoji": "👃",
+      "plural": "noses",
+      "use": "This is my nose",
+      "useHi": "यह मेरी नाक है"
+     },
+     {
+      "en": "leg",
+      "hi": "टाँग",
+      "pron": "लेग",
+      "emoji": "🦵",
+      "plural": "legs",
+      "use": "I have two legs",
+      "useHi": "मेरी दो टाँगें हैं"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "How do you feel today?",
+      "lineHi": "आज तुम कैसा महसूस कर रही हो?",
+      "replies": [
+       {
+        "text": "I feel fine, thank you.",
+        "textHi": "मैं ठीक महसूस करती हूँ, धन्यवाद।",
+        "ok": true
+       },
+       {
+        "text": "I want two bananas.",
+        "ok": false
+       },
+       {
+        "text": "It is on the table.",
+        "ok": false
+       }
+      ],
+      "then": "That is good to hear."
+     },
+     {
+      "who": "👩",
+      "line": "Wash your hands before you eat.",
+      "lineHi": "खाने से पहले अपने हाथ धो लो।",
+      "replies": [
+       {
+        "text": "Okay, I will wash my hands.",
+        "textHi": "ठीक है, मैं अपने हाथ धो लूँगी।",
+        "ok": true
+       },
+       {
+        "text": "The bus is late.",
+        "ok": false
+       },
+       {
+        "text": "I am ten years old.",
+        "ok": false
+       }
+      ],
+      "then": "Good. Clean hands keep you healthy."
+     }
+    ],
+    "read": [
+     {
+      "title": "Clean Hands",
+      "titleHi": "साफ़ हाथ",
+      "emoji": "✋",
+      "text": "We use our hands every day. Dirty hands can make us sick. Always wash your hands with soap before you eat.",
+      "textHi": "हम रोज़ अपने हाथों का इस्तेमाल करते हैं। गंदे हाथ हमें बीमार कर सकते हैं। खाने से पहले हमेशा साबुन से हाथ धोओ।",
+      "q": "When should you wash your hands?",
+      "qHi": "तुम्हें हाथ कब धोने चाहिए?",
+      "choices": [
+       "Before you eat",
+       "After you sleep",
+       "Before you sing"
+      ],
+      "answer": "Before you eat",
+      "teach": "The story says to wash your hands with soap before you eat.",
+      "teachHi": "कहानी कहती है खाने से पहले साबुन से हाथ धोओ।"
+     },
+     {
+      "title": "Two Eyes, Two Ears",
+      "titleHi": "दो आँखें, दो कान",
+      "emoji": "👀",
+      "text": "We have two eyes to see. We have two ears to hear. We must keep our body clean and safe.",
+      "textHi": "हमारे पास देखने के लिए दो आँखें हैं। हमारे पास सुनने के लिए दो कान हैं। हमें अपने शरीर को साफ़ और सुरक्षित रखना चाहिए।",
+      "q": "What do we use to hear?",
+      "qHi": "हम सुनने के लिए क्या इस्तेमाल करते हैं?",
+      "choices": [
+       "Our ears",
+       "Our eyes",
+       "Our hands"
+      ],
+      "answer": "Our ears",
+      "teach": "We hear with our ears and see with our eyes.",
+      "teachHi": "हम कानों से सुनते हैं और आँखों से देखते हैं।"
+     }
+    ]
+   },
+   {
+    "key": "clinic",
+    "title": "At the Clinic",
+    "titleHi": "क्लिनिक में",
+    "words": [
+     {
+      "en": "doctor",
+      "hi": "डॉक्टर",
+      "pron": "डॉक्टर",
+      "emoji": "👩‍⚕️",
+      "plural": "doctors",
+      "type": "person"
+     },
+     {
+      "en": "medicine",
+      "hi": "दवा",
+      "pron": "मेडिसिन",
+      "emoji": "💊",
+      "uncount": true
+     },
+     {
+      "en": "fever",
+      "hi": "बुखार",
+      "pron": "फ़ीवर",
+      "emoji": "🤒",
+      "uncount": true,
+      "use": "I have a fever",
+      "useHi": "मुझे बुखार है"
+     },
+     {
+      "en": "rest",
+      "hi": "आराम",
+      "pron": "रेस्ट",
+      "emoji": "🛌",
+      "uncount": true,
+      "type": "verb"
+     },
+     {
+      "en": "clinic",
+      "hi": "क्लिनिक",
+      "pron": "क्लिनिक",
+      "emoji": "🏥",
+      "plural": "clinics",
+      "use": "I go to the clinic",
+      "useHi": "मैं क्लिनिक जाती हूँ"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "What is the problem?",
+      "lineHi": "क्या तकलीफ़ है?",
+      "replies": [
+       {
+        "text": "I have a fever.",
+        "textHi": "मुझे बुखार है।",
+        "ok": true
+       },
+       {
+        "text": "I want to buy rice.",
+        "ok": false
+       },
+       {
+        "text": "My name is Sita.",
+        "ok": false
+       }
+      ],
+      "then": "Take this medicine and rest well."
+     },
+     {
+      "who": "👩‍⚕️",
+      "line": "Take rest for two days.",
+      "lineHi": "दो दिन आराम करो।",
+      "replies": [
+       {
+        "text": "Okay doctor, thank you.",
+        "textHi": "ठीक है डॉक्टर, धन्यवाद।",
+        "ok": true
+       },
+       {
+        "text": "I have three pens.",
+        "ok": false
+       },
+       {
+        "text": "The shop is open.",
+        "ok": false
+       }
+      ],
+      "then": "Get well soon!"
+     }
+    ],
+    "read": [
+     {
+      "title": "A Visit to the Doctor",
+      "titleHi": "डॉक्टर के पास",
+      "emoji": "🩺",
+      "text": "Priya has a fever. Her mother takes her to the clinic. The doctor gives her medicine and tells her to rest.",
+      "textHi": "प्रिया को बुखार है। उसकी माँ उसे क्लिनिक ले जाती है। डॉक्टर उसे दवा देते हैं और आराम करने को कहते हैं।",
+      "q": "Why does Priya go to the clinic?",
+      "qHi": "प्रिया क्लिनिक क्यों जाती है?",
+      "choices": [
+       "She has a fever",
+       "She wants food",
+       "She wants a book"
+      ],
+      "answer": "She has a fever",
+      "teach": "Priya goes to the clinic because she has a fever.",
+      "teachHi": "प्रिया क्लिनिक जाती है क्योंकि उसे बुखार है।"
+     },
+     {
+      "title": "Take Your Medicine",
+      "titleHi": "अपनी दवा लो",
+      "emoji": "💊",
+      "text": "The doctor gives Ali some medicine. He must take it two times a day. Soon Ali feels well again.",
+      "textHi": "डॉक्टर अली को कुछ दवा देते हैं। उसे इसे दिन में दो बार लेना है। जल्द ही अली फिर से ठीक महसूस करता है।",
+      "q": "How many times a day must Ali take the medicine?",
+      "qHi": "अली को दिन में कितनी बार दवा लेनी है?",
+      "choices": [
+       "Two times",
+       "One time",
+       "Five times"
+      ],
+      "answer": "Two times",
+      "teach": "The story says Ali must take the medicine two times a day.",
+      "teachHi": "कहानी कहती है अली को दवा दिन में दो बार लेनी है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "money",
+  "title": "Money & Bank",
+  "titleHi": "पैसा और बैंक",
+  "icon": "🏦",
+  "color": "#16a34a",
+  "blurb": "Coins, notes & saving",
+  "blurbHi": "सिक्के, नोट और बचत",
+  "published": true,
+  "lessons": [
+   {
+    "key": "coins",
+    "title": "Coins & Notes",
+    "titleHi": "सिक्के और नोट",
+    "words": [
+     {
+      "en": "money",
+      "hi": "पैसा",
+      "pron": "मनी",
+      "emoji": "💰",
+      "uncount": true
+     },
+     {
+      "en": "coin",
+      "hi": "सिक्का",
+      "pron": "कॉइन",
+      "emoji": "🪙",
+      "plural": "coins",
+      "type": "thing"
+     },
+     {
+      "en": "note",
+      "hi": "नोट",
+      "pron": "नोट",
+      "emoji": "💵",
+      "plural": "notes",
+      "type": "thing"
+     },
+     {
+      "en": "price",
+      "hi": "दाम",
+      "pron": "प्राइस",
+      "emoji": "🏷️",
+      "plural": "prices",
+      "use": "The price is ten rupees",
+      "useHi": "दाम दस रुपये है"
+     },
+     {
+      "en": "change",
+      "hi": "बाक़ी पैसे",
+      "pron": "चेंज",
+      "emoji": "💱",
+      "uncount": true,
+      "use": "Here is your change",
+      "useHi": "यह रहा आपका बाक़ी पैसा"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍💼",
+      "line": "The price is twenty rupees.",
+      "lineHi": "दाम बीस रुपये है।",
+      "replies": [
+       {
+        "text": "Here is the money.",
+        "textHi": "यह रहे पैसे।",
+        "ok": true
+       },
+       {
+        "text": "I am a teacher.",
+        "ok": false
+       },
+       {
+        "text": "It is very hot.",
+        "ok": false
+       }
+      ],
+      "then": "Thank you. Here is your change."
+     },
+     {
+      "who": "🧑‍💼",
+      "line": "Do you have change for fifty?",
+      "lineHi": "क्या आपके पास पचास के खुल्ले हैं?",
+      "replies": [
+       {
+        "text": "Yes, here are two notes.",
+        "textHi": "हाँ, ये रहे दो नोट।",
+        "ok": true
+       },
+       {
+        "text": "I want to sleep.",
+        "ok": false
+       },
+       {
+        "text": "The dog is black.",
+        "ok": false
+       }
+      ],
+      "then": "Thank you very much."
+     }
+    ],
+    "read": [
+     {
+      "title": "Counting Coins",
+      "titleHi": "सिक्के गिनना",
+      "emoji": "🪙",
+      "text": "Rina has ten coins in her hand. She wants to buy a pencil. The pencil costs five rupees, so she has enough money.",
+      "textHi": "रीना के हाथ में दस सिक्के हैं। वह एक पेंसिल खरीदना चाहती है। पेंसिल पाँच रुपये की है, तो उसके पास काफ़ी पैसे हैं।",
+      "q": "How much does the pencil cost?",
+      "qHi": "पेंसिल कितने की है?",
+      "choices": [
+       "Five rupees",
+       "Ten rupees",
+       "Two rupees"
+      ],
+      "answer": "Five rupees",
+      "teach": "The story says the pencil costs five rupees.",
+      "teachHi": "कहानी कहती है पेंसिल पाँच रुपये की है।"
+     },
+     {
+      "title": "Getting Change",
+      "titleHi": "बाक़ी पैसे लेना",
+      "emoji": "💵",
+      "text": "Mohan buys rice for thirty rupees. He gives the shopkeeper a fifty rupee note. The shopkeeper gives back twenty rupees as change.",
+      "textHi": "मोहन तीस रुपये में चावल खरीदता है। वह दुकानदार को पचास रुपये का नोट देता है। दुकानदार बीस रुपये बाक़ी लौटाता है।",
+      "q": "How much change does Mohan get back?",
+      "qHi": "मोहन को कितने पैसे बाक़ी मिलते हैं?",
+      "choices": [
+       "Twenty rupees",
+       "Fifty rupees",
+       "Ten rupees"
+      ],
+      "answer": "Twenty rupees",
+      "teach": "Fifty minus thirty is twenty, so the change is twenty rupees.",
+      "teachHi": "पचास में से तीस घटाओ तो बीस, तो बाक़ी बीस रुपये हैं।"
+     }
+    ]
+   },
+   {
+    "key": "bank",
+    "title": "At the Bank",
+    "titleHi": "बैंक में",
+    "words": [
+     {
+      "en": "bank",
+      "hi": "बैंक",
+      "pron": "बैंक",
+      "emoji": "🏦",
+      "plural": "banks",
+      "use": "I go to the bank",
+      "useHi": "मैं बैंक जाती हूँ"
+     },
+     {
+      "en": "save",
+      "hi": "बचाना",
+      "pron": "सेव",
+      "emoji": "🐷",
+      "type": "verb"
+     },
+     {
+      "en": "account",
+      "hi": "खाता",
+      "pron": "अकाउंट",
+      "emoji": "📒",
+      "plural": "accounts",
+      "use": "I have a bank account",
+      "useHi": "मेरा बैंक खाता है"
+     },
+     {
+      "en": "card",
+      "hi": "कार्ड",
+      "pron": "कार्ड",
+      "emoji": "💳",
+      "plural": "cards",
+      "type": "thing"
+     },
+     {
+      "en": "form",
+      "hi": "फ़ॉर्म",
+      "pron": "फ़ॉर्म",
+      "emoji": "📄",
+      "plural": "forms",
+      "use": "Please fill the form",
+      "useHi": "कृपया फ़ॉर्म भरें"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍💼",
+      "line": "How can I help you?",
+      "lineHi": "मैं आपकी क्या मदद कर सकता हूँ?",
+      "replies": [
+       {
+        "text": "I want to open an account.",
+        "textHi": "मैं एक खाता खोलना चाहती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I have a red bag.",
+        "ok": false
+       },
+       {
+        "text": "The tea is hot.",
+        "ok": false
+       }
+      ],
+      "then": "Sure. Please fill this form."
+     },
+     {
+      "who": "🧑‍💼",
+      "line": "Do you want to save this money?",
+      "lineHi": "क्या आप यह पैसा बचाना चाहती हैं?",
+      "replies": [
+       {
+        "text": "Yes, please save it.",
+        "textHi": "हाँ, कृपया इसे बचा लें।",
+        "ok": true
+       },
+       {
+        "text": "I can sing a song.",
+        "ok": false
+       },
+       {
+        "text": "It is my birthday.",
+        "ok": false
+       }
+      ],
+      "then": "Good idea. Your money is safe here."
+     }
+    ],
+    "read": [
+     {
+      "title": "Opening an Account",
+      "titleHi": "खाता खोलना",
+      "emoji": "🏦",
+      "text": "Sunita goes to the bank. She wants to save her money. The clerk gives her a form and helps her open a new account.",
+      "textHi": "सुनीता बैंक जाती है। वह अपना पैसा बचाना चाहती है। क्लर्क उसे एक फ़ॉर्म देता है और उसका नया खाता खोलने में मदद करता है।",
+      "q": "Why does Sunita go to the bank?",
+      "qHi": "सुनीता बैंक क्यों जाती है?",
+      "choices": [
+       "To save her money",
+       "To buy fruit",
+       "To meet a doctor"
+      ],
+      "answer": "To save her money",
+      "teach": "Sunita goes to the bank to save her money in a new account.",
+      "teachHi": "सुनीता अपना पैसा नए खाते में बचाने के लिए बैंक जाती है।"
+     },
+     {
+      "title": "Money is Safe",
+      "titleHi": "पैसा सुरक्षित है",
+      "emoji": "💳",
+      "text": "It is not safe to keep all your money at home. A bank keeps your money safe. You can take it out when you need it.",
+      "textHi": "अपना सारा पैसा घर पर रखना सुरक्षित नहीं है। बैंक आपके पैसे को सुरक्षित रखता है। ज़रूरत होने पर आप इसे निकाल सकती हैं।",
+      "q": "Where is your money safe?",
+      "qHi": "आपका पैसा कहाँ सुरक्षित है?",
+      "choices": [
+       "In a bank",
+       "On the road",
+       "In the market"
+      ],
+      "answer": "In a bank",
+      "teach": "The story says a bank keeps your money safe.",
+      "teachHi": "कहानी कहती है बैंक आपके पैसे को सुरक्षित रखता है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "travel",
+  "title": "Travel & Directions",
+  "titleHi": "सफ़र और रास्ता",
+  "icon": "🚌",
+  "color": "#0ea5e9",
+  "blurb": "Buses, tickets & the way",
+  "blurbHi": "बस, टिकट और रास्ता",
+  "published": true,
+  "lessons": [
+   {
+    "key": "around",
+    "title": "Getting Around",
+    "titleHi": "आना-जाना",
+    "words": [
+     {
+      "en": "bus",
+      "hi": "बस",
+      "pron": "बस",
+      "emoji": "🚌",
+      "plural": "buses",
+      "use": "I go by bus",
+      "useHi": "मैं बस से जाती हूँ"
+     },
+     {
+      "en": "train",
+      "hi": "रेलगाड़ी",
+      "pron": "ट्रेन",
+      "emoji": "🚆",
+      "plural": "trains",
+      "use": "The train is here",
+      "useHi": "रेलगाड़ी आ गई है"
+     },
+     {
+      "en": "ticket",
+      "hi": "टिकट",
+      "pron": "टिकट",
+      "emoji": "🎫",
+      "plural": "tickets",
+      "type": "thing"
+     },
+     {
+      "en": "road",
+      "hi": "सड़क",
+      "pron": "रोड",
+      "emoji": "🛣️",
+      "plural": "roads",
+      "use": "Cross the road slowly",
+      "useHi": "सड़क धीरे से पार करो"
+     },
+     {
+      "en": "station",
+      "hi": "स्टेशन",
+      "pron": "स्टेशन",
+      "emoji": "🚉",
+      "plural": "stations",
+      "use": "I wait at the station",
+      "useHi": "मैं स्टेशन पर इंतज़ार करती हूँ"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑",
+      "line": "Where do you want to go?",
+      "lineHi": "आप कहाँ जाना चाहती हैं?",
+      "replies": [
+       {
+        "text": "I want to go to the market.",
+        "textHi": "मैं बाज़ार जाना चाहती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I have a blue pen.",
+        "ok": false
+       },
+       {
+        "text": "She is my teacher.",
+        "ok": false
+       }
+      ],
+      "then": "Okay. One ticket for the market."
+     },
+     {
+      "who": "🧑",
+      "line": "The ticket is ten rupees.",
+      "lineHi": "टिकट दस रुपये का है।",
+      "replies": [
+       {
+        "text": "Here is ten rupees.",
+        "textHi": "ये रहे दस रुपये।",
+        "ok": true
+       },
+       {
+        "text": "I like to dance.",
+        "ok": false
+       },
+       {
+        "text": "The door is open.",
+        "ok": false
+       }
+      ],
+      "then": "Thank you. Please sit down."
+     }
+    ],
+    "read": [
+     {
+      "title": "The Morning Bus",
+      "titleHi": "सुबह की बस",
+      "emoji": "🚌",
+      "text": "Kavita takes the bus to school every morning. The bus comes at seven o'clock. She buys a ticket and finds a seat.",
+      "textHi": "कविता हर सुबह स्कूल जाने के लिए बस लेती है। बस सात बजे आती है। वह टिकट खरीदती है और एक सीट ढूँढती है।",
+      "q": "When does the bus come?",
+      "qHi": "बस कब आती है?",
+      "choices": [
+       "At seven o'clock",
+       "At night",
+       "At noon"
+      ],
+      "answer": "At seven o'clock",
+      "teach": "The story says the bus comes at seven o'clock.",
+      "teachHi": "कहानी कहती है बस सात बजे आती है।"
+     },
+     {
+      "title": "Crossing the Road",
+      "titleHi": "सड़क पार करना",
+      "emoji": "🚦",
+      "text": "Always look left and right before you cross the road. Wait for the cars to stop. Then walk across slowly and safely.",
+      "textHi": "सड़क पार करने से पहले हमेशा बाएँ और दाएँ देखो। गाड़ियों के रुकने का इंतज़ार करो। फिर धीरे और सुरक्षित चलकर पार करो।",
+      "q": "What should you do before crossing the road?",
+      "qHi": "सड़क पार करने से पहले क्या करना चाहिए?",
+      "choices": [
+       "Look left and right",
+       "Run fast",
+       "Close your eyes"
+      ],
+      "answer": "Look left and right",
+      "teach": "The story says to look left and right before crossing the road.",
+      "teachHi": "कहानी कहती है सड़क पार करने से पहले बाएँ और दाएँ देखो।"
+     }
+    ]
+   },
+   {
+    "key": "directions",
+    "title": "Asking the Way",
+    "titleHi": "रास्ता पूछना",
+    "words": [
+     {
+      "en": "left",
+      "hi": "बाएँ",
+      "pron": "लेफ़्ट",
+      "emoji": "👈",
+      "use": "Turn left here",
+      "useHi": "यहाँ बाएँ मुड़ो"
+     },
+     {
+      "en": "right",
+      "hi": "दाएँ",
+      "pron": "राइट",
+      "emoji": "👉",
+      "use": "Turn right at the shop",
+      "useHi": "दुकान पर दाएँ मुड़ो"
+     },
+     {
+      "en": "near",
+      "hi": "पास",
+      "pron": "नियर",
+      "emoji": "📍",
+      "use": "The school is near",
+      "useHi": "स्कूल पास है"
+     },
+     {
+      "en": "far",
+      "hi": "दूर",
+      "pron": "फ़ार",
+      "emoji": "🛣️",
+      "use": "The market is far",
+      "useHi": "बाज़ार दूर है"
+     },
+     {
+      "en": "map",
+      "hi": "नक्शा",
+      "pron": "मैप",
+      "emoji": "🗺️",
+      "plural": "maps",
+      "type": "thing"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑",
+      "line": "Excuse me, where is the bank?",
+      "lineHi": "माफ़ कीजिए, बैंक कहाँ है?",
+      "replies": [
+       {
+        "text": "Turn left at the shop.",
+        "textHi": "दुकान पर बाएँ मुड़ो।",
+        "ok": true
+       },
+       {
+        "text": "I am eating rice.",
+        "ok": false
+       },
+       {
+        "text": "It is my book.",
+        "ok": false
+       }
+      ],
+      "then": "Thank you for your help!"
+     },
+     {
+      "who": "🧑",
+      "line": "Is the market far from here?",
+      "lineHi": "क्या बाज़ार यहाँ से दूर है?",
+      "replies": [
+       {
+        "text": "No, it is very near.",
+        "textHi": "नहीं, यह बहुत पास है।",
+        "ok": true
+       },
+       {
+        "text": "I have two sisters.",
+        "ok": false
+       },
+       {
+        "text": "The cat is sleeping.",
+        "ok": false
+       }
+      ],
+      "then": "Oh good, I will walk there."
+     }
+    ],
+    "read": [
+     {
+      "title": "The Way to the Clinic",
+      "titleHi": "क्लिनिक का रास्ता",
+      "emoji": "🗺️",
+      "text": "A woman asks Geeta where the clinic is. Geeta says, 'Go straight, then turn right. The clinic is near the big tree.'",
+      "textHi": "एक महिला गीता से पूछती है कि क्लिनिक कहाँ है। गीता कहती है, 'सीधे जाओ, फिर दाएँ मुड़ो। क्लिनिक बड़े पेड़ के पास है।'",
+      "q": "Which way is the clinic?",
+      "qHi": "क्लिनिक किस तरफ़ है?",
+      "choices": [
+       "Turn right",
+       "Turn left",
+       "Go back"
+      ],
+      "answer": "Turn right",
+      "teach": "Geeta says to go straight and then turn right.",
+      "teachHi": "गीता कहती है सीधे जाओ और फिर दाएँ मुड़ो।"
+     },
+     {
+      "title": "Using a Map",
+      "titleHi": "नक्शे का उपयोग",
+      "emoji": "🗺️",
+      "text": "A map shows us the way to a new place. It has roads and names on it. When you are lost, a map can help you find your way.",
+      "textHi": "नक्शा हमें किसी नई जगह का रास्ता दिखाता है। इस पर सड़कें और नाम होते हैं। जब आप खो जाएँ, तो नक्शा आपको रास्ता ढूँढने में मदद कर सकता है।",
+      "q": "How can a map help you?",
+      "qHi": "नक्शा आपकी कैसे मदद कर सकता है?",
+      "choices": [
+       "Find your way",
+       "Cook food",
+       "Wash clothes"
+      ],
+      "answer": "Find your way",
+      "teach": "A map helps you find your way when you are lost.",
+      "teachHi": "जब आप खो जाएँ तो नक्शा रास्ता ढूँढने में मदद करता है।"
+     }
+    ]
+   }
+  ]
  }
 ]

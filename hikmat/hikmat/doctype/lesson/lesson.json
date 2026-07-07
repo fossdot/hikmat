@@ -22,7 +22,9 @@
   "sec_email",
   "email",
   "sec_quiz",
-  "quiz"
+  "quiz",
+  "sec_read",
+  "read"
  ],
  "fields": [
   {
@@ -117,12 +119,23 @@
    "fieldtype": "Table",
    "label": "Quiz questions",
    "options": "Lesson Quiz"
+  },
+  {
+   "fieldname": "sec_read",
+   "fieldtype": "Section Break",
+   "label": "Read & Answer passages"
+  },
+  {
+   "fieldname": "read",
+   "fieldtype": "Table",
+   "label": "Read & Answer passages",
+   "options": "Lesson Read"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-20 23:35:59.409951",
+ "modified": "2026-07-07 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Lesson",

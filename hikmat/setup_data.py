@@ -108,6 +108,21 @@ def create_doctypes():
         f("teach_hi", "Small Text", "Why (Hindi)"),
     ], istable=1)
 
+    # reading comprehension — a short passage the child reads (or hears) before answering
+    _mk("Lesson Read", [
+        f("title", "Data", "Title (English)", in_list_view=1),
+        f("title_hi", "Data", "Title (Hindi)"),
+        f("emoji", "Data", "Picture / emoji (optional, shown by the title)"),
+        f("passage", "Small Text", "Passage (English) — a short simple story", reqd=1, in_list_view=1),
+        f("passage_hi", "Small Text", "Passage (Hindi gloss)"),
+        f("question", "Data", "Question (English)", reqd=1, in_list_view=1),
+        f("question_hi", "Data", "Question (Hindi)"),
+        f("choices", "Small Text", "Choices (one per line)", reqd=1),
+        f("answer", "Data", "Answer (correct choice)", reqd=1, in_list_view=1),
+        f("teach", "Small Text", "Why (explains the answer)"),
+        f("teach_hi", "Small Text", "Why (Hindi)"),
+    ], istable=1)
+
     # --- structure: grade bands + subjects (Class 1–10 grouping) ---
     _mk("Grade Band", [
         f("band_key", "Data", "Key (slug, e.g. 1-4)", reqd=1, unique=1, in_list_view=1),
@@ -933,6 +948,13 @@ def seed_content():
                     "choices": "\n".join(q["choices"]), "answer": q["answer"],
                     "teach": q.get("teach", ""), "teach_hi": q.get("teachHi", ""),
                 } for q in les.get("quiz", [])],
+                "read": [{
+                    "title": r.get("title", ""), "title_hi": r.get("titleHi", ""), "emoji": r.get("emoji", ""),
+                    "passage": r["text"], "passage_hi": r.get("textHi", ""),
+                    "question": r["q"], "question_hi": r.get("qHi", ""),
+                    "choices": "\n".join(r["choices"]), "answer": r["answer"],
+                    "teach": r.get("teach", ""), "teach_hi": r.get("teachHi", ""),
+                } for r in les.get("read", [])],
             }).insert(ignore_permissions=1)
 
             for di, dl in enumerate(les.get("dialogues", [])):

@@ -347,10 +347,23 @@ def _track_json(t, with_content):
                 "answer": (q.answer or "").strip(), "teach": q.teach or "", "teachHi": q.teach_hi or "",
             })
 
+        read = []
+        for r in frappe.get_all("Lesson Read", filters={"parent": l.name},
+                                fields=["title", "title_hi", "emoji", "passage", "passage_hi",
+                                        "question", "question_hi", "choices", "answer", "teach", "teach_hi"],
+                                order_by="idx asc"):
+            read.append({
+                "title": r.title or "", "titleHi": r.title_hi or "", "emoji": r.emoji or "",
+                "text": r.passage or "", "textHi": r.passage_hi or "",
+                "q": r.question or "", "qHi": r.question_hi or "",
+                "choices": _split_lines(r.choices), "answer": (r.answer or "").strip(),
+                "teach": r.teach or "", "teachHi": r.teach_hi or "",
+            })
+
         track["lessons"].append({
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
-            "email": email, "quiz": quiz,
+            "email": email, "quiz": quiz, "read": read,
         })
 
     # Module test: the question bank ships WITH the curriculum so tests work fully
