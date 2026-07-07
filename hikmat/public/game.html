@@ -2893,10 +2893,18 @@ function renderTestResult(course, back, r){
 // Each word carries a `type` (thing/mass/person/verb/adj/time/phrase). Frames are
 // chosen to fit the type, so we never generate nonsense like "How much is the mother?"
 // or "I want one read". Words of type time/phrase have no good frame and are skipped.
+// a / an: pick the right article by the SOUND of the next word, not just its first
+// letter — "an apple", but "a university"/"a user" (yoo-) and "an hour" (silent h).
+function artFor(w){
+  w = String(w || "");
+  if(/^(uni|use|usu|ubi|eu|ewe|one|once)/i.test(w)) return "a";     // "yoo"/"wuh" sound: a university, a user, a one-way
+  if(/^(hour|honest|honou?r|heir)/i.test(w)) return "an";           // silent h: an hour
+  return /^[aeiou]/i.test(w) ? "an" : "a";
+}
 const PHRASE_FRAMES = {
   thing: [
     it => ({ words:["I","want","one",it.en],        hintHi:`"मुझे एक ${it.hi} चाहिए"`, hintHiSpoken:`मुझे एक ${it.hi} चाहिए` }),
-    it => ({ words:["This","is","a",it.en],          hintHi:`"यह एक ${it.hi} है"`,     hintHiSpoken:`यह एक ${it.hi} है` }),
+    it => ({ words:["This","is",artFor(it.en),it.en], hintHi:`"यह एक ${it.hi} है"`,     hintHiSpoken:`यह एक ${it.hi} है` }),
     it => ({ words:["Give","me","two",it.plural||it.en], hintHi:`"मुझे दो ${it.hi} दीजिए"`, hintHiSpoken:`मुझे दो ${it.hi} दीजिए` }),
   ],
   mass: [
@@ -2907,7 +2915,7 @@ const PHRASE_FRAMES = {
   person: [
     it => ({ words:["This","is","my",it.en],          hintHi:`"यह मेरा ${it.hi} है"`,    hintHiSpoken:`यह मेरा ${it.hi} है` }),
     it => ({ words:["She","is","my",it.en],           hintHi:`"वह मेरी ${it.hi} है"`,    hintHiSpoken:`वह मेरी ${it.hi} है` }),
-    it => ({ words:["I","have","a",it.en],            hintHi:`"मेरा एक ${it.hi} है"`,    hintHiSpoken:`मेरा एक ${it.hi} है` }),
+    it => ({ words:["I","have",artFor(it.en),it.en],  hintHi:`"मेरा एक ${it.hi} है"`,    hintHiSpoken:`मेरा एक ${it.hi} है` }),
   ],
   verb: [
     it => ({ words:["I","can",it.en],                 hintHi:`"मैं ${it.hi} सकती हूँ"`,  hintHiSpoken:`मैं ${it.hi} सकती हूँ` }),

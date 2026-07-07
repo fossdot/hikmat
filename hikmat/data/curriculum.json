@@ -381,7 +381,9 @@
       "hi": "आधा",
       "pron": "हाफ",
       "emoji": "🌗",
-      "type": "adj"
+      "type": "adj",
+      "use": "I want half a kilo",
+      "useHi": "मुझे आधा किलो चाहिए"
      },
      {
       "en": "dozen",
@@ -724,14 +726,18 @@
       "hi": "कम",
       "pron": "लेस",
       "emoji": "➖",
-      "type": "adj"
+      "type": "adj",
+      "use": "Please give less salt",
+      "useHi": "कृपया कम नमक दें"
      },
      {
       "en": "more",
       "hi": "ज़्यादा",
       "pron": "मोर",
       "emoji": "➕",
-      "type": "adj"
+      "type": "adj",
+      "use": "I want more rice",
+      "useHi": "मुझे ज़्यादा चावल चाहिए"
      },
      {
       "en": "fresh",
@@ -962,7 +968,9 @@
       "hi": "पाव",
       "pron": "क्वार्टर",
       "emoji": "🍕",
-      "type": "adj"
+      "type": "adj",
+      "use": "I want a quarter kilo",
+      "useHi": "मुझे पाव किलो चाहिए"
      },
      {
       "en": "packet",
@@ -985,7 +993,9 @@
       "hi": "ज़्यादा",
       "pron": "एक्स्ट्रा",
       "emoji": "✨",
-      "type": "adj"
+      "type": "adj",
+      "use": "I want extra rice",
+      "useHi": "मुझे अतिरिक्त चावल चाहिए"
      }
     ],
     "dialogues": [
@@ -1077,7 +1087,9 @@
       "hi": "काफ़ी",
       "pron": "इनफ़",
       "emoji": "✋",
-      "type": "adj"
+      "type": "adj",
+      "use": "That is enough",
+      "useHi": "बस, इतना काफ़ी है"
      },
      {
       "en": "thank you",
@@ -3423,7 +3435,9 @@
       "hi": "गैरहाज़िर",
       "pron": "एब्सेंट",
       "emoji": "🚫",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am absent today",
+      "useHi": "मैं आज गैरहाज़िर हूँ"
      },
      {
       "en": "finish",
@@ -7671,7 +7685,7 @@
       "hi": "बर्फ़",
       "pron": "आइस",
       "emoji": "❄️",
-      "type": "thing",
+      "type": "mass",
       "uncount": true
      },
      {
@@ -7679,7 +7693,7 @@
       "hi": "भाप",
       "pron": "स्टीम",
       "emoji": "♨️",
-      "type": "thing",
+      "type": "mass",
       "uncount": true
      }
     ],
