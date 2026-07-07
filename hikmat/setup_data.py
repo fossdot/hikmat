@@ -923,6 +923,8 @@ def seed_content():
             lesson = frappe.get_doc({
                 "doctype": "Lesson", "track": track.name, "lesson_key": les["key"],
                 "title": les["title"], "title_hi": les["titleHi"], "sort_order": li, "published": 1,
+                "video": les.get("videoUrl", ""), "video_title": les.get("videoTitle", ""),
+                "video_title_hi": les.get("videoTitleHi", ""), "video_duration_secs": les.get("videoDuration") or 0,
                 "words": [{
                     "en": w["en"], "hi": w["hi"], "pron": w["pron"], "emoji": w["emoji"],
                     "word_type": w.get("type", ""),

@@ -534,6 +534,7 @@
   .videowrap { width:100%; background:#000; border:2px solid var(--line); border-radius:16px;
                overflow:hidden; aspect-ratio:16/9; margin-top:10px; }
   .videowrap video { width:100%; height:100%; display:block; }
+  .videowrap iframe { width:100%; height:100%; display:block; border:0; }
   /* ---- Reply to the Email ---- */
   .emailin { border-left:6px solid var(--grape,#6c5ce7); }   /* the received mail, visually "theirs" */
   .esig input { font:inherit; border:0; border-bottom:2px dashed var(--line); background:transparent;
@@ -1956,6 +1957,10 @@ function renderTrack(course, back){
 // never gates progress. No autoplay (30 shared laptops must not blast audio).
 function canStreamVideo(){ return backendLive && navigator.onLine && location.protocol.indexOf("http") === 0; }
 function fmtMin(secs){ const m = Math.max(1, Math.round(secs/60)); return tx(m+" min", m+" मिनट"); }
+// YouTube: recognise watch / youtu.be / embed / shorts / live URLs, and build a
+// privacy-friendly (no-cookie) embed URL. Any other URL is treated as a direct video file.
+function ytId(u){ const m = String(u||"").match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; }
+function ytEmbedUrl(u){ const id = ytId(u); return id ? ("https://www.youtube-nocookie.com/embed/" + id + "?rel=0&modestbranding=1&playsinline=1") : null; }
 function videoNodeSub(course){
   if(!canStreamVideo()) return tx("Needs internet","इंटरनेट चाहिए");
   return course.videoDuration ? esc(fmtMin(course.videoDuration)) : tx("Video","वीडियो");
@@ -1969,18 +1974,28 @@ function flushVideoWatch(){
   if(!_vid || _vid.flushed) return;
   _vid.flushed = true;
   if(_vid.secs >= 5)      // <5s = misclick, same rule as dwell events
-    recordEvent({ kind:"tool_use", tool:"video_watch", track:_vid.course.key, activity:"video",
+    recordEvent({ kind:"tool_use", tool:"video_watch", track:_vid.course.key,
+                  lesson: _vid.lesson ? _vid.lesson.key : "", activity:"video",
                   duration_secs: Math.min(7200, Math.round(_vid.secs)), count: 1 });
 }
-function renderVideo(course, back){
+// Renders a TRACK video (lesson omitted) or a per-LESSON video (lesson passed). The URL may
+// be a YouTube link (embedded in an iframe) or a direct video file (native <video>).
+function renderVideo(course, back, lesson){
   stopSpeech();
   clearTimeout(_vidWatchdog); _vidWatchdog = null;   // a leftover watchdog must never fire into this render
   flushVideoWatch();                                 // rerender (language toggle) flushes the previous visit
-  _vid = { course, secs: 0, lastT: null, flushed: false, played: false };
-  rerender = () => renderVideo(course, back);
+  const V = lesson || course;                        // the track OR lesson carrying the video fields
+  const seenKey = lesson ? (course.key + "::" + lesson.key) : course.key;
+  const parentTitle = lesson ? tx(lesson.title, lesson.titleHi) : tx(course.title, course.titleHi);
+  _vid = { course, lesson: lesson || null, seenKey, secs: 0, lastT: null, flushed: false, played: false };
+  rerender = () => renderVideo(course, back, lesson);
   root.innerHTML = "";
-  const title = tx(course.videoTitle || course.title, course.videoTitleHi || course.titleHi);
-  const goBack = () => { clearTimeout(_vidWatchdog); _vidWatchdog = null; flushVideoWatch(); renderTrack(course, back); };
+  const title = tx(V.videoTitle || parentTitle, V.videoTitleHi || parentTitle);
+  const goBack = () => { clearTimeout(_vidWatchdog); _vidWatchdog = null; flushVideoWatch();
+                         if(lesson) renderLessonMap(course, lesson, back); else renderTrack(course, back); };
+  const markSeen = () => { state.videosSeen = state.videosSeen || {}; state.videosSeen[seenKey] = 1; save(); };
+  const recordPlay = () => { if(_vid && !_vid.played){ _vid.played = true;
+      recordEvent({ kind:"tool_use", tool:"video_play", track:course.key, lesson: lesson?lesson.key:"", activity:"video", count:1 }); } };
   const offlineCard = (broken) => `
     <div class="hero">
       <div class="mascot big m-happy">${mascotSVG()}</div>
@@ -2003,21 +2018,42 @@ function renderVideo(course, back){
       sfx.tap();
       const s = await api("get_settings");           // cheap reachability probe; also revives backendLive mid-session
       if(s) backendLive = true;
-      if(canStreamVideo()){ renderVideo(course, back); }
+      if(canStreamVideo()){ renderVideo(course, back, lesson); }
       else { const m = tx("Still no internet 💛","अभी भी इंटरनेट नहीं है 💛"); flashToast(m); srSay(m); }
     };
     moveFocusToTop(); refreshTop();
   };
-  setBack("← " + tx(course.title, course.titleHi), goBack);
+  setBack("← " + parentTitle, goBack);
   if(!canStreamVideo()){ showFallback(false); return; }
+  const durLine = V.videoDuration ? esc(fmtMin(V.videoDuration)) : tx("Video lesson","वीडियो पाठ");
+  const embed = ytEmbedUrl(V.videoUrl);
+  if(embed){
+    // YouTube: embed in a sandboxed iframe. Fine-grained watch-seconds aren't available
+    // without the YT JS API (an external script we deliberately don't load), so we count a
+    // play and mark the node seen once the player loads.
+    root.appendChild(el(`<div class="screen">
+      <div class="maphead"><div><h2>📺 ${esc(title)}</h2><div class="sub">${durLine}</div></div></div>
+      <div class="videowrap">
+        <iframe id="ytFrame" src="${escAttr(embed)}" title="${escAttr(title)}" loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </div>`));
+    const f = $("#ytFrame");
+    if(f) f.addEventListener("load", () => { stopSpeech(); recordPlay(); markSeen(); });
+    const narrY = tx(title+". This is a video lesson. Tap the play button to watch.",
+                     title+". यह एक वीडियो पाठ है। देखने के लिए प्ले बटन पर टैप करो।");
+    setNarration(narrY, narrY); moveFocusToTop(); refreshTop();
+    return;
+  }
   root.appendChild(el(`<div class="screen">
     <div class="maphead"><div><h2>📺 ${esc(title)}</h2>
-      <div class="sub">${course.videoDuration ? esc(fmtMin(course.videoDuration)) : tx("Video lesson","वीडियो पाठ")}</div></div></div>
+      <div class="sub">${durLine}</div></div></div>
     <div class="videowrap">
       <video id="trackVideo" controls playsinline preload="metadata" aria-label="${escAttr(title)}">
-        <source src="${escAttr(course.videoUrl)}">
-        ${course.videoCaptionsHi ? `<track kind="subtitles" srclang="hi" label="हिन्दी" src="${escAttr(course.videoCaptionsHi)}" ${state.lang==="hi"?"default":""}>` : ""}
-        ${course.videoCaptions ? `<track kind="subtitles" srclang="en" label="English" src="${escAttr(course.videoCaptions)}" ${state.lang!=="hi"?"default":""}>` : ""}
+        <source src="${escAttr(V.videoUrl)}">
+        ${V.videoCaptionsHi ? `<track kind="subtitles" srclang="hi" label="हिन्दी" src="${escAttr(V.videoCaptionsHi)}" ${state.lang==="hi"?"default":""}>` : ""}
+        ${V.videoCaptions ? `<track kind="subtitles" srclang="en" label="English" src="${escAttr(V.videoCaptions)}" ${state.lang!=="hi"?"default":""}>` : ""}
       </video>
     </div>
   </div>`));
@@ -2031,8 +2067,7 @@ function renderVideo(course, back){
   const lastSource = v.querySelector("source"); if(lastSource) lastSource.addEventListener("error", broke);
   v.addEventListener("play", () => {
     stopSpeech();                                     // narration must never talk over the video
-    if(_vid && !_vid.played){ _vid.played = true;
-      recordEvent({ kind:"tool_use", tool:"video_play", track:course.key, activity:"video", count:1 }); }
+    recordPlay();
     // stalled/waiting fire spuriously on slow links — instead: if nothing is buffered
     // 20s after play, treat it as broken (cleared by timeupdate below)
     clearTimeout(_vidWatchdog);
@@ -2046,11 +2081,7 @@ function renderVideo(course, back){
     if(_vid.lastT != null){ const d = t - _vid.lastT; if(d > 0 && d < 2) _vid.secs += d; }  // ignore seeks
     _vid.lastT = t;
   });
-  v.addEventListener("ended", () => {
-    state.videosSeen = state.videosSeen || {};
-    state.videosSeen[course.key] = 1; save();
-    flushVideoWatch();
-  });
+  v.addEventListener("ended", () => { markSeen(); flushVideoWatch(); });
   moveFocusToTop(); refreshTop();
 }
 
@@ -2089,6 +2120,16 @@ function renderLessonMap(course, lesson, back){
         : (() => { sfx.locked(); sayHi("पहले पिछला स्तर पूरा करें"); }),
     };
   });
+  // 📺 optional per-lesson explainer video sits at the TOP of the lesson path — never gates
+  if(lesson.videoUrl){
+    items.unshift({
+      cls: (state.videosSeen||{})[course.key + "::" + lesson.key] ? "done" : "",
+      num: "▶", face: "📺",
+      label: tx(lesson.videoTitle || "Watch the video", lesson.videoTitleHi || lesson.videoTitle || "वीडियो देखो"),
+      sub: videoNodeSub(lesson),
+      onClick: () => { sfx.enter(); renderVideo(course, back, lesson); },
+    });
+  }
   renderPath(items);
   refreshTop();
 }

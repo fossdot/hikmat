@@ -13,6 +13,11 @@
   "title_hi",
   "sort_order",
   "published",
+  "sec_video",
+  "video",
+  "video_title",
+  "video_title_hi",
+  "video_duration_secs",
   "sec_words",
   "words",
   "sec_code",
@@ -66,6 +71,31 @@
    "fieldname": "published",
    "fieldtype": "Check",
    "label": "Published"
+  },
+  {
+   "fieldname": "sec_video",
+   "fieldtype": "Section Break",
+   "label": "Video (optional)"
+  },
+  {
+   "fieldname": "video",
+   "fieldtype": "Data",
+   "label": "Explainer video — YouTube link or file URL"
+  },
+  {
+   "fieldname": "video_title",
+   "fieldtype": "Data",
+   "label": "Video title (English)"
+  },
+  {
+   "fieldname": "video_title_hi",
+   "fieldtype": "Data",
+   "label": "Video title (Hindi)"
+  },
+  {
+   "fieldname": "video_duration_secs",
+   "fieldtype": "Int",
+   "label": "Video length (seconds)"
   },
   {
    "fieldname": "sec_words",

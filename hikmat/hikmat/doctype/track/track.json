@@ -92,10 +92,10 @@
    "options": "Subject"
   },
   {
-   "description": "Explainer video for this module (MP4/H.264 recommended, keep under ~50 MB). Must be a public file — students are not logged into Frappe. Streams online only; the game shows a friendly offline message otherwise.",
+   "description": "Explainer video for this module (MP4/H.264 recommended, keep under ~50 MB). Must be a public file \u2014 students are not logged into Frappe. Streams online only; the game shows a friendly offline message otherwise.",
    "fieldname": "video",
-   "fieldtype": "Attach",
-   "label": "Explainer video"
+   "fieldtype": "Data",
+   "label": "Explainer video \u2014 YouTube link or file URL"
   },
   {
    "fieldname": "video_title",
@@ -108,7 +108,7 @@
    "label": "Video title (Hindi)"
   },
   {
-   "description": "Optional — shown as \"N min\" on the video button.",
+   "description": "Optional \u2014 shown as \"N min\" on the video button.",
    "fieldname": "video_duration_secs",
    "fieldtype": "Int",
    "label": "Video length (seconds)"
@@ -128,7 +128,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-20 23:35:59.129921",
+ "modified": "2026-07-07 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Track",

@@ -272,7 +272,8 @@ def _track_json(t, with_content):
 
     lessons = frappe.get_all(
         "Lesson", filters={"track": t.name, "published": 1},
-        fields=["name", "lesson_key", "title", "title_hi"],
+        fields=["name", "lesson_key", "title", "title_hi",
+                "video", "video_title", "video_title_hi", "video_duration_secs"],
         order_by="sort_order asc, creation asc",
     )
     for l in lessons:
@@ -374,11 +375,19 @@ def _track_json(t, with_content):
                 "slots": spec.get("slots", []),
             })
 
-        track["lessons"].append({
+        ld = {
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
             "email": email, "quiz": quiz, "read": read, "reply": reply,
-        })
+        }
+        # optional per-lesson explainer video (YouTube link or file URL) — keys absent when unset
+        if (l.get("video") or "").strip():
+            ld["videoUrl"] = l.video.strip()
+            ld["videoTitle"] = l.get("video_title") or ""
+            ld["videoTitleHi"] = l.get("video_title_hi") or ""
+            if _int(l.get("video_duration_secs")):
+                ld["videoDuration"] = _int(l.get("video_duration_secs"))
+        track["lessons"].append(ld)
 
     # Module test: the question bank ships WITH the curriculum so tests work fully
     # offline (answers therefore exist in the client payload — accepted tradeoff: the
