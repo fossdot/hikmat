@@ -955,6 +955,11 @@ def seed_content():
                     "choices": "\n".join(r["choices"]), "answer": r["answer"],
                     "teach": r.get("teach", ""), "teach_hi": r.get("teachHi", ""),
                 } for r in les.get("read", [])],
+                "reply": [{
+                    "from_name": e["from"], "subject": e.get("subject", ""),
+                    "message": e["msg"], "message_hi": e.get("msgHi", ""),
+                    "spec_json": json.dumps({"slots": e["slots"]}, ensure_ascii=False),
+                } for e in les.get("reply", [])],
             }).insert(ignore_permissions=1)
 
             for di, dl in enumerate(les.get("dialogues", [])):

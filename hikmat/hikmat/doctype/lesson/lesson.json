@@ -24,7 +24,9 @@
   "sec_quiz",
   "quiz",
   "sec_read",
-  "read"
+  "read",
+  "sec_reply",
+  "reply"
  ],
  "fields": [
   {
@@ -130,6 +132,17 @@
    "fieldtype": "Table",
    "label": "Read & Answer passages",
    "options": "Lesson Read"
+  },
+  {
+   "fieldname": "sec_reply",
+   "fieldtype": "Section Break",
+   "label": "Reply to the Email exercises"
+  },
+  {
+   "fieldname": "reply",
+   "fieldtype": "Table",
+   "label": "Reply to the Email exercises",
+   "options": "Lesson Reply"
   }
  ],
  "grid_page_length": 50,

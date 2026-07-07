@@ -24,7 +24,7 @@ frappe.query_reports["Activity Drill-down"] = {
 			fieldname: "activity",
 			label: __("Activity"),
 			fieldtype: "Select",
-			options: "\nlearn\nlisten\nspell\nphrase\ntalk\nquiz\ncode\nfix\nemail",
+			options: "\nlearn\nlisten\nspell\nphrase\ntalk\nquiz\ncode\nfix\nemail\nread\nreply",
 		},
 		{
 			fieldname: "student",

@@ -360,10 +360,24 @@ def _track_json(t, with_content):
                 "teach": r.teach or "", "teachHi": r.teach_hi or "",
             })
 
+        reply = []
+        for e in frappe.get_all("Lesson Reply", filters={"parent": l.name},
+                                fields=["from_name", "subject", "message", "message_hi", "spec_json"],
+                                order_by="idx asc"):
+            try:
+                spec = json.loads(e.spec_json or "{}")
+            except Exception:
+                spec = {}
+            reply.append({
+                "from": e.from_name or "", "subject": e.subject or "",
+                "msg": e.message or "", "msgHi": e.message_hi or "",
+                "slots": spec.get("slots", []),
+            })
+
         track["lessons"].append({
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
-            "email": email, "quiz": quiz, "read": read,
+            "email": email, "quiz": quiz, "read": read, "reply": reply,
         })
 
     # Module test: the question bank ships WITH the curriculum so tests work fully

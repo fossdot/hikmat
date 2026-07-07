@@ -534,6 +534,11 @@
   .videowrap { width:100%; background:#000; border:2px solid var(--line); border-radius:16px;
                overflow:hidden; aspect-ratio:16/9; margin-top:10px; }
   .videowrap video { width:100%; height:100%; display:block; }
+  /* ---- Reply to the Email ---- */
+  .emailin { border-left:6px solid var(--grape,#6c5ce7); }   /* the received mail, visually "theirs" */
+  .esig input { font:inherit; border:0; border-bottom:2px dashed var(--line); background:transparent;
+                color:var(--ink); padding:2px 4px; min-width:150px; }
+  .esig input:focus { outline:none; border-bottom:2px solid var(--grape,#6c5ce7); }
 </style>
 </head>
 <body>
@@ -1035,6 +1040,7 @@ const CODE_LEVEL  = { id:"code",  name:"Complete the Code", nameHi:"कोड �
 const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती ढूँढो",  sub:"Spot the wrong word", subHi:"गलत शब्द पकड़ो", ico:"🐞", type:"fix" };
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
 const READ_LEVEL  = { id:"read",  name:"Read & Answer",     nameHi:"पढ़ो और बताओ",  sub:"Read, then answer", subHi:"पढ़ो, फिर उत्तर दो", ico:"📃", type:"read" };
+const REPLY_LEVEL = { id:"reply", name:"Reply to the Email", nameHi:"ईमेल का जवाब दो", sub:"Read it, then reply", subHi:"पढ़ो, फिर जवाब दो", ico:"📨", type:"reply" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
@@ -1047,6 +1053,7 @@ function levelsFor(lesson){
   if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
   if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
+  if(lesson && lesson.reply && lesson.reply.length) lv = lv.concat([REPLY_LEVEL]);
   return lv;
 }
 
@@ -2143,6 +2150,7 @@ function startLevel(course, lesson, lv, back){
     if(lv.type==="fix")    return roundFix(r);
     if(lv.type==="email")  return roundEmail(r);
     if(lv.type==="read")   return roundRead(r);
+    if(lv.type==="reply")  return roundReply(r);
   }
 
   // --- LEARN: flashcard, see + hear + Hindi, then "Got it"
@@ -2553,6 +2561,73 @@ function startLevel(course, lesson, lv, back){
       };
       opts.appendChild(b);
     });
+  }
+
+  // --- REPLY: read a received email, then WRITE the answer — choose each reply line
+  //     and sign it by typing your own name (her first real free-typing moment).
+  //     Mirrors roundEmail's contract: she can fix red lines and resend until it's
+  //     right (never trapped, wrong sends are logged for the facilitator).
+  function roundReply(r){
+    // a slot with no correct option would be unanswerable → skip, never trap the child
+    if(!Array.isArray(r.slots) || !r.slots.length ||
+       r.slots.some(s => !Array.isArray(s.options) || !s.options.some(o => o && o.ok))) return next(true);
+    const chosen = {};   // slotIndex -> optionIndex
+    mount(`${head(tx("📨 Reply to the email","📨 ईमेल का जवाब दो"), tx("Read it, then write your reply","पहले पढ़ो, फिर अपना जवाब लिखो"), r.msgHi || "")}
+      <div class="email emailin">
+        <div class="erow"><span class="elabel">${tx("From","से")}:</span> ${esc(r.from)}</div>
+        ${r.subject ? `<div class="erow"><span class="elabel">${tx("Subject","विषय")}:</span> ${esc(r.subject)}</div>` : ""}
+        <div class="erow">${esc(r.msg)}</div>
+        ${(state.hindi && r.msgHi) ? `<div class="erow rdHi">🔊 ${esc(r.msgHi)}</div>` : ""}
+        <button class="speakbtn" id="rpsay">🔊 ${tx("Read it to me","पढ़कर सुनाओ")}</button>
+      </div>
+      <div class="email" id="email"></div>
+      <div class="eopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn primary" id="send" disabled>${tx("Send reply 📤","जवाब भेजो 📤")}</button>`);
+    $("#rpsay").onclick = () => speak(r.msg);
+    // hear the whole email first, then the instruction — a non-reader gets the full item aloud
+    announce(() => { speak(r.msg); speak(tx("Now write your reply.","अब अपना जवाब लिखो।"), state.lang==="hi" ? "hi" : "en", { queue:true, gap:700 }); });
+    const emailEl = $("#email"), optsEl = $("#opts");
+    // shuffle each slot's options ONCE so the correct line isn't always first (stable across re-renders)
+    const slots = r.slots.map(s => ({ label:s.label, labelHi:s.labelHi, options:shuffle(s.options) }));
+    let sig = (currentStudent && currentStudent.name) ? currentStudent.name : "";
+    function lineFor(si){
+      const c = chosen[si];
+      return c==null ? `<i class="eplace">${tx("Tap a line below ↓","नीचे से चुनो ↓")}</i>` : esc(slots[si].options[c].t);
+    }
+    function canSend(){ return Object.keys(chosen).length === slots.length && sig.trim().length > 0; }
+    function render(){
+      emailEl.innerHTML =
+        `<div class="erow"><span class="elabel">${tx("To","प्रति")}:</span> ${esc(r.from)}</div>` +
+        slots.map((s,si)=>`<div class="erow"><span class="elabel">${esc(tx(s.label, s.labelHi || s.label))}:</span> <span class="eslot ${chosen[si]!=null?"set":""}" data-si="${si}">${lineFor(si)}</span></div>`).join("") +
+        `<div class="erow esig"><span class="elabel">${tx("Your name","तुम्हारा नाम")}:</span> <input id="esign" type="text" maxlength="40" autocomplete="off" placeholder="${escAttr(tx("Write your name…","अपना नाम लिखो…"))}" value="${escAttr(sig)}" aria-label="${escAttr(tx("Write your name","अपना नाम लिखो"))}"></div>`;
+      optsEl.innerHTML = slots.map((s,si)=>
+        `<div class="optgroup"><div class="oglabel">${esc(tx(s.label, s.labelHi || s.label))}</div>` +
+        s.options.map((o,oi)=>`<button class="echip ${chosen[si]===oi?"sel":""}" data-si="${si}" data-oi="${oi}">${esc(o.t)}${(state.hindi && o.hi)?`<small>${esc(o.hi)}</small>`:""}</button>`).join("") +
+        `</div>`).join("");
+      optsEl.querySelectorAll(".echip").forEach(b => b.onclick = () => { chosen[+b.dataset.si] = +b.dataset.oi; sfx.tap(); render(); });
+      const sg = $("#esign");
+      sg.oninput = () => { sig = sg.value; $("#send").disabled = !canSend(); };
+      $("#send").disabled = !canSend();
+    }
+    render();
+    $("#send").onclick = () => {
+      if(!canSend()) return;
+      const allOk = slots.every((s,si)=> s.options[chosen[si]] && s.options[chosen[si]].ok);
+      const fb = $("#fb");
+      if(allOk){
+        setMood("happy"); sfx.correct(); emailEl.classList.add("sent"); setFooter("");
+        fb.textContent = tx("Reply sent! 🎉","जवाब भेज दिया! 🎉"); fb.className = "feedback good";
+        setTimeout(() => next(true), 1400);
+      } else {
+        setMood("sad"); sfx.wrong();
+        slots.forEach((s,si)=>{ if(!(s.options[chosen[si]] && s.options[chosen[si]].ok)){
+          logWrong((r.subject || r.msg) + " — " + s.label, (s.options[chosen[si]]||{}).t, ((s.options.find(o=>o.ok))||{}).t);
+          const e2 = emailEl.querySelector(`.eslot[data-si="${si}"]`); if(e2) e2.classList.add("bad"); } });
+        fb.textContent = tx("Some lines don't fit the email — fix the red ones.","कुछ पंक्तियाँ ईमेल से मेल नहीं खातीं — लाल को ठीक करो।"); fb.className = "feedback bad";
+        setTimeout(() => { emailEl.querySelectorAll(".eslot.bad").forEach(e2 => e2.classList.remove("bad")); fb.textContent = ""; }, 1700);
+      }
+    };
   }
 
   // --- finish: award stars
@@ -2968,6 +3043,7 @@ function buildRounds(lv, lesson){
   if(lv.type==="fix")  return (lesson.fix||[]).slice();
   if(lv.type==="email") return (lesson.email||[]).slice();
   if(lv.type==="read") return (lesson.read||[]).slice();
+  if(lv.type==="reply") return (lesson.reply||[]).slice();
   return [];
 }
 

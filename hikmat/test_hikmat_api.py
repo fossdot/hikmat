@@ -617,3 +617,62 @@ class TestTrackVideo(FrappeTestCase):
 		doc = frappe.get_doc({"doctype": "Track", "track_key": "vid-priv", "title": "P",
 		                      "published": 0, "video": "/private/files/x.mp4"})
 		self.assertRaises(frappe.ValidationError, doc.insert)
+
+
+class TestLessonReply(FrappeTestCase):
+	"""Reply-to-the-Email activity: curriculum export shape."""
+
+	def test_track_json_exports_reply(self):
+		key = "reply-export-t"
+		def _rm():
+			frappe.db.delete("Lesson", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		if frappe.db.exists("Track", key):
+			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "Reply T",
+		                        "published": 1}).insert(ignore_permissions=True)
+		import json as _json
+		frappe.get_doc({"doctype": "Lesson", "track": track.name, "lesson_key": "l1",
+		                "title": "L1", "published": 1,
+		                "reply": [{"from_name": "Sunita Madam", "subject": "Class time",
+		                           "message": "Class starts at 10 tomorrow.",
+		                           "message_hi": "कक्षा कल 10 बजे शुरू होगी।",
+		                           "spec_json": _json.dumps({"slots": [
+		                               {"label": "Greeting", "labelHi": "अभिवादन",
+		                                "options": [{"t": "Dear Sunita Madam,", "hi": "आदरणीय", "ok": True},
+		                                            {"t": "Hey you,", "hi": "ऐ", "ok": False}]}]})}],
+		               }).insert(ignore_permissions=True)
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == key)
+		les = t["lessons"][0]
+		self.assertEqual(len(les["reply"]), 1)
+		r = les["reply"][0]
+		self.assertEqual(r["from"], "Sunita Madam")
+		self.assertEqual(r["subject"], "Class time")
+		self.assertEqual(r["msg"], "Class starts at 10 tomorrow.")
+		self.assertEqual(len(r["slots"]), 1)
+		self.assertTrue(r["slots"][0]["options"][0]["ok"])
+
+	def test_reply_export_survives_bad_spec_json(self):
+		key = "reply-badspec-t"
+		def _rm():
+			frappe.db.delete("Lesson", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		if frappe.db.exists("Track", key):
+			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "Reply B",
+		                        "published": 1}).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Lesson", "track": track.name, "lesson_key": "l1",
+		                "title": "L1", "published": 1,
+		                "reply": [{"from_name": "X", "message": "m", "spec_json": "not-json["}],
+		               }).insert(ignore_permissions=True)
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == key)
+		r = t["lessons"][0]["reply"][0]
+		self.assertEqual(r["slots"], [])   # malformed spec → empty slots; game skips the round
