@@ -3098,7 +3098,15 @@ const ATTEMPT_QUEUE = "hikmat_attempt_queue";
 const DOUBT_QUEUE = "hikmat_doubt_queue";
 let backendLive = false;   // true once we've reached the Frappe server
 
-function apiURL(m){ return "/api/method/hikmat.api." + m; }
+// Backend origin. Empty = same-origin (the normal web build served by Frappe). A PACKAGED build
+// (the Android/Capacitor app runs from a local origin) sets window.HIKMAT_BACKEND to the remote
+// Frappe host so API calls reach the server; bundled static assets (curriculum.json, icons) stay
+// relative and resolve to the local bundle. localStorage override eases on-device testing.
+const BACKEND_BASE = (function(){
+  try { return String(window.HIKMAT_BACKEND || localStorage.getItem("hikmat_backend") || "").replace(/\/+$/, ""); }
+  catch(e){ return ""; }
+})();
+function apiURL(m){ return BACKEND_BASE + "/api/method/hikmat.api." + m; }
 // The game page is static, but the browser may carry a logged-in Frappe session (a
 // facilitator with Desk open, or an online student) — Frappe then REJECTS POSTs that
 // lack the session's CSRF token (400). We fetch the token once (GET, same-origin) and
@@ -3847,7 +3855,7 @@ function renderLogin(){
 // the linked Student via get_my_student. Signup goes through hikmat.signup_online (invite code).
 async function frappeLogin(usr, pwd){
   try {
-    const r = await fetch("/api/method/login", {
+    const r = await fetch(BACKEND_BASE + "/api/method/login", {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", ...postHeaders() },
       body: new URLSearchParams({ usr, pwd }),
     });
@@ -4017,7 +4025,7 @@ async function pbkdf2Verify(stored, pin){
     return diff === 0;
   } catch(e){ return false; }
 }
-async function frappeLogout(){ try { await fetch("/api/method/logout"); } catch(e){} CSRF_TOKEN = ""; }
+async function frappeLogout(){ try { await fetch(BACKEND_BASE + "/api/method/logout"); } catch(e){} CSRF_TOKEN = ""; }
 
 function renderCampusLogin(){
   stopSpeech(); rerender = renderCampusLogin; root.innerHTML = "";
