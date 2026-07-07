@@ -9092,5 +9092,1029 @@
     ]
    }
   ]
+ },
+ {
+  "key": "coding",
+  "title": "Coding",
+  "titleHi": "कोडिंग",
+  "icon": "👩‍💻",
+  "color": "#4f46e5",
+  "blurb": "Learn to code, step by step",
+  "blurbHi": "कदम दर कदम कोड करना सीखो",
+  "published": true,
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Your First Code",
+    "titleHi": "तुम्हारा पहला कोड",
+    "words": [
+     {
+      "en": "code",
+      "hi": "कोड",
+      "pron": "कोड",
+      "emoji": "💻",
+      "uncount": true,
+      "use": "I write code",
+      "useHi": "मैं कोड लिखती हूँ"
+     },
+     {
+      "en": "print",
+      "hi": "छापना",
+      "pron": "प्रिंट",
+      "emoji": "🖨️",
+      "type": "verb"
+     },
+     {
+      "en": "program",
+      "hi": "प्रोग्राम",
+      "pron": "प्रोग्राम",
+      "emoji": "📄",
+      "plural": "programs",
+      "type": "thing"
+     },
+     {
+      "en": "run",
+      "hi": "चलाना",
+      "pron": "रन",
+      "emoji": "▶️",
+      "type": "verb"
+     },
+     {
+      "en": "output",
+      "hi": "नतीजा",
+      "pron": "आउटपुट",
+      "emoji": "🖥️",
+      "uncount": true,
+      "use": "This is the output",
+      "useHi": "यह नतीजा है"
+     }
+    ],
+    "code": [
+     {
+      "prompt": "Print your name on the screen.",
+      "promptHi": "स्क्रीन पर अपना नाम छापें।",
+      "lines": [
+       "print(\"___\")"
+      ],
+      "choices": [
+       "Sita",
+       "print",
+       "screen"
+      ],
+      "answer": "Sita",
+      "teach": "Put the text you want to show inside the quotes.",
+      "teachHi": "जो दिखाना है उसे quotes के अंदर रखें।"
+     },
+     {
+      "prompt": "Finish the code to show a message.",
+      "promptHi": "संदेश दिखाने के लिए कोड पूरा करें।",
+      "lines": [
+       "___(\"Good morning\")"
+      ],
+      "choices": [
+       "print",
+       "run",
+       "code"
+      ],
+      "answer": "print",
+      "teach": "Use print( ) to show a message on the screen.",
+      "teachHi": "संदेश दिखाने के लिए print( ) का उपयोग करें।"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is code?",
+      "qHi": "कोड क्या है?",
+      "choices": [
+       "Instructions for a computer",
+       "A kind of food",
+       "A school bag"
+      ],
+      "answer": "Instructions for a computer",
+      "emoji": "💻",
+      "teach": "Code is a set of instructions we give a computer.",
+      "teachHi": "कोड कंप्यूटर को दिए गए निर्देश हैं।"
+     },
+     {
+      "q": "What does print( ) do?",
+      "qHi": "print( ) क्या करता है?",
+      "choices": [
+       "Shows words on the screen",
+       "Deletes a file",
+       "Turns off the phone"
+      ],
+      "answer": "Shows words on the screen",
+      "emoji": "🖨️",
+      "teach": "print( ) shows words on the screen.",
+      "teachHi": "print( ) स्क्रीन पर शब्द दिखाता है।"
+     }
+    ],
+    "read": [
+     {
+      "title": "Learning to Code",
+      "titleHi": "कोड सीखना",
+      "emoji": "👩‍💻",
+      "text": "Anjali is learning to code. She writes small programs on the computer. Her first program shows the word Hello on the screen.",
+      "textHi": "अंजली कोड करना सीख रही है। वह कंप्यूटर पर छोटे प्रोग्राम लिखती है। उसका पहला प्रोग्राम स्क्रीन पर Hello दिखाता है।",
+      "q": "What does Anjali's first program show?",
+      "qHi": "अंजली का पहला प्रोग्राम क्या दिखाता है?",
+      "choices": [
+       "The word Hello",
+       "A photo",
+       "A song"
+      ],
+      "answer": "The word Hello",
+      "teach": "Her first program prints the word Hello.",
+      "teachHi": "उसका पहला प्रोग्राम Hello छापता है।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Variables",
+    "titleHi": "वेरिएबल",
+    "words": [
+     {
+      "en": "variable",
+      "hi": "वेरिएबल",
+      "pron": "वेरिएबल",
+      "emoji": "📦",
+      "plural": "variables",
+      "use": "A variable stores a value",
+      "useHi": "वेरिएबल एक मान रखता है"
+     },
+     {
+      "en": "value",
+      "hi": "मान",
+      "pron": "वैल्यू",
+      "emoji": "🔢",
+      "plural": "values",
+      "type": "thing"
+     },
+     {
+      "en": "number",
+      "hi": "संख्या",
+      "pron": "नंबर",
+      "emoji": "🔟",
+      "plural": "numbers",
+      "type": "thing"
+     },
+     {
+      "en": "text",
+      "hi": "पाठ",
+      "pron": "टेक्स्ट",
+      "emoji": "🔤",
+      "uncount": true,
+      "use": "This is text",
+      "useHi": "यह टेक्स्ट है"
+     },
+     {
+      "en": "store",
+      "hi": "रखना",
+      "pron": "स्टोर",
+      "emoji": "📥",
+      "type": "verb"
+     }
+    ],
+    "code": [
+     {
+      "prompt": "Store the number 5 in x.",
+      "promptHi": "x में संख्या 5 रखें।",
+      "lines": [
+       "x = ___"
+      ],
+      "choices": [
+       "5",
+       "print",
+       "x"
+      ],
+      "answer": "5",
+      "teach": "A variable like x can store a number.",
+      "teachHi": "x जैसा वेरिएबल एक संख्या रख सकता है।"
+     },
+     {
+      "prompt": "Store your name in a variable.",
+      "promptHi": "अपना नाम एक वेरिएबल में रखें।",
+      "lines": [
+       "name = \"___\""
+      ],
+      "choices": [
+       "Meena",
+       "print",
+       "5"
+      ],
+      "answer": "Meena",
+      "teach": "Text values go inside quotes.",
+      "teachHi": "टेक्स्ट को quotes के अंदर रखें।"
+     },
+     {
+      "prompt": "Show the value stored in x.",
+      "promptHi": "x में रखा मान दिखाएँ।",
+      "lines": [
+       "print(___)"
+      ],
+      "choices": [
+       "x",
+       "5",
+       "name"
+      ],
+      "answer": "x",
+      "teach": "print(x) shows what is stored in x.",
+      "teachHi": "print(x) दिखाता है कि x में क्या रखा है।"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "The variable x store the number.",
+      "wrongWord": "store",
+      "fix": "stores",
+      "teach": "With 'x' (it), add 's' to the verb: stores.",
+      "teachHi": "'x' (it) के साथ verb में 's': stores।"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What does a variable do?",
+      "qHi": "वेरिएबल क्या करता है?",
+      "choices": [
+       "Stores a value",
+       "Prints paper",
+       "Cleans the screen"
+      ],
+      "answer": "Stores a value",
+      "emoji": "📦",
+      "teach": "A variable stores a value we can use later.",
+      "teachHi": "वेरिएबल एक मान रखता है जिसे हम बाद में इस्तेमाल करते हैं।"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Getting Input",
+    "titleHi": "इनपुट लेना",
+    "words": [
+     {
+      "en": "input",
+      "hi": "इनपुट",
+      "pron": "इनपुट",
+      "emoji": "⌨️",
+      "uncount": true,
+      "use": "The program takes input",
+      "useHi": "प्रोग्राम इनपुट लेता है"
+     },
+     {
+      "en": "ask",
+      "hi": "पूछना",
+      "pron": "आस्क",
+      "emoji": "❓",
+      "type": "verb"
+     },
+     {
+      "en": "user",
+      "hi": "उपयोगकर्ता",
+      "pron": "यूज़र",
+      "emoji": "🧑",
+      "plural": "users",
+      "use": "The user types an answer",
+      "useHi": "उपयोगकर्ता एक जवाब लिखता है"
+     },
+     {
+      "en": "question",
+      "hi": "सवाल",
+      "pron": "क्वेश्चन",
+      "emoji": "❔",
+      "plural": "questions",
+      "type": "thing"
+     },
+     {
+      "en": "answer",
+      "hi": "जवाब",
+      "pron": "आन्सर",
+      "emoji": "💬",
+      "plural": "answers",
+      "type": "thing"
+     }
+    ],
+    "code": [
+     {
+      "prompt": "Ask the user for their name.",
+      "promptHi": "उपयोगकर्ता से उनका नाम पूछें।",
+      "lines": [
+       "name = ___(\"What is your name? \")"
+      ],
+      "choices": [
+       "input",
+       "print",
+       "run"
+      ],
+      "answer": "input",
+      "teach": "input( ) asks the user to type something.",
+      "teachHi": "input( ) उपयोगकर्ता से कुछ लिखवाता है।"
+     },
+     {
+      "prompt": "Show a hello message to the user.",
+      "promptHi": "उपयोगकर्ता को नमस्ते दिखाएँ।",
+      "lines": [
+       "print(\"Hello, \" + ___)"
+      ],
+      "choices": [
+       "name",
+       "input",
+       "5"
+      ],
+      "answer": "name",
+      "teach": "We join the word Hello with the name.",
+      "teachHi": "हम Hello को नाम के साथ जोड़ते हैं।"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What does input( ) do?",
+      "qHi": "input( ) क्या करता है?",
+      "choices": [
+       "Takes what the user types",
+       "Prints on paper",
+       "Deletes the code"
+      ],
+      "answer": "Takes what the user types",
+      "emoji": "⌨️",
+      "teach": "input( ) lets the user type something in.",
+      "teachHi": "input( ) से उपयोगकर्ता कुछ लिख सकता है।"
+     }
+    ],
+    "read": [
+     {
+      "title": "A Talking Program",
+      "titleHi": "बातचीत करता प्रोग्राम",
+      "emoji": "💬",
+      "text": "Ravi writes a program that asks for your name. When you type your name, the program says hello to you. It uses input to listen and print to answer.",
+      "textHi": "रवि एक प्रोग्राम लिखता है जो तुम्हारा नाम पूछता है। जब तुम नाम लिखते हो, प्रोग्राम तुम्हें नमस्ते कहता है। यह सुनने के लिए input और जवाब देने के लिए print इस्तेमाल करता है।",
+      "q": "What does the program ask for?",
+      "qHi": "प्रोग्राम क्या पूछता है?",
+      "choices": [
+       "Your name",
+       "Your money",
+       "Your photo"
+      ],
+      "answer": "Your name",
+      "teach": "The program asks for your name using input.",
+      "teachHi": "प्रोग्राम input से तुम्हारा नाम पूछता है।"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "If and Else",
+    "titleHi": "अगर और वरना",
+    "words": [
+     {
+      "en": "if",
+      "hi": "अगर",
+      "pron": "इफ़",
+      "emoji": "❓",
+      "use": "Use if to make a choice",
+      "useHi": "चुनाव के लिए if इस्तेमाल करो"
+     },
+     {
+      "en": "else",
+      "hi": "वरना",
+      "pron": "एल्स",
+      "emoji": "🔀",
+      "use": "Else runs the other way",
+      "useHi": "else दूसरा रास्ता चलाता है"
+     },
+     {
+      "en": "true",
+      "hi": "सही",
+      "pron": "ट्रू",
+      "emoji": "✅",
+      "use": "The answer is true",
+      "useHi": "जवाब सही है"
+     },
+     {
+      "en": "false",
+      "hi": "गलत",
+      "pron": "फ़ॉल्स",
+      "emoji": "❌",
+      "use": "The answer is false",
+      "useHi": "जवाब गलत है"
+     },
+     {
+      "en": "check",
+      "hi": "जाँचना",
+      "pron": "चेक",
+      "emoji": "🔎",
+      "type": "verb"
+     }
+    ],
+    "code": [
+     {
+      "prompt": "Check if x is bigger than 10.",
+      "promptHi": "जाँचें कि x, 10 से बड़ा है।",
+      "lines": [
+       "___ x > 10:",
+       "    print(\"Big\")"
+      ],
+      "choices": [
+       "if",
+       "for",
+       "print"
+      ],
+      "answer": "if",
+      "teach": "if checks a condition before running the line under it.",
+      "teachHi": "if एक शर्त जाँचता है फिर नीचे की लाइन चलाता है।"
+     },
+     {
+      "prompt": "Run this when the if is not true.",
+      "promptHi": "जब if सही न हो तब यह चलाएँ।",
+      "lines": [
+       "if x > 10:",
+       "    print(\"Big\")",
+       "___:",
+       "    print(\"Small\")"
+      ],
+      "choices": [
+       "else",
+       "if",
+       "for"
+      ],
+      "answer": "else",
+      "teach": "else runs when the if condition is false.",
+      "teachHi": "else तब चलता है जब if की शर्त गलत हो।"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "If the number is big we prints it.",
+      "wrongWord": "prints",
+      "fix": "print",
+      "teach": "After 'we', use print with no 's'.",
+      "teachHi": "'we' के बाद print (बिना s)।"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "When does else run?",
+      "qHi": "else कब चलता है?",
+      "choices": [
+       "When the if is not true",
+       "Always first",
+       "Never"
+      ],
+      "answer": "When the if is not true",
+      "emoji": "🔀",
+      "teach": "else runs when the if condition is false.",
+      "teachHi": "else तब चलता है जब if गलत हो।"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Loops",
+    "titleHi": "लूप",
+    "words": [
+     {
+      "en": "loop",
+      "hi": "लूप",
+      "pron": "लूप",
+      "emoji": "🔁",
+      "plural": "loops",
+      "type": "thing"
+     },
+     {
+      "en": "repeat",
+      "hi": "दोहराना",
+      "pron": "रिपीट",
+      "emoji": "🔂",
+      "type": "verb"
+     },
+     {
+      "en": "for",
+      "hi": "के लिए",
+      "pron": "फ़ॉर",
+      "emoji": "🔢",
+      "use": "A for loop repeats lines",
+      "useHi": "for लूप लाइनें दोहराता है"
+     },
+     {
+      "en": "range",
+      "hi": "सीमा",
+      "pron": "रेंज",
+      "emoji": "📏",
+      "use": "Range gives a set of numbers",
+      "useHi": "range कुछ संख्याएँ देता है"
+     },
+     {
+      "en": "again",
+      "hi": "फिर",
+      "pron": "अगेन",
+      "emoji": "🔄",
+      "use": "Do it again",
+      "useHi": "इसे फिर करो"
+     }
+    ],
+    "code": [
+     {
+      "prompt": "Repeat the message 5 times.",
+      "promptHi": "संदेश को 5 बार दोहराएँ।",
+      "lines": [
+       "for i in range(___):",
+       "    print(\"Hi\")"
+      ],
+      "choices": [
+       "5",
+       "Hi",
+       "print"
+      ],
+      "answer": "5",
+      "teach": "range(5) repeats the loop five times.",
+      "teachHi": "range(5) लूप को पाँच बार दोहराता है।"
+     },
+     {
+      "prompt": "Start a loop that repeats.",
+      "promptHi": "दोहराने वाला लूप शुरू करें।",
+      "lines": [
+       "___ i in range(3):",
+       "    print(i)"
+      ],
+      "choices": [
+       "for",
+       "if",
+       "print"
+      ],
+      "answer": "for",
+      "teach": "A for loop repeats the lines under it.",
+      "teachHi": "for लूप नीचे की लाइनें दोहराता है।"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "The loop repeat five times.",
+      "wrongWord": "repeat",
+      "fix": "repeats",
+      "teach": "With 'the loop' (it), add 's': repeats.",
+      "teachHi": "'the loop' (it) के साथ 's': repeats।"
+     }
+    ],
+    "read": [
+     {
+      "title": "Doing It Again",
+      "titleHi": "फिर से करना",
+      "emoji": "🔁",
+      "text": "A loop lets the computer repeat work. Instead of writing the same line ten times, we write it once inside a loop. The computer does it again and again for us.",
+      "textHi": "लूप कंप्यूटर से काम दोहरवाता है। एक ही लाइन दस बार लिखने के बजाय, हम इसे लूप के अंदर एक बार लिखते हैं। कंप्यूटर इसे बार-बार करता है।",
+      "q": "Why do we use a loop?",
+      "qHi": "हम लूप क्यों इस्तेमाल करते हैं?",
+      "choices": [
+       "To repeat work",
+       "To delete work",
+       "To slow the computer"
+      ],
+      "answer": "To repeat work",
+      "teach": "A loop repeats the work for us.",
+      "teachHi": "लूप हमारे लिए काम दोहराता है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "ai",
+  "title": "AI Skills",
+  "titleHi": "AI कौशल",
+  "icon": "🤖",
+  "color": "#9333ea",
+  "blurb": "Understand & use AI wisely",
+  "blurbHi": "AI समझो और समझदारी से इस्तेमाल करो",
+  "published": true,
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "What is AI?",
+    "titleHi": "AI क्या है?",
+    "words": [
+     {
+      "en": "AI",
+      "hi": "एआई",
+      "pron": "ए-आई",
+      "emoji": "🧠",
+      "uncount": true,
+      "use": "AI can learn from data",
+      "useHi": "AI डेटा से सीख सकता है"
+     },
+     {
+      "en": "robot",
+      "hi": "रोबोट",
+      "pron": "रोबोट",
+      "emoji": "🤖",
+      "plural": "robots",
+      "type": "thing"
+     },
+     {
+      "en": "smart",
+      "hi": "समझदार",
+      "pron": "स्मार्ट",
+      "emoji": "💡",
+      "type": "adj"
+     },
+     {
+      "en": "machine",
+      "hi": "मशीन",
+      "pron": "मशीन",
+      "emoji": "⚙️",
+      "plural": "machines",
+      "type": "thing"
+     },
+     {
+      "en": "learn",
+      "hi": "सीखना",
+      "pron": "लर्न",
+      "emoji": "📚",
+      "type": "verb"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is AI short for?",
+      "qHi": "AI किसका छोटा रूप है?",
+      "choices": [
+       "Artificial Intelligence",
+       "Any Idea",
+       "Air India"
+      ],
+      "answer": "Artificial Intelligence",
+      "emoji": "🤖",
+      "teach": "AI means Artificial Intelligence.",
+      "teachHi": "AI का मतलब Artificial Intelligence है।"
+     },
+     {
+      "q": "How does AI get smart?",
+      "qHi": "AI कैसे समझदार बनता है?",
+      "choices": [
+       "It learns from data",
+       "It sleeps",
+       "It eats food"
+      ],
+      "answer": "It learns from data",
+      "emoji": "🧠",
+      "teach": "AI learns from lots of data (examples).",
+      "teachHi": "AI बहुत सारे डेटा (उदाहरणों) से सीखता है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🤖",
+      "line": "Hello! I am an AI assistant. How can I help?",
+      "lineHi": "नमस्ते! मैं एक AI सहायक हूँ। कैसे मदद करूँ?",
+      "replies": [
+       {
+        "text": "Can you help me write a letter?",
+        "textHi": "क्या तुम मुझे पत्र लिखने में मदद कर सकते हो?",
+        "ok": true
+       },
+       {
+        "text": "I want two apples.",
+        "ok": false
+       },
+       {
+        "text": "It is raining today.",
+        "ok": false
+       }
+      ],
+      "then": "Sure! Let us write it together."
+     }
+    ],
+    "read": [
+     {
+      "title": "What is AI?",
+      "titleHi": "AI क्या है?",
+      "emoji": "🤖",
+      "text": "AI means Artificial Intelligence. It is a computer program that can learn from examples. AI can understand words, pictures, and sounds, and help people do work faster.",
+      "textHi": "AI का मतलब Artificial Intelligence है। यह एक कंप्यूटर प्रोग्राम है जो उदाहरणों से सीख सकता है। AI शब्द, तस्वीरें और आवाज़ें समझ सकता है और लोगों की मदद करता है।",
+      "q": "How does AI learn?",
+      "qHi": "AI कैसे सीखता है?",
+      "choices": [
+       "From examples",
+       "From sleeping",
+       "From eating"
+      ],
+      "answer": "From examples",
+      "teach": "AI learns from many examples, called data.",
+      "teachHi": "AI कई उदाहरणों (डेटा) से सीखता है।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Talking to AI",
+    "titleHi": "AI से बात करना",
+    "words": [
+     {
+      "en": "prompt",
+      "hi": "प्रॉम्प्ट",
+      "pron": "प्रॉम्प्ट",
+      "emoji": "💬",
+      "plural": "prompts",
+      "use": "I write a clear prompt",
+      "useHi": "मैं साफ़ प्रॉम्प्ट लिखती हूँ"
+     },
+     {
+      "en": "chatbot",
+      "hi": "चैटबॉट",
+      "pron": "चैटबॉट",
+      "emoji": "🗨️",
+      "plural": "chatbots",
+      "type": "thing"
+     },
+     {
+      "en": "clear",
+      "hi": "साफ़",
+      "pron": "क्लियर",
+      "emoji": "✨",
+      "type": "adj"
+     },
+     {
+      "en": "ask",
+      "hi": "पूछना",
+      "pron": "आस्क",
+      "emoji": "❓",
+      "type": "verb"
+     },
+     {
+      "en": "reply",
+      "hi": "जवाब",
+      "pron": "रिप्लाई",
+      "emoji": "💬",
+      "plural": "replies",
+      "use": "Read the AI reply",
+      "useHi": "AI का जवाब पढ़ो"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is a prompt?",
+      "qHi": "प्रॉम्प्ट क्या है?",
+      "choices": [
+       "What you ask the AI",
+       "A kind of fruit",
+       "A computer game"
+      ],
+      "answer": "What you ask the AI",
+      "emoji": "💬",
+      "teach": "A prompt is the question or task you give the AI.",
+      "teachHi": "प्रॉम्प्ट वह सवाल या काम है जो तुम AI को देते हो।"
+     },
+     {
+      "q": "Which is a better prompt?",
+      "qHi": "बेहतर प्रॉम्प्ट कौन सा है?",
+      "choices": [
+       "Write a short poem about rain",
+       "Do something",
+       "Hi"
+      ],
+      "answer": "Write a short poem about rain",
+      "emoji": "✨",
+      "teach": "A clear, detailed prompt gives a better answer.",
+      "teachHi": "साफ़ और विस्तृत प्रॉम्प्ट बेहतर जवाब देता है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🤖",
+      "line": "What would you like me to do?",
+      "lineHi": "तुम मुझसे क्या करवाना चाहती हो?",
+      "replies": [
+       {
+        "text": "Please explain this word simply.",
+        "textHi": "कृपया यह शब्द आसान भाषा में समझाओ।",
+        "ok": true
+       },
+       {
+        "text": "I am fine, thank you.",
+        "ok": false
+       },
+       {
+        "text": "Give me two mangoes.",
+        "ok": false
+       }
+      ],
+      "then": "Sure, here is a simple explanation."
+     }
+    ],
+    "read": [
+     {
+      "title": "Ask Clearly",
+      "titleHi": "साफ़ पूछो",
+      "emoji": "💬",
+      "text": "When you talk to an AI, ask in a clear way. Say exactly what you want. A clear prompt like 'Explain water in easy words' gives a better answer than just 'water'.",
+      "textHi": "जब तुम AI से बात करो, साफ़ तरीके से पूछो। ठीक-ठीक बताओ कि क्या चाहिए। 'पानी को आसान शब्दों में समझाओ' जैसा साफ़ प्रॉम्प्ट सिर्फ़ 'पानी' से बेहतर जवाब देता है।",
+      "q": "What makes a good prompt?",
+      "qHi": "अच्छा प्रॉम्प्ट क्या बनाता है?",
+      "choices": [
+       "Being clear",
+       "Being empty",
+       "Saying nothing"
+      ],
+      "answer": "Being clear",
+      "teach": "A clear, exact prompt gets a better answer.",
+      "teachHi": "साफ़ और सटीक प्रॉम्प्ट बेहतर जवाब देता है।"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Using AI Safely",
+    "titleHi": "AI सुरक्षित इस्तेमाल",
+    "words": [
+     {
+      "en": "safe",
+      "hi": "सुरक्षित",
+      "pron": "सेफ़",
+      "emoji": "🛡️",
+      "type": "adj"
+     },
+     {
+      "en": "private",
+      "hi": "निजी",
+      "pron": "प्राइवेट",
+      "emoji": "🔒",
+      "type": "adj"
+     },
+     {
+      "en": "check",
+      "hi": "जाँचना",
+      "pron": "चेक",
+      "emoji": "🔎",
+      "type": "verb"
+     },
+     {
+      "en": "mistake",
+      "hi": "गलती",
+      "pron": "मिस्टेक",
+      "emoji": "⚠️",
+      "plural": "mistakes",
+      "type": "thing"
+     },
+     {
+      "en": "secret",
+      "hi": "राज़",
+      "pron": "सीक्रेट",
+      "emoji": "🤫",
+      "plural": "secrets",
+      "type": "thing"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Should you share your password with an AI?",
+      "qHi": "क्या तुम्हें AI को अपना पासवर्ड बताना चाहिए?",
+      "choices": [
+       "No, keep it private",
+       "Yes, always",
+       "Only on Monday"
+      ],
+      "answer": "No, keep it private",
+      "emoji": "🔒",
+      "teach": "Never share passwords or secrets with an AI or online.",
+      "teachHi": "AI या ऑनलाइन पासवर्ड कभी न बताओ।"
+     },
+     {
+      "q": "Can AI make mistakes?",
+      "qHi": "क्या AI गलती कर सकता है?",
+      "choices": [
+       "Yes, always check its answer",
+       "No, it is perfect",
+       "Only at night"
+      ],
+      "answer": "Yes, always check its answer",
+      "emoji": "⚠️",
+      "teach": "AI can be wrong, so always check its answers.",
+      "teachHi": "AI गलत हो सकता है, इसलिए जवाब हमेशा जाँचो।"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "AI sometimes make mistakes.",
+      "wrongWord": "make",
+      "fix": "makes",
+      "teach": "With 'AI' (it), add 's': makes.",
+      "teachHi": "'AI' (it) के साथ 's': makes।"
+     }
+    ],
+    "read": [
+     {
+      "title": "Check the Answer",
+      "titleHi": "जवाब जाँचो",
+      "emoji": "⚠️",
+      "text": "AI is helpful, but it can make mistakes. It may give a wrong answer that looks correct. Always check important answers yourself, and never share private things like your password.",
+      "textHi": "AI मददगार है, पर यह गलती कर सकता है। यह गलत जवाब दे सकता है जो सही लगता है। ज़रूरी जवाब खुद जाँचो, और पासवर्ड जैसी निजी बातें कभी न बताओ।",
+      "q": "What should you do with an AI answer?",
+      "qHi": "AI के जवाब के साथ क्या करना चाहिए?",
+      "choices": [
+       "Check it yourself",
+       "Believe it always",
+       "Delete your work"
+      ],
+      "answer": "Check it yourself",
+      "teach": "AI can be wrong, so check important answers.",
+      "teachHi": "AI गलत हो सकता है, इसलिए ज़रूरी जवाब जाँचो।"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "AI in Daily Life",
+    "titleHi": "रोज़ की ज़िंदगी में AI",
+    "words": [
+     {
+      "en": "voice",
+      "hi": "आवाज़",
+      "pron": "वॉइस",
+      "emoji": "🎙️",
+      "plural": "voices",
+      "use": "AI understands my voice",
+      "useHi": "AI मेरी आवाज़ समझता है"
+     },
+     {
+      "en": "translate",
+      "hi": "अनुवाद करना",
+      "pron": "ट्रांसलेट",
+      "emoji": "🌐",
+      "type": "verb"
+     },
+     {
+      "en": "photo",
+      "hi": "फ़ोटो",
+      "pron": "फ़ोटो",
+      "emoji": "📷",
+      "plural": "photos",
+      "type": "thing"
+     },
+     {
+      "en": "map",
+      "hi": "नक्शा",
+      "pron": "मैप",
+      "emoji": "🗺️",
+      "plural": "maps",
+      "type": "thing"
+     },
+     {
+      "en": "help",
+      "hi": "मदद",
+      "pron": "हेल्प",
+      "emoji": "🤝",
+      "uncount": true,
+      "type": "verb"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which one can use AI?",
+      "qHi": "इनमें AI कौन इस्तेमाल करता है?",
+      "choices": [
+       "A voice assistant",
+       "A stone",
+       "A spoon"
+      ],
+      "answer": "A voice assistant",
+      "emoji": "🎙️",
+      "teach": "Voice assistants use AI to understand speech.",
+      "teachHi": "वॉइस असिस्टेंट बोली समझने के लिए AI इस्तेमाल करते हैं।"
+     },
+     {
+      "q": "How can AI help with language?",
+      "qHi": "भाषा में AI कैसे मदद करता है?",
+      "choices": [
+       "It can translate words",
+       "It can eat words",
+       "It can hide words"
+      ],
+      "answer": "It can translate words",
+      "emoji": "🌐",
+      "teach": "AI can translate from one language to another.",
+      "teachHi": "AI एक भाषा से दूसरी में अनुवाद कर सकता है।"
+     }
+    ],
+    "read": [
+     {
+      "title": "AI Around Us",
+      "titleHi": "हमारे आसपास AI",
+      "emoji": "🌐",
+      "text": "AI is used in many everyday things. It helps phones understand our voice, translate languages, and find the way on a map. Used well, AI can save time and help us learn.",
+      "textHi": "AI रोज़ की कई चीज़ों में इस्तेमाल होता है। यह फ़ोन को हमारी आवाज़ समझने, भाषा अनुवाद करने और नक्शे पर रास्ता खोजने में मदद करता है। सही इस्तेमाल से AI समय बचाता है और सीखने में मदद करता है।",
+      "q": "What can AI help with?",
+      "qHi": "AI किसमें मदद करता है?",
+      "choices": [
+       "Understanding voice",
+       "Cooking rice",
+       "Washing clothes"
+      ],
+      "answer": "Understanding voice",
+      "teach": "AI helps understand voice, translate, and find the way.",
+      "teachHi": "AI आवाज़ समझने, अनुवाद और रास्ता खोजने में मदद करता है।"
+     }
+    ]
+   }
+  ]
  }
 ]
