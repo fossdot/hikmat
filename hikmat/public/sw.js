@@ -1,6 +1,6 @@
 /* Hikmat PWA service worker — offline-first app shell + content.
    Scope: /assets/hikmat/. Bump CACHE to ship an update to installed PWAs. */
-const CACHE = "hikmat-pwa-v5";
+const CACHE = "hikmat-pwa-v6";   // v6: module tests + attendance + explainer videos
 const BASE = "/assets/hikmat/";
 const SHELL = [
   BASE + "game.html",
