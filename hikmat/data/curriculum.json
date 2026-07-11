@@ -11761,6 +11761,720 @@
       "teachHi": "कहानी कहती है अली को दवा दिन में दो बार लेनी है।"
      }
     ]
+   },
+   {
+    "key": "illness",
+    "title": "Common Illnesses",
+    "titleHi": "आम बीमारियाँ",
+    "words": [
+     {
+      "en": "cough",
+      "hi": "खाँसी",
+      "pron": "कॉफ़",
+      "emoji": "😷",
+      "plural": "coughs",
+      "use": "I have a bad cough",
+      "useHi": "मुझे तेज़ खाँसी है।"
+     },
+     {
+      "en": "cold",
+      "hi": "जुकाम",
+      "pron": "कोल्ड",
+      "emoji": "🤧",
+      "plural": "colds",
+      "use": "I have a cold today",
+      "useHi": "मुझे आज जुकाम है।"
+     },
+     {
+      "en": "headache",
+      "hi": "सिरदर्द",
+      "pron": "हेडेक",
+      "emoji": "🤕",
+      "plural": "headaches",
+      "use": "I have a headache",
+      "useHi": "मेरे सिर में दर्द है।"
+     },
+     {
+      "en": "pain",
+      "hi": "दर्द",
+      "pron": "पेन",
+      "emoji": "😣",
+      "uncount": true,
+      "use": "I feel pain in my leg",
+      "useHi": "मेरी टाँग में दर्द है।"
+     },
+     {
+      "en": "weak",
+      "hi": "कमज़ोर",
+      "pron": "वीक",
+      "emoji": "🥴",
+      "uncount": true,
+      "use": "I feel weak today",
+      "useHi": "मैं आज कमज़ोर महसूस करती हूँ।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "How long have you had this cough?",
+      "lineHi": "यह खाँसी कब से है?",
+      "then": "Take this syrup two times a day and drink warm water.",
+      "replies": [
+       {
+        "text": "I have had a cough for three days.",
+        "textHi": "मुझे तीन दिन से खाँसी है।",
+        "ok": true
+       },
+       {
+        "text": "The train leaves at six o'clock.",
+        "textHi": "ट्रेन छह बजे चलती है।",
+        "ok": false
+       },
+       {
+        "text": "I want to buy a red saree.",
+        "textHi": "मुझे एक लाल साड़ी खरीदनी है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩‍⚕️",
+      "line": "You look weak. What is the problem?",
+      "lineHi": "तुम कमज़ोर लग रही हो। क्या तकलीफ़ है?",
+      "then": "Rest at home and eat well. You will feel better soon.",
+      "replies": [
+       {
+        "text": "I have a headache and a cold.",
+        "textHi": "मेरे सिर में दर्द है और जुकाम है।",
+        "ok": true
+       },
+       {
+        "text": "My goat ate the green grass.",
+        "textHi": "मेरी बकरी ने हरी घास खाई।",
+        "ok": false
+       },
+       {
+        "text": "The moon is very big tonight.",
+        "textHi": "आज रात चाँद बहुत बड़ा है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Meena Has a Cold",
+      "titleHi": "मीना को जुकाम है",
+      "emoji": "🤧",
+      "text": "Meena has a cold and a cough. She feels weak and tired. She drinks warm water and takes rest at home.",
+      "textHi": "मीना को जुकाम और खाँसी है। वह कमज़ोर और थकी हुई महसूस करती है। वह गरम पानी पीती है और घर पर आराम करती है।",
+      "q": "How does Meena feel?",
+      "qHi": "मीना कैसा महसूस करती है?",
+      "choices": [
+       "Weak and tired",
+       "Happy and strong",
+       "Hungry and angry"
+      ],
+      "answer": "Weak and tired",
+      "teach": "Meena has a cold, so she feels weak and tired.",
+      "teachHi": "मीना को जुकाम है, इसलिए वह कमज़ोर और थकी महसूस करती है।"
+     }
+    ]
+   },
+   {
+    "key": "medicine-shop",
+    "title": "At the Medicine Shop",
+    "titleHi": "दवाई की दुकान पर",
+    "words": [
+     {
+      "en": "tablet",
+      "hi": "गोली",
+      "pron": "टैबलेट",
+      "emoji": "💊",
+      "plural": "tablets",
+      "use": "Take one tablet at night",
+      "useHi": "रात को एक गोली लो।"
+     },
+     {
+      "en": "syrup",
+      "hi": "सिरप",
+      "pron": "सिरप",
+      "emoji": "🧪",
+      "uncount": true,
+      "use": "This syrup is for cough",
+      "useHi": "यह सिरप खाँसी के लिए है।"
+     },
+     {
+      "en": "bottle",
+      "hi": "बोतल",
+      "pron": "बॉटल",
+      "emoji": "🍶",
+      "plural": "bottles",
+      "use": "Give me one bottle",
+      "useHi": "मुझे एक बोतल दीजिए।"
+     },
+     {
+      "en": "dose",
+      "hi": "खुराक",
+      "pron": "डोस",
+      "emoji": "🥄",
+      "plural": "doses",
+      "use": "Take one dose after food",
+      "useHi": "खाने के बाद एक खुराक लो।"
+     },
+     {
+      "en": "chemist",
+      "hi": "दवा दुकानदार",
+      "pron": "केमिस्ट",
+      "emoji": "🧑‍⚕️",
+      "plural": "chemists",
+      "use": "The chemist gives medicine",
+      "useHi": "दवा दुकानदार दवा देता है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍⚕️",
+      "line": "What medicine do you need?",
+      "lineHi": "आपको कौन सी दवा चाहिए?",
+      "then": "Here is the syrup. Take one dose after food.",
+      "replies": [
+       {
+        "text": "I need syrup for my cough.",
+        "textHi": "मुझे खाँसी के लिए सिरप चाहिए।",
+        "ok": true
+       },
+       {
+        "text": "I want to open a bank account.",
+        "textHi": "मुझे बैंक खाता खोलना है।",
+        "ok": false
+       },
+       {
+        "text": "Please give me two bus tickets.",
+        "textHi": "मुझे दो बस टिकट दीजिए।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑‍⚕️",
+      "line": "Take one tablet at night with water.",
+      "lineHi": "रात को एक गोली पानी के साथ लो।",
+      "then": "Good. Come back if the pain stays.",
+      "replies": [
+       {
+        "text": "Okay, one tablet at night.",
+        "textHi": "ठीक है, रात को एक गोली।",
+        "ok": true
+       },
+       {
+        "text": "The cow is standing in the field.",
+        "textHi": "गाय खेत में खड़ी है।",
+        "ok": false
+       },
+       {
+        "text": "I can sing a very long song.",
+        "textHi": "मैं एक बहुत लंबा गाना गा सकती हूँ।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Sita Buys Syrup",
+      "titleHi": "सीता सिरप खरीदती है",
+      "emoji": "💊",
+      "text": "Sita has a bad cough. She goes to the chemist. He gives her a bottle of syrup and tells her one dose after food.",
+      "textHi": "सीता को तेज़ खाँसी है। वह दवा दुकानदार के पास जाती है। वह उसे सिरप की एक बोतल देता है और खाने के बाद एक खुराक बताता है।",
+      "q": "What does the chemist give Sita?",
+      "qHi": "दवा दुकानदार सीता को क्या देता है?",
+      "choices": [
+       "A bottle of syrup",
+       "A new phone",
+       "A bag of rice"
+      ],
+      "answer": "A bottle of syrup",
+      "teach": "The chemist gives Sita a bottle of syrup for her cough.",
+      "teachHi": "दवा दुकानदार सीता को उसकी खाँसी के लिए सिरप की बोतल देता है।"
+     }
+    ]
+   },
+   {
+    "key": "healthy-habits",
+    "title": "Healthy Habits",
+    "titleHi": "सेहतमंद आदतें",
+    "words": [
+     {
+      "en": "exercise",
+      "hi": "व्यायाम",
+      "pron": "एक्सरसाइज़",
+      "emoji": "🏃‍♀️",
+      "uncount": true,
+      "use": "I do exercise every day",
+      "useHi": "मैं रोज़ व्यायाम करती हूँ।"
+     },
+     {
+      "en": "sleep",
+      "hi": "नींद",
+      "pron": "स्लीप",
+      "emoji": "😴",
+      "uncount": true,
+      "use": "I need good sleep at night",
+      "useHi": "मुझे रात को अच्छी नींद चाहिए।"
+     },
+     {
+      "en": "wash",
+      "hi": "धोना",
+      "pron": "वॉश",
+      "emoji": "🧼",
+      "uncount": true,
+      "use": "Wash your hands before food",
+      "useHi": "खाने से पहले अपने हाथ धोओ।"
+     },
+     {
+      "en": "fruit",
+      "hi": "फल",
+      "pron": "फ़्रूट",
+      "emoji": "🍎",
+      "uncount": true,
+      "use": "Eat fresh fruit daily",
+      "useHi": "रोज़ ताज़ा फल खाओ।"
+     },
+     {
+      "en": "clean",
+      "hi": "साफ़",
+      "pron": "क्लीन",
+      "emoji": "🧹",
+      "uncount": true,
+      "use": "Keep your home clean",
+      "useHi": "अपना घर साफ़ रखो।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "How do you stay healthy?",
+      "lineHi": "तुम सेहतमंद कैसे रहती हो?",
+      "then": "Very good! Keep doing that every day.",
+      "replies": [
+       {
+        "text": "I do exercise and eat fruit.",
+        "textHi": "मैं व्यायाम करती हूँ और फल खाती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I paint the door blue.",
+        "textHi": "मैं दरवाज़ा नीला रंगती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "I count ten stars at night.",
+        "textHi": "मैं रात को दस तारे गिनती हूँ।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩",
+      "line": "Wash your hands and keep clean.",
+      "lineHi": "अपने हाथ धोओ और साफ़ रहो।",
+      "then": "Well done. Clean habits keep sickness away.",
+      "replies": [
+       {
+        "text": "Yes, I will wash my hands.",
+        "textHi": "हाँ, मैं अपने हाथ धोऊँगी।",
+        "ok": true
+       },
+       {
+        "text": "The kite is stuck on the tree.",
+        "textHi": "पतंग पेड़ पर फँसी है।",
+        "ok": false
+       },
+       {
+        "text": "I have a new pair of shoes.",
+        "textHi": "मेरे पास जूतों की नई जोड़ी है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Good Habits",
+      "titleHi": "अच्छी आदतें",
+      "emoji": "🍎",
+      "text": "Rina wakes up early and does exercise. She washes her hands and eats fruit. Good sleep and clean habits keep her healthy.",
+      "textHi": "रीना जल्दी उठती है और व्यायाम करती है। वह अपने हाथ धोती है और फल खाती है। अच्छी नींद और साफ़ आदतें उसे सेहतमंद रखती हैं।",
+      "q": "What keeps Rina healthy?",
+      "qHi": "रीना को सेहतमंद क्या रखता है?",
+      "choices": [
+       "Good sleep and clean habits",
+       "A big new car",
+       "A long red rope"
+      ],
+      "answer": "Good sleep and clean habits",
+      "teach": "Exercise, fruit, good sleep and clean habits keep Rina healthy.",
+      "teachHi": "व्यायाम, फल, अच्छी नींद और साफ़ आदतें रीना को सेहतमंद रखती हैं।"
+     }
+    ]
+   },
+   {
+    "key": "mother-baby",
+    "title": "Mother & Baby Care",
+    "titleHi": "माँ और बच्चे की देखभाल",
+    "words": [
+     {
+      "en": "checkup",
+      "hi": "जाँच",
+      "pron": "चेकअप",
+      "emoji": "🩺",
+      "plural": "checkups",
+      "use": "The baby needs a checkup",
+      "useHi": "बच्चे को जाँच की ज़रूरत है।"
+     },
+     {
+      "en": "nurse",
+      "hi": "नर्स",
+      "pron": "नर्स",
+      "emoji": "👩‍⚕️",
+      "plural": "nurses",
+      "use": "The nurse helps the mother",
+      "useHi": "नर्स माँ की मदद करती है।"
+     },
+     {
+      "en": "vaccine",
+      "hi": "टीका",
+      "pron": "वैक्सीन",
+      "emoji": "💉",
+      "plural": "vaccines",
+      "use": "The baby gets a vaccine",
+      "useHi": "बच्चे को टीका लगता है।"
+     },
+     {
+      "en": "weight",
+      "hi": "वज़न",
+      "pron": "वेट",
+      "emoji": "⚖️",
+      "uncount": true,
+      "use": "The nurse checks the baby's weight",
+      "useHi": "नर्स बच्चे का वज़न जाँचती है।"
+     },
+     {
+      "en": "care",
+      "hi": "देखभाल",
+      "pron": "केयर",
+      "emoji": "🤱",
+      "uncount": true,
+      "use": "A baby needs love and care",
+      "useHi": "बच्चे को प्यार और देखभाल चाहिए।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "Bring your baby for a checkup.",
+      "lineHi": "अपने बच्चे को जाँच के लिए लाओ।",
+      "then": "Good. We will check the baby's weight and give a vaccine.",
+      "replies": [
+       {
+        "text": "Yes, I will bring my baby.",
+        "textHi": "हाँ, मैं अपने बच्चे को लाऊँगी।",
+        "ok": true
+       },
+       {
+        "text": "I want to sell my old cycle.",
+        "textHi": "मुझे अपनी पुरानी साइकिल बेचनी है।",
+        "ok": false
+       },
+       {
+        "text": "The market is far from here.",
+        "textHi": "बाज़ार यहाँ से दूर है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩‍⚕️",
+      "line": "Give the baby milk and lots of care.",
+      "lineHi": "बच्चे को दूध और खूब देखभाल दो।",
+      "then": "Very good. Come again next month for a checkup.",
+      "replies": [
+       {
+        "text": "Yes, I will take good care.",
+        "textHi": "हाँ, मैं अच्छी देखभाल करूँगी।",
+        "ok": true
+       },
+       {
+        "text": "I want to fly to the big city.",
+        "textHi": "मुझे बड़े शहर उड़कर जाना है।",
+        "ok": false
+       },
+       {
+        "text": "The pot is full of cold water.",
+        "textHi": "बर्तन ठंडे पानी से भरा है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "The Nurse Visits",
+      "titleHi": "नर्स आती हैं",
+      "emoji": "👶",
+      "text": "Sunita takes her baby to the nurse. The nurse checks the baby's weight and gives a vaccine. She tells Sunita to give milk and care.",
+      "textHi": "सुनीता अपने बच्चे को नर्स के पास ले जाती है। नर्स बच्चे का वज़न जाँचती है और टीका लगाती है। वह सुनीता को दूध और देखभाल देने को कहती है।",
+      "q": "What does the nurse give the baby?",
+      "qHi": "नर्स बच्चे को क्या देती है?",
+      "choices": [
+       "A vaccine",
+       "A bus ticket",
+       "A gold ring"
+      ],
+      "answer": "A vaccine",
+      "teach": "The nurse checks the weight and gives the baby a vaccine.",
+      "teachHi": "नर्स वज़न जाँचती है और बच्चे को टीका लगाती है।"
+     }
+    ]
+   },
+   {
+    "key": "first-aid",
+    "title": "First Aid & Emergency",
+    "titleHi": "प्राथमिक उपचार",
+    "words": [
+     {
+      "en": "cut",
+      "hi": "कट",
+      "pron": "कट",
+      "emoji": "🤕",
+      "plural": "cuts",
+      "use": "I have a cut on my hand",
+      "useHi": "मेरे हाथ पर कट लगा है।"
+     },
+     {
+      "en": "bandage",
+      "hi": "पट्टी",
+      "pron": "बैंडेज",
+      "emoji": "🩹",
+      "plural": "bandages",
+      "use": "Put a bandage on the cut",
+      "useHi": "कट पर पट्टी बाँधो।"
+     },
+     {
+      "en": "burn",
+      "hi": "जला",
+      "pron": "बर्न",
+      "emoji": "🔥",
+      "plural": "burns",
+      "use": "Cool the burn with water",
+      "useHi": "जले को पानी से ठंडा करो।"
+     },
+     {
+      "en": "ambulance",
+      "hi": "एम्बुलेंस",
+      "pron": "ऐंबुलेंस",
+      "emoji": "🚑",
+      "plural": "ambulances",
+      "use": "Call an ambulance quickly",
+      "useHi": "जल्दी एम्बुलेंस बुलाओ।"
+     },
+     {
+      "en": "help",
+      "hi": "मदद",
+      "pron": "हेल्प",
+      "emoji": "🆘",
+      "uncount": true,
+      "use": "Please help me now",
+      "useHi": "कृपया अभी मेरी मदद करो।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩",
+      "line": "You have a cut on your hand!",
+      "lineHi": "तुम्हारे हाथ पर कट लगा है!",
+      "then": "Wash it with clean water and I will put a bandage.",
+      "replies": [
+       {
+        "text": "Yes, please put a bandage on it.",
+        "textHi": "हाँ, कृपया इस पर पट्टी बाँध दो।",
+        "ok": true
+       },
+       {
+        "text": "I want to buy a big drum.",
+        "textHi": "मुझे एक बड़ा ढोल खरीदना है।",
+        "ok": false
+       },
+       {
+        "text": "The garden has many flowers.",
+        "textHi": "बगीचे में बहुत फूल हैं।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑",
+      "line": "A man fell down and is hurt badly!",
+      "lineHi": "एक आदमी गिर गया और बुरी तरह घायल है!",
+      "then": "Right! I am calling the ambulance now.",
+      "replies": [
+       {
+        "text": "Quick, call an ambulance for help!",
+        "textHi": "जल्दी, मदद के लिए एम्बुलेंस बुलाओ!",
+        "ok": true
+       },
+       {
+        "text": "Let us play a game of cards.",
+        "textHi": "चलो ताश का खेल खेलें।",
+        "ok": false
+       },
+       {
+        "text": "I like the taste of sweet mango.",
+        "textHi": "मुझे मीठे आम का स्वाद पसंद है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "A Small Cut",
+      "titleHi": "एक छोटा कट",
+      "emoji": "🩹",
+      "text": "Anita cuts her finger while cutting vegetables. Her mother washes the cut with clean water. Then she puts a bandage on it.",
+      "textHi": "अनीता सब्ज़ी काटते समय अपनी उँगली काट लेती है। उसकी माँ कट को साफ़ पानी से धोती है। फिर वह उस पर पट्टी बाँधती है।",
+      "q": "What does the mother do first?",
+      "qHi": "माँ पहले क्या करती है?",
+      "choices": [
+       "Washes the cut with water",
+       "Cooks the rice",
+       "Sings a happy song"
+      ],
+      "answer": "Washes the cut with water",
+      "teach": "First wash a cut with clean water, then put a bandage.",
+      "teachHi": "पहले कट को साफ़ पानी से धोओ, फिर पट्टी बाँधो।"
+     }
+    ]
+   },
+   {
+    "key": "eating-well",
+    "title": "Eating Well",
+    "titleHi": "अच्छा खानपान",
+    "words": [
+     {
+      "en": "dal",
+      "hi": "दाल",
+      "pron": "दाल",
+      "emoji": "🍲",
+      "uncount": true,
+      "use": "Dal gives us protein",
+      "useHi": "दाल हमें प्रोटीन देती है।"
+     },
+     {
+      "en": "rice",
+      "hi": "चावल",
+      "pron": "राइस",
+      "emoji": "🍚",
+      "uncount": true,
+      "use": "We eat rice every day",
+      "useHi": "हम रोज़ चावल खाते हैं।"
+     },
+     {
+      "en": "vegetable",
+      "hi": "सब्ज़ी",
+      "pron": "वेजिटेबल",
+      "emoji": "🥦",
+      "plural": "vegetables",
+      "use": "Green vegetables are healthy",
+      "useHi": "हरी सब्ज़ियाँ सेहतमंद होती हैं।"
+     },
+     {
+      "en": "milk",
+      "hi": "दूध",
+      "pron": "मिल्क",
+      "emoji": "🥛",
+      "uncount": true,
+      "use": "Milk is good for bones",
+      "useHi": "दूध हड्डियों के लिए अच्छा है।"
+     },
+     {
+      "en": "iron",
+      "hi": "आयरन",
+      "pron": "आयरन",
+      "emoji": "🩸",
+      "uncount": true,
+      "use": "Green food gives us iron",
+      "useHi": "हरा खाना हमें आयरन देता है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩‍⚕️",
+      "line": "What do you eat every day?",
+      "lineHi": "तुम रोज़ क्या खाती हो?",
+      "then": "Good. Dal, rice and vegetables keep you strong.",
+      "replies": [
+       {
+        "text": "I eat dal, rice and vegetables.",
+        "textHi": "मैं दाल, चावल और सब्ज़ी खाती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I ride a horse to the hill.",
+        "textHi": "मैं घोड़े पर पहाड़ी जाती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "My uncle has a blue boat.",
+        "textHi": "मेरे चाचा के पास नीली नाव है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩‍⚕️",
+      "line": "You look pale. Eat food with iron.",
+      "lineHi": "तुम पीली लग रही हो। आयरन वाला खाना खाओ।",
+      "then": "Yes. Green vegetables and dal give you iron.",
+      "replies": [
+       {
+        "text": "Okay, I will eat green vegetables.",
+        "textHi": "ठीक है, मैं हरी सब्ज़ी खाऊँगी।",
+        "ok": true
+       },
+       {
+        "text": "The lamp is on the high shelf.",
+        "textHi": "दीया ऊँची शेल्फ़ पर है।",
+        "ok": false
+       },
+       {
+        "text": "We will paint the wall yellow.",
+        "textHi": "हम दीवार पीली रंगेंगे।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "A Healthy Plate",
+      "titleHi": "सेहतमंद थाली",
+      "emoji": "🍛",
+      "text": "Kavita eats dal, rice and green vegetables. She drinks a glass of milk every day. This food gives her iron and keeps her strong.",
+      "textHi": "कविता दाल, चावल और हरी सब्ज़ी खाती है। वह रोज़ एक गिलास दूध पीती है। यह खाना उसे आयरन देता है और मज़बूत रखता है।",
+      "q": "What does Kavita drink every day?",
+      "qHi": "कविता रोज़ क्या पीती है?",
+      "choices": [
+       "A glass of milk",
+       "A cup of mud",
+       "A bowl of sand"
+      ],
+      "answer": "A glass of milk",
+      "teach": "Milk, dal, rice and vegetables give Kavita iron and strength.",
+      "teachHi": "दूध, दाल, चावल और सब्ज़ी कविता को आयरन और ताकत देते हैं।"
+     }
+    ]
    }
   ]
  },
@@ -12028,6 +12742,720 @@
       "answer": "In a bank",
       "teach": "The story says a bank keeps your money safe.",
       "teachHi": "कहानी कहती है बैंक आपके पैसे को सुरक्षित रखता है।"
+     }
+    ]
+   },
+   {
+    "key": "saving",
+    "title": "Saving Money",
+    "titleHi": "पैसा बचाना",
+    "words": [
+     {
+      "en": "goal",
+      "hi": "लक्ष्य",
+      "pron": "गोल",
+      "emoji": "🎯",
+      "plural": "goals",
+      "use": "My goal is to save money",
+      "useHi": "मेरा लक्ष्य पैसा बचाना है।"
+     },
+     {
+      "en": "box",
+      "hi": "डिब्बा",
+      "pron": "बॉक्स",
+      "emoji": "📦",
+      "plural": "boxes",
+      "use": "I keep coins in a box",
+      "useHi": "मैं सिक्के डिब्बे में रखती हूँ।"
+     },
+     {
+      "en": "extra",
+      "hi": "अतिरिक्त",
+      "pron": "एक्स्ट्रा",
+      "emoji": "➕",
+      "uncount": true,
+      "use": "I save the extra money",
+      "useHi": "मैं अतिरिक्त पैसा बचाती हूँ।"
+     },
+     {
+      "en": "future",
+      "hi": "भविष्य",
+      "pron": "फ़्यूचर",
+      "emoji": "🔮",
+      "uncount": true,
+      "use": "I save for the future",
+      "useHi": "मैं भविष्य के लिए बचाती हूँ।"
+     },
+     {
+      "en": "spend",
+      "hi": "खर्च करना",
+      "pron": "स्पेंड",
+      "emoji": "💸",
+      "uncount": true,
+      "use": "Do not spend all your money",
+      "useHi": "अपना सारा पैसा खर्च मत करो।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩",
+      "line": "How do you save money each week?",
+      "lineHi": "आप हर हफ़्ते पैसा कैसे बचाती हैं?",
+      "then": "That is a very good habit.",
+      "replies": [
+       {
+        "text": "I keep some extra money in a box.",
+        "textHi": "मैं कुछ अतिरिक्त पैसा डिब्बे में रखती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "The train is very fast.",
+        "textHi": "रेलगाड़ी बहुत तेज़ है।",
+        "ok": false
+       },
+       {
+        "text": "My goat is white.",
+        "textHi": "मेरी बकरी सफ़ेद है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩",
+      "line": "Why do you save money?",
+      "lineHi": "आप पैसा क्यों बचाती हैं?",
+      "then": "Saving for the future is wise.",
+      "replies": [
+       {
+        "text": "I save for my future.",
+        "textHi": "मैं अपने भविष्य के लिए बचाती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I can touch the moon.",
+        "textHi": "मैं चाँद छू सकती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "The rice is cooking.",
+        "textHi": "चावल पक रहा है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "The Money Box",
+      "titleHi": "पैसों का डिब्बा",
+      "emoji": "📦",
+      "text": "Meena wants to save money. Every week she puts ten rupees in a box. After some months, she has enough to reach her goal.",
+      "textHi": "मीना पैसा बचाना चाहती है। हर हफ़्ते वह डिब्बे में दस रुपये डालती है। कुछ महीनों बाद, उसके पास अपने लक्ष्य तक पहुँचने के लिए काफ़ी पैसे हो जाते हैं।",
+      "q": "Where does Meena keep her money?",
+      "qHi": "मीना अपना पैसा कहाँ रखती है?",
+      "choices": [
+       "In a box",
+       "In a well",
+       "In a shoe"
+      ],
+      "answer": "In a box",
+      "teach": "Meena saves ten rupees in a box every week.",
+      "teachHi": "मीना हर हफ़्ते डिब्बे में दस रुपये बचाती है।"
+     }
+    ]
+   },
+   {
+    "key": "atm",
+    "title": "Using an ATM",
+    "titleHi": "एटीएम इस्तेमाल करना",
+    "words": [
+     {
+      "en": "ATM",
+      "hi": "एटीएम",
+      "pron": "ए टी एम",
+      "emoji": "🏧",
+      "plural": "ATMs",
+      "use": "I go to the ATM",
+      "useHi": "मैं एटीएम जाती हूँ।"
+     },
+     {
+      "en": "PIN",
+      "hi": "गुप्त नंबर",
+      "pron": "पिन",
+      "emoji": "🔢",
+      "plural": "PINs",
+      "use": "Keep your PIN secret",
+      "useHi": "अपना पिन गुप्त रखें।"
+     },
+     {
+      "en": "withdraw",
+      "hi": "पैसे निकालना",
+      "pron": "विदड्रॉ",
+      "emoji": "💵",
+      "uncount": true,
+      "use": "I want to withdraw money",
+      "useHi": "मैं पैसे निकालना चाहती हूँ।"
+     },
+     {
+      "en": "machine",
+      "hi": "मशीन",
+      "pron": "मशीन",
+      "emoji": "⚙️",
+      "plural": "machines",
+      "use": "The machine gives money",
+      "useHi": "मशीन पैसे देती है।"
+     },
+     {
+      "en": "screen",
+      "hi": "स्क्रीन",
+      "pron": "स्क्रीन",
+      "emoji": "🖥️",
+      "plural": "screens",
+      "use": "Look at the screen",
+      "useHi": "स्क्रीन देखें।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "💂",
+      "line": "What do you want to do at the ATM?",
+      "lineHi": "आप एटीएम पर क्या करना चाहती हैं?",
+      "then": "Okay. Please enter your PIN yourself.",
+      "replies": [
+       {
+        "text": "I want to withdraw some money.",
+        "textHi": "मैं कुछ पैसे निकालना चाहती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I want to fly a kite.",
+        "textHi": "मैं पतंग उड़ाना चाहती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "I want to plant a tree.",
+        "textHi": "मैं पेड़ लगाना चाहती हूँ।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑",
+      "line": "Tell me your PIN and I will help you.",
+      "lineHi": "मुझे अपना पिन बताओ और मैं मदद करूँगा।",
+      "then": "You are right. Never share your PIN with anyone.",
+      "replies": [
+       {
+        "text": "No, I keep my PIN secret.",
+        "textHi": "नहीं, मैं अपना पिन गुप्त रखती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "Yes, the sky is red.",
+        "textHi": "हाँ, आसमान लाल है।",
+        "ok": false
+       },
+       {
+        "text": "Okay, my cow is hungry.",
+        "textHi": "ठीक है, मेरी गाय भूखी है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "At the ATM",
+      "titleHi": "एटीएम पर",
+      "emoji": "🏧",
+      "text": "Radha goes to the ATM. She puts in her card and enters her secret PIN. The machine gives her the money she needs.",
+      "textHi": "राधा एटीएम पर जाती है। वह अपना कार्ड डालती है और अपना गुप्त पिन डालती है। मशीन उसे ज़रूरत के पैसे देती है।",
+      "q": "What does Radha enter at the ATM?",
+      "qHi": "राधा एटीएम पर क्या डालती है?",
+      "choices": [
+       "Her secret PIN",
+       "Her phone number",
+       "Her name"
+      ],
+      "answer": "Her secret PIN",
+      "teach": "Radha enters her secret PIN to get money.",
+      "teachHi": "राधा पैसे पाने के लिए अपना गुप्त पिन डालती है।"
+     }
+    ]
+   },
+   {
+    "key": "upi",
+    "title": "Phone Payment",
+    "titleHi": "फ़ोन से भुगतान",
+    "words": [
+     {
+      "en": "phone",
+      "hi": "फ़ोन",
+      "pron": "फ़ोन",
+      "emoji": "📱",
+      "plural": "phones",
+      "use": "I pay with my phone",
+      "useHi": "मैं अपने फ़ोन से भुगतान करती हूँ।"
+     },
+     {
+      "en": "app",
+      "hi": "ऐप",
+      "pron": "ऐप",
+      "emoji": "📲",
+      "plural": "apps",
+      "use": "Open the payment app",
+      "useHi": "भुगतान ऐप खोलें।"
+     },
+     {
+      "en": "scan",
+      "hi": "स्कैन करना",
+      "pron": "स्कैन",
+      "emoji": "📷",
+      "uncount": true,
+      "use": "Scan the shop's code",
+      "useHi": "दुकान का कोड स्कैन करें।"
+     },
+     {
+      "en": "send",
+      "hi": "भेजना",
+      "pron": "सेंड",
+      "emoji": "💸",
+      "uncount": true,
+      "use": "I send money to my sister",
+      "useHi": "मैं अपनी बहन को पैसे भेजती हूँ।"
+     },
+     {
+      "en": "OTP",
+      "hi": "ओटीपी",
+      "pron": "ओ टी पी",
+      "emoji": "🔐",
+      "plural": "OTPs",
+      "use": "Do not share your OTP",
+      "useHi": "अपना ओटीपी किसी को मत बताएँ।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩",
+      "line": "How will you pay?",
+      "lineHi": "आप कैसे भुगतान करेंगी?",
+      "then": "Good. Scan the QR code here.",
+      "replies": [
+       {
+        "text": "I will pay with my phone.",
+        "textHi": "मैं अपने फ़ोन से भुगतान करूँगी।",
+        "ok": true
+       },
+       {
+        "text": "I will paint the wall.",
+        "textHi": "मैं दीवार रंगूँगी।",
+        "ok": false
+       },
+       {
+        "text": "I will feed the birds.",
+        "textHi": "मैं पक्षियों को खाना दूँगी।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑",
+      "line": "Please tell me the OTP on your phone.",
+      "lineHi": "कृपया अपने फ़ोन का ओटीपी मुझे बताएँ।",
+      "then": "Correct. Banks never ask for your OTP.",
+      "replies": [
+       {
+        "text": "No, I will not share my OTP.",
+        "textHi": "नहीं, मैं अपना ओटीपी नहीं बताऊँगी।",
+        "ok": true
+       },
+       {
+        "text": "Yes, the moon is sweet.",
+        "textHi": "हाँ, चाँद मीठा है।",
+        "ok": false
+       },
+       {
+        "text": "Okay, the fish can sing.",
+        "textHi": "ठीक है, मछली गा सकती है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Paying with a Phone",
+      "titleHi": "फ़ोन से भुगतान",
+      "emoji": "📱",
+      "text": "Guddi buys vegetables in the market. She opens the app on her phone and scans the shop's code. She sends the money in one minute.",
+      "textHi": "गुड्डी बाज़ार में सब्ज़ी खरीदती है। वह अपने फ़ोन पर ऐप खोलती है और दुकान का कोड स्कैन करती है। वह एक मिनट में पैसे भेज देती है।",
+      "q": "How does Guddi pay for the vegetables?",
+      "qHi": "गुड्डी सब्ज़ी के पैसे कैसे देती है?",
+      "choices": [
+       "With her phone",
+       "With a goat",
+       "With a letter"
+      ],
+      "answer": "With her phone",
+      "teach": "Guddi scans the code and pays with her phone.",
+      "teachHi": "गुड्डी कोड स्कैन करके अपने फ़ोन से भुगतान करती है।"
+     }
+    ]
+   },
+   {
+    "key": "bills",
+    "title": "Paying Bills",
+    "titleHi": "बिल भरना",
+    "words": [
+     {
+      "en": "bill",
+      "hi": "बिल",
+      "pron": "बिल",
+      "emoji": "📄",
+      "plural": "bills",
+      "use": "Please pay the light bill",
+      "useHi": "कृपया बिजली का बिल भरें।"
+     },
+     {
+      "en": "receipt",
+      "hi": "रसीद",
+      "pron": "रिसीट",
+      "emoji": "🧾",
+      "plural": "receipts",
+      "use": "Keep the receipt safe",
+      "useHi": "रसीद सँभाल कर रखें।"
+     },
+     {
+      "en": "total",
+      "hi": "कुल",
+      "pron": "टोटल",
+      "emoji": "🧮",
+      "plural": "totals",
+      "use": "What is the total?",
+      "useHi": "कुल कितना है?"
+     },
+     {
+      "en": "due",
+      "hi": "देय",
+      "pron": "ड्यू",
+      "emoji": "📅",
+      "uncount": true,
+      "use": "The bill is due today",
+      "useHi": "बिल आज देय है।"
+     },
+     {
+      "en": "pay",
+      "hi": "भुगतान करना",
+      "pron": "पे",
+      "emoji": "💵",
+      "uncount": true,
+      "use": "I pay the bill on time",
+      "useHi": "मैं समय पर बिल भरती हूँ।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍💼",
+      "line": "Your electricity bill is two hundred rupees.",
+      "lineHi": "आपका बिजली का बिल दो सौ रुपये है।",
+      "then": "Thank you. Here is your receipt.",
+      "replies": [
+       {
+        "text": "Okay, I will pay it now.",
+        "textHi": "ठीक है, मैं अभी भुगतान करती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "Okay, I will climb the tree.",
+        "textHi": "ठीक है, मैं पेड़ पर चढ़ूँगी।",
+        "ok": false
+       },
+       {
+        "text": "Okay, the sun is green.",
+        "textHi": "ठीक है, सूरज हरा है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑‍💼",
+      "line": "Do you want the receipt?",
+      "lineHi": "क्या आपको रसीद चाहिए?",
+      "then": "Good. Always keep your receipt.",
+      "replies": [
+       {
+        "text": "Yes, please give me the receipt.",
+        "textHi": "हाँ, कृपया मुझे रसीद दें।",
+        "ok": true
+       },
+       {
+        "text": "Yes, I will eat the door.",
+        "textHi": "हाँ, मैं दरवाज़ा खाऊँगी।",
+        "ok": false
+       },
+       {
+        "text": "Yes, the stone is singing.",
+        "textHi": "हाँ, पत्थर गा रहा है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "The Water Bill",
+      "titleHi": "पानी का बिल",
+      "emoji": "🧾",
+      "text": "The water bill comes to Kamla's house. The total is one hundred rupees, and it is due this week. She pays the bill and keeps the receipt.",
+      "textHi": "कमला के घर पानी का बिल आता है। कुल एक सौ रुपये है, और यह इसी हफ़्ते देय है। वह बिल भरती है और रसीद सँभाल कर रखती है।",
+      "q": "What does Kamla keep after paying?",
+      "qHi": "भुगतान के बाद कमला क्या रखती है?",
+      "choices": [
+       "The receipt",
+       "A mango",
+       "A drum"
+      ],
+      "answer": "The receipt",
+      "teach": "Kamla keeps the receipt as proof that she paid.",
+      "teachHi": "कमला भुगतान के सबूत के तौर पर रसीद रखती है।"
+     }
+    ]
+   },
+   {
+    "key": "loan",
+    "title": "Loans & Group Savings",
+    "titleHi": "क़र्ज़ और समूह बचत",
+    "words": [
+     {
+      "en": "loan",
+      "hi": "क़र्ज़",
+      "pron": "लोन",
+      "emoji": "🤝",
+      "plural": "loans",
+      "use": "I took a small loan",
+      "useHi": "मैंने एक छोटा क़र्ज़ लिया।"
+     },
+     {
+      "en": "interest",
+      "hi": "ब्याज",
+      "pron": "इंट्रेस्ट",
+      "emoji": "📈",
+      "uncount": true,
+      "use": "The loan has low interest",
+      "useHi": "क़र्ज़ पर कम ब्याज है।"
+     },
+     {
+      "en": "repay",
+      "hi": "चुकाना",
+      "pron": "रिपे",
+      "emoji": "🔄",
+      "uncount": true,
+      "use": "I repay the loan every month",
+      "useHi": "मैं हर महीने क़र्ज़ चुकाती हूँ।"
+     },
+     {
+      "en": "group",
+      "hi": "समूह",
+      "pron": "ग्रुप",
+      "emoji": "👭",
+      "plural": "groups",
+      "use": "Our group saves together",
+      "useHi": "हमारा समूह मिलकर बचत करता है।"
+     },
+     {
+      "en": "meeting",
+      "hi": "बैठक",
+      "pron": "मीटिंग",
+      "emoji": "🗓️",
+      "plural": "meetings",
+      "use": "The group meeting is on Monday",
+      "useHi": "समूह की बैठक सोमवार को है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩",
+      "line": "Why do you want a loan?",
+      "lineHi": "आप क़र्ज़ क्यों लेना चाहती हैं?",
+      "then": "Good plan. Our group can help you.",
+      "replies": [
+       {
+        "text": "I want to start a small shop.",
+        "textHi": "मैं एक छोटी दुकान शुरू करना चाहती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I want to swim in the sky.",
+        "textHi": "मैं आसमान में तैरना चाहती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "I want to eat a cloud.",
+        "textHi": "मैं बादल खाना चाहती हूँ।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩",
+      "line": "When will you repay the loan?",
+      "lineHi": "आप क़र्ज़ कब चुकाएँगी?",
+      "then": "Very good. Repay on time to keep trust.",
+      "replies": [
+       {
+        "text": "I will repay a little every month.",
+        "textHi": "मैं हर महीने थोड़ा-थोड़ा चुकाऊँगी।",
+        "ok": true
+       },
+       {
+        "text": "I will paint my hair blue.",
+        "textHi": "मैं अपने बाल नीले रंगूँगी।",
+        "ok": false
+       },
+       {
+        "text": "I will teach the goat to read.",
+        "textHi": "मैं बकरी को पढ़ना सिखाऊँगी।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "The Group Meeting",
+      "titleHi": "समूह की बैठक",
+      "emoji": "👭",
+      "text": "Every month the women's group has a meeting. Each woman saves a little money. Sita takes a small loan and repays it with low interest.",
+      "textHi": "हर महीने महिला समूह की एक बैठक होती है। हर महिला थोड़ा पैसा बचाती है। सीता एक छोटा क़र्ज़ लेती है और उसे कम ब्याज के साथ चुकाती है।",
+      "q": "How often does the group meet?",
+      "qHi": "समूह कितनी बार मिलता है?",
+      "choices": [
+       "Every month",
+       "Every hour",
+       "Never"
+      ],
+      "answer": "Every month",
+      "teach": "The women's group meets every month to save and give loans.",
+      "teachHi": "महिला समूह बचत करने और क़र्ज़ देने के लिए हर महीने मिलता है।"
+     }
+    ]
+   },
+   {
+    "key": "safe-money",
+    "title": "Keeping Money Safe",
+    "titleHi": "पैसा सुरक्षित रखना",
+    "words": [
+     {
+      "en": "safe",
+      "hi": "सुरक्षित",
+      "pron": "सेफ़",
+      "emoji": "🔒",
+      "uncount": true,
+      "use": "My money is safe",
+      "useHi": "मेरा पैसा सुरक्षित है।"
+     },
+     {
+      "en": "secret",
+      "hi": "गुप्त",
+      "pron": "सीक्रेट",
+      "emoji": "🤫",
+      "plural": "secrets",
+      "use": "Keep your PIN a secret",
+      "useHi": "अपना पिन गुप्त रखें।"
+     },
+     {
+      "en": "careful",
+      "hi": "सावधान",
+      "pron": "केयरफ़ुल",
+      "emoji": "⚠️",
+      "uncount": true,
+      "use": "Be careful with your money",
+      "useHi": "अपने पैसे को लेकर सावधान रहें।"
+     },
+     {
+      "en": "fraud",
+      "hi": "धोखाधड़ी",
+      "pron": "फ़्रॉड",
+      "emoji": "🚫",
+      "uncount": true,
+      "use": "Be alert about fraud",
+      "useHi": "धोखाधड़ी से सतर्क रहें।"
+     },
+     {
+      "en": "cash",
+      "hi": "नक़द",
+      "pron": "कैश",
+      "emoji": "💵",
+      "uncount": true,
+      "use": "Do not keep too much cash at home",
+      "useHi": "घर पर बहुत ज़्यादा नक़द मत रखें।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑",
+      "line": "You won a prize! First send me two thousand rupees.",
+      "lineHi": "आपने इनाम जीता है! पहले मुझे दो हज़ार रुपये भेजें।",
+      "then": "Right. This is a fraud, never send money.",
+      "replies": [
+       {
+        "text": "No, this is a fraud.",
+        "textHi": "नहीं, यह धोखाधड़ी है।",
+        "ok": true
+       },
+       {
+        "text": "Yes, my shoes can talk.",
+        "textHi": "हाँ, मेरे जूते बोल सकते हैं।",
+        "ok": false
+       },
+       {
+        "text": "Okay, the wall is hungry.",
+        "textHi": "ठीक है, दीवार भूखी है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩",
+      "line": "Where do you keep your money?",
+      "lineHi": "आप अपना पैसा कहाँ रखती हैं?",
+      "then": "Wise. The bank is safer than home.",
+      "replies": [
+       {
+        "text": "I keep it safe in the bank.",
+        "textHi": "मैं इसे बैंक में सुरक्षित रखती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I keep it inside a cloud.",
+        "textHi": "मैं इसे बादल के अंदर रखती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "I keep it under the river.",
+        "textHi": "मैं इसे नदी के नीचे रखती हूँ।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Be Careful with Money",
+      "titleHi": "पैसे को लेकर सावधान रहें",
+      "emoji": "🔒",
+      "text": "A man calls Anita and asks for her secret PIN. Anita is careful. She knows this is a fraud, so she keeps her PIN safe and says no.",
+      "textHi": "एक आदमी अनीता को फ़ोन करता है और उसका गुप्त पिन माँगता है। अनीता सावधान है। वह जानती है कि यह धोखाधड़ी है, इसलिए वह अपना पिन सुरक्षित रखती है और मना कर देती है।",
+      "q": "What does Anita do when the man asks for her PIN?",
+      "qHi": "जब आदमी पिन माँगता है तो अनीता क्या करती है?",
+      "choices": [
+       "She says no",
+       "She sends money",
+       "She tells the PIN"
+      ],
+      "answer": "She says no",
+      "teach": "Anita is careful and never shares her secret PIN.",
+      "teachHi": "अनीता सावधान रहती है और अपना गुप्त पिन कभी नहीं बताती।"
      }
     ]
    }
@@ -12298,6 +13726,720 @@
       "answer": "Find your way",
       "teach": "A map helps you find your way when you are lost.",
       "teachHi": "जब आप खो जाएँ तो नक्शा रास्ता ढूँढने में मदद करता है।"
+     }
+    ]
+   },
+   {
+    "key": "bus-stand",
+    "title": "At the Bus Stand",
+    "titleHi": "बस अड्डे पर",
+    "words": [
+     {
+      "en": "stop",
+      "hi": "ठहराव",
+      "pron": "स्टॉप",
+      "emoji": "🚏",
+      "plural": "stops",
+      "use": "The bus stop is near my home",
+      "useHi": "बस का ठहराव मेरे घर के पास है।"
+     },
+     {
+      "en": "driver",
+      "hi": "चालक",
+      "pron": "ड्राइवर",
+      "emoji": "🧑‍✈️",
+      "plural": "drivers",
+      "use": "The driver knows the way",
+      "useHi": "चालक को रास्ता पता है।"
+     },
+     {
+      "en": "seat",
+      "hi": "सीट",
+      "pron": "सीट",
+      "emoji": "💺",
+      "plural": "seats",
+      "use": "This seat is empty",
+      "useHi": "यह सीट खाली है।"
+     },
+     {
+      "en": "queue",
+      "hi": "कतार",
+      "pron": "क्यू",
+      "emoji": "🧍‍♀️",
+      "plural": "queues",
+      "use": "Please stand in the queue",
+      "useHi": "कृपया कतार में खड़ी रहें।"
+     },
+     {
+      "en": "board",
+      "hi": "चढ़ना",
+      "pron": "बोर्ड",
+      "emoji": "🚌",
+      "uncount": true,
+      "use": "We board the bus from the front",
+      "useHi": "हम बस में आगे से चढ़ते हैं।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍✈️",
+      "line": "Which bus are you waiting for?",
+      "lineHi": "आप कौन सी बस का इंतज़ार कर रही हैं?",
+      "then": "That bus stops right here. Please wait.",
+      "replies": [
+       {
+        "text": "I am waiting for the Motihari bus.",
+        "textHi": "मैं मोतिहारी की बस का इंतज़ार कर रही हूँ।",
+        "ok": true
+       },
+       {
+        "text": "My goat is eating green grass.",
+        "textHi": "मेरी बकरी हरी घास खा रही है।",
+        "ok": false
+       },
+       {
+        "text": "I painted the whole wall blue.",
+        "textHi": "मैंने पूरी दीवार नीली रंग दी।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑‍✈️",
+      "line": "Please stand in the queue to board.",
+      "lineHi": "चढ़ने के लिए कतार में खड़ी रहें।",
+      "then": "Good. Now find an empty seat inside.",
+      "replies": [
+       {
+        "text": "Okay, I will stand in the line.",
+        "textHi": "ठीक है, मैं कतार में खड़ी रहूँगी।",
+        "ok": true
+       },
+       {
+        "text": "The hot tea is on the roof.",
+        "textHi": "गरम चाय छत पर रखी है।",
+        "ok": false
+       },
+       {
+        "text": "My red umbrella can fly away.",
+        "textHi": "मेरा लाल छाता उड़ सकता है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Waiting at the Bus Stand",
+      "titleHi": "बस अड्डे पर इंतज़ार",
+      "emoji": "🚏",
+      "text": "Rekha reaches the bus stand early. She stands in the queue with her bag. When the bus comes, the driver stops it and she gets a seat by the window.",
+      "textHi": "रेखा जल्दी बस अड्डे पहुँचती है। वह अपने थैले के साथ कतार में खड़ी रहती है। जब बस आती है, चालक उसे रोकता है और उसे खिड़की के पास सीट मिलती है।",
+      "q": "Where did Rekha get a seat?",
+      "qHi": "रेखा को कहाँ सीट मिली?",
+      "choices": [
+       "By the window",
+       "On the roof",
+       "Under the bus"
+      ],
+      "answer": "By the window",
+      "teach": "Rekha got a seat by the window of the bus.",
+      "teachHi": "रेखा को बस में खिड़की के पास सीट मिली।"
+     }
+    ]
+   },
+   {
+    "key": "railway",
+    "title": "At the Railway Station",
+    "titleHi": "रेलवे स्टेशन पर",
+    "words": [
+     {
+      "en": "platform",
+      "hi": "प्लेटफ़ॉर्म",
+      "pron": "प्लैटफ़ॉर्म",
+      "emoji": "🚉",
+      "plural": "platforms",
+      "use": "The train is on platform two",
+      "useHi": "रेलगाड़ी प्लेटफ़ॉर्म दो पर है।"
+     },
+     {
+      "en": "coach",
+      "hi": "डिब्बा",
+      "pron": "कोच",
+      "emoji": "🚃",
+      "plural": "coaches",
+      "use": "My coach is at the front",
+      "useHi": "मेरा डिब्बा आगे है।"
+     },
+     {
+      "en": "wait",
+      "hi": "इंतज़ार",
+      "pron": "वेट",
+      "emoji": "⏳",
+      "uncount": true,
+      "use": "We wait on the platform",
+      "useHi": "हम प्लेटफ़ॉर्म पर इंतज़ार करते हैं।"
+     },
+     {
+      "en": "luggage",
+      "hi": "सामान",
+      "pron": "लगेज",
+      "emoji": "🧳",
+      "uncount": true,
+      "use": "Keep your luggage with you",
+      "useHi": "अपना सामान अपने पास रखो।"
+     },
+     {
+      "en": "announce",
+      "hi": "घोषणा करना",
+      "pron": "अनाउंस",
+      "emoji": "📢",
+      "uncount": true,
+      "use": "They announce the train time",
+      "useHi": "वे रेलगाड़ी का समय घोषित करते हैं।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑‍💼",
+      "line": "Which train do you want to take?",
+      "lineHi": "आप कौन सी रेलगाड़ी लेना चाहती हैं?",
+      "then": "It will come on platform two. Please wait there.",
+      "replies": [
+       {
+        "text": "I want the train to Patna.",
+        "textHi": "मुझे पटना की रेलगाड़ी चाहिए।",
+        "ok": true
+       },
+       {
+        "text": "My shoes are full of mud.",
+        "textHi": "मेरे जूते कीचड़ से भरे हैं।",
+        "ok": false
+       },
+       {
+        "text": "The parrot can talk very well.",
+        "textHi": "तोता बहुत अच्छे से बोल सकता है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑",
+      "line": "Did you hear the announcement?",
+      "lineHi": "क्या आपने घोषणा सुनी?",
+      "then": "Yes, your train is late by ten minutes.",
+      "replies": [
+       {
+        "text": "Yes, they said the train is late.",
+        "textHi": "हाँ, उन्होंने कहा रेलगाड़ी देर से है।",
+        "ok": true
+       },
+       {
+        "text": "Yes, I can lift a big elephant.",
+        "textHi": "हाँ, मैं बड़ा हाथी उठा सकती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "Yes, the soup tastes like sugar.",
+        "textHi": "हाँ, सूप चीनी जैसा लगता है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "On the Platform",
+      "titleHi": "प्लेटफ़ॉर्म पर",
+      "emoji": "🚉",
+      "text": "Munni waits on the platform with her luggage. A loud voice announces her train. She walks to coach number five and climbs in.",
+      "textHi": "मुन्नी अपने सामान के साथ प्लेटफ़ॉर्म पर इंतज़ार करती है। एक ज़ोर की आवाज़ उसकी रेलगाड़ी की घोषणा करती है। वह पाँच नंबर के डिब्बे तक जाती है और चढ़ जाती है।",
+      "q": "Which coach did Munni go to?",
+      "qHi": "मुन्नी किस डिब्बे में गई?",
+      "choices": [
+       "Coach number five",
+       "Coach number ten",
+       "The engine"
+      ],
+      "answer": "Coach number five",
+      "teach": "Munni went to coach number five to board her train.",
+      "teachHi": "मुन्नी अपनी रेलगाड़ी में चढ़ने के लिए पाँच नंबर के डिब्बे में गई।"
+     }
+    ]
+   },
+   {
+    "key": "auto-rickshaw",
+    "title": "Auto and Rickshaw",
+    "titleHi": "ऑटो और रिक्शा",
+    "words": [
+     {
+      "en": "auto",
+      "hi": "ऑटो",
+      "pron": "ऑटो",
+      "emoji": "🛺",
+      "plural": "autos",
+      "use": "I go to work by auto",
+      "useHi": "मैं ऑटो से काम पर जाती हूँ।"
+     },
+     {
+      "en": "rickshaw",
+      "hi": "रिक्शा",
+      "pron": "रिक्शॉ",
+      "emoji": "🚲",
+      "plural": "rickshaws",
+      "use": "The rickshaw is slow but cheap",
+      "useHi": "रिक्शा धीमा लेकिन सस्ता है।"
+     },
+     {
+      "en": "fare",
+      "hi": "किराया",
+      "pron": "फ़ेयर",
+      "emoji": "💰",
+      "plural": "fares",
+      "use": "What is the fare to the market?",
+      "useHi": "बाज़ार का किराया कितना है?"
+     },
+     {
+      "en": "meter",
+      "hi": "मीटर",
+      "pron": "मीटर",
+      "emoji": "🔢",
+      "plural": "meters",
+      "use": "Please start the meter",
+      "useHi": "कृपया मीटर चालू करें।"
+     },
+     {
+      "en": "ride",
+      "hi": "सवारी",
+      "pron": "राइड",
+      "emoji": "🚕",
+      "plural": "rides",
+      "use": "The ride was very short",
+      "useHi": "सवारी बहुत छोटी थी।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑",
+      "line": "Which place do you need to reach?",
+      "lineHi": "आपको किस जगह पहुँचना है?",
+      "then": "The fare will be thirty rupees. Please sit down.",
+      "replies": [
+       {
+        "text": "I need to reach the hospital.",
+        "textHi": "मुझे अस्पताल पहुँचना है।",
+        "ok": true
+       },
+       {
+        "text": "My hen laid three white eggs.",
+        "textHi": "मेरी मुर्गी ने तीन सफ़ेद अंडे दिए।",
+        "ok": false
+       },
+       {
+        "text": "The paper kite flew very high.",
+        "textHi": "कागज़ की पतंग बहुत ऊँची उड़ी।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "🧑",
+      "line": "The fare to the market is thirty rupees.",
+      "lineHi": "बाज़ार का किराया तीस रुपये है।",
+      "then": "Good. Please sit down. We will go now.",
+      "replies": [
+       {
+        "text": "Okay, thirty rupees is fine.",
+        "textHi": "ठीक है, तीस रुपये ठीक हैं।",
+        "ok": true
+       },
+       {
+        "text": "I am reading a very big book.",
+        "textHi": "मैं एक बहुत बड़ी किताब पढ़ रही हूँ।",
+        "ok": false
+       },
+       {
+        "text": "The garden has many red roses.",
+        "textHi": "बगीचे में बहुत सारे लाल गुलाब हैं।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "A Rickshaw Ride",
+      "titleHi": "रिक्शा की सवारी",
+      "emoji": "🛺",
+      "text": "Sunita takes an auto to the market. She asks the driver about the fare first. They agree on twenty rupees for the short ride.",
+      "textHi": "सुनीता बाज़ार जाने के लिए ऑटो लेती है। वह पहले चालक से किराए के बारे में पूछती है। वे छोटी सवारी के लिए बीस रुपये पर राज़ी हो जाते हैं।",
+      "q": "How much did the ride cost?",
+      "qHi": "सवारी कितने की पड़ी?",
+      "choices": [
+       "Twenty rupees",
+       "Two rupees",
+       "Hundred rupees"
+      ],
+      "answer": "Twenty rupees",
+      "teach": "The short auto ride cost Sunita twenty rupees.",
+      "teachHi": "छोटी ऑटो सवारी सुनीता को बीस रुपये की पड़ी।"
+     }
+    ]
+   },
+   {
+    "key": "road-safety",
+    "title": "Road Safety",
+    "titleHi": "सड़क सुरक्षा",
+    "words": [
+     {
+      "en": "cross",
+      "hi": "पार करना",
+      "pron": "क्रॉस",
+      "emoji": "🚸",
+      "uncount": true,
+      "use": "Cross the road slowly",
+      "useHi": "सड़क धीरे से पार करो।"
+     },
+     {
+      "en": "signal",
+      "hi": "बत्ती",
+      "pron": "सिग्नल",
+      "emoji": "🚦",
+      "plural": "signals",
+      "use": "Wait for the green signal",
+      "useHi": "हरी बत्ती का इंतज़ार करो।"
+     },
+     {
+      "en": "careful",
+      "hi": "सावधान",
+      "pron": "केयरफ़ुल",
+      "emoji": "⚠️",
+      "uncount": true,
+      "use": "Be careful on the road",
+      "useHi": "सड़क पर सावधान रहो।"
+     },
+     {
+      "en": "look",
+      "hi": "देखना",
+      "pron": "लुक",
+      "emoji": "👀",
+      "uncount": true,
+      "use": "Look both ways before you cross",
+      "useHi": "पार करने से पहले दोनों तरफ़ देखो।"
+     },
+     {
+      "en": "footpath",
+      "hi": "फुटपाथ",
+      "pron": "फुटपाथ",
+      "emoji": "🚶‍♀️",
+      "plural": "footpaths",
+      "use": "Walk on the footpath",
+      "useHi": "फुटपाथ पर चलो।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👮",
+      "line": "How do you cross a busy road?",
+      "lineHi": "व्यस्त सड़क कैसे पार करती हो?",
+      "then": "Very good. Always look both ways first.",
+      "replies": [
+       {
+        "text": "I wait for the green signal.",
+        "textHi": "मैं हरी बत्ती का इंतज़ार करती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I like to eat sweet mangoes.",
+        "textHi": "मुझे मीठे आम खाना पसंद है।",
+        "ok": false
+       },
+       {
+        "text": "The round clock is on the wall.",
+        "textHi": "गोल घड़ी दीवार पर है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👮‍♀️",
+      "line": "Where should children walk on the road?",
+      "lineHi": "बच्चों को सड़क पर कहाँ चलना चाहिए?",
+      "then": "Right. The footpath keeps you safe from cars.",
+      "replies": [
+       {
+        "text": "We should walk on the footpath.",
+        "textHi": "हमें फुटपाथ पर चलना चाहिए।",
+        "ok": true
+       },
+       {
+        "text": "We should fly a paper plane.",
+        "textHi": "हमें कागज़ का हवाई जहाज़ उड़ाना चाहिए।",
+        "ok": false
+       },
+       {
+        "text": "We should sleep on the green grass.",
+        "textHi": "हमें हरी घास पर सोना चाहिए।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Crossing Safely",
+      "titleHi": "सुरक्षित पार करना",
+      "emoji": "🚦",
+      "text": "Anju wants to cross the road. She stops at the signal and waits for it to turn green. She looks both ways, then walks across on the crossing.",
+      "textHi": "अंजू सड़क पार करना चाहती है। वह सिग्नल पर रुकती है और उसके हरा होने का इंतज़ार करती है। वह दोनों तरफ़ देखती है, फिर क्रॉसिंग पर चलकर पार करती है।",
+      "q": "What did Anju wait for?",
+      "qHi": "अंजू ने किसका इंतज़ार किया?",
+      "choices": [
+       "The green signal",
+       "A cup of tea",
+       "The dark night"
+      ],
+      "answer": "The green signal",
+      "teach": "Anju waited for the green signal before crossing.",
+      "teachHi": "अंजू ने पार करने से पहले हरी बत्ती का इंतज़ार किया।"
+     }
+    ]
+   },
+   {
+    "key": "landmarks",
+    "title": "Places in Town",
+    "titleHi": "शहर की जगहें",
+    "words": [
+     {
+      "en": "temple",
+      "hi": "मंदिर",
+      "pron": "टेम्पल",
+      "emoji": "🛕",
+      "plural": "temples",
+      "use": "The temple is near the river",
+      "useHi": "मंदिर नदी के पास है।"
+     },
+     {
+      "en": "market",
+      "hi": "बाज़ार",
+      "pron": "मार्केट",
+      "emoji": "🏪",
+      "plural": "markets",
+      "use": "The market is very busy today",
+      "useHi": "आज बाज़ार बहुत व्यस्त है।"
+     },
+     {
+      "en": "school",
+      "hi": "स्कूल",
+      "pron": "स्कूल",
+      "emoji": "🏫",
+      "plural": "schools",
+      "use": "My school opens at nine",
+      "useHi": "मेरा स्कूल नौ बजे खुलता है।"
+     },
+     {
+      "en": "hospital",
+      "hi": "अस्पताल",
+      "pron": "हॉस्पिटल",
+      "emoji": "🏥",
+      "plural": "hospitals",
+      "use": "The hospital is on the main road",
+      "useHi": "अस्पताल मुख्य सड़क पर है।"
+     },
+     {
+      "en": "shop",
+      "hi": "दुकान",
+      "pron": "शॉप",
+      "emoji": "🏬",
+      "plural": "shops",
+      "use": "The shop sells fresh milk",
+      "useHi": "दुकान ताज़ा दूध बेचती है।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "🧑",
+      "line": "What is this big building near the market?",
+      "lineHi": "बाज़ार के पास यह बड़ी इमारत क्या है?",
+      "then": "Yes, people go there when they are sick.",
+      "replies": [
+       {
+        "text": "That is the town hospital.",
+        "textHi": "वह शहर का अस्पताल है।",
+        "ok": true
+       },
+       {
+        "text": "That is a big flying carpet.",
+        "textHi": "वह एक बड़ा उड़ने वाला कालीन है।",
+        "ok": false
+       },
+       {
+        "text": "That is a small bowl of curd.",
+        "textHi": "वह दही का एक छोटा कटोरा है।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👵",
+      "line": "Where do you buy your vegetables?",
+      "lineHi": "आप सब्ज़ियाँ कहाँ से खरीदती हैं?",
+      "then": "The market has the freshest vegetables.",
+      "replies": [
+       {
+        "text": "I buy them at the market.",
+        "textHi": "मैं उन्हें बाज़ार से खरीदती हूँ।",
+        "ok": true
+       },
+       {
+        "text": "I keep them inside a big drum.",
+        "textHi": "मैं उन्हें एक बड़े ढोल के अंदर रखती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "I write them on my left hand.",
+        "textHi": "मैं उन्हें अपने बाएँ हाथ पर लिखती हूँ।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Around the Town",
+      "titleHi": "शहर के आस-पास",
+      "emoji": "🏫",
+      "text": "Bela walks through her town. She passes the school, the temple, and a small shop. At the end of the road, she reaches the hospital to meet the nurse.",
+      "textHi": "बेला अपने शहर से होकर चलती है। वह स्कूल, मंदिर और एक छोटी दुकान के पास से गुज़रती है। सड़क के अंत में, वह नर्स से मिलने अस्पताल पहुँचती है।",
+      "q": "Where did Bela go to meet the nurse?",
+      "qHi": "बेला नर्स से मिलने कहाँ गई?",
+      "choices": [
+       "The hospital",
+       "The temple",
+       "The shop"
+      ],
+      "answer": "The hospital",
+      "teach": "Bela went to the hospital to meet the nurse.",
+      "teachHi": "बेला नर्स से मिलने अस्पताल गई।"
+     }
+    ]
+   },
+   {
+    "key": "trip-plan",
+    "title": "Planning a Trip",
+    "titleHi": "यात्रा की योजना",
+    "words": [
+     {
+      "en": "time",
+      "hi": "समय",
+      "pron": "टाइम",
+      "emoji": "🕐",
+      "uncount": true,
+      "use": "What is the time now?",
+      "useHi": "अभी समय क्या है?"
+     },
+     {
+      "en": "reach",
+      "hi": "पहुँचना",
+      "pron": "रीच",
+      "emoji": "🏁",
+      "uncount": true,
+      "use": "We reach the station by ten",
+      "useHi": "हम दस बजे तक स्टेशन पहुँचते हैं।"
+     },
+     {
+      "en": "address",
+      "hi": "पता",
+      "pron": "एड्रेस",
+      "emoji": "📮",
+      "plural": "addresses",
+      "use": "Write the address on the paper",
+      "useHi": "कागज़ पर पता लिखो।"
+     },
+     {
+      "en": "late",
+      "hi": "देर",
+      "pron": "लेट",
+      "emoji": "⏰",
+      "uncount": true,
+      "use": "The bus is late today",
+      "useHi": "आज बस देर से है।"
+     },
+     {
+      "en": "early",
+      "hi": "जल्दी",
+      "pron": "अर्ली",
+      "emoji": "🌅",
+      "uncount": true,
+      "use": "We start early in the morning",
+      "useHi": "हम सुबह जल्दी निकलते हैं।"
+     }
+    ],
+    "dialogues": [
+     {
+      "who": "👩",
+      "line": "What time should we leave for the trip?",
+      "lineHi": "यात्रा के लिए हमें किस समय निकलना चाहिए?",
+      "then": "Good idea. If we leave early, we will not be late.",
+      "replies": [
+       {
+        "text": "Let us leave early in the morning.",
+        "textHi": "चलो सुबह जल्दी निकलते हैं।",
+        "ok": true
+       },
+       {
+        "text": "Let us paint the brown cow green.",
+        "textHi": "चलो भूरी गाय को हरा रंग दें।",
+        "ok": false
+       },
+       {
+        "text": "Let us count all the stars twice.",
+        "textHi": "चलो सारे तारों को दो बार गिनें।",
+        "ok": false
+       }
+      ]
+     },
+     {
+      "who": "👩",
+      "line": "Do you know your aunt's address?",
+      "lineHi": "क्या तुम्हें अपनी मौसी का पता मालूम है?",
+      "then": "Perfect. We will reach her house on time.",
+      "replies": [
+       {
+        "text": "Yes, I wrote her address in my book.",
+        "textHi": "हाँ, मैंने उसका पता अपनी किताब में लिखा है।",
+        "ok": true
+       },
+       {
+        "text": "Yes, I can jump over the deep well.",
+        "textHi": "हाँ, मैं गहरे कुएँ के ऊपर से कूद सकती हूँ।",
+        "ok": false
+       },
+       {
+        "text": "Yes, the fish is riding a cycle.",
+        "textHi": "हाँ, मछली साइकिल चला रही है।",
+        "ok": false
+       }
+      ]
+     }
+    ],
+    "read": [
+     {
+      "title": "Planning the Journey",
+      "titleHi": "यात्रा की योजना",
+      "emoji": "🗓️",
+      "text": "Farida plans a trip to her village. She checks the bus time and writes down the address. She leaves early so she can reach before it gets dark.",
+      "textHi": "फ़रीदा अपने गाँव की यात्रा की योजना बनाती है। वह बस का समय देखती है और पता लिख लेती है। वह जल्दी निकलती है ताकि अँधेरा होने से पहले पहुँच सके।",
+      "q": "Why did Farida leave early?",
+      "qHi": "फ़रीदा जल्दी क्यों निकली?",
+      "choices": [
+       "To reach before dark",
+       "To sleep more",
+       "To miss the bus"
+      ],
+      "answer": "To reach before dark",
+      "teach": "Farida left early to reach her village before dark.",
+      "teachHi": "फ़रीदा अँधेरा होने से पहले पहुँचने के लिए जल्दी निकली।"
      }
     ]
    }
