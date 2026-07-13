@@ -8199,19 +8199,17 @@
     "titleHi": "हमारा खाना",
     "words": [
      {
-      "en": "rice",
-      "hi": "चावल",
-      "pron": "राइस",
-      "emoji": "🍚",
-      "type": "mass",
-      "uncount": true
+      "en": "roti",
+      "hi": "रोटी",
+      "pron": "रोटी",
+      "emoji": "🫓",
+      "plural": "rotis"
      },
      {
-      "en": "milk",
-      "hi": "दूध",
-      "pron": "मिल्क",
-      "emoji": "🥛",
-      "type": "mass",
+      "en": "dal",
+      "hi": "दाल",
+      "pron": "दाल",
+      "emoji": "🍲",
       "uncount": true
      },
      {
@@ -8219,7 +8217,6 @@
       "hi": "अंडा",
       "pron": "एग",
       "emoji": "🥚",
-      "type": "thing",
       "plural": "eggs"
      },
      {
@@ -8227,16 +8224,14 @@
       "hi": "सेब",
       "pron": "ऐप्पल",
       "emoji": "🍎",
-      "type": "thing",
       "plural": "apples"
      },
      {
-      "en": "banana",
-      "hi": "केला",
-      "pron": "बनाना",
-      "emoji": "🍌",
-      "type": "thing",
-      "plural": "bananas"
+      "en": "vegetable",
+      "hi": "सब्ज़ी",
+      "pron": "वेजिटेबल",
+      "emoji": "🥦",
+      "plural": "vegetables"
      }
     ],
     "quiz": [
@@ -8246,38 +8241,38 @@
       "emoji": "🍎",
       "choices": [
        "apple",
-       "banana",
-       "egg"
+       "egg",
+       "roti"
       ],
       "answer": "apple",
       "teach": "This is an apple.",
       "teachHi": "यह सेब है।"
      },
      {
-      "q": "What do we drink?",
-      "qHi": "हम क्या पीते हैं?",
-      "emoji": "🥛",
+      "q": "Which food comes from a hen?",
+      "qHi": "मुर्गी से कौन-सा भोजन मिलता है?",
+      "emoji": "🥚",
       "choices": [
-       "milk",
-       "rice",
-       "egg"
+       "egg",
+       "apple",
+       "vegetable"
       ],
-      "answer": "milk",
-      "teach": "We drink milk.",
-      "teachHi": "हम दूध पीते हैं।"
+      "answer": "egg",
+      "teach": "A hen gives us eggs.",
+      "teachHi": "मुर्गी हमें अंडे देती है।"
      },
      {
-      "q": "Which fruit is yellow?",
-      "qHi": "कौन-सा फल पीला है?",
-      "emoji": "🍌",
+      "q": "Which one is a green vegetable?",
+      "qHi": "इनमें हरी सब्ज़ी कौन-सी है?",
+      "emoji": "🥦",
       "choices": [
-       "banana",
+       "vegetable",
        "apple",
-       "rice"
+       "roti"
       ],
-      "answer": "banana",
-      "teach": "A banana is yellow.",
-      "teachHi": "केला पीला होता है।"
+      "answer": "vegetable",
+      "teach": "A green vegetable is healthy food.",
+      "teachHi": "हरी सब्ज़ी सेहतमंद भोजन है।"
      }
     ]
    },
@@ -8811,7 +8806,7 @@
       ],
       "answer": "in",
       "teach": "'in' means inside something.",
-      "teachHi": "'in' का अर्थ किसी चीज़ के अंदर।"
+      "teachHi": "'in' का अर्थ है किसी चीज़ के अंदर होना।"
      },
      {
       "q": "The cup rests ___ the top of the table.",
@@ -8824,7 +8819,7 @@
       ],
       "answer": "on",
       "teach": "'on' means on top of a surface.",
-      "teachHi": "'on' का अर्थ किसी सतह के ऊपर।"
+      "teachHi": "'on' का अर्थ है किसी सतह के ऊपर होना।"
      },
      {
       "q": "The shoes are ___ the bed, so we bend down to reach them.",
@@ -8837,7 +8832,7 @@
       ],
       "answer": "under",
       "teach": "'under' means below something.",
-      "teachHi": "'under' का अर्थ किसी चीज़ के नीचे।"
+      "teachHi": "'under' का अर्थ है किसी चीज़ के नीचे होना।"
      },
      {
       "q": "The bus comes ___ 4 o'clock.",
@@ -10665,7 +10660,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Work is done when a force moves an object",
-      "useHi": "जब कोई बल किसी वस्तु को खिसकाता है तब कार्य होता है"
+      "useHi": "जब कोई बल किसी वस्तु को खिसकाता है तब कार्य होता है।"
      },
      {
       "en": "joule",
@@ -10675,7 +10670,7 @@
       "type": "thing",
       "plural": "joules",
       "use": "Energy is measured in joules",
-      "useHi": "ऊर्जा जूल में मापी जाती है"
+      "useHi": "ऊर्जा जूल में मापी जाती है।"
      },
      {
       "en": "power",
@@ -10685,7 +10680,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Power is the work done each second",
-      "useHi": "शक्ति प्रति सेकंड किया गया कार्य है"
+      "useHi": "शक्ति प्रति सेकंड किया गया कार्य है।"
      },
      {
       "en": "watt",
@@ -10695,7 +10690,7 @@
       "type": "thing",
       "plural": "watts",
       "use": "A 60 watt bulb glows bright",
-      "useHi": "60 वाट का बल्ब तेज़ चमकता है"
+      "useHi": "60 वाट का बल्ब तेज़ चमकता है।"
      }
     ],
     "quiz": [
@@ -10753,7 +10748,7 @@
       "type": "thing",
       "uncount": true,
       "use": "A mirror sends light back by reflection",
-      "useHi": "दर्पण परावर्तन से प्रकाश वापस भेजता है"
+      "useHi": "दर्पण परावर्तन से प्रकाश वापस भेजता है।"
      },
      {
       "en": "refraction",
@@ -10763,7 +10758,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Light bends by refraction in water",
-      "useHi": "पानी में अपवर्तन से प्रकाश मुड़ता है"
+      "useHi": "पानी में अपवर्तन से प्रकाश मुड़ता है।"
      },
      {
       "en": "mirror",
@@ -10773,7 +10768,7 @@
       "type": "thing",
       "plural": "mirrors",
       "use": "A plane mirror reflects light",
-      "useHi": "समतल दर्पण प्रकाश परावर्तित करता है"
+      "useHi": "समतल दर्पण प्रकाश परावर्तित करता है।"
      },
      {
       "en": "ray",
@@ -10783,7 +10778,7 @@
       "type": "thing",
       "plural": "rays",
       "use": "A ray of light travels in a straight line",
-      "useHi": "प्रकाश की किरण सीधी रेखा में चलती है"
+      "useHi": "प्रकाश की किरण सीधी रेखा में चलती है।"
      }
     ],
     "quiz": [
@@ -10841,7 +10836,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Current flows through the wire",
-      "useHi": "तार में धारा बहती है"
+      "useHi": "तार में धारा बहती है।"
      },
      {
       "en": "ampere",
@@ -10851,7 +10846,7 @@
       "type": "thing",
       "plural": "amperes",
       "use": "Current is measured in amperes",
-      "useHi": "धारा एम्पियर में मापी जाती है"
+      "useHi": "धारा एम्पियर में मापी जाती है।"
      },
      {
       "en": "circuit",
@@ -10861,7 +10856,7 @@
       "type": "thing",
       "plural": "circuits",
       "use": "A closed circuit lets current flow",
-      "useHi": "बंद परिपथ में धारा बहती है"
+      "useHi": "बंद परिपथ में धारा बहती है।"
      },
      {
       "en": "battery",
@@ -10871,7 +10866,7 @@
       "type": "thing",
       "plural": "batteries",
       "use": "A battery gives electric energy",
-      "useHi": "बैटरी विद्युत ऊर्जा देती है"
+      "useHi": "बैटरी विद्युत ऊर्जा देती है।"
      }
     ],
     "quiz": [
@@ -10929,7 +10924,7 @@
       "type": "thing",
       "plural": "acids",
       "use": "Lemon juice is an acid",
-      "useHi": "नींबू का रस अम्ल है"
+      "useHi": "नींबू का रस अम्ल है।"
      },
      {
       "en": "base",
@@ -10939,7 +10934,7 @@
       "type": "thing",
       "plural": "bases",
       "use": "Soap is a base",
-      "useHi": "साबुन एक क्षार है"
+      "useHi": "साबुन एक क्षार है।"
      },
      {
       "en": "salt",
@@ -10949,7 +10944,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Salt forms from an acid and a base",
-      "useHi": "नमक अम्ल और क्षार से बनता है"
+      "useHi": "नमक अम्ल और क्षार से बनता है।"
      },
      {
       "en": "litmus",
@@ -10959,7 +10954,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Litmus paper tests for acids",
-      "useHi": "लिटमस कागज़ अम्ल की जाँच करता है"
+      "useHi": "लिटमस कागज़ अम्ल की जाँच करता है।"
      }
     ],
     "quiz": [
@@ -12286,7 +12281,7 @@
       "emoji": "🆘",
       "uncount": true,
       "use": "Please help me now",
-      "useHi": "कृपया अभी मेरी मदद करो।"
+      "useHi": "कृपया अभी मेरी मदद करें।"
      }
     ],
     "dialogues": [
@@ -12298,7 +12293,7 @@
       "replies": [
        {
         "text": "Yes, please put a bandage on it.",
-        "textHi": "हाँ, कृपया इस पर पट्टी बाँध दो।",
+        "textHi": "हाँ, कृपया इस पर पट्टी बाँध दें।",
         "ok": true
        },
        {
@@ -12422,7 +12417,7 @@
        },
        {
         "text": "I ride a horse to the hill.",
-        "textHi": "मैं घोड़े पर पहाड़ी जाती हूँ।",
+        "textHi": "मैं घोड़े पर पहाड़ी पर जाती हूँ।",
         "ok": false
        },
        {
@@ -13736,12 +13731,12 @@
     "words": [
      {
       "en": "stop",
-      "hi": "ठहराव",
+      "hi": "बस स्टॉप",
       "pron": "स्टॉप",
       "emoji": "🚏",
       "plural": "stops",
       "use": "The bus stop is near my home",
-      "useHi": "बस का ठहराव मेरे घर के पास है।"
+      "useHi": "बस स्टॉप मेरे घर के पास है।"
      },
      {
       "en": "driver",
