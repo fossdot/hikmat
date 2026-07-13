@@ -17879,6 +17879,14 @@
       "emoji": "🔢",
       "type": "thing",
       "plural": "number keys"
+     },
+     {
+      "en": "key",
+      "hi": "कुंजी",
+      "pron": "की",
+      "emoji": "🔑",
+      "type": "thing",
+      "plural": "keys"
      }
     ],
     "quiz": [
@@ -18362,7 +18370,7 @@
       "qHi": "वीरता के वर्णन से कौन-सा रस उत्पन्न होता है?",
       "choices": [
        "वीर रस",
-       "श्रृंगार रस",
+       "शृंगार रस",
        "हास्य रस"
       ],
       "answer": "वीर रस",
@@ -18385,11 +18393,11 @@
       "q": "Love and beauty are described in which ras?",
       "qHi": "प्रेम और सौंदर्य का वर्णन किस रस में होता है?",
       "choices": [
-       "श्रृंगार रस",
+       "शृंगार रस",
        "रौद्र रस",
        "भयानक रस"
       ],
-      "answer": "श्रृंगार रस",
+      "answer": "शृंगार रस",
       "emoji": "🌸"
      }
     ]
@@ -18555,11 +18563,11 @@
       "teachHi": "'आँखें' स्त्रीलिंग है, इसलिए 'अपनी' आएगा।"
      },
      {
-      "sentence": "वह बहुत अच्छे चित्र बनाती है।",
-      "wrongWord": "अच्छे",
-      "fix": "अच्छा",
-      "teach": "As an adverb of manner here, use 'अच्छा'.",
-      "teachHi": "यहाँ क्रिया-विशेषण के रूप में 'अच्छा' आएगा।"
+      "sentence": "मुझे हिंदी बहुत अच्छा आती है।",
+      "wrongWord": "अच्छा",
+      "fix": "अच्छी",
+      "teach": "'हिंदी' is feminine, so use 'अच्छी'.",
+      "teachHi": "'हिंदी' स्त्रीलिंग है, इसलिए 'अच्छी' आएगा।"
      },
      {
       "sentence": "उसने अपना पूरा काम समय पर कर लिया हैं।",
@@ -18715,6 +18723,14 @@
       "emoji": "🧑",
       "type": "thing",
       "plural": "citizens"
+     },
+     {
+      "en": "king",
+      "hi": "राजा",
+      "pron": "किंग",
+      "emoji": "👑",
+      "type": "thing",
+      "plural": "kings"
      }
     ],
     "quiz": [
@@ -18942,6 +18958,14 @@
       "emoji": "🏛️",
       "type": "thing",
       "plural": "parliaments"
+     },
+     {
+      "en": "vote",
+      "hi": "वोट",
+      "pron": "वोट",
+      "emoji": "☑️",
+      "type": "thing",
+      "plural": "votes"
      }
     ],
     "quiz": [
@@ -19017,6 +19041,14 @@
       "pron": "सेक्युलर",
       "emoji": "🕊️",
       "type": "describe"
+     },
+     {
+      "en": "law",
+      "hi": "कानून",
+      "pron": "लॉ",
+      "emoji": "📖",
+      "type": "thing",
+      "plural": "laws"
      }
     ],
     "quiz": [
