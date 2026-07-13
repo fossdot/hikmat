@@ -1277,9 +1277,7 @@ function audioCtx(){
   return _actx;
 }
 const NOTE = { G4:392, A4:440, C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880, C6:1046.5, E6:1318.5, G6:1568 };
-function tone(freq, startIn, dur, vol, type){
-  const ac = audioCtx(); if(!ac) return;
-  if(ac.state !== "running"){ try { ac.resume(); } catch(e){} }   // fire-and-forget resume; schedule anyway
+function _emitTone(ac, freq, startIn, dur, vol, type){
   const t = ac.currentTime + 0.04 + startIn;   // lookahead so a just-woken context doesn't clip the attack
   const o = ac.createOscillator(), g = ac.createGain();
   o.type = type || "triangle"; o.frequency.value = freq;
@@ -1288,6 +1286,17 @@ function tone(freq, startIn, dur, vol, type){
   g.gain.exponentialRampToValueAtTime(vol || 0.12, t + 0.012);   // soft attack
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);          // smooth decay
   o.start(t); o.stop(t + dur + 0.03);
+}
+function tone(freq, startIn, dur, vol, type){
+  const ac = audioCtx(); if(!ac) return;
+  // If the context is still waking from the browser's autoplay lock, DON'T schedule against a
+  // frozen clock (the note would land "in the past" and be dropped — why the very first click
+  // after load was silent). Resume, then emit once it's actually running.
+  if(ac.state !== "running"){
+    try { const p = ac.resume(); if(p && p.then){ p.then(() => _emitTone(ac, freq, startIn, dur, vol, type)).catch(()=>{}); return; } }
+    catch(e){}
+  }
+  _emitTone(ac, freq, startIn, dur, vol, type);
 }
 function seq(notes){ let t = 0; notes.forEach(n => { tone(n[0], t, n[1], n[2], n[3]); t += n[4] || n[1]; }); }
 // Create/resume the audio context on a reliable user gesture, and (crucially for
