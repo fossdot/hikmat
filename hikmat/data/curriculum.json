@@ -15468,5 +15468,3771 @@
     ]
    }
   ]
+ },
+ {
+  "key": "hindi-aksharmala",
+  "title": "First Hindi",
+  "titleHi": "पहली हिंदी",
+  "icon": "📖",
+  "color": "#e11d48",
+  "blurb": "Letters, matras & first words",
+  "blurbHi": "अक्षर, मात्रा और पहले शब्द",
+  "published": true,
+  "band": "1-4",
+  "subject": "hindi",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Vowels (Swar)",
+    "titleHi": "स्वर",
+    "quiz": [
+     {
+      "q": "Which one is a vowel (swar)?",
+      "qHi": "इनमें से स्वर कौन-सा है?",
+      "choices": [
+       "अ",
+       "क",
+       "प"
+      ],
+      "answer": "अ",
+      "teach": "अ आ इ ई उ ऊ स्वर कहलाते हैं।",
+      "teachHi": "अ आ इ ई उ ऊ स्वर कहलाते हैं।"
+     },
+     {
+      "q": "Which vowel comes right after 'अ'?",
+      "qHi": "'अ' के तुरंत बाद कौन-सा स्वर आता है?",
+      "choices": [
+       "आ",
+       "इ",
+       "उ"
+      ],
+      "answer": "आ"
+     },
+     {
+      "q": "'आम' (mango) begins with which vowel?",
+      "qHi": "'आम' किस स्वर से शुरू होता है?",
+      "choices": [
+       "आ",
+       "ई",
+       "ऊ"
+      ],
+      "answer": "आ",
+      "emoji": "🥭",
+      "teach": "आ-म — पहला अक्षर 'आ' है।",
+      "teachHi": "आ-म — पहला अक्षर 'आ' है।"
+     },
+     {
+      "q": "Which of these is NOT a vowel?",
+      "qHi": "इनमें से कौन स्वर नहीं है?",
+      "choices": [
+       "ग",
+       "इ",
+       "उ"
+      ],
+      "answer": "ग"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Consonants (Vyanjan)",
+    "titleHi": "व्यंजन",
+    "quiz": [
+     {
+      "q": "Which one is a consonant (vyanjan)?",
+      "qHi": "इनमें से व्यंजन कौन-सा है?",
+      "choices": [
+       "क",
+       "आ",
+       "ई"
+      ],
+      "answer": "क",
+      "teach": "क ख ग घ व्यंजन कहलाते हैं।",
+      "teachHi": "क ख ग घ व्यंजन कहलाते हैं।"
+     },
+     {
+      "q": "'कमल' (lotus) begins with which letter?",
+      "qHi": "'कमल' किस अक्षर से शुरू होता है?",
+      "choices": [
+       "क",
+       "ख",
+       "ग"
+      ],
+      "answer": "क",
+      "emoji": "🪷"
+     },
+     {
+      "q": "Which letter comes after 'क'?",
+      "qHi": "'क' के बाद कौन-सा अक्षर आता है?",
+      "choices": [
+       "ख",
+       "ग",
+       "घ"
+      ],
+      "answer": "ख"
+     },
+     {
+      "q": "'गमला' (flower pot) starts with which letter?",
+      "qHi": "'गमला' किस अक्षर से शुरू होता है?",
+      "choices": [
+       "ग",
+       "क",
+       "म"
+      ],
+      "answer": "ग",
+      "emoji": "🪴"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Matras (Vowel signs)",
+    "titleHi": "मात्राएँ",
+    "quiz": [
+     {
+      "q": "क + ा makes which sound?",
+      "qHi": "क में 'ा' मात्रा लगाने से क्या बनता है?",
+      "choices": [
+       "का",
+       "कि",
+       "कु"
+      ],
+      "answer": "का",
+      "teach": "'ा' आ की मात्रा है — क से का।",
+      "teachHi": "'ा' आ की मात्रा है — क से का।"
+     },
+     {
+      "q": "Which word uses the 'ी' (badi ee) matra?",
+      "qHi": "किस शब्द में 'ी' की मात्रा है?",
+      "choices": [
+       "नदी",
+       "कल",
+       "घर"
+      ],
+      "answer": "नदी",
+      "emoji": "🏞️"
+     },
+     {
+      "q": "न + ि makes...",
+      "qHi": "न में 'ि' मात्रा लगाने से बनता है...",
+      "choices": [
+       "नि",
+       "ना",
+       "नू"
+      ],
+      "answer": "नि"
+     },
+     {
+      "q": "Which word means 'water'?",
+      "qHi": "किस शब्द का अर्थ 'पानी' है?",
+      "choices": [
+       "पानी",
+       "पंखा",
+       "पेड़"
+      ],
+      "answer": "पानी",
+      "emoji": "💧"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Two-letter Words",
+    "titleHi": "दो अक्षर के शब्द",
+    "quiz": [
+     {
+      "q": "Which is a two-letter word?",
+      "qHi": "कौन-सा दो अक्षर का शब्द है?",
+      "choices": [
+       "कमल",
+       "नल",
+       "मकान"
+      ],
+      "answer": "नल",
+      "emoji": "🚰",
+      "teach": "न + ल = नल (tap).",
+      "teachHi": "न + ल = नल (नल)।"
+     },
+     {
+      "q": "What does 'घर' mean?",
+      "qHi": "'घर' का अर्थ क्या है?",
+      "choices": [
+       "home / घर",
+       "tree / पेड़",
+       "water / पानी"
+      ],
+      "answer": "home / घर",
+      "emoji": "🏠"
+     },
+     {
+      "q": "Join the letters: म + न",
+      "qHi": "अक्षर जोड़ो: म + न",
+      "choices": [
+       "मन",
+       "नम",
+       "मम"
+      ],
+      "answer": "मन"
+     }
+    ],
+    "read": [
+     {
+      "title": "My Home",
+      "titleHi": "मेरा घर",
+      "emoji": "🏠",
+      "text": "This is my home. Ravi is at home. Mother is at home too.",
+      "textHi": "यह मेरा घर है। रवि घर पर है। माँ भी घर पर है।",
+      "q": "Who is at home?",
+      "qHi": "घर पर कौन है?",
+      "choices": [
+       "Ravi and Mother / रवि और माँ",
+       "only Ravi / सिर्फ़ रवि",
+       "no one / कोई नहीं"
+      ],
+      "answer": "Ravi and Mother / रवि और माँ",
+      "teach": "रवि और माँ दोनों घर पर हैं।",
+      "teachHi": "रवि और माँ दोनों घर पर हैं।"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Colours & Things",
+    "titleHi": "रंग और चीज़ें",
+    "quiz": [
+     {
+      "q": "What colour is the sky?",
+      "qHi": "आसमान का रंग क्या है?",
+      "choices": [
+       "नीला (blue)",
+       "लाल (red)",
+       "हरा (green)"
+      ],
+      "answer": "नीला (blue)",
+      "emoji": "🌤️"
+     },
+     {
+      "q": "What colour are leaves?",
+      "qHi": "पत्तों का रंग क्या है?",
+      "choices": [
+       "हरा (green)",
+       "काला (black)",
+       "पीला (yellow)"
+      ],
+      "answer": "हरा (green)",
+      "emoji": "🍃"
+     },
+     {
+      "q": "Which word means 'red'?",
+      "qHi": "किस शब्द का अर्थ 'लाल' है?",
+      "choices": [
+       "लाल",
+       "सफ़ेद",
+       "काला"
+      ],
+      "answer": "लाल",
+      "emoji": "🔴"
+     },
+     {
+      "q": "A banana is which colour?",
+      "qHi": "केला किस रंग का होता है?",
+      "choices": [
+       "पीला (yellow)",
+       "नीला (blue)",
+       "हरा (green)"
+      ],
+      "answer": "पीला (yellow)",
+      "emoji": "🍌"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Counting in Hindi",
+    "titleHi": "हिंदी में गिनती",
+    "quiz": [
+     {
+      "q": "How do you write 3 in Hindi words?",
+      "qHi": "3 को हिंदी शब्द में कैसे लिखते हैं?",
+      "choices": [
+       "तीन",
+       "दो",
+       "चार"
+      ],
+      "answer": "तीन",
+      "emoji": "3️⃣"
+     },
+     {
+      "q": "What comes after 'दो'?",
+      "qHi": "'दो' के बाद क्या आता है?",
+      "choices": [
+       "तीन",
+       "एक",
+       "पाँच"
+      ],
+      "answer": "तीन"
+     },
+     {
+      "q": "How many? 🌸🌸🌸🌸🌸",
+      "qHi": "कितने? 🌸🌸🌸🌸🌸",
+      "choices": [
+       "पाँच",
+       "चार",
+       "छह"
+      ],
+      "answer": "पाँच",
+      "emoji": "🌸"
+     },
+     {
+      "q": "Which means 'ten'?",
+      "qHi": "किसका अर्थ 'दस' है?",
+      "choices": [
+       "दस",
+       "नौ",
+       "आठ"
+      ],
+      "answer": "दस"
+     }
+    ],
+    "read": [
+     {
+      "title": "Counting Flowers",
+      "titleHi": "फूल गिनना",
+      "emoji": "🌼",
+      "text": "Sita has three flowers. Meena has two flowers. Together they have five flowers.",
+      "textHi": "सीता के पास तीन फूल हैं। मीना के पास दो फूल हैं। दोनों के पास मिलाकर पाँच फूल हैं।",
+      "q": "How many flowers in all?",
+      "qHi": "कुल कितने फूल हैं?",
+      "choices": [
+       "five / पाँच",
+       "three / तीन",
+       "two / दो"
+      ],
+      "answer": "five / पाँच",
+      "teach": "तीन और दो मिलकर पाँच होते हैं।",
+      "teachHi": "तीन और दो मिलकर पाँच होते हैं।"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "My Family",
+    "titleHi": "मेरा परिवार",
+    "quiz": [
+     {
+      "q": "What do we call father in Hindi?",
+      "qHi": "पिता को हिंदी में क्या कहते हैं?",
+      "choices": [
+       "पिताजी",
+       "बहन",
+       "भाई"
+      ],
+      "answer": "पिताजी",
+      "emoji": "👨"
+     },
+     {
+      "q": "Which word means 'sister'?",
+      "qHi": "किस शब्द का अर्थ 'बहन' है?",
+      "choices": [
+       "बहन",
+       "भाई",
+       "दादी"
+      ],
+      "answer": "बहन",
+      "emoji": "👧"
+     },
+     {
+      "q": "Mother's mother is called...",
+      "qHi": "माँ की माँ को कहते हैं...",
+      "choices": [
+       "नानी",
+       "दादी",
+       "बुआ"
+      ],
+      "answer": "नानी",
+      "emoji": "👵"
+     }
+    ],
+    "read": [
+     {
+      "title": "Our Family",
+      "titleHi": "हमारा परिवार",
+      "emoji": "👨‍👩‍👧‍👦",
+      "text": "There are four people in my family. Father, Mother, my brother and me. We all love each other.",
+      "textHi": "मेरे परिवार में चार लोग हैं। पिताजी, माँ, मेरा भाई और मैं। हम सब एक-दूसरे से प्यार करते हैं।",
+      "q": "How many people are in the family?",
+      "qHi": "परिवार में कितने लोग हैं?",
+      "choices": [
+       "four / चार",
+       "three / तीन",
+       "five / पाँच"
+      ],
+      "answer": "four / चार",
+      "teach": "पिताजी, माँ, भाई और मैं — कुल चार।",
+      "teachHi": "पिताजी, माँ, भाई और मैं — कुल चार।"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "A Little Story",
+    "titleHi": "एक छोटी कहानी",
+    "read": [
+     {
+      "title": "The Thirsty Crow",
+      "titleHi": "प्यासा कौआ",
+      "emoji": "🐦",
+      "text": "A crow was very thirsty. It found a pot with a little water. The crow dropped small stones in the pot. The water rose up and the crow drank it.",
+      "textHi": "एक कौआ बहुत प्यासा था। उसे थोड़े पानी वाला घड़ा मिला। कौए ने घड़े में छोटे-छोटे पत्थर डाले। पानी ऊपर आ गया और कौए ने पी लिया।",
+      "q": "How did the crow drink the water?",
+      "qHi": "कौए ने पानी कैसे पिया?",
+      "choices": [
+       "by dropping stones / पत्थर डालकर",
+       "by tipping the pot / घड़ा गिराकर",
+       "with a straw / नली से"
+      ],
+      "answer": "by dropping stones / पत्थर डालकर",
+      "teach": "पत्थर डालने से पानी ऊपर आया — यही चतुराई है।",
+      "teachHi": "पत्थर डालने से पानी ऊपर आया — यही चतुराई है।"
+     },
+     {
+      "title": "Be Kind",
+      "titleHi": "दयालु बनो",
+      "emoji": "🤝",
+      "text": "Guddi saw a hungry puppy near her school. She gave it a piece of her roti. The puppy wagged its tail happily.",
+      "textHi": "गुड्डी ने अपने स्कूल के पास एक भूखा पिल्ला देखा। उसने उसे अपनी रोटी का एक टुकड़ा दिया। पिल्ले ने खुशी से पूँछ हिलाई।",
+      "q": "What did Guddi do?",
+      "qHi": "गुड्डी ने क्या किया?",
+      "choices": [
+       "fed the puppy / पिल्ले को खिलाया",
+       "chased it away / भगा दिया",
+       "ignored it / अनदेखा किया"
+      ],
+      "answer": "fed the puppy / पिल्ले को खिलाया",
+      "teach": "गुड्डी दयालु है — उसने भूखे पिल्ले को खाना दिया।",
+      "teachHi": "गुड्डी दयालु है — उसने भूखे पिल्ले को खाना दिया।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "sci-early",
+  "title": "Look & Learn",
+  "titleHi": "देखो और सीखो",
+  "icon": "🔬",
+  "color": "#06b6d4",
+  "blurb": "First science: senses, weather, matter",
+  "blurbHi": "पहला विज्ञान: इंद्रियाँ, मौसम, पदार्थ",
+  "published": true,
+  "band": "1-4",
+  "subject": "science",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "My Five Senses",
+    "titleHi": "मेरी पाँच इंद्रियाँ",
+    "words": [
+     {
+      "en": "eye",
+      "hi": "आँख",
+      "pron": "आई",
+      "emoji": "👁️",
+      "type": "thing",
+      "plural": "eyes"
+     },
+     {
+      "en": "ear",
+      "hi": "कान",
+      "pron": "इयर",
+      "emoji": "👂",
+      "type": "thing",
+      "plural": "ears"
+     },
+     {
+      "en": "nose",
+      "hi": "नाक",
+      "pron": "नोज़",
+      "emoji": "👃",
+      "type": "thing",
+      "plural": "noses"
+     },
+     {
+      "en": "tongue",
+      "hi": "जीभ",
+      "pron": "टंग",
+      "emoji": "👅",
+      "type": "thing",
+      "plural": "tongues"
+     },
+     {
+      "en": "skin",
+      "hi": "त्वचा",
+      "pron": "स्किन",
+      "emoji": "🖐️",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which body part do we see with?",
+      "qHi": "हम किस अंग से देखते हैं?",
+      "choices": [
+       "eye / आँख",
+       "ear / कान",
+       "nose / नाक"
+      ],
+      "answer": "eye / आँख",
+      "emoji": "👁️",
+      "teach": "We see with our eyes.",
+      "teachHi": "हम आँखों से देखते हैं।"
+     },
+     {
+      "q": "We hear with our...",
+      "qHi": "हम सुनते हैं अपने...",
+      "choices": [
+       "ears / कान",
+       "eyes / आँख",
+       "tongue / जीभ"
+      ],
+      "answer": "ears / कान",
+      "emoji": "👂"
+     },
+     {
+      "q": "Which sense tells us food is sweet?",
+      "qHi": "कौन-सी इंद्रिय बताती है कि खाना मीठा है?",
+      "choices": [
+       "taste / स्वाद",
+       "smell / गंध",
+       "sight / दृष्टि"
+      ],
+      "answer": "taste / स्वाद",
+      "emoji": "🍬"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Living & Non-living",
+    "titleHi": "सजीव और निर्जीव",
+    "words": [
+     {
+      "en": "plant",
+      "hi": "पौधा",
+      "pron": "प्लांट",
+      "emoji": "🌱",
+      "type": "thing",
+      "plural": "plants"
+     },
+     {
+      "en": "animal",
+      "hi": "जानवर",
+      "pron": "ऐनिमल",
+      "emoji": "🐐",
+      "type": "thing",
+      "plural": "animals"
+     },
+     {
+      "en": "stone",
+      "hi": "पत्थर",
+      "pron": "स्टोन",
+      "emoji": "🪨",
+      "type": "thing",
+      "plural": "stones"
+     },
+     {
+      "en": "bird",
+      "hi": "पक्षी",
+      "pron": "बर्ड",
+      "emoji": "🐦",
+      "type": "thing",
+      "plural": "birds"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which one is living?",
+      "qHi": "इनमें से सजीव कौन है?",
+      "choices": [
+       "a dog / कुत्ता",
+       "a rock / चट्टान",
+       "a chair / कुर्सी"
+      ],
+      "answer": "a dog / कुत्ता",
+      "emoji": "🐶",
+      "teach": "Living things grow, eat and breathe.",
+      "teachHi": "सजीव चीज़ें बढ़ती हैं, खाती हैं और साँस लेती हैं।"
+     },
+     {
+      "q": "Which one is non-living?",
+      "qHi": "इनमें से निर्जीव कौन है?",
+      "choices": [
+       "a stone / पत्थर",
+       "a plant / पौधा",
+       "a fish / मछली"
+      ],
+      "answer": "a stone / पत्थर",
+      "emoji": "🪨"
+     },
+     {
+      "q": "Do plants need water to live?",
+      "qHi": "क्या पौधों को जीने के लिए पानी चाहिए?",
+      "choices": [
+       "yes / हाँ",
+       "no / नहीं",
+       "sometimes / कभी-कभी"
+      ],
+      "answer": "yes / हाँ",
+      "emoji": "💧"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Day & Night",
+    "titleHi": "दिन और रात",
+    "words": [
+     {
+      "en": "sun",
+      "hi": "सूरज",
+      "pron": "सन",
+      "emoji": "☀️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "moon",
+      "hi": "चाँद",
+      "pron": "मून",
+      "emoji": "🌙",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "star",
+      "hi": "तारा",
+      "pron": "स्टार",
+      "emoji": "⭐",
+      "type": "thing",
+      "plural": "stars"
+     },
+     {
+      "en": "sky",
+      "hi": "आसमान",
+      "pron": "स्काई",
+      "emoji": "🌌",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What do we see in the sky at night?",
+      "qHi": "रात में आसमान में क्या दिखता है?",
+      "choices": [
+       "moon / चाँद",
+       "sun / सूरज",
+       "rainbow / इंद्रधनुष"
+      ],
+      "answer": "moon / चाँद",
+      "emoji": "🌙",
+      "teach": "The moon and stars come out at night.",
+      "teachHi": "रात में चाँद और तारे दिखते हैं।"
+     },
+     {
+      "q": "The sun gives us...",
+      "qHi": "सूरज हमें देता है...",
+      "choices": [
+       "light and heat / रोशनी और गर्मी",
+       "rain / बारिश",
+       "wind / हवा"
+      ],
+      "answer": "light and heat / रोशनी और गर्मी",
+      "emoji": "☀️"
+     },
+     {
+      "q": "When do we sleep?",
+      "qHi": "हम कब सोते हैं?",
+      "choices": [
+       "at night / रात में",
+       "at noon / दोपहर में",
+       "in the morning / सुबह"
+      ],
+      "answer": "at night / रात में",
+      "emoji": "😴"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Weather",
+    "titleHi": "मौसम",
+    "words": [
+     {
+      "en": "rain",
+      "hi": "बारिश",
+      "pron": "रेन",
+      "emoji": "🌧️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "cloud",
+      "hi": "बादल",
+      "pron": "क्लाउड",
+      "emoji": "☁️",
+      "type": "thing",
+      "plural": "clouds"
+     },
+     {
+      "en": "wind",
+      "hi": "हवा",
+      "pron": "विंड",
+      "emoji": "💨",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "rainbow",
+      "hi": "इंद्रधनुष",
+      "pron": "रेनबो",
+      "emoji": "🌈",
+      "type": "thing",
+      "plural": "rainbows"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What do we use in the rain?",
+      "qHi": "बारिश में हम क्या इस्तेमाल करते हैं?",
+      "choices": [
+       "umbrella / छाता",
+       "fan / पंखा",
+       "torch / टॉर्च"
+      ],
+      "answer": "umbrella / छाता",
+      "emoji": "☂️",
+      "teach": "An umbrella keeps us dry in the rain.",
+      "teachHi": "छाता हमें बारिश में सूखा रखता है।"
+     },
+     {
+      "q": "Rain comes from...",
+      "qHi": "बारिश आती है...",
+      "choices": [
+       "clouds / बादल",
+       "the sun / सूरज",
+       "the moon / चाँद"
+      ],
+      "answer": "clouds / बादल",
+      "emoji": "☁️"
+     },
+     {
+      "q": "When do we see a rainbow?",
+      "qHi": "इंद्रधनुष कब दिखता है?",
+      "choices": [
+       "after rain / बारिश के बाद",
+       "at night / रात में",
+       "in fog / कोहरे में"
+      ],
+      "answer": "after rain / बारिश के बाद",
+      "emoji": "🌈"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Hot & Cold",
+    "titleHi": "गरम और ठंडा",
+    "words": [
+     {
+      "en": "hot",
+      "hi": "गरम",
+      "pron": "हॉट",
+      "emoji": "🔥",
+      "type": "describe"
+     },
+     {
+      "en": "cold",
+      "hi": "ठंडा",
+      "pron": "कोल्ड",
+      "emoji": "❄️",
+      "type": "describe"
+     },
+     {
+      "en": "fire",
+      "hi": "आग",
+      "pron": "फ़ायर",
+      "emoji": "🔥",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "ice",
+      "hi": "बर्फ़",
+      "pron": "आइस",
+      "emoji": "🧊",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which one is hot?",
+      "qHi": "इनमें से गरम क्या है?",
+      "choices": [
+       "fire / आग",
+       "ice / बर्फ़",
+       "snow / हिम"
+      ],
+      "answer": "fire / आग",
+      "emoji": "🔥",
+      "teach": "Fire is hot. Ice is cold.",
+      "teachHi": "आग गरम है। बर्फ़ ठंडी है।"
+     },
+     {
+      "q": "Ice feels...",
+      "qHi": "बर्फ़ लगती है...",
+      "choices": [
+       "cold / ठंडी",
+       "hot / गरम",
+       "warm / गुनगुनी"
+      ],
+      "answer": "cold / ठंडी",
+      "emoji": "🧊"
+     },
+     {
+      "q": "Tea is usually...",
+      "qHi": "चाय आमतौर पर होती है...",
+      "choices": [
+       "hot / गरम",
+       "cold / ठंडी",
+       "frozen / जमी हुई"
+      ],
+      "answer": "hot / गरम",
+      "emoji": "🍵"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Float or Sink",
+    "titleHi": "तैरना या डूबना",
+    "words": [
+     {
+      "en": "water",
+      "hi": "पानी",
+      "pron": "वॉटर",
+      "emoji": "💧",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "boat",
+      "hi": "नाव",
+      "pron": "बोट",
+      "emoji": "⛵",
+      "type": "thing",
+      "plural": "boats"
+     },
+     {
+      "en": "leaf",
+      "hi": "पत्ता",
+      "pron": "लीफ़",
+      "emoji": "🍃",
+      "type": "thing",
+      "plural": "leaves"
+     },
+     {
+      "en": "coin",
+      "hi": "सिक्का",
+      "pron": "कॉइन",
+      "emoji": "🪙",
+      "type": "thing",
+      "plural": "coins"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which one floats on water?",
+      "qHi": "पानी पर कौन तैरता है?",
+      "choices": [
+       "a leaf / पत्ता",
+       "a stone / पत्थर",
+       "an iron nail / लोहे की कील"
+      ],
+      "answer": "a leaf / पत्ता",
+      "emoji": "🍃",
+      "teach": "Light things float; heavy things sink.",
+      "teachHi": "हल्की चीज़ें तैरती हैं; भारी चीज़ें डूबती हैं।"
+     },
+     {
+      "q": "Which one sinks in water?",
+      "qHi": "पानी में कौन डूबता है?",
+      "choices": [
+       "a coin / सिक्का",
+       "a paper boat / कागज़ की नाव",
+       "a leaf / पत्ता"
+      ],
+      "answer": "a coin / सिक्का",
+      "emoji": "🪙"
+     },
+     {
+      "q": "A wooden boat on the river will...",
+      "qHi": "नदी पर लकड़ी की नाव...",
+      "choices": [
+       "float / तैरेगी",
+       "sink / डूबेगी",
+       "melt / पिघलेगी"
+      ],
+      "answer": "float / तैरेगी",
+      "emoji": "⛵"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Push & Pull",
+    "titleHi": "धक्का और खिंचाव",
+    "words": [
+     {
+      "en": "push",
+      "hi": "धक्का देना",
+      "pron": "पुश",
+      "emoji": "👐",
+      "type": "action"
+     },
+     {
+      "en": "pull",
+      "hi": "खींचना",
+      "pron": "पुल",
+      "emoji": "🤝",
+      "type": "action"
+     },
+     {
+      "en": "door",
+      "hi": "दरवाज़ा",
+      "pron": "डोर",
+      "emoji": "🚪",
+      "type": "thing",
+      "plural": "doors"
+     },
+     {
+      "en": "cart",
+      "hi": "गाड़ी",
+      "pron": "कार्ट",
+      "emoji": "🛒",
+      "type": "thing",
+      "plural": "carts"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "To open a drawer, you...",
+      "qHi": "दराज़ खोलने के लिए आप...",
+      "choices": [
+       "pull it / खींचते हैं",
+       "push it / धक्का देते हैं",
+       "lift it / उठाते हैं"
+      ],
+      "answer": "pull it / खींचते हैं",
+      "emoji": "🗄️",
+      "teach": "A push moves things away; a pull brings them near.",
+      "teachHi": "धक्का चीज़ को दूर ले जाता है; खिंचाव पास लाता है।"
+     },
+     {
+      "q": "A push and a pull are kinds of...",
+      "qHi": "धक्का और खिंचाव एक प्रकार का...",
+      "choices": [
+       "force / बल",
+       "colour / रंग",
+       "sound / ध्वनि"
+      ],
+      "answer": "force / बल",
+      "emoji": "💪"
+     },
+     {
+      "q": "To ring a bell you give it a...",
+      "qHi": "घंटी बजाने के लिए आप देते हैं...",
+      "choices": [
+       "pull / खिंचाव",
+       "smell / गंध",
+       "taste / स्वाद"
+      ],
+      "answer": "pull / खिंचाव",
+      "emoji": "🔔"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "The Seasons",
+    "titleHi": "ऋतुएँ",
+    "words": [
+     {
+      "en": "summer",
+      "hi": "गर्मी",
+      "pron": "समर",
+      "emoji": "🌞",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "winter",
+      "hi": "सर्दी",
+      "pron": "विंटर",
+      "emoji": "🧣",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "monsoon",
+      "hi": "बरसात",
+      "pron": "मॉनसून",
+      "emoji": "🌧️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "season",
+      "hi": "ऋतु",
+      "pron": "सीज़न",
+      "emoji": "🍂",
+      "type": "thing",
+      "plural": "seasons"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "In which season does it rain the most?",
+      "qHi": "किस ऋतु में सबसे ज़्यादा बारिश होती है?",
+      "choices": [
+       "monsoon / बरसात",
+       "winter / सर्दी",
+       "summer / गर्मी"
+      ],
+      "answer": "monsoon / बरसात",
+      "emoji": "🌧️",
+      "teach": "The monsoon brings heavy rain.",
+      "teachHi": "बरसात में तेज़ बारिश होती है।"
+     },
+     {
+      "q": "In summer the weather is...",
+      "qHi": "गर्मी में मौसम होता है...",
+      "choices": [
+       "hot / गरम",
+       "cold / ठंडा",
+       "snowy / बर्फ़ीला"
+      ],
+      "answer": "hot / गरम",
+      "emoji": "🌞"
+     },
+     {
+      "q": "We wear warm clothes in...",
+      "qHi": "हम गरम कपड़े पहनते हैं...",
+      "choices": [
+       "winter / सर्दी",
+       "summer / गर्मी",
+       "monsoon / बरसात"
+      ],
+      "answer": "winter / सर्दी",
+      "emoji": "🧣"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "hindi-vyakaran",
+  "title": "Hindi Grammar",
+  "titleHi": "हिंदी व्याकरण",
+  "icon": "📖",
+  "color": "#e11d48",
+  "blurb": "Nouns, verbs, gender, tense & more",
+  "blurbHi": "संज्ञा, क्रिया, लिंग, काल और अधिक",
+  "published": true,
+  "band": "5-8",
+  "subject": "hindi",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Nouns (Sangya)",
+    "titleHi": "संज्ञा",
+    "quiz": [
+     {
+      "q": "Which word is a noun (naam)?",
+      "qHi": "इनमें संज्ञा (नाम) कौन-सा है?",
+      "choices": [
+       "पटना",
+       "दौड़ना",
+       "सुंदर"
+      ],
+      "answer": "पटना",
+      "emoji": "🏙️",
+      "teach": "संज्ञा किसी व्यक्ति, स्थान या वस्तु का नाम है।",
+      "teachHi": "संज्ञा किसी व्यक्ति, स्थान या वस्तु का नाम है।"
+     },
+     {
+      "q": "Which is a proper noun (vyaktivachak)?",
+      "qHi": "व्यक्तिवाचक संज्ञा कौन-सी है?",
+      "choices": [
+       "गंगा",
+       "नदी",
+       "लड़की"
+      ],
+      "answer": "गंगा",
+      "emoji": "🌊"
+     },
+     {
+      "q": "'मिठास' is which kind of noun?",
+      "qHi": "'मिठास' किस प्रकार की संज्ञा है?",
+      "choices": [
+       "भाववाचक",
+       "जातिवाचक",
+       "व्यक्तिवाचक"
+      ],
+      "answer": "भाववाचक"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "मोहन रोज़ सुबह दौड़ने जाती है।",
+      "wrongWord": "जाती",
+      "fix": "जाता",
+      "teach": "'Mohan' is a masculine name, so use 'जाता'.",
+      "teachHi": "'मोहन' पुल्लिंग है, इसलिए 'जाता' आएगा।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Pronouns (Sarvanam)",
+    "titleHi": "सर्वनाम",
+    "quiz": [
+     {
+      "q": "Which word is a pronoun (sarvanam)?",
+      "qHi": "इनमें सर्वनाम कौन-सा है?",
+      "choices": [
+       "वह",
+       "किताब",
+       "लाल"
+      ],
+      "answer": "वह",
+      "teach": "सर्वनाम संज्ञा के स्थान पर आता है — मैं, तुम, वह, हम।",
+      "teachHi": "सर्वनाम संज्ञा के स्थान पर आता है — मैं, तुम, वह, हम।"
+     },
+     {
+      "q": "Replace 'सीता' with a pronoun:",
+      "qHi": "'सीता' के स्थान पर सर्वनाम लगाओ:",
+      "choices": [
+       "वह",
+       "यह किताब",
+       "सीता जी"
+      ],
+      "answer": "वह"
+     },
+     {
+      "q": "Which is a pronoun for 'many people'?",
+      "qHi": "'बहुत लोगों' के लिए सर्वनाम कौन-सा है?",
+      "choices": [
+       "वे",
+       "मैं",
+       "तू"
+      ],
+      "answer": "वे"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "हम सब मिलकर त्योहार मनाता हैं।",
+      "wrongWord": "मनाता",
+      "fix": "मनाते",
+      "teach": "'हम' (we) is plural, so use 'मनाते'.",
+      "teachHi": "'हम' बहुवचन है, इसलिए 'मनाते' आएगा।"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Verbs (Kriya)",
+    "titleHi": "क्रिया",
+    "quiz": [
+     {
+      "q": "Which word is a verb (kriya)?",
+      "qHi": "इनमें क्रिया कौन-सी है?",
+      "choices": [
+       "खाना",
+       "मीठा",
+       "घर"
+      ],
+      "answer": "खाना",
+      "teach": "क्रिया काम या कार्य को बताती है — पढ़ना, लिखना, खाना।",
+      "teachHi": "क्रिया काम या कार्य को बताती है — पढ़ना, लिखना, खाना।"
+     },
+     {
+      "q": "Find the verb: 'बच्चे मैदान में खेलते हैं।'",
+      "qHi": "क्रिया चुनो: 'बच्चे मैदान में खेलते हैं।'",
+      "choices": [
+       "खेलते हैं",
+       "बच्चे",
+       "मैदान"
+      ],
+      "answer": "खेलते हैं",
+      "emoji": "⚽"
+     },
+     {
+      "q": "Which is an action word?",
+      "qHi": "कौन-सा क्रिया शब्द है?",
+      "choices": [
+       "दौड़ना",
+       "पीला",
+       "पर्वत"
+      ],
+      "answer": "दौड़ना",
+      "emoji": "🏃‍♀️"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "सीता स्कूल में हिंदी पढ़ते है।",
+      "wrongWord": "पढ़ते",
+      "fix": "पढ़ती",
+      "teach": "'Sita' is singular feminine, so use 'पढ़ती'.",
+      "teachHi": "'सीता' एकवचन स्त्रीलिंग है, इसलिए 'पढ़ती' आएगा।"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Adjectives (Visheshan)",
+    "titleHi": "विशेषण",
+    "quiz": [
+     {
+      "q": "Which word is an adjective (visheshan)?",
+      "qHi": "इनमें विशेषण कौन-सा है?",
+      "choices": [
+       "सुंदर",
+       "लड़की",
+       "दौड़ना"
+      ],
+      "answer": "सुंदर",
+      "teach": "विशेषण संज्ञा की विशेषता बताता है — बड़ा, लाल, मीठा।",
+      "teachHi": "विशेषण संज्ञा की विशेषता बताता है — बड़ा, लाल, मीठा।"
+     },
+     {
+      "q": "Find the adjective: 'लाल गुलाब खिला है।'",
+      "qHi": "विशेषण चुनो: 'लाल गुलाब खिला है।'",
+      "choices": [
+       "लाल",
+       "गुलाब",
+       "खिला"
+      ],
+      "answer": "लाल",
+      "emoji": "🌹"
+     },
+     {
+      "q": "Which describes a quantity?",
+      "qHi": "कौन-सा परिमाण बताता है?",
+      "choices": [
+       "थोड़ा",
+       "काला",
+       "गोल"
+      ],
+      "answer": "थोड़ा"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "यह एक अच्छी लड़का है।",
+      "wrongWord": "अच्छी",
+      "fix": "अच्छा",
+      "teach": "'लड़का' is masculine, so the adjective is 'अच्छा'.",
+      "teachHi": "'लड़का' पुल्लिंग है, इसलिए विशेषण 'अच्छा' होगा।"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Gender (Ling)",
+    "titleHi": "लिंग",
+    "quiz": [
+     {
+      "q": "Which word is feminine (striling)?",
+      "qHi": "इनमें स्त्रीलिंग शब्द कौन-सा है?",
+      "choices": [
+       "लड़की",
+       "लड़का",
+       "घोड़ा"
+      ],
+      "answer": "लड़की",
+      "emoji": "👧",
+      "teach": "स्त्रीलिंग स्त्री जाति का बोध कराता है; पुल्लिंग पुरुष जाति का।",
+      "teachHi": "स्त्रीलिंग स्त्री जाति का बोध कराता है; पुल्लिंग पुरुष जाति का।"
+     },
+     {
+      "q": "Feminine of 'शिक्षक' is...",
+      "qHi": "'शिक्षक' का स्त्रीलिंग है...",
+      "choices": [
+       "शिक्षिका",
+       "शिक्षकी",
+       "शिक्षकिन"
+      ],
+      "answer": "शिक्षिका"
+     },
+     {
+      "q": "Which word is masculine (pulling)?",
+      "qHi": "इनमें पुल्लिंग शब्द कौन-सा है?",
+      "choices": [
+       "घोड़ा",
+       "गाय",
+       "नदी"
+      ],
+      "answer": "घोड़ा",
+      "emoji": "🐴"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "छोटा बच्ची ज़ोर से रोती है।",
+      "wrongWord": "छोटा",
+      "fix": "छोटी",
+      "teach": "'बच्ची' (girl) is feminine, so use 'छोटी'.",
+      "teachHi": "'बच्ची' स्त्रीलिंग है, इसलिए 'छोटी' आएगा।"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Number (Vachan)",
+    "titleHi": "वचन",
+    "quiz": [
+     {
+      "q": "Plural (bahuvachan) of 'लड़का' is...",
+      "qHi": "'लड़का' का बहुवचन है...",
+      "choices": [
+       "लड़के",
+       "लड़का",
+       "लड़कों"
+      ],
+      "answer": "लड़के",
+      "teach": "एक के लिए एकवचन, एक से अधिक के लिए बहुवचन।",
+      "teachHi": "एक के लिए एकवचन, एक से अधिक के लिए बहुवचन।"
+     },
+     {
+      "q": "Plural of 'किताब' is...",
+      "qHi": "'किताब' का बहुवचन है...",
+      "choices": [
+       "किताबें",
+       "किताबों",
+       "किताब"
+      ],
+      "answer": "किताबें",
+      "emoji": "📚"
+     },
+     {
+      "q": "'नदियाँ' is which number?",
+      "qHi": "'नदियाँ' किस वचन में है?",
+      "choices": [
+       "बहुवचन",
+       "एकवचन",
+       "कोई नहीं"
+      ],
+      "answer": "बहुवचन"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "यहाँ बहुत सारी पुरानी किताब रखी हैं।",
+      "wrongWord": "किताब",
+      "fix": "किताबें",
+      "teach": "Plural of 'किताब' is 'किताबें'.",
+      "teachHi": "'किताब' का बहुवचन 'किताबें' होता है।"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Tense (Kaal)",
+    "titleHi": "काल",
+    "quiz": [
+     {
+      "q": "'वह पढ़ रही है' is in which tense?",
+      "qHi": "'वह पढ़ रही है' किस काल में है?",
+      "choices": [
+       "वर्तमान काल",
+       "भूतकाल",
+       "भविष्यत् काल"
+      ],
+      "answer": "वर्तमान काल",
+      "teach": "वर्तमान = अभी, भूत = बीता हुआ, भविष्य = आने वाला।",
+      "teachHi": "वर्तमान = अभी, भूत = बीता हुआ, भविष्य = आने वाला।"
+     },
+     {
+      "q": "'मैंने खाना खाया' is in which tense?",
+      "qHi": "'मैंने खाना खाया' किस काल में है?",
+      "choices": [
+       "भूतकाल",
+       "वर्तमान काल",
+       "भविष्यत् काल"
+      ],
+      "answer": "भूतकाल"
+     },
+     {
+      "q": "Which sentence is future tense?",
+      "qHi": "कौन-सा वाक्य भविष्यत् काल में है?",
+      "choices": [
+       "वह कल आएगी।",
+       "वह आ रही है।",
+       "वह आई थी।"
+      ],
+      "answer": "वह कल आएगी।"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "अगले हफ़्ते मैं बाज़ार जाकर नयी किताब खरीदी।",
+      "wrongWord": "खरीदी।",
+      "fix": "खरीदूँगी।",
+      "teach": "'अगले हफ़्ते' (next week) is future, so use 'खरीदूँगी'.",
+      "teachHi": "'अगले हफ़्ते' भविष्यत् काल है, इसलिए 'खरीदूँगी' आएगा।"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "Antonyms (Vilom)",
+    "titleHi": "विलोम शब्द",
+    "quiz": [
+     {
+      "q": "Opposite (vilom) of 'दिन' is...",
+      "qHi": "'दिन' का विलोम है...",
+      "choices": [
+       "रात",
+       "सुबह",
+       "शाम"
+      ],
+      "answer": "रात",
+      "emoji": "🌙",
+      "teach": "विलोम शब्द उल्टा अर्थ देते हैं — दिन/रात, सच/झूठ।",
+      "teachHi": "विलोम शब्द उल्टा अर्थ देते हैं — दिन/रात, सच/झूठ।"
+     },
+     {
+      "q": "Opposite of 'अमीर' is...",
+      "qHi": "'अमीर' का विलोम है...",
+      "choices": [
+       "गरीब",
+       "धनी",
+       "बड़ा"
+      ],
+      "answer": "गरीब"
+     },
+     {
+      "q": "Opposite of 'ऊपर' is...",
+      "qHi": "'ऊपर' का विलोम है...",
+      "choices": [
+       "नीचे",
+       "आगे",
+       "पास"
+      ],
+      "answer": "नीचे",
+      "emoji": "⬇️"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "सूरज सुबह उगता है और शाम को उदय होता है।",
+      "wrongWord": "उदय",
+      "fix": "अस्त",
+      "teach": "The opposite of 'उदय' (rise) is 'अस्त' (set).",
+      "teachHi": "'उदय' का विलोम 'अस्त' है — सूरज शाम को अस्त होता है।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "sst-bharat",
+  "title": "India & The World",
+  "titleHi": "भारत और विश्व",
+  "icon": "🗺️",
+  "color": "#d97706",
+  "blurb": "Geography, history & our government",
+  "blurbHi": "भूगोल, इतिहास और हमारी सरकार",
+  "published": true,
+  "band": "5-8",
+  "subject": "sst",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Our Country India",
+    "titleHi": "हमारा देश भारत",
+    "words": [
+     {
+      "en": "country",
+      "hi": "देश",
+      "pron": "कंट्री",
+      "emoji": "🇮🇳",
+      "type": "thing",
+      "plural": "countries"
+     },
+     {
+      "en": "capital",
+      "hi": "राजधानी",
+      "pron": "कैपिटल",
+      "emoji": "🏛️",
+      "type": "thing",
+      "plural": "capitals"
+     },
+     {
+      "en": "border",
+      "hi": "सीमा",
+      "pron": "बॉर्डर",
+      "emoji": "🗺️",
+      "type": "thing",
+      "plural": "borders"
+     },
+     {
+      "en": "citizen",
+      "hi": "नागरिक",
+      "pron": "सिटिज़न",
+      "emoji": "🧑",
+      "type": "thing",
+      "plural": "citizens"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is the capital of India?",
+      "qHi": "भारत की राजधानी क्या है?",
+      "choices": [
+       "New Delhi",
+       "Mumbai",
+       "Kolkata"
+      ],
+      "answer": "New Delhi",
+      "emoji": "🏛️",
+      "teach": "New Delhi is the capital of India.",
+      "teachHi": "नई दिल्ली भारत की राजधानी है।"
+     },
+     {
+      "q": "Which ocean is to the south of India?",
+      "qHi": "भारत के दक्षिण में कौन-सा महासागर है?",
+      "choices": [
+       "Indian Ocean",
+       "Atlantic Ocean",
+       "Arctic Ocean"
+      ],
+      "answer": "Indian Ocean",
+      "emoji": "🌊"
+     },
+     {
+      "q": "India got independence in which year?",
+      "qHi": "भारत को स्वतंत्रता किस वर्ष मिली?",
+      "choices": [
+       "1947",
+       "1950",
+       "1930"
+      ],
+      "answer": "1947",
+      "emoji": "🇮🇳"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "States & Capitals",
+    "titleHi": "राज्य और राजधानियाँ",
+    "words": [
+     {
+      "en": "state",
+      "hi": "राज्य",
+      "pron": "स्टेट",
+      "emoji": "🗺️",
+      "type": "thing",
+      "plural": "states"
+     },
+     {
+      "en": "village",
+      "hi": "गाँव",
+      "pron": "विलेज",
+      "emoji": "🏡",
+      "type": "thing",
+      "plural": "villages"
+     },
+     {
+      "en": "city",
+      "hi": "शहर",
+      "pron": "सिटी",
+      "emoji": "🏙️",
+      "type": "thing",
+      "plural": "cities"
+     },
+     {
+      "en": "district",
+      "hi": "ज़िला",
+      "pron": "डिस्ट्रिक्ट",
+      "emoji": "📍",
+      "type": "thing",
+      "plural": "districts"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What is the capital of Bihar?",
+      "qHi": "बिहार की राजधानी क्या है?",
+      "choices": [
+       "Patna",
+       "Ranchi",
+       "Lucknow"
+      ],
+      "answer": "Patna",
+      "emoji": "🏙️",
+      "teach": "Patna is the capital of Bihar.",
+      "teachHi": "पटना बिहार की राजधानी है।"
+     },
+     {
+      "q": "The Champaran district is in which state?",
+      "qHi": "चंपारण ज़िला किस राज्य में है?",
+      "choices": [
+       "Bihar",
+       "Punjab",
+       "Kerala"
+      ],
+      "answer": "Bihar",
+      "emoji": "📍"
+     },
+     {
+      "q": "Which is the capital of Rajasthan?",
+      "qHi": "राजस्थान की राजधानी कौन-सी है?",
+      "choices": [
+       "Jaipur",
+       "Bhopal",
+       "Chennai"
+      ],
+      "answer": "Jaipur"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Rivers & Mountains",
+    "titleHi": "नदियाँ और पर्वत",
+    "words": [
+     {
+      "en": "river",
+      "hi": "नदी",
+      "pron": "रिवर",
+      "emoji": "🏞️",
+      "type": "thing",
+      "plural": "rivers"
+     },
+     {
+      "en": "mountain",
+      "hi": "पर्वत",
+      "pron": "माउंटेन",
+      "emoji": "⛰️",
+      "type": "thing",
+      "plural": "mountains"
+     },
+     {
+      "en": "forest",
+      "hi": "जंगल",
+      "pron": "फ़ॉरेस्ट",
+      "emoji": "🌳",
+      "type": "thing",
+      "plural": "forests"
+     },
+     {
+      "en": "valley",
+      "hi": "घाटी",
+      "pron": "वैली",
+      "emoji": "🏔️",
+      "type": "thing",
+      "plural": "valleys"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which is the longest river in India?",
+      "qHi": "भारत की सबसे लंबी नदी कौन-सी है?",
+      "choices": [
+       "Ganga",
+       "Yamuna",
+       "Kosi"
+      ],
+      "answer": "Ganga",
+      "emoji": "🌊",
+      "teach": "The Ganga is India's longest and holiest river.",
+      "teachHi": "गंगा भारत की सबसे लंबी और पवित्र नदी है।"
+     },
+     {
+      "q": "Which mountain range is in the north of India?",
+      "qHi": "भारत के उत्तर में कौन-सी पर्वत श्रृंखला है?",
+      "choices": [
+       "Himalayas",
+       "Aravalli",
+       "Nilgiri"
+      ],
+      "answer": "Himalayas",
+      "emoji": "🏔️"
+     },
+     {
+      "q": "Which river often floods North Bihar?",
+      "qHi": "उत्तर बिहार में अक्सर कौन-सी नदी बाढ़ लाती है?",
+      "choices": [
+       "Kosi",
+       "Ganga",
+       "Godavari"
+      ],
+      "answer": "Kosi",
+      "emoji": "🏞️"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Our Freedom Struggle",
+    "titleHi": "हमारा स्वतंत्रता संग्राम",
+    "words": [
+     {
+      "en": "freedom",
+      "hi": "स्वतंत्रता",
+      "pron": "फ़्रीडम",
+      "emoji": "🕊️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "leader",
+      "hi": "नेता",
+      "pron": "लीडर",
+      "emoji": "🧑‍💼",
+      "type": "thing",
+      "plural": "leaders"
+     },
+     {
+      "en": "protest",
+      "hi": "आंदोलन",
+      "pron": "प्रोटेस्ट",
+      "emoji": "✊",
+      "type": "thing",
+      "plural": "protests"
+     },
+     {
+      "en": "flag",
+      "hi": "झंडा",
+      "pron": "फ़्लैग",
+      "emoji": "🚩",
+      "type": "thing",
+      "plural": "flags"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Who led India's non-violent freedom movement?",
+      "qHi": "भारत के अहिंसक स्वतंत्रता आंदोलन का नेतृत्व किसने किया?",
+      "choices": [
+       "Mahatma Gandhi",
+       "Akbar",
+       "Ashoka"
+      ],
+      "answer": "Mahatma Gandhi",
+      "emoji": "🕊️",
+      "teach": "Gandhiji led the freedom movement with truth and non-violence.",
+      "teachHi": "गांधीजी ने सत्य और अहिंसा से स्वतंत्रता आंदोलन का नेतृत्व किया।"
+     },
+     {
+      "q": "The 1917 Champaran movement was about the rights of...",
+      "qHi": "1917 का चंपारण आंदोलन किसके अधिकारों के लिए था?",
+      "choices": [
+       "indigo farmers",
+       "soldiers",
+       "traders"
+      ],
+      "answer": "indigo farmers",
+      "emoji": "🌾"
+     },
+     {
+      "q": "What does the Ashoka Chakra on our flag stand for?",
+      "qHi": "हमारे झंडे का अशोक चक्र किसका प्रतीक है?",
+      "choices": [
+       "law and progress",
+       "war",
+       "money"
+      ],
+      "answer": "law and progress",
+      "emoji": "🇮🇳"
+     }
+    ],
+    "read": [
+     {
+      "title": "Gandhi in Champaran",
+      "titleHi": "चंपारण में गांधी",
+      "emoji": "🕊️",
+      "text": "In 1917 the farmers of Champaran were forced to grow indigo and were treated unfairly. Mahatma Gandhi came, listened to them, and led a peaceful satyagraha. The unjust system was finally ended.",
+      "textHi": "1917 में चंपारण के किसानों को ज़बरदस्ती नील उगाने के लिए मजबूर किया जाता था और उनके साथ अन्याय होता था। महात्मा गांधी आए, उनकी बात सुनी और एक शांतिपूर्ण सत्याग्रह चलाया। आख़िरकार यह अन्यायी व्यवस्था समाप्त हुई।",
+      "q": "How did Gandhi help the Champaran farmers?",
+      "qHi": "गांधी ने चंपारण के किसानों की मदद कैसे की?",
+      "choices": [
+       "with a peaceful satyagraha / शांतिपूर्ण सत्याग्रह से",
+       "by fighting the police / पुलिस से लड़कर",
+       "by leaving India / भारत छोड़कर"
+      ],
+      "answer": "with a peaceful satyagraha / शांतिपूर्ण सत्याग्रह से",
+      "teach": "Gandhi used peaceful protest (satyagraha) to win justice.",
+      "teachHi": "गांधी ने न्याय पाने के लिए शांतिपूर्ण सत्याग्रह का उपयोग किया।"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Government & Democracy",
+    "titleHi": "सरकार और लोकतंत्र",
+    "words": [
+     {
+      "en": "vote",
+      "hi": "वोट",
+      "pron": "वोट",
+      "emoji": "🗳️",
+      "type": "thing",
+      "plural": "votes"
+     },
+     {
+      "en": "election",
+      "hi": "चुनाव",
+      "pron": "इलेक्शन",
+      "emoji": "🗳️",
+      "type": "thing",
+      "plural": "elections"
+     },
+     {
+      "en": "law",
+      "hi": "कानून",
+      "pron": "लॉ",
+      "emoji": "⚖️",
+      "type": "thing",
+      "plural": "laws"
+     },
+     {
+      "en": "minister",
+      "hi": "मंत्री",
+      "pron": "मिनिस्टर",
+      "emoji": "🧑‍💼",
+      "type": "thing",
+      "plural": "ministers"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "In a democracy, who chooses the leaders?",
+      "qHi": "लोकतंत्र में नेता कौन चुनता है?",
+      "choices": [
+       "the people",
+       "the king",
+       "the army"
+      ],
+      "answer": "the people",
+      "emoji": "🗳️",
+      "teach": "In a democracy, the people vote to choose their leaders.",
+      "teachHi": "लोकतंत्र में जनता वोट देकर अपने नेता चुनती है।"
+     },
+     {
+      "q": "At what age can an Indian citizen vote?",
+      "qHi": "भारतीय नागरिक किस उम्र में वोट दे सकता है?",
+      "choices": [
+       "18 years",
+       "15 years",
+       "25 years"
+      ],
+      "answer": "18 years",
+      "emoji": "🎂"
+     },
+     {
+      "q": "Who is the head of the Indian government?",
+      "qHi": "भारत सरकार का प्रमुख कौन होता है?",
+      "choices": [
+       "Prime Minister",
+       "Governor",
+       "Judge"
+      ],
+      "answer": "Prime Minister"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Constitution & Rights",
+    "titleHi": "संविधान और अधिकार",
+    "words": [
+     {
+      "en": "constitution",
+      "hi": "संविधान",
+      "pron": "कॉन्स्टिट्यूशन",
+      "emoji": "📜",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "right",
+      "hi": "अधिकार",
+      "pron": "राइट",
+      "emoji": "✋",
+      "type": "thing",
+      "plural": "rights"
+     },
+     {
+      "en": "duty",
+      "hi": "कर्तव्य",
+      "pron": "ड्यूटी",
+      "emoji": "🤲",
+      "type": "thing",
+      "plural": "duties"
+     },
+     {
+      "en": "equality",
+      "hi": "समानता",
+      "pron": "इक्वैलिटी",
+      "emoji": "⚖️",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Every child in India has the right to...",
+      "qHi": "भारत में हर बच्चे को किसका अधिकार है?",
+      "choices": [
+       "free education",
+       "a car",
+       "gold"
+      ],
+      "answer": "free education",
+      "emoji": "📚",
+      "teach": "Free education up to age 14 is a fundamental right.",
+      "teachHi": "14 वर्ष तक निःशुल्क शिक्षा एक मौलिक अधिकार है।"
+     },
+     {
+      "q": "The Constitution says all citizens are...",
+      "qHi": "संविधान कहता है कि सभी नागरिक हैं...",
+      "choices": [
+       "equal",
+       "different",
+       "separate"
+      ],
+      "answer": "equal",
+      "emoji": "⚖️"
+     },
+     {
+      "q": "Keeping your surroundings clean is a...",
+      "qHi": "अपने आस-पास सफ़ाई रखना एक...",
+      "choices": [
+       "duty",
+       "punishment",
+       "right only"
+      ],
+      "answer": "duty",
+      "emoji": "🧹"
+     }
+    ],
+    "read": [
+     {
+      "title": "The Right to Learn",
+      "titleHi": "सीखने का अधिकार",
+      "emoji": "📚",
+      "text": "In India, every child between 6 and 14 has the right to free schooling. This means a girl in a village and a boy in a city both get the same chance to learn.",
+      "textHi": "भारत में 6 से 14 वर्ष के हर बच्चे को निःशुल्क स्कूली शिक्षा का अधिकार है। इसका मतलब है कि गाँव की लड़की और शहर के लड़के — दोनों को सीखने का समान अवसर मिलता है।",
+      "q": "What does the Right to Education give every child?",
+      "qHi": "शिक्षा का अधिकार हर बच्चे को क्या देता है?",
+      "choices": [
+       "free schooling / निःशुल्क शिक्षा",
+       "a free phone / मुफ़्त फ़ोन",
+       "a job / नौकरी"
+      ],
+      "answer": "free schooling / निःशुल्क शिक्षा",
+      "teach": "The Right to Education gives every child free schooling.",
+      "teachHi": "शिक्षा का अधिकार हर बच्चे को निःशुल्क शिक्षा देता है।"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Maps & Directions",
+    "titleHi": "मानचित्र और दिशाएँ",
+    "words": [
+     {
+      "en": "map",
+      "hi": "मानचित्र",
+      "pron": "मैप",
+      "emoji": "🗺️",
+      "type": "thing",
+      "plural": "maps"
+     },
+     {
+      "en": "north",
+      "hi": "उत्तर",
+      "pron": "नॉर्थ",
+      "emoji": "🧭",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "east",
+      "hi": "पूर्व",
+      "pron": "ईस्ट",
+      "emoji": "🧭",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "symbol",
+      "hi": "प्रतीक",
+      "pron": "सिंबल",
+      "emoji": "🔣",
+      "type": "thing",
+      "plural": "symbols"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "The sun rises in which direction?",
+      "qHi": "सूरज किस दिशा में उगता है?",
+      "choices": [
+       "East",
+       "West",
+       "North"
+      ],
+      "answer": "East",
+      "emoji": "🌅",
+      "teach": "The sun rises in the east and sets in the west.",
+      "teachHi": "सूरज पूर्व में उगता है और पश्चिम में डूबता है।"
+     },
+     {
+      "q": "On a map, which direction is usually at the top?",
+      "qHi": "मानचित्र में आमतौर पर ऊपर कौन-सी दिशा होती है?",
+      "choices": [
+       "North",
+       "South",
+       "East"
+      ],
+      "answer": "North",
+      "emoji": "🧭"
+     },
+     {
+      "q": "Blue colour on a map usually shows...",
+      "qHi": "मानचित्र पर नीला रंग आमतौर पर दिखाता है...",
+      "choices": [
+       "water",
+       "roads",
+       "forests"
+      ],
+      "answer": "water",
+      "emoji": "💧"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "The Earth in Space",
+    "titleHi": "अंतरिक्ष में पृथ्वी",
+    "words": [
+     {
+      "en": "Earth",
+      "hi": "पृथ्वी",
+      "pron": "अर्थ",
+      "emoji": "🌍",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "planet",
+      "hi": "ग्रह",
+      "pron": "प्लैनेट",
+      "emoji": "🪐",
+      "type": "thing",
+      "plural": "planets"
+     },
+     {
+      "en": "continent",
+      "hi": "महाद्वीप",
+      "pron": "कॉन्टिनेंट",
+      "emoji": "🌐",
+      "type": "thing",
+      "plural": "continents"
+     },
+     {
+      "en": "globe",
+      "hi": "भूगोलक",
+      "pron": "ग्लोब",
+      "emoji": "🌐",
+      "type": "thing",
+      "plural": "globes"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Our Earth moves around the...",
+      "qHi": "हमारी पृथ्वी किसके चारों ओर घूमती है?",
+      "choices": [
+       "Sun",
+       "Moon",
+       "stars"
+      ],
+      "answer": "Sun",
+      "emoji": "☀️",
+      "teach": "The Earth revolves around the Sun once a year.",
+      "teachHi": "पृथ्वी साल में एक बार सूरज के चारों ओर घूमती है।"
+     },
+     {
+      "q": "Which shape is the Earth?",
+      "qHi": "पृथ्वी का आकार कैसा है?",
+      "choices": [
+       "round (a sphere)",
+       "flat",
+       "square"
+      ],
+      "answer": "round (a sphere)",
+      "emoji": "🌍"
+     },
+     {
+      "q": "Day and night happen because the Earth...",
+      "qHi": "दिन और रात होते हैं क्योंकि पृथ्वी...",
+      "choices": [
+       "spins on its axis",
+       "stops moving",
+       "grows bigger"
+      ],
+      "answer": "spins on its axis",
+      "emoji": "🔄"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "comp-skills",
+  "title": "Computer Skills",
+  "titleHi": "कंप्यूटर कौशल",
+  "icon": "💻",
+  "color": "#8b5cf6",
+  "blurb": "Parts, typing, files & staying safe",
+  "blurbHi": "भाग, टाइपिंग, फ़ाइलें और सुरक्षा",
+  "published": true,
+  "band": "5-8",
+  "subject": "computer",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "What is a Computer",
+    "titleHi": "कंप्यूटर क्या है",
+    "words": [
+     {
+      "en": "computer",
+      "hi": "कंप्यूटर",
+      "pron": "कंप्यूटर",
+      "emoji": "💻",
+      "type": "thing",
+      "plural": "computers"
+     },
+     {
+      "en": "machine",
+      "hi": "मशीन",
+      "pron": "मशीन",
+      "emoji": "⚙️",
+      "type": "thing",
+      "plural": "machines"
+     },
+     {
+      "en": "screen",
+      "hi": "स्क्रीन",
+      "pron": "स्क्रीन",
+      "emoji": "🖥️",
+      "type": "thing",
+      "plural": "screens"
+     },
+     {
+      "en": "power",
+      "hi": "बिजली",
+      "pron": "पावर",
+      "emoji": "🔌",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "A computer is a machine that...",
+      "qHi": "कंप्यूटर एक मशीन है जो...",
+      "choices": [
+       "stores and works with data",
+       "cooks food",
+       "washes clothes"
+      ],
+      "answer": "stores and works with data",
+      "emoji": "💻",
+      "teach": "A computer stores information and follows our instructions.",
+      "teachHi": "कंप्यूटर जानकारी संग्रह करता है और हमारे निर्देशों का पालन करता है।"
+     },
+     {
+      "q": "To start a computer we press the...",
+      "qHi": "कंप्यूटर चालू करने के लिए हम दबाते हैं...",
+      "choices": [
+       "power button",
+       "screen",
+       "printer"
+      ],
+      "answer": "power button",
+      "emoji": "⏻"
+     },
+     {
+      "q": "Which of these is a computer?",
+      "qHi": "इनमें से कौन एक कंप्यूटर है?",
+      "choices": [
+       "a laptop",
+       "a bicycle",
+       "a spoon"
+      ],
+      "answer": "a laptop",
+      "emoji": "💻"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Parts of a Computer",
+    "titleHi": "कंप्यूटर के भाग",
+    "words": [
+     {
+      "en": "monitor",
+      "hi": "मॉनिटर",
+      "pron": "मॉनिटर",
+      "emoji": "🖥️",
+      "type": "thing",
+      "plural": "monitors"
+     },
+     {
+      "en": "keyboard",
+      "hi": "कीबोर्ड",
+      "pron": "कीबोर्ड",
+      "emoji": "⌨️",
+      "type": "thing",
+      "plural": "keyboards"
+     },
+     {
+      "en": "mouse",
+      "hi": "माउस",
+      "pron": "माउस",
+      "emoji": "🖱️",
+      "type": "thing",
+      "plural": "mice"
+     },
+     {
+      "en": "CPU",
+      "hi": "सीपीयू",
+      "pron": "सीपीयू",
+      "emoji": "🧠",
+      "type": "thing",
+      "plural": "CPUs"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which part shows what the computer is doing?",
+      "qHi": "कौन-सा भाग दिखाता है कि कंप्यूटर क्या कर रहा है?",
+      "choices": [
+       "monitor",
+       "keyboard",
+       "mouse"
+      ],
+      "answer": "monitor",
+      "emoji": "🖥️",
+      "teach": "The monitor (screen) shows text and pictures.",
+      "teachHi": "मॉनिटर (स्क्रीन) पर लिखाई और चित्र दिखते हैं।"
+     },
+     {
+      "q": "Which part is called the 'brain' of the computer?",
+      "qHi": "कंप्यूटर का 'दिमाग' किसे कहा जाता है?",
+      "choices": [
+       "CPU",
+       "monitor",
+       "speaker"
+      ],
+      "answer": "CPU",
+      "emoji": "🧠"
+     },
+     {
+      "q": "Which part do we type with?",
+      "qHi": "हम किस भाग से टाइप करते हैं?",
+      "choices": [
+       "keyboard",
+       "monitor",
+       "CPU"
+      ],
+      "answer": "keyboard",
+      "emoji": "⌨️"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Input & Output",
+    "titleHi": "इनपुट और आउटपुट",
+    "words": [
+     {
+      "en": "input",
+      "hi": "इनपुट",
+      "pron": "इनपुट",
+      "emoji": "⬇️",
+      "type": "thing",
+      "plural": "inputs"
+     },
+     {
+      "en": "output",
+      "hi": "आउटपुट",
+      "pron": "आउटपुट",
+      "emoji": "⬆️",
+      "type": "thing",
+      "plural": "outputs"
+     },
+     {
+      "en": "printer",
+      "hi": "प्रिंटर",
+      "pron": "प्रिंटर",
+      "emoji": "🖨️",
+      "type": "thing",
+      "plural": "printers"
+     },
+     {
+      "en": "speaker",
+      "hi": "स्पीकर",
+      "pron": "स्पीकर",
+      "emoji": "🔊",
+      "type": "thing",
+      "plural": "speakers"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "A keyboard is an ___ device.",
+      "qHi": "कीबोर्ड एक ___ उपकरण है।",
+      "choices": [
+       "input",
+       "output",
+       "power"
+      ],
+      "answer": "input",
+      "emoji": "⌨️",
+      "teach": "Input devices send data IN (keyboard, mouse, mic).",
+      "teachHi": "इनपुट उपकरण डेटा अंदर भेजते हैं (कीबोर्ड, माउस, माइक)।"
+     },
+     {
+      "q": "A printer is an ___ device.",
+      "qHi": "प्रिंटर एक ___ उपकरण है।",
+      "choices": [
+       "output",
+       "input",
+       "storage"
+      ],
+      "answer": "output",
+      "emoji": "🖨️"
+     },
+     {
+      "q": "Which one lets you hear sound?",
+      "qHi": "किससे आप ध्वनि सुनते हैं?",
+      "choices": [
+       "speaker",
+       "keyboard",
+       "mouse"
+      ],
+      "answer": "speaker",
+      "emoji": "🔊"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Using the Keyboard",
+    "titleHi": "कीबोर्ड का उपयोग",
+    "words": [
+     {
+      "en": "letter key",
+      "hi": "अक्षर कुंजी",
+      "pron": "लेटर की",
+      "emoji": "🔤",
+      "type": "thing",
+      "plural": "letter keys"
+     },
+     {
+      "en": "spacebar",
+      "hi": "स्पेसबार",
+      "pron": "स्पेसबार",
+      "emoji": "␣",
+      "type": "thing",
+      "plural": "spacebars"
+     },
+     {
+      "en": "enter key",
+      "hi": "एंटर कुंजी",
+      "pron": "एंटर की",
+      "emoji": "↵",
+      "type": "thing",
+      "plural": "enter keys"
+     },
+     {
+      "en": "number key",
+      "hi": "अंक कुंजी",
+      "pron": "नंबर की",
+      "emoji": "🔢",
+      "type": "thing",
+      "plural": "number keys"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which key makes a space between words?",
+      "qHi": "शब्दों के बीच जगह कौन-सी कुंजी बनाती है?",
+      "choices": [
+       "spacebar",
+       "enter",
+       "shift"
+      ],
+      "answer": "spacebar",
+      "emoji": "␣",
+      "teach": "The long spacebar adds a space between words.",
+      "teachHi": "लंबा स्पेसबार शब्दों के बीच जगह जोड़ता है।"
+     },
+     {
+      "q": "Which key starts a new line?",
+      "qHi": "नई पंक्ति कौन-सी कुंजी शुरू करती है?",
+      "choices": [
+       "Enter",
+       "Spacebar",
+       "Delete"
+      ],
+      "answer": "Enter",
+      "emoji": "↵"
+     },
+     {
+      "q": "To type a capital letter you hold...",
+      "qHi": "बड़ा अक्षर टाइप करने के लिए दबाकर रखते हैं...",
+      "choices": [
+       "Shift",
+       "Enter",
+       "Space"
+      ],
+      "answer": "Shift",
+      "emoji": "⬆️"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Mouse & Desktop",
+    "titleHi": "माउस और डेस्कटॉप",
+    "words": [
+     {
+      "en": "click",
+      "hi": "क्लिक",
+      "pron": "क्लिक",
+      "emoji": "👆",
+      "type": "action"
+     },
+     {
+      "en": "icon",
+      "hi": "आइकन",
+      "pron": "आइकन",
+      "emoji": "🔲",
+      "type": "thing",
+      "plural": "icons"
+     },
+     {
+      "en": "desktop",
+      "hi": "डेस्कटॉप",
+      "pron": "डेस्कटॉप",
+      "emoji": "🖥️",
+      "type": "thing",
+      "plural": "desktops"
+     },
+     {
+      "en": "cursor",
+      "hi": "कर्सर",
+      "pron": "कर्सर",
+      "emoji": "➤",
+      "type": "thing",
+      "plural": "cursors"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "To open a program, you ___ its icon.",
+      "qHi": "प्रोग्राम खोलने के लिए आप उसके आइकन पर ___ करते हैं।",
+      "choices": [
+       "double-click",
+       "shout at",
+       "unplug"
+      ],
+      "answer": "double-click",
+      "emoji": "🖱️",
+      "teach": "A quick double-click opens an icon.",
+      "teachHi": "जल्दी से दो बार क्लिक (डबल-क्लिक) करने पर आइकन खुलता है।"
+     },
+     {
+      "q": "The small arrow that moves with the mouse is the...",
+      "qHi": "माउस के साथ चलता छोटा तीर है...",
+      "choices": [
+       "cursor",
+       "icon",
+       "window"
+      ],
+      "answer": "cursor",
+      "emoji": "➤"
+     },
+     {
+      "q": "The first screen you see after start-up is the...",
+      "qHi": "चालू होने पर पहली स्क्रीन कहलाती है...",
+      "choices": [
+       "desktop",
+       "keyboard",
+       "printer"
+      ],
+      "answer": "desktop",
+      "emoji": "🖥️"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Files & Folders",
+    "titleHi": "फ़ाइलें और फ़ोल्डर",
+    "words": [
+     {
+      "en": "file",
+      "hi": "फ़ाइल",
+      "pron": "फ़ाइल",
+      "emoji": "📄",
+      "type": "thing",
+      "plural": "files"
+     },
+     {
+      "en": "folder",
+      "hi": "फ़ोल्डर",
+      "pron": "फ़ोल्डर",
+      "emoji": "📁",
+      "type": "thing",
+      "plural": "folders"
+     },
+     {
+      "en": "save",
+      "hi": "सहेजना",
+      "pron": "सेव",
+      "emoji": "💾",
+      "type": "action"
+     },
+     {
+      "en": "delete",
+      "hi": "मिटाना",
+      "pron": "डिलीट",
+      "emoji": "🗑️",
+      "type": "action"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Where do we keep many files together?",
+      "qHi": "हम कई फ़ाइलें एक साथ कहाँ रखते हैं?",
+      "choices": [
+       "in a folder",
+       "on the mouse",
+       "in the plug"
+      ],
+      "answer": "in a folder",
+      "emoji": "📁",
+      "teach": "A folder holds many files, like a box holds papers.",
+      "teachHi": "फ़ोल्डर में कई फ़ाइलें रहती हैं, जैसे डिब्बे में कागज़।"
+     },
+     {
+      "q": "To keep your work for later, you must...",
+      "qHi": "अपना काम बाद के लिए रखने हेतु आपको करना होगा...",
+      "choices": [
+       "save it",
+       "delete it",
+       "close it"
+      ],
+      "answer": "save it",
+      "emoji": "💾"
+     },
+     {
+      "q": "What happens if you delete a file?",
+      "qHi": "फ़ाइल मिटाने पर क्या होता है?",
+      "choices": [
+       "it is removed",
+       "it is printed",
+       "it is saved"
+      ],
+      "answer": "it is removed",
+      "emoji": "🗑️"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Painting & Typing",
+    "titleHi": "पेंट और टाइपिंग",
+    "words": [
+     {
+      "en": "document",
+      "hi": "दस्तावेज़",
+      "pron": "डॉक्यूमेंट",
+      "emoji": "📃",
+      "type": "thing",
+      "plural": "documents"
+     },
+     {
+      "en": "paint",
+      "hi": "पेंट",
+      "pron": "पेंट",
+      "emoji": "🎨",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "colour",
+      "hi": "रंग",
+      "pron": "कलर",
+      "emoji": "🌈",
+      "type": "thing",
+      "plural": "colours"
+     },
+     {
+      "en": "brush",
+      "hi": "ब्रश",
+      "pron": "ब्रश",
+      "emoji": "🖌️",
+      "type": "thing",
+      "plural": "brushes"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which program is used to draw pictures?",
+      "qHi": "चित्र बनाने के लिए कौन-सा प्रोग्राम है?",
+      "choices": [
+       "Paint",
+       "Calculator",
+       "Clock"
+      ],
+      "answer": "Paint",
+      "emoji": "🎨",
+      "teach": "Paint lets you draw and colour on the computer.",
+      "teachHi": "पेंट से आप कंप्यूटर पर चित्र बना और रंग सकते हैं।"
+     },
+     {
+      "q": "Which program is used to type a letter?",
+      "qHi": "पत्र टाइप करने के लिए कौन-सा प्रोग्राम है?",
+      "choices": [
+       "a word processor",
+       "Paint",
+       "a game"
+      ],
+      "answer": "a word processor",
+      "emoji": "📃"
+     },
+     {
+      "q": "To make text bigger you change the...",
+      "qHi": "अक्षर बड़े करने के लिए आप बदलते हैं...",
+      "choices": [
+       "font size",
+       "mouse",
+       "power"
+      ],
+      "answer": "font size",
+      "emoji": "🔠"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "Staying Safe",
+    "titleHi": "सुरक्षित रहना",
+    "words": [
+     {
+      "en": "password",
+      "hi": "पासवर्ड",
+      "pron": "पासवर्ड",
+      "emoji": "🔑",
+      "type": "thing",
+      "plural": "passwords"
+     },
+     {
+      "en": "safe",
+      "hi": "सुरक्षित",
+      "pron": "सेफ़",
+      "emoji": "🛡️",
+      "type": "describe"
+     },
+     {
+      "en": "stranger",
+      "hi": "अजनबी",
+      "pron": "स्ट्रेंजर",
+      "emoji": "🚫",
+      "type": "thing",
+      "plural": "strangers"
+     },
+     {
+      "en": "secret",
+      "hi": "गुप्त",
+      "pron": "सीक्रेट",
+      "emoji": "🤫",
+      "type": "describe"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "You should keep your password...",
+      "qHi": "अपना पासवर्ड आपको रखना चाहिए...",
+      "choices": [
+       "secret",
+       "on the wall",
+       "in a group chat"
+      ],
+      "answer": "secret",
+      "emoji": "🔑",
+      "teach": "Never share your password — keep it secret.",
+      "teachHi": "अपना पासवर्ड कभी साझा न करें — इसे गुप्त रखें।"
+     },
+     {
+      "q": "If a stranger online asks where you live, you...",
+      "qHi": "अगर कोई ऑनलाइन अजनबी पूछे कि आप कहाँ रहती हैं, तो आप...",
+      "choices": [
+       "do not tell and inform an elder",
+       "send your address",
+       "send a photo"
+      ],
+      "answer": "do not tell and inform an elder",
+      "emoji": "🚫"
+     },
+     {
+      "q": "A strong password should be...",
+      "qHi": "एक मज़बूत पासवर्ड होना चाहिए...",
+      "choices": [
+       "hard to guess",
+       "your name",
+       "1234"
+      ],
+      "answer": "hard to guess",
+      "emoji": "🛡️"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "hindi-sahitya",
+  "title": "Hindi Grammar & Literature",
+  "titleHi": "हिंदी व्याकरण और साहित्य",
+  "icon": "📖",
+  "color": "#e11d48",
+  "blurb": "Sandhi, samas, alankar, idioms & reading",
+  "blurbHi": "संधि, समास, अलंकार, मुहावरे और गद्यांश",
+  "published": true,
+  "band": "9-10",
+  "subject": "hindi",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Sandhi (Joining sounds)",
+    "titleHi": "संधि",
+    "quiz": [
+     {
+      "q": "विद्या + आलय = ?",
+      "qHi": "विद्या + आलय = ?",
+      "choices": [
+       "विद्यालय",
+       "विद्याआलय",
+       "विद्यालाय"
+      ],
+      "answer": "विद्यालय",
+      "teach": "आ + आ मिलकर 'आ' बनता है — यह दीर्घ संधि है।",
+      "teachHi": "आ + आ मिलकर 'आ' बनता है — यह दीर्घ संधि है।"
+     },
+     {
+      "q": "सूर्य + उदय = ?",
+      "qHi": "सूर्य + उदय = ?",
+      "choices": [
+       "सूर्योदय",
+       "सूर्यउदय",
+       "सुर्योदय"
+      ],
+      "answer": "सूर्योदय"
+     },
+     {
+      "q": "Break the sandhi: 'हिमालय'",
+      "qHi": "संधि-विच्छेद करो: 'हिमालय'",
+      "choices": [
+       "हिम + आलय",
+       "हि + मालय",
+       "हिमा + लय"
+      ],
+      "answer": "हिम + आलय",
+      "emoji": "🏔️"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "Samas (Compound words)",
+    "titleHi": "समास",
+    "quiz": [
+     {
+      "q": "'राजपुत्र' (son of a king) is which samas?",
+      "qHi": "'राजपुत्र' किस समास का उदाहरण है?",
+      "choices": [
+       "तत्पुरुष",
+       "द्वंद्व",
+       "बहुव्रीहि"
+      ],
+      "answer": "तत्पुरुष",
+      "teach": "'राजा का पुत्र' — इसमें तत्पुरुष समास है।",
+      "teachHi": "'राजा का पुत्र' — इसमें तत्पुरुष समास है।"
+     },
+     {
+      "q": "'माता-पिता' is which samas?",
+      "qHi": "'माता-पिता' किस समास में है?",
+      "choices": [
+       "द्वंद्व",
+       "कर्मधारय",
+       "अव्ययीभाव"
+      ],
+      "answer": "द्वंद्व"
+     },
+     {
+      "q": "'त्रिभुज' (three angles) is which samas?",
+      "qHi": "'त्रिभुज' किस समास का उदाहरण है?",
+      "choices": [
+       "द्विगु",
+       "बहुव्रीहि",
+       "द्वंद्व"
+      ],
+      "answer": "द्विगु",
+      "emoji": "🔺"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Alankar (Figures of speech)",
+    "titleHi": "अलंकार",
+    "quiz": [
+     {
+      "q": "'चारु चंद्र की चंचल किरणें' — which alankar?",
+      "qHi": "'चारु चंद्र की चंचल किरणें' में कौन-सा अलंकार है?",
+      "choices": [
+       "अनुप्रास",
+       "उपमा",
+       "रूपक"
+      ],
+      "answer": "अनुप्रास",
+      "teach": "एक ही वर्ण (च) बार-बार आने से अनुप्रास अलंकार होता है।",
+      "teachHi": "एक ही वर्ण (च) बार-बार आने से अनुप्रास अलंकार होता है।"
+     },
+     {
+      "q": "'हाथी के समान चाल' — which alankar?",
+      "qHi": "'हाथी के समान चाल' में कौन-सा अलंकार है?",
+      "choices": [
+       "उपमा",
+       "अनुप्रास",
+       "यमक"
+      ],
+      "answer": "उपमा",
+      "emoji": "🐘"
+     },
+     {
+      "q": "In उपमा, two things are...",
+      "qHi": "उपमा अलंकार में दो वस्तुओं की...",
+      "choices": [
+       "compared / तुलना होती है",
+       "counted / गिनती होती है",
+       "hidden / छिपाई जाती हैं"
+      ],
+      "answer": "compared / तुलना होती है"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Ras (Emotions in poetry)",
+    "titleHi": "रस",
+    "quiz": [
+     {
+      "q": "Descriptions of bravery create which ras?",
+      "qHi": "वीरता के वर्णन से कौन-सा रस उत्पन्न होता है?",
+      "choices": [
+       "वीर रस",
+       "श्रृंगार रस",
+       "हास्य रस"
+      ],
+      "answer": "वीर रस",
+      "emoji": "⚔️",
+      "teach": "युद्ध और वीरता के वर्णन में वीर रस होता है।",
+      "teachHi": "युद्ध और वीरता के वर्णन में वीर रस होता है।"
+     },
+     {
+      "q": "Jokes and laughter create which ras?",
+      "qHi": "हँसी-मज़ाक से कौन-सा रस उत्पन्न होता है?",
+      "choices": [
+       "हास्य रस",
+       "करुण रस",
+       "वीर रस"
+      ],
+      "answer": "हास्य रस",
+      "emoji": "😄"
+     },
+     {
+      "q": "Love and beauty are described in which ras?",
+      "qHi": "प्रेम और सौंदर्य का वर्णन किस रस में होता है?",
+      "choices": [
+       "श्रृंगार रस",
+       "रौद्र रस",
+       "भयानक रस"
+      ],
+      "answer": "श्रृंगार रस",
+      "emoji": "🌸"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Idioms (Muhavare)",
+    "titleHi": "मुहावरे",
+    "quiz": [
+     {
+      "q": "'नाक में दम करना' means...",
+      "qHi": "'नाक में दम करना' का अर्थ है...",
+      "choices": [
+       "to trouble a lot / बहुत परेशान करना",
+       "to sleep / सो जाना",
+       "to be happy / खुश होना"
+      ],
+      "answer": "to trouble a lot / बहुत परेशान करना",
+      "teach": "'नाक में दम करना' = किसी को बहुत परेशान करना।",
+      "teachHi": "'नाक में दम करना' = किसी को बहुत परेशान करना।"
+     },
+     {
+      "q": "'आँखों का तारा' means...",
+      "qHi": "'आँखों का तारा' का अर्थ है...",
+      "choices": [
+       "very dear / बहुत प्यारा",
+       "an eye disease / आँख का रोग",
+       "a bright star / चमकीला तारा"
+      ],
+      "answer": "very dear / बहुत प्यारा",
+      "emoji": "⭐"
+     },
+     {
+      "q": "'ईद का चाँद होना' means...",
+      "qHi": "'ईद का चाँद होना' का अर्थ है...",
+      "choices": [
+       "rarely seen / बहुत कम दिखना",
+       "to shine / चमकना",
+       "to visit daily / रोज़ आना"
+      ],
+      "answer": "rarely seen / बहुत कम दिखना",
+      "emoji": "🌙"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "Synonyms & Antonyms",
+    "titleHi": "पर्यायवाची और विलोम",
+    "quiz": [
+     {
+      "q": "A synonym (paryayvachi) of 'पानी' is...",
+      "qHi": "'पानी' का पर्यायवाची है...",
+      "choices": [
+       "जल",
+       "अग्नि",
+       "वायु"
+      ],
+      "answer": "जल",
+      "emoji": "💧",
+      "teach": "पर्यायवाची = समान अर्थ वाले शब्द; पानी = जल, नीर।",
+      "teachHi": "पर्यायवाची = समान अर्थ वाले शब्द; पानी = जल, नीर।"
+     },
+     {
+      "q": "A synonym of 'सूरज' is...",
+      "qHi": "'सूरज' का पर्यायवाची है...",
+      "choices": [
+       "रवि",
+       "चंद्र",
+       "पवन"
+      ],
+      "answer": "रवि",
+      "emoji": "☀️"
+     },
+     {
+      "q": "The antonym (vilom) of 'सजीव' is...",
+      "qHi": "'सजीव' का विलोम है...",
+      "choices": [
+       "निर्जीव",
+       "जीवित",
+       "सचल"
+      ],
+      "answer": "निर्जीव"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Reading (Gadyansh)",
+    "titleHi": "गद्यांश",
+    "read": [
+     {
+      "title": "A Girl Who Studied",
+      "titleHi": "पढ़ने वाली लड़की",
+      "emoji": "📖",
+      "text": "Kamla lived in a small village. There was no school for girls nearby, but she walked five kilometres every day to reach one. Years later she became the first teacher of her village, and now many girls study because of her.",
+      "textHi": "कमला एक छोटे गाँव में रहती थी। पास में लड़कियों के लिए कोई स्कूल नहीं था, फिर भी वह हर दिन पाँच किलोमीटर पैदल चलकर स्कूल पहुँचती थी। वर्षों बाद वह अपने गाँव की पहली शिक्षिका बनी, और आज उसकी वजह से कई लड़कियाँ पढ़ती हैं।",
+      "q": "Why do many girls in the village study today?",
+      "qHi": "आज गाँव की कई लड़कियाँ क्यों पढ़ती हैं?",
+      "choices": [
+       "because Kamla became a teacher / क्योंकि कमला शिक्षिका बनी",
+       "because school was near / क्योंकि स्कूल पास था",
+       "because it was easy / क्योंकि यह आसान था"
+      ],
+      "answer": "because Kamla became a teacher / क्योंकि कमला शिक्षिका बनी",
+      "teach": "कमला की मेहनत ने रास्ता खोला, इसलिए अब कई लड़कियाँ पढ़ती हैं।",
+      "teachHi": "कमला की मेहनत ने रास्ता खोला, इसलिए अब कई लड़कियाँ पढ़ती हैं।"
+     },
+     {
+      "title": "The Honest Woodcutter",
+      "titleHi": "ईमानदार लकड़हारा",
+      "emoji": "🪓",
+      "text": "A woodcutter dropped his axe into a river. A water spirit offered him a golden axe, then a silver one, but he said neither was his. Pleased with his honesty, the spirit gave him all three axes.",
+      "textHi": "एक लकड़हारे की कुल्हाड़ी नदी में गिर गई। जल-देवता ने उसे सोने की, फिर चाँदी की कुल्हाड़ी दी, पर उसने कहा कि दोनों उसकी नहीं हैं। उसकी ईमानदारी से प्रसन्न होकर देवता ने उसे तीनों कुल्हाड़ियाँ दे दीं।",
+      "q": "Why did the spirit reward the woodcutter?",
+      "qHi": "देवता ने लकड़हारे को इनाम क्यों दिया?",
+      "choices": [
+       "for his honesty / उसकी ईमानदारी के लिए",
+       "for being rich / अमीर होने के लिए",
+       "for being strong / ताकतवर होने के लिए"
+      ],
+      "answer": "for his honesty / उसकी ईमानदारी के लिए",
+      "teach": "ईमानदारी का फल मीठा होता है — यही कहानी का संदेश है।",
+      "teachHi": "ईमानदारी का फल मीठा होता है — यही कहानी का संदेश है।"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "Correct the Sentence",
+    "titleHi": "वाक्य शुद्धि",
+    "quiz": [
+     {
+      "q": "Which sentence is correct?",
+      "qHi": "कौन-सा वाक्य शुद्ध है?",
+      "choices": [
+       "वह अच्छा गाती है।",
+       "वह अच्छे गाती है।",
+       "वह अच्छी गाती है।"
+      ],
+      "answer": "वह अच्छा गाती है।",
+      "teach": "क्रिया की विशेषता बताते समय 'अच्छा' (क्रिया-विशेषण) आता है।",
+      "teachHi": "क्रिया की विशेषता बताते समय 'अच्छा' (क्रिया-विशेषण) आता है।"
+     },
+     {
+      "q": "Which is the correct spelling?",
+      "qHi": "शुद्ध वर्तनी कौन-सी है?",
+      "choices": [
+       "परीक्षा",
+       "परिक्षा",
+       "परिखा"
+      ],
+      "answer": "परीक्षा",
+      "emoji": "📝"
+     }
+    ],
+    "fix": [
+     {
+      "sentence": "मैं अपने आँखों से सपने देखता हूँ।",
+      "wrongWord": "अपने",
+      "fix": "अपनी",
+      "teach": "'आँखें' is feminine, so use 'अपनी'.",
+      "teachHi": "'आँखें' स्त्रीलिंग है, इसलिए 'अपनी' आएगा।"
+     },
+     {
+      "sentence": "वह बहुत अच्छे चित्र बनाती है।",
+      "wrongWord": "अच्छे",
+      "fix": "अच्छा",
+      "teach": "As an adverb of manner here, use 'अच्छा'.",
+      "teachHi": "यहाँ क्रिया-विशेषण के रूप में 'अच्छा' आएगा।"
+     },
+     {
+      "sentence": "उसने अपना पूरा काम समय पर कर लिया हैं।",
+      "wrongWord": "हैं।",
+      "fix": "है।",
+      "teach": "The subject is singular, so use 'है'.",
+      "teachHi": "कर्ता एकवचन है, इसलिए 'है' आएगा, 'हैं' नहीं।"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "key": "sst-secondary",
+  "title": "Social Science",
+  "titleHi": "सामाजिक विज्ञान",
+  "icon": "🗺️",
+  "color": "#d97706",
+  "blurb": "History, geography, civics & economics",
+  "blurbHi": "इतिहास, भूगोल, नागरिक शास्त्र और अर्थशास्त्र",
+  "published": true,
+  "band": "9-10",
+  "subject": "sst",
+  "lessons": [
+   {
+    "key": "l01",
+    "title": "Nationalism in India",
+    "titleHi": "भारत में राष्ट्रवाद",
+    "words": [
+     {
+      "en": "nation",
+      "hi": "राष्ट्र",
+      "pron": "नेशन",
+      "emoji": "🇮🇳",
+      "type": "thing",
+      "plural": "nations"
+     },
+     {
+      "en": "movement",
+      "hi": "आंदोलन",
+      "pron": "मूवमेंट",
+      "emoji": "✊",
+      "type": "thing",
+      "plural": "movements"
+     },
+     {
+      "en": "boycott",
+      "hi": "बहिष्कार",
+      "pron": "बॉयकॉट",
+      "emoji": "🚫",
+      "type": "thing",
+      "plural": "boycotts"
+     },
+     {
+      "en": "independence",
+      "hi": "स्वतंत्रता",
+      "pron": "इंडिपेंडेंस",
+      "emoji": "🕊️",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Who started the Non-Cooperation Movement (1920)?",
+      "qHi": "असहयोग आंदोलन (1920) किसने शुरू किया?",
+      "choices": [
+       "Mahatma Gandhi",
+       "Bhagat Singh",
+       "Tipu Sultan"
+      ],
+      "answer": "Mahatma Gandhi",
+      "emoji": "🕊️",
+      "teach": "Gandhiji began the Non-Cooperation Movement in 1920.",
+      "teachHi": "गांधीजी ने 1920 में असहयोग आंदोलन शुरू किया।"
+     },
+     {
+      "q": "The Salt March (1930) was a protest against the tax on...",
+      "qHi": "नमक सत्याग्रह (1930) किस पर लगे कर का विरोध था?",
+      "choices": [
+       "salt",
+       "cloth",
+       "books"
+      ],
+      "answer": "salt",
+      "emoji": "🧂"
+     },
+     {
+      "q": "'Swadeshi' means using goods made in...",
+      "qHi": "'स्वदेशी' का अर्थ है वस्तुएँ बनी हुई...",
+      "choices": [
+       "our own country",
+       "England",
+       "any country"
+      ],
+      "answer": "our own country",
+      "emoji": "🪡"
+     }
+    ],
+    "read": [
+     {
+      "title": "The Salt March",
+      "titleHi": "नमक यात्रा",
+      "emoji": "🧂",
+      "text": "In 1930 the British taxed even salt, which every poor family needed. Gandhi walked 240 miles to the sea at Dandi and made salt from sea water, breaking the unjust law. Thousands joined him across India.",
+      "textHi": "1930 में अंग्रेज़ों ने नमक पर भी कर लगा दिया, जिसकी हर गरीब परिवार को ज़रूरत थी। गांधी 240 मील पैदल चलकर दांडी के समुद्र तट तक गए और समुद्र के पानी से नमक बनाकर उस अन्यायी कानून को तोड़ा। पूरे भारत में हज़ारों लोग उनके साथ जुड़ गए।",
+      "q": "Why was the Salt March important?",
+      "qHi": "नमक यात्रा क्यों महत्वपूर्ण थी?",
+      "choices": [
+       "it broke an unjust law peacefully / अन्यायी कानून को शांति से तोड़ा",
+       "it started a war / युद्ध शुरू किया",
+       "it raised the salt tax / नमक कर बढ़ाया"
+      ],
+      "answer": "it broke an unjust law peacefully / अन्यायी कानून को शांति से तोड़ा",
+      "teach": "Ordinary people breaking an unjust law peacefully shook British rule.",
+      "teachHi": "आम लोगों द्वारा अन्यायी कानून को शांति से तोड़ना अंग्रेज़ी शासन को हिला गया।"
+     }
+    ]
+   },
+   {
+    "key": "l02",
+    "title": "The French Revolution",
+    "titleHi": "फ़्रांसीसी क्रांति",
+    "words": [
+     {
+      "en": "revolution",
+      "hi": "क्रांति",
+      "pron": "रेवोल्यूशन",
+      "emoji": "🔥",
+      "type": "thing",
+      "plural": "revolutions"
+     },
+     {
+      "en": "liberty",
+      "hi": "स्वतंत्रता",
+      "pron": "लिबर्टी",
+      "emoji": "🗽",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "equality",
+      "hi": "समानता",
+      "pron": "इक्वैलिटी",
+      "emoji": "⚖️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "citizen",
+      "hi": "नागरिक",
+      "pron": "सिटिज़न",
+      "emoji": "🧑",
+      "type": "thing",
+      "plural": "citizens"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "The French Revolution began in which year?",
+      "qHi": "फ़्रांसीसी क्रांति किस वर्ष शुरू हुई?",
+      "choices": [
+       "1789",
+       "1857",
+       "1947"
+      ],
+      "answer": "1789",
+      "emoji": "🔥",
+      "teach": "The French Revolution began in 1789.",
+      "teachHi": "फ़्रांसीसी क्रांति 1789 में शुरू हुई।"
+     },
+     {
+      "q": "What were the three ideals of the Revolution?",
+      "qHi": "क्रांति के तीन आदर्श क्या थे?",
+      "choices": [
+       "Liberty, Equality, Fraternity",
+       "Gold, Land, Power",
+       "Army, Navy, King"
+      ],
+      "answer": "Liberty, Equality, Fraternity",
+      "emoji": "⚖️"
+     },
+     {
+      "q": "Before the revolution, who paid most of the taxes?",
+      "qHi": "क्रांति से पहले अधिकांश कर कौन चुकाता था?",
+      "choices": [
+       "the common people",
+       "the king",
+       "the nobles"
+      ],
+      "answer": "the common people",
+      "emoji": "💰"
+     }
+    ]
+   },
+   {
+    "key": "l03",
+    "title": "Resources & Development",
+    "titleHi": "संसाधन और विकास",
+    "words": [
+     {
+      "en": "resource",
+      "hi": "संसाधन",
+      "pron": "रिसोर्स",
+      "emoji": "🛢️",
+      "type": "thing",
+      "plural": "resources"
+     },
+     {
+      "en": "renewable",
+      "hi": "नवीकरणीय",
+      "pron": "रिन्यूएबल",
+      "emoji": "♻️",
+      "type": "describe"
+     },
+     {
+      "en": "mineral",
+      "hi": "खनिज",
+      "pron": "मिनरल",
+      "emoji": "⛏️",
+      "type": "thing",
+      "plural": "minerals"
+     },
+     {
+      "en": "soil",
+      "hi": "मिट्टी",
+      "pron": "सॉइल",
+      "emoji": "🟤",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Which of these is a renewable resource?",
+      "qHi": "इनमें से कौन नवीकरणीय संसाधन है?",
+      "choices": [
+       "sunlight",
+       "coal",
+       "petroleum"
+      ],
+      "answer": "sunlight",
+      "emoji": "☀️",
+      "teach": "Sunlight and wind are renewable — they do not run out.",
+      "teachHi": "सूर्य का प्रकाश और हवा नवीकरणीय हैं — ये समाप्त नहीं होते।"
+     },
+     {
+      "q": "Which is a non-renewable resource?",
+      "qHi": "इनमें से कौन अनवीकरणीय संसाधन है?",
+      "choices": [
+       "coal",
+       "wind",
+       "water"
+      ],
+      "answer": "coal",
+      "emoji": "⛏️"
+     },
+     {
+      "q": "Why should we conserve resources?",
+      "qHi": "हमें संसाधनों का संरक्षण क्यों करना चाहिए?",
+      "choices": [
+       "for future generations",
+       "to waste them",
+       "to hide them"
+      ],
+      "answer": "for future generations",
+      "emoji": "♻️"
+     }
+    ]
+   },
+   {
+    "key": "l04",
+    "title": "Agriculture in India",
+    "titleHi": "भारत में कृषि",
+    "words": [
+     {
+      "en": "crop",
+      "hi": "फ़सल",
+      "pron": "क्रॉप",
+      "emoji": "🌾",
+      "type": "thing",
+      "plural": "crops"
+     },
+     {
+      "en": "harvest",
+      "hi": "कटाई",
+      "pron": "हार्वेस्ट",
+      "emoji": "🚜",
+      "type": "thing",
+      "plural": "harvests"
+     },
+     {
+      "en": "irrigation",
+      "hi": "सिंचाई",
+      "pron": "इरिगेशन",
+      "emoji": "💦",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "farmer",
+      "hi": "किसान",
+      "pron": "फ़ार्मर",
+      "emoji": "👨‍🌾",
+      "type": "thing",
+      "plural": "farmers"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Rice and wheat are examples of...",
+      "qHi": "चावल और गेहूँ किसके उदाहरण हैं?",
+      "choices": [
+       "food crops",
+       "minerals",
+       "machines"
+      ],
+      "answer": "food crops",
+      "emoji": "🌾",
+      "teach": "Rice, wheat and maize are important food crops.",
+      "teachHi": "चावल, गेहूँ और मक्का महत्वपूर्ण खाद्य फ़सलें हैं।"
+     },
+     {
+      "q": "Kharif crops are sown in which season?",
+      "qHi": "खरीफ़ फ़सलें किस मौसम में बोई जाती हैं?",
+      "choices": [
+       "the monsoon",
+       "winter",
+       "summer only"
+      ],
+      "answer": "the monsoon",
+      "emoji": "🌧️"
+     },
+     {
+      "q": "Supplying water to crops is called...",
+      "qHi": "फ़सलों को पानी देना कहलाता है...",
+      "choices": [
+       "irrigation",
+       "harvesting",
+       "sowing"
+      ],
+      "answer": "irrigation",
+      "emoji": "💦"
+     }
+    ]
+   },
+   {
+    "key": "l05",
+    "title": "Democracy & Elections",
+    "titleHi": "लोकतंत्र और चुनाव",
+    "words": [
+     {
+      "en": "democracy",
+      "hi": "लोकतंत्र",
+      "pron": "डेमोक्रेसी",
+      "emoji": "🗳️",
+      "type": "thing",
+      "plural": "democracies"
+     },
+     {
+      "en": "candidate",
+      "hi": "उम्मीदवार",
+      "pron": "कैंडिडेट",
+      "emoji": "🧑‍💼",
+      "type": "thing",
+      "plural": "candidates"
+     },
+     {
+      "en": "majority",
+      "hi": "बहुमत",
+      "pron": "मेजॉरिटी",
+      "emoji": "✅",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "parliament",
+      "hi": "संसद",
+      "pron": "पार्लियामेंट",
+      "emoji": "🏛️",
+      "type": "thing",
+      "plural": "parliaments"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "In a democracy, power finally lies with the...",
+      "qHi": "लोकतंत्र में अंतिम शक्ति किसके पास होती है?",
+      "choices": [
+       "people",
+       "army",
+       "one leader"
+      ],
+      "answer": "people",
+      "emoji": "🗳️",
+      "teach": "In a democracy, the people hold the final power through voting.",
+      "teachHi": "लोकतंत्र में अंतिम शक्ति मतदान के ज़रिए जनता के पास होती है।"
+     },
+     {
+      "q": "How often are general elections held in India?",
+      "qHi": "भारत में आम चुनाव कितने वर्षों में होते हैं?",
+      "choices": [
+       "every 5 years",
+       "every year",
+       "every 10 years"
+      ],
+      "answer": "every 5 years",
+      "emoji": "📅"
+     },
+     {
+      "q": "Who conducts elections in India?",
+      "qHi": "भारत में चुनाव कौन कराता है?",
+      "choices": [
+       "the Election Commission",
+       "the army",
+       "one party"
+      ],
+      "answer": "the Election Commission",
+      "emoji": "🗳️"
+     }
+    ]
+   },
+   {
+    "key": "l06",
+    "title": "The Indian Constitution",
+    "titleHi": "भारतीय संविधान",
+    "words": [
+     {
+      "en": "constitution",
+      "hi": "संविधान",
+      "pron": "कॉन्स्टिट्यूशन",
+      "emoji": "📜",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "fundamental right",
+      "hi": "मौलिक अधिकार",
+      "pron": "फ़ंडामेंटल राइट",
+      "emoji": "✋",
+      "type": "thing",
+      "plural": "fundamental rights"
+     },
+     {
+      "en": "justice",
+      "hi": "न्याय",
+      "pron": "जस्टिस",
+      "emoji": "⚖️",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "secular",
+      "hi": "पंथनिरपेक्ष",
+      "pron": "सेक्युलर",
+      "emoji": "🕊️",
+      "type": "describe"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Who is called the chief architect of the Indian Constitution?",
+      "qHi": "भारतीय संविधान का प्रमुख निर्माता किसे कहा जाता है?",
+      "choices": [
+       "Dr. B. R. Ambedkar",
+       "Akbar",
+       "Vasco da Gama"
+      ],
+      "answer": "Dr. B. R. Ambedkar",
+      "emoji": "📜",
+      "teach": "Dr. B. R. Ambedkar chaired the drafting committee of the Constitution.",
+      "teachHi": "डॉ. भीमराव अंबेडकर संविधान की प्रारूप समिति के अध्यक्ष थे।"
+     },
+     {
+      "q": "India being 'secular' means the state...",
+      "qHi": "भारत का 'पंथनिरपेक्ष' होना अर्थात राज्य...",
+      "choices": [
+       "treats all religions equally",
+       "has one religion",
+       "bans religion"
+      ],
+      "answer": "treats all religions equally",
+      "emoji": "🕊️"
+     },
+     {
+      "q": "The Constitution of India came into force in...",
+      "qHi": "भारत का संविधान लागू हुआ...",
+      "choices": [
+       "1950",
+       "1947",
+       "1930"
+      ],
+      "answer": "1950",
+      "emoji": "📅"
+     }
+    ]
+   },
+   {
+    "key": "l07",
+    "title": "Money & Credit",
+    "titleHi": "मुद्रा और साख",
+    "words": [
+     {
+      "en": "currency",
+      "hi": "मुद्रा",
+      "pron": "करेंसी",
+      "emoji": "💵",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "loan",
+      "hi": "ऋण",
+      "pron": "लोन",
+      "emoji": "🏦",
+      "type": "thing",
+      "plural": "loans"
+     },
+     {
+      "en": "interest",
+      "hi": "ब्याज",
+      "pron": "इंटरेस्ट",
+      "emoji": "📈",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "savings",
+      "hi": "बचत",
+      "pron": "सेविंग्स",
+      "emoji": "🐷",
+      "type": "thing",
+      "uncount": true
+     }
+    ],
+    "quiz": [
+     {
+      "q": "What do banks do with the money people deposit?",
+      "qHi": "लोग जो पैसा जमा करते हैं, बैंक उसका क्या करते हैं?",
+      "choices": [
+       "lend it to others as loans",
+       "burn it",
+       "throw it away"
+      ],
+      "answer": "lend it to others as loans",
+      "emoji": "🏦",
+      "teach": "Banks accept deposits and lend that money to others as loans.",
+      "teachHi": "बैंक जमा स्वीकार करते हैं और वही पैसा दूसरों को ऋण के रूप में देते हैं।"
+     },
+     {
+      "q": "Extra money paid for using a loan is called...",
+      "qHi": "ऋण के उपयोग के बदले चुकाया गया अतिरिक्त धन कहलाता है...",
+      "choices": [
+       "interest",
+       "savings",
+       "salary"
+      ],
+      "answer": "interest",
+      "emoji": "📈"
+     },
+     {
+      "q": "A Self-Help Group helps village women mainly to...",
+      "qHi": "स्वयं सहायता समूह गाँव की महिलाओं की मुख्यतः किसमें मदद करता है?",
+      "choices": [
+       "save and borrow together",
+       "buy gold only",
+       "avoid banks"
+      ],
+      "answer": "save and borrow together",
+      "emoji": "👩‍👩‍👧"
+     }
+    ],
+    "read": [
+     {
+      "title": "A Small Loan, A Big Change",
+      "titleHi": "छोटा ऋण, बड़ा बदलाव",
+      "emoji": "🏦",
+      "text": "Ten women in a village formed a Self-Help Group. Each saved ten rupees a week. Soon the group had enough to give Sunita a small loan to buy a sewing machine. She started stitching clothes and repaid the loan easily.",
+      "textHi": "एक गाँव की दस महिलाओं ने एक स्वयं सहायता समूह बनाया। हर एक ने हफ़्ते में दस रुपये बचाए। जल्द ही समूह के पास इतना पैसा हो गया कि सुनीता को सिलाई मशीन खरीदने के लिए छोटा ऋण दिया जा सके। उसने कपड़े सिलना शुरू किया और आसानी से ऋण चुका दिया।",
+      "q": "How did the group help Sunita?",
+      "qHi": "समूह ने सुनीता की मदद कैसे की?",
+      "choices": [
+       "a small loan to start work / काम शुरू करने के लिए छोटा ऋण",
+       "a free house / मुफ़्त घर",
+       "a government job / सरकारी नौकरी"
+      ],
+      "answer": "a small loan to start work / काम शुरू करने के लिए छोटा ऋण",
+      "teach": "Small savings pooled together can fund a loan that changes a life.",
+      "teachHi": "छोटी-छोटी बचत मिलकर ऐसा ऋण बन सकती है जो ज़िंदगी बदल दे।"
+     }
+    ]
+   },
+   {
+    "key": "l08",
+    "title": "Globalisation",
+    "titleHi": "वैश्वीकरण",
+    "words": [
+     {
+      "en": "globalisation",
+      "hi": "वैश्वीकरण",
+      "pron": "ग्लोबलाइज़ेशन",
+      "emoji": "🌐",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "trade",
+      "hi": "व्यापार",
+      "pron": "ट्रेड",
+      "emoji": "🚢",
+      "type": "thing",
+      "uncount": true
+     },
+     {
+      "en": "export",
+      "hi": "निर्यात",
+      "pron": "एक्सपोर्ट",
+      "emoji": "📦",
+      "type": "thing",
+      "plural": "exports"
+     },
+     {
+      "en": "import",
+      "hi": "आयात",
+      "pron": "इंपोर्ट",
+      "emoji": "🛳️",
+      "type": "thing",
+      "plural": "imports"
+     }
+    ],
+    "quiz": [
+     {
+      "q": "Globalisation means countries becoming more...",
+      "qHi": "वैश्वीकरण का अर्थ है देशों का आपस में अधिक...",
+      "choices": [
+       "connected",
+       "separated",
+       "hidden"
+      ],
+      "answer": "connected",
+      "emoji": "🌐",
+      "teach": "Globalisation links countries through trade, travel and technology.",
+      "teachHi": "वैश्वीकरण देशों को व्यापार, यात्रा और तकनीक से जोड़ता है।"
+     },
+     {
+      "q": "Selling goods to another country is called...",
+      "qHi": "दूसरे देश को वस्तुएँ बेचना कहलाता है...",
+      "choices": [
+       "export",
+       "import",
+       "saving"
+      ],
+      "answer": "export",
+      "emoji": "📦"
+     },
+     {
+      "q": "Buying goods from another country is called...",
+      "qHi": "दूसरे देश से वस्तुएँ खरीदना कहलाता है...",
+      "choices": [
+       "import",
+       "export",
+       "trade fair"
+      ],
+      "answer": "import",
+      "emoji": "🛳️"
+     }
+    ]
+   }
+  ]
  }
 ]
