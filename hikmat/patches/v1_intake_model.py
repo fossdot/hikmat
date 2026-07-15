@@ -18,7 +18,14 @@ def execute():
         frappe.get_doc({"doctype": "Campus", "campus_name": "Noor Girls High School",
                         "location": "Meghwal Mathia", "active": 1}).insert(ignore_permissions=True)
 
-    # First start-date intake batch.
+    # First start-date intake batch. Cohort.start_date is a Link → Cohort Start Date
+    # (that dropdown arrives in v3). On a clean migration every patch runs in one pass
+    # against the *current* schema, so the linked row must exist before the Cohort that
+    # references it — seed it here idempotently (v3 re-checks and skips it).
+    if frappe.db.exists("DocType", "Cohort Start Date") \
+            and not frappe.db.exists("Cohort Start Date", "2026-08-01"):
+        frappe.get_doc({"doctype": "Cohort Start Date",
+                        "start_date": "2026-08-01"}).insert(ignore_permissions=True)
     if not frappe.db.exists("Cohort", "Aug 2026"):
         frappe.get_doc({"doctype": "Cohort", "cohort_name": "Aug 2026",
                         "start_date": "2026-08-01"}).insert(ignore_permissions=True)
