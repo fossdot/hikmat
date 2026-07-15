@@ -988,6 +988,8 @@ def seed_content():
         s.tagline_en = "Learn English by playing"
         s.tagline_hi = "खेल-खेल में अंग्रेज़ी सीखो"
         s.default_language = "en"
+        s.default_sound = 1               # sound on by default (the field default; set it explicitly
+                                          # so a doc created before the field existed still gets it)
         s.save(ignore_permissions=1)
 
     frappe.db.commit()
