@@ -431,6 +431,37 @@
   .bubble.me { background:var(--grape); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
   .bubble small { display:block; opacity:.7; font-size:12px; margin-top:4px; font-weight:600;}
 
+  /* DIALECT CAPTURE — record your own boli, then write it down */
+  .capbox { text-align:center; max-width:520px; margin:6px auto 14px; }
+  .capprompt { font-size:24px; font-weight:900; line-height:1.55; color:var(--ink); }
+  .capgloss { color:var(--muted); font-size:15px; font-weight:700; margin-top:6px; }
+  .capbtn { display:inline-flex; align-items:center; justify-content:center; gap:10px; margin-top:14px;
+    min-width:200px; min-height:64px; padding:14px 30px; border:0; border-radius:999px; cursor:pointer;   /* ≥48px touch target */
+    font-size:19px; font-weight:900; color:#fff; background:linear-gradient(135deg,#ffa24d,var(--primary));
+    box-shadow:var(--shadow-primary); transition:transform .06s, box-shadow .06s; }
+  .capbtn:active { transform:translateY(3px); }
+  .capbtn.stop { background:var(--bad-d); box-shadow:var(--shadow-sm); }   /* #ba1a1a — AA 4.5:1+ with white text */
+  .caprec { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:6px 14px; border-radius:999px;
+    background:#fff0f0; border:2px solid var(--bad); color:var(--bad-d); font-weight:900; font-size:15px; }  /* --bad-d on #fff0f0 — AA */
+  [data-theme="dark"] .caprec { background:#3a1f24; border-color:var(--bad); color:#ffb4ab; }
+  .capdot { width:12px; height:12px; border-radius:50%; background:var(--bad-d); animation:capblink 1.1s ease-in-out infinite; }
+  [data-theme="dark"] .capdot { background:#ffb4ab; }
+  @keyframes capblink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  @media (prefers-reduced-motion:reduce){ .capdot{ animation:none; } }
+  .captimer { font-size:36px; font-weight:900; font-variant-numeric:tabular-nums; color:var(--ink); margin-top:10px; }
+  .capaudio { display:block; width:100%; max-width:420px; margin:12px auto; }
+  .captext { display:block; width:100%; max-width:520px; margin:6px auto; min-height:96px; font-size:18px; line-height:1.7;
+    padding:12px 14px; border:2px solid var(--line); border-radius:14px; background:var(--card); color:var(--ink);
+    font-family:inherit; resize:vertical; }
+  .cappending { display:inline-flex; align-items:center; gap:6px; margin:8px auto 0; background:#fff7e6; color:#5b4a1a;
+    border:1px solid #ffd86b; border-radius:999px; padding:5px 13px; font-weight:800; font-size:13px; }   /* #5b4a1a on #fff7e6 — AA */
+  .cappending[hidden] { display:none; }   /* author display would otherwise defeat the hidden attribute */
+  [data-theme="dark"] .cappending { background:#3a3316; border-color:#7a6a3a; color:#ffd86b; }
+  .dialectnote { color:var(--muted); font-size:12.5px; font-weight:600; margin:10px 2px 0; line-height:1.5; }
+  .linkbtn { background:none; border:0; padding:0; font:inherit; font-weight:800; color:var(--primary-d);
+    cursor:pointer; text-decoration:underline; }
+  [data-theme="dark"] .linkbtn { color:#ffb474; }
+
   /* MASCOT — Roshni, the guide */
   .mascotrow { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
   .mascot { width:96px; flex:0 0 auto; transform-origin:center bottom; animation: float 3s ease-in-out infinite; }
@@ -710,6 +741,10 @@ let COURSES = [
           { who:"🧑‍🦱", line:"Do you want anything else?", lineHi:"क्या आपको और कुछ चाहिए?",
             replies:[ {text:"No, that is all. Thank you.", ok:true}, {text:"I am hungry now.", ok:false}, {text:"It is raining.", ok:false} ],
             then:"Okay! Have a nice day." },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में कहो — बाज़ार में तुम क्या-क्या खरीदती हो?", en:"What do you buy at the market?", category:"market_money", tier:3 },
+          { key:"cap2", hi:"अपनी बोली में बताओ — तुम्हें कौन-सा फल सबसे अच्छा लगता है, और क्यों?", en:"Which fruit do you like best, and why?", category:"market_money", tier:4 },
         ] },
       { key:"veg", title:"Veg & Staples", titleHi:"सब्ज़ी और अनाज",
         words:[
@@ -748,6 +783,9 @@ let COURSES = [
           { who:"👩", line:"Please close the door.", lineHi:"कृपया दरवाज़ा बंद करो।",
             replies:[ {text:"Okay, I will close it.", ok:true}, {text:"I want two apples.", ok:false}, {text:"It is raining.", ok:false} ],
             then:"Thank you!" },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में बताओ — सुबह उठकर घर में सबसे पहले क्या करती हो?", en:"What do you do first at home in the morning?", category:"home_family", tier:4 },
         ] },
     ]
   },
@@ -770,6 +808,10 @@ let COURSES = [
           { who:"👩‍🏫", line:"Open your book, please.", lineHi:"अपनी किताब खोलो।",
             replies:[ {text:"Yes, teacher.", ok:true}, {text:"Goodbye!", ok:false}, {text:"I am hungry.", ok:false} ],
             then:"Let us begin." },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में कहो — स्कूल में तुम्हें क्या सबसे अच्छा लगता है?", en:"What do you like best at school?", category:"school_learning", tier:3 },
+          { key:"cap2", hi:"अपनी बोली में बताओ — तुम्हारी सबसे अच्छी सहेली कौन है?", en:"Who is your best friend?", category:"feelings", tier:2 },
         ] },
     ]
   },
@@ -1055,6 +1097,7 @@ const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
 const READ_LEVEL  = { id:"read",  name:"Read & Answer",     nameHi:"पढ़ो और बताओ",  sub:"Read, then answer", subHi:"पढ़ो, फिर उत्तर दो", ico:"📃", type:"read" };
 const REPLY_LEVEL = { id:"reply", name:"Reply to the Email", nameHi:"ईमेल का जवाब दो", sub:"Read it, then reply", subHi:"पढ़ो, फिर जवाब दो", ico:"📨", type:"reply" };
+const CAPTURE_LEVEL = { id:"capture", name:"Speak & Write", nameHi:"बोलो और लिखो", sub:"Record your boli", subHi:"अपनी बोली रिकॉर्ड करो", ico:"🎤", type:"capture" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
@@ -1068,6 +1111,7 @@ function levelsFor(lesson){
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
   if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
   if(lesson && lesson.reply && lesson.reply.length) lv = lv.concat([REPLY_LEVEL]);
+  if(lesson && lesson.capture && lesson.capture.length) lv = lv.concat([CAPTURE_LEVEL]);   // always LAST — capture ends the lesson
   return lv;
 }
 
@@ -2214,6 +2258,7 @@ function startLevel(course, lesson, lv, back){
     if(lv.type==="email")  return roundEmail(r);
     if(lv.type==="read")   return roundRead(r);
     if(lv.type==="reply")  return roundReply(r);
+    if(lv.type==="capture") return roundCapture(r);
   }
 
   // --- LEARN: flashcard, see + hear + Hindi, then "Got it"
@@ -2693,6 +2738,191 @@ function startLevel(course, lesson, lv, back){
     };
   }
 
+  // --- CAPTURE: speak the prompt in your own boli, record it, then write what you said.
+  // ready → recording (MM:SS timer, auto-stop at 3 min) → review (play back + re-record +
+  // transcription) → save (upload now, or buffer in the IndexedDB outbox and sync later).
+  // Guests get the full practice flow but nothing is stored. Mic failure never bricks the
+  // lesson: Retry + Skip are always offered.
+  function roundCapture(r){
+    const CAP_MAX_SECS = 180;
+    let capBlob = null, capClientId = null, capTick = null, capSecs = 0, recStart = 0, stopping = false, myGen = 0;
+    function mmss(s){ const m = Math.floor(s/60), x = s%60; return (m<10?"0":"")+m+":"+(x<10?"0":"")+x; }
+    function promptBox(noSay){
+      return `<div class="capbox">
+        <div class="capprompt" lang="hi">${esc(r.hi)}</div>
+        ${r.en ? `<div class="capgloss">${esc(r.en)}</div>` : ""}
+        ${noSay ? "" : `<div style="margin-top:10px"><button class="speakbtn" id="capSay">🔊 ${tx("Hear it","सुनो")}</button></div>`}
+      </div>`;
+    }
+    function wireSay(){ const b = document.getElementById("capSay"); if(b) b.onclick = () => speak(r.hi, "hi"); }
+    function pendingChip(){ return `<div class="center"><div class="cappending" id="capPending" hidden></div></div>`; }
+    function showPending(){   // "⏳ N recordings waiting to upload" — only when the outbox has clips
+      capOutboxCount().then(n => {
+        const p = document.getElementById("capPending");
+        if(p && n > 0){ p.hidden = false; p.textContent = "⏳ " + tx(n + (n>1 ? " recordings" : " recording") + " waiting to upload", n + " रिकॉर्डिंग अपलोड बाकी"); }
+      });
+    }
+    // NOTE: roshniBusy is reset by whichever path releases the mic (finishRecording, the tick
+    // abort, or the startRec catch) — never here, so a genuine Roshni turn isn't clobbered.
+    function cleanup(){ if(capTick){ clearInterval(capTick); capTick = null; } }
+    function leave(ok){ cleanup(); capURL(null); next(ok); }   // release the playback objectURL when the round ends
+
+    function showReady(){
+      mount(`${head(tx("🎤 Speak in your boli","🎤 अपनी बोली में बोलो"), tx("Press record and answer out loud","रिकॉर्ड दबाओ और बोलकर जवाब दो"), "अपनी बोली में बोलकर जवाब दो।")}
+        ${promptBox()}
+        <div class="capbox"><button class="capbtn" id="capRec">⏺ ${tx("Record","रिकॉर्ड करो")}</button></div>
+        ${pendingChip()}
+        <div class="feedback" id="fb"></div>`);
+      setFooter("");
+      // keep each slot in its own script: the Devanagari prompt goes only in the hi slot, so the
+      // 🔊 button never reads Devanagari with an English voice. The prompt is also spoken in 'hi'
+      // via the announce()/speak() below regardless of UI language.
+      setNarration(tx("Speak in your own boli.","अपनी बोली में बोलो।"), "अपनी बोली में बोलो। " + r.hi);
+      wireSay(); showPending();
+      if(idx===0) announce(() => speak(r.hi, "hi"));
+      else speak(r.hi, "hi", { queue:true, gap:2000 });
+      $("#capRec").onclick = startRecording;
+    }
+
+    async function startRecording(){
+      if(roshniBusy) return;             // the shared recorder is mid-use (Roshni's mic)
+      roshniBusy = true;                 // …and block Roshni's mic while we hold it
+      stopSpeech();                      // don't let the prompt's TTS bleed into the recording
+      try { await startRec(); }
+      catch(e){ roshniBusy = false; return showMicError(); }
+      _capGen++; myGen = _capGen;
+      capSecs = 0; recStart = Date.now(); stopping = false;
+      showRecording();
+    }
+
+    function showRecording(){
+      mount(`${head(tx("🎤 Speak now!","🎤 अब बोलो!"), tx("Say your answer, then press stop","अपना जवाब बोलो, फिर रोको दबाओ"), "अब बोलो! फिर रोको दबाओ।")}
+        ${promptBox(true)}
+        <div class="capbox">
+          <div class="caprec" role="status"><span class="capdot" aria-hidden="true"></span> ${tx("Recording…","रिकॉर्डिंग हो रही है…")}</div>
+          <div class="captimer" id="capTimer">00:00</div>
+          <div><button class="capbtn stop" id="capStop">⏹ ${tx("Stop","रोको")}</button></div>
+        </div>`);
+      setFooter("");
+      const narr = tx("Recording. Say your answer, then press stop.","रिकॉर्डिंग हो रही है। अपना जवाब बोलो, फिर रोको दबाओ।");
+      // set the narration text WITHOUT auto-speaking: on a standalone/PWA build setNarration would
+      // speak it aloud a moment into the recording and that TTS would bleed into the clip. The top
+      // 🔊 button still reads it on demand via hearNarration().
+      narration = { en: narr, hi: narr };
+      srSay(tx("Recording started","रिकॉर्डिंग शुरू हो गई"));
+      $("#capStop").onclick = () => { sfx.tap(); finishRecording(); };
+      capTick = setInterval(() => {
+        const tEl = document.getElementById("capTimer");
+        if(!tEl){   // navigated away mid-recording (Back / language toggle) → release the mic
+          if(capTick){ clearInterval(capTick); capTick = null; }
+          if(_capGen === myGen){ stopRec(); roshniBusy = false; }   // only if no newer recording took over
+          return;
+        }
+        capSecs = Math.floor((Date.now() - recStart)/1000);
+        tEl.textContent = mmss(Math.min(capSecs, CAP_MAX_SECS));
+        if(capSecs >= CAP_MAX_SECS) finishRecording();   // auto-stop at 3 minutes
+      }, 250);
+    }
+
+    async function finishRecording(){
+      if(stopping) return;               // stop button + auto-stop can't double-fire
+      stopping = true;
+      if(capTick){ clearInterval(capTick); capTick = null; }
+      capSecs = Math.min(Math.max(1, Math.round((Date.now() - recStart)/1000)), CAP_MAX_SECS);
+      const blob = await stopRec();
+      roshniBusy = false;
+      srSay(tx("Recording stopped","रिकॉर्डिंग रुक गई"));
+      if(!blob || !blob.size) return showMicError();   // nothing captured → same friendly retry path
+      capBlob = blob;
+      capClientId = uid();   // one id per recording — reused across Save retries so the server dedups instead of duplicating
+      showReview();
+    }
+
+    function showReview(){
+      const url = capURL(capBlob);
+      mount(`${head(tx("✍️ Now write what you said","✍️ अब जो कहा, वही लिखो"), tx("Listen back, then write it in your boli","सुनो, फिर अपनी बोली में लिखो"), "जो कहा गया, वही लिखो।")}
+        ${promptBox()}
+        <div class="capbox">
+          <audio class="capaudio" controls src="${escAttr(url)}"></audio>
+          <label class="fieldlabel" for="capText">${tx("What you said, in your boli","जो कहा, अपनी बोली में")}</label>
+          <textarea id="capText" class="captext" lang="hi" rows="3" placeholder="${escAttr(tx("Write what was said…","जो कहा गया, वही लिखो…"))}"></textarea>
+        </div>
+        ${pendingChip()}
+        <div class="feedback" id="fb"></div>`);
+      setFooter(`<button class="btn ghost" id="capRedo">↺ ${tx("Re-record","फिर रिकॉर्ड करो")}</button>
+        <button class="btn primary" id="capSave" disabled>${tx("Save →","सेव करो →")}</button>`);
+      const narr = tx("Listen to your recording, then write what you said.","अपनी रिकॉर्डिंग सुनो, फिर जो कहा वही लिखो।");
+      setNarration(narr, narr);
+      wireSay(); showPending();
+      const ta = $("#capText"), saveBtn = $("#capSave");
+      ta.oninput = () => { saveBtn.disabled = !ta.value.trim(); };
+      $("#capRedo").onclick = () => { sfx.tap(); capBlob = null; capClientId = null; capURL(null); showReady(); };
+      saveBtn.onclick = () => { const t = ta.value.trim(); if(t) doSave(t); };
+      announce(() => speak(narr, state.lang==="hi" ? "hi" : "en"));
+    }
+
+    async function doSave(text){
+      const fb = $("#fb"), saveBtn = $("#capSave");
+      if(saveBtn) saveBtn.disabled = true;
+      if(!currentStudent){
+        // guest: full practice, nothing stored — one soft nudge that a profile keeps recordings
+        sfx.correct(); setMood("happy");
+        flashToast(tx("Nice practice! Sign in and your recordings will be saved.","बढ़िया अभ्यास! साइन इन करोगी तो रिकॉर्डिंग सेव होगी।"));
+        return leave(true);
+      }
+      if(fb){ fb.textContent = tx("Saving…","सेव हो रहा है…"); fb.className = "feedback"; }
+      let blob = capBlob, type = (capBlob && capBlob.type) || "audio/webm";
+      try { blob = await toWav16k(capBlob); type = "audio/wav"; }
+      catch(e){ blob = capBlob; type = (capBlob && capBlob.type) || "audio/webm"; }   // can't decode → send the raw recording
+      const fields = { student: currentStudent.id, token: currentStudent.token || "",
+                       track: course.key, lesson: lesson.key, prompt_key: r.key,
+                       prompt_text_hi: r.hi, transcription: text,
+                       duration_secs: capSecs, client_id: capClientId };
+      const res = await uploadCapture(fields, blob, type);
+      if(res !== "transient"){
+        // sent — or a permanent reject the server will never accept (don't trap her on it)
+        sfx.correct(); setMood("happy");
+        leave(true); syncCaptures(); return;
+      }
+      // offline / server busy → buffer in the outbox and move on
+      const n = await capOutboxCount();
+      const stored = n < CAPTURE_OUTBOX_CAP &&
+                     await capOutboxPut({ client_id: fields.client_id, blob, type, fields, created: Date.now() });
+      if(stored){
+        sfx.correct(); setMood("happy");
+        flashToast(tx("Saved — will upload when online","रिकॉर्डिंग सेव हुई — इंटरनेट आने पर भेजी जाएगी"));
+        leave(true); syncCaptures(); return;
+      }
+      // outbox full (or unusable): never drop her voice silently — explain, let her retry or skip
+      const msg = tx("No internet, and " + CAPTURE_OUTBOX_CAP + " recordings are already waiting. Try again near the internet, or skip this one.",
+                     "इंटरनेट नहीं है, और " + CAPTURE_OUTBOX_CAP + " रिकॉर्डिंग पहले से बाकी हैं। इंटरनेट के पास फिर कोशिश करो, या इसे छोड़ दो।");
+      if(fb){ fb.textContent = msg; fb.className = "feedback bad"; }
+      srSay(msg);
+      setFooter(`<button class="btn ghost" id="capSkip">${tx("Skip →","छोड़ो →")}</button>
+        <button class="btn primary" id="capRetry">${tx("Try again","फिर कोशिश करो")}</button>`);
+      $("#capSkip").onclick = () => { sfx.next(); leave(true); };
+      $("#capRetry").onclick = () => { sfx.tap(); doSave(text); };
+    }
+
+    function showMicError(){
+      cleanup();
+      mount(`${head(tx("🎤 Mic didn't start","🎤 माइक नहीं चला"), tx("Ask your teacher to allow the microphone","शिक्षक से माइक चालू करने को कहो"), "माइक नहीं चला — फिर कोशिश करो या छोड़ दो।")}
+        ${promptBox()}
+        <div class="feedback bad" id="fb">माइक शुरू नहीं हुआ — फिर कोशिश करो, या इसे छोड़ दो।<br><small>The microphone did not start — try again, or skip this one.</small></div>`);
+      setFooter(`<button class="btn ghost" id="capSkip">${tx("Skip →","छोड़ो →")}</button>
+        <button class="btn primary" id="capRetry">🎤 ${tx("Try again","फिर कोशिश करो")}</button>`);
+      const narr = tx("The microphone did not start. Try again, or skip.","माइक नहीं चला। फिर कोशिश करो, या छोड़ दो।");
+      setNarration(narr, narr);
+      srSay(narr);
+      wireSay();
+      announce(() => speak("माइक नहीं चला। फिर कोशिश करो, या छोड़ दो।", "hi"));   // Hindi-first, out loud
+      $("#capRetry").onclick = () => { sfx.tap(); startRecording(); };
+      $("#capSkip").onclick = () => { sfx.next(); leave(false); };   // never brick the lesson
+    }
+
+    showReady();
+  }
+
   // --- finish: award stars
   function finish(){
     clearAnnounce();
@@ -3107,6 +3337,7 @@ function buildRounds(lv, lesson){
   if(lv.type==="email") return (lesson.email||[]).slice();
   if(lv.type==="read") return (lesson.read||[]).slice();
   if(lv.type==="reply") return (lesson.reply||[]).slice();
+  if(lv.type==="capture") return (lesson.capture||[]).slice();
   return [];
 }
 
@@ -3544,6 +3775,102 @@ async function syncDoubts(){
 window.addEventListener("online", syncDoubts);
 
 // ============================================================
+//  DIALECT CAPTURE outbox — recorded clips are audio blobs, too big for the
+//  localStorage queues, so they buffer in IndexedDB (mirrors the ttsDB pattern)
+//  and flush with the same offline-queue contract as attempts/doubts.
+// ============================================================
+const CAPTURE_OUTBOX_CAP = 8;      // shared-laptop guard: at most 8 clips wait on-device
+let _capGen = 0;                   // recording generation — a stale timer must not stop a newer recording
+let _capObjURL = null;             // the review screen's playback URL (one live at a time)
+function capURL(blob){             // create the playback URL, revoking the previous one; capURL(null) just revokes
+  if(_capObjURL){ try { URL.revokeObjectURL(_capObjURL); } catch(e){} _capObjURL = null; }
+  if(blob) _capObjURL = URL.createObjectURL(blob);
+  return _capObjURL;
+}
+let _capDB = null;
+function capDB(){
+  return new Promise(res => {
+    if(_capDB) return res(_capDB);
+    try {
+      const rq = indexedDB.open("hikmat_capture_db", 1);
+      rq.onupgradeneeded = () => { try { rq.result.createObjectStore("outbox", { keyPath:"client_id" }); } catch(e){} };
+      rq.onsuccess = () => { _capDB = rq.result; res(_capDB); };
+      rq.onerror = () => res(null);
+    } catch(e){ res(null); }
+  });
+}
+function capOutboxPut(rec){        // rec = { client_id, blob, type, fields, created }
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(false);
+    try { const t = db.transaction("outbox","readwrite").objectStore("outbox").put(rec);
+          t.onsuccess = () => res(true); t.onerror = () => res(false); }
+    catch(e){ res(false); }
+  });
+}
+function capOutboxAll(){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res([]);
+    try { const t = db.transaction("outbox","readonly").objectStore("outbox").getAll();
+          t.onsuccess = () => res(t.result || []); t.onerror = () => res([]); }
+    catch(e){ res([]); }
+  });
+}
+function capOutboxDelete(id){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(false);
+    try { const t = db.transaction("outbox","readwrite").objectStore("outbox").delete(id);
+          t.onsuccess = () => res(true); t.onerror = () => res(false); }
+    catch(e){ res(false); }
+  });
+}
+function capOutboxCount(){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(0);
+    try { const t = db.transaction("outbox","readonly").objectStore("outbox").count();
+          t.onsuccess = () => res(t.result || 0); t.onerror = () => res(0); }
+    catch(e){ res(0); }
+  });
+}
+// POST one clip. Returns "ok" (sent/deduped) | "permanent" (server will never accept it —
+// drop) | "transient" (offline / rate-limited / server error — keep and retry later).
+async function uploadCapture(fields, blob, type){
+  try {
+    const fd = new FormData();
+    const t = String(type || "");
+    const ext = t === "audio/wav" ? ".wav" : t.indexOf("webm") >= 0 ? ".webm" :
+                t.indexOf("mp4") >= 0 ? ".m4a" : t.indexOf("mpeg") >= 0 ? ".mp3" : ".bin";
+    fd.append("audio", blob, "clip" + ext);
+    for(const k in fields) fd.append(k, fields[k]);
+    const r = await fetch(apiURL("submit_dialect_capture"), { method:"POST", headers: postHeaders(), body: fd });
+    if(!r.ok) return "transient";                                  // HTTP/network error → retry later
+    let m = null; try { m = (await r.json()).message; } catch(e){}
+    if(m && m.ok) return "ok";                                     // saved (or server-side dedup)
+    const err = m && m.error;
+    if(err === "unknown_student" || err === "bad_audio" || err === "bad_transcription") return "permanent";
+    return "transient";                                            // rate_limited / anything unrecognised → retry
+  } catch(e){ return "transient"; }                                // offline → keep for next time
+}
+let _syncingCaps = false;
+async function syncCaptures(){
+  if(_syncingCaps) return;           // serialize runs so concurrent calls can't double-upload
+  _syncingCaps = true;
+  try {
+    const items = await capOutboxAll();
+    for(const it of items){
+      // refresh the auth token for the signed-in student's OWN clips: a token renewed since the clip
+      // was buffered (e.g. after a re-login) would otherwise leave it permanently "auth"-rejected and
+      // trapped in the outbox. Guarded by student id so one girl's clip is never sent as another's.
+      if(currentStudent && it.fields && it.fields.student === currentStudent.id) it.fields.token = currentStudent.token || "";
+      const res = await uploadCapture(it.fields, it.blob, it.type);
+      if(res === "ok" || res === "permanent") await capOutboxDelete(it.client_id);
+      // transient → keep for next time
+    }
+  } catch(e){ /* best-effort: whatever remains retries on the next trigger */ }
+  finally { _syncingCaps = false; }
+}
+window.addEventListener("online", syncCaptures);
+
+// ============================================================
 //  ATTENDANCE — the device banks a logged-in student's ACTIVE screen time and
 //  flushes small deltas to the server (offline-queued, idempotent). Facilitator
 //  report only: nothing about attendance is EVER shown to a student — no timers,
@@ -3734,6 +4061,42 @@ async function mergeServerProgress(){
 
 // SIGN UP — a learner creates their own profile (name + avatar + optional PIN), then plays.
 const AVATARS = ["🙂","👧","🧒","👩","😀","🦋","🌸","🌟","🐱","🦊","🐥","🚀"];
+// Soft, plain-language note on why some lessons record her boli — opened from the
+// "Learn more →" link on the signup screens. A sheet overlay (like Roshni's), fully offline.
+function openDialectNote(){
+  if(document.getElementById("dialectNoteWrap")) return;
+  sfx.tap(); stopSpeech();
+  const opener = document.activeElement;   // restore focus here when the sheet closes
+  const noteHi = "हिकमत के कुछ पाठ आपसे आपकी अपनी बोली में बोलने और लिखने को कहते हैं। इन रिकॉर्डिंग को हम सुरक्षित रूप से सहेजते हैं और हिकमत के पाठ बेहतर बनाने के लिए इस्तेमाल करते हैं। अगर आप किसी और की आवाज़ रिकॉर्ड करें, तो पहले उनसे अनुमति ले लें।";
+  const noteEn = "Some Hikmat lessons ask you to speak and write in your own dialect. We save these recordings safely and use them to make Hikmat's lessons better. If you record someone else's voice, please ask their permission first.";
+  const sheet = el(`<div class="sheetwrap" id="dialectNoteWrap">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="${escAttr(tx("About your recordings","आपकी रिकॉर्डिंग के बारे में"))}">
+      <div class="doubthead">
+        <div class="mascot small m-happy">${mascotSVG()}</div>
+        <div class="doubttitle">
+          <div class="doubtq">${tx("About your recordings 🎤","आपकी रिकॉर्डिंग के बारे में 🎤")}</div>
+        </div>
+      </div>
+      <p style="font-size:16px; line-height:1.7; font-weight:600; margin:0 0 12px" lang="hi">${esc(noteHi)}</p>
+      <p style="font-size:14px; line-height:1.6; font-weight:600; color:var(--muted); margin:0 0 16px">${esc(noteEn)}</p>
+      <button class="btn ghost wide" id="dnBack">← ${tx("Back","वापस")}</button>
+    </div>
+  </div>`);
+  document.body.appendChild(sheet);
+  const close = () => { sfx.back(); sheet.remove(); try { opener && opener.focus(); } catch(e){} };
+  sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
+  sheet.addEventListener("keydown", e => { if(e.key === "Escape"){ e.preventDefault(); close(); } });
+  $("#dnBack").onclick = close;
+  const dnBack = $("#dnBack"); if(dnBack) dnBack.focus();   // move focus into the dialog (keyboard + screen reader)
+  srSay(tx(noteEn, noteHi));
+  speak(tx(noteEn, noteHi), state.lang==="hi" ? "hi" : "en");
+}
+// the one soft line + link shown on both signup screens
+function dialectNoteLine(id){
+  return `<div class="dialectnote">${tx("Sometimes we save recordings of your dialect to help make Hikmat better.","कभी-कभी हम आपकी बोली की रिकॉर्डिंग सहेजते हैं, ताकि हिकमत को और बेहतर बना सकें।")}
+    <button type="button" class="linkbtn" id="${escAttr(id)}">${tx("Learn more →","और जानें →")}</button></div>`;
+}
+
 function renderSignup(){
   stopSpeech(); rerender = renderSignup; root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderLogin);
@@ -3761,6 +4124,7 @@ function renderSignup(){
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="suConsent">
         <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      ${dialectNoteLine("suDialectMore")}
       <div class="feedback bad" id="suErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
@@ -3797,6 +4161,7 @@ function renderSignup(){
   setTimeout(() => name.focus(), 60);
   $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
   $("#suOnline").onclick = () => { sfx.tap(); renderOnlineSignup(); };
+  $("#suDialectMore").onclick = openDialectNote;
   $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
     const nm = name.value.trim();
@@ -3959,6 +4324,7 @@ function renderOnlineSignup(){
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="osConsent">
         <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      ${dialectNoteLine("osDialectMore")}
       <div class="feedback bad" id="osErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px"><button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button></div>
@@ -3989,6 +4355,7 @@ function renderOnlineSignup(){
   }
   setTimeout(() => code.focus(), 60);
   $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+  $("#osDialectMore").onclick = openDialectNote;
   const submit = async () => {
     const un = user.value.trim().toLowerCase();
     if(!userOK()){ err.textContent = tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -"); return; }
@@ -4290,7 +4657,7 @@ function mountRoshniFab(){
   document.body.appendChild(fab);
 }
 function openRoshni(){
-  if(!(SETTINGS.aiEnabled && currentStudent) || document.getElementById("roshniWrap")) return;
+  if(roshniBusy || !(SETTINGS.aiEnabled && currentStudent) || document.getElementById("roshniWrap")) return;   // roshniBusy: the shared recorder is mid-use (a capture recording or a Roshni turn) — don't tear it down
   sfx.tap(); stopSpeech(); setMood("happy");
   const voice = !!SETTINGS.voiceEnabled, convoId = uid();
   const sheet = el(`<div class="sheetwrap" id="roshniWrap">
@@ -4400,6 +4767,7 @@ refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 4
   syncDoubts();              // flush any doubts logged while offline
   syncEvents();              // flush any wrong-answer events queued while offline
   syncAttendance();          // flush any attendance pings queued while offline
+  syncCaptures();            // flush any dialect recordings buffered while offline
 });
 loadFromBackend().then(async ok => {
   backendLive = ok;

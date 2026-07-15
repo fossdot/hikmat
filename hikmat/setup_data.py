@@ -907,7 +907,8 @@ def seed_content():
     courses = _load_curriculum()
     seed_structure()   # bands + subjects must exist before tracks Link to them
     # clean slate (dev): remove existing curriculum docs, then recreate
-    for dt in ["Dialogue", "Lesson", "Track"]:
+    # (prompts Link to Lesson, so they go first)
+    for dt in ["Dialect Prompt", "Dialogue", "Lesson", "Track"]:
         for n in frappe.get_all(dt, pluck="name"):
             frappe.delete_doc(dt, n, force=1, ignore_permissions=1)
 
@@ -970,6 +971,14 @@ def seed_content():
                     "line": dl["line"], "line_hi": dl["lineHi"], "followup": dl["then"], "sort_order": di,
                     "replies": [{"text": r["text"], "text_hi": r.get("textHi", ""),
                                  "is_correct": 1 if r["ok"] else 0} for r in dl["replies"]],
+                }).insert(ignore_permissions=1)
+
+            for ci, cp in enumerate(les.get("capture", [])):
+                frappe.get_doc({
+                    "doctype": "Dialect Prompt", "lesson": lesson.name, "prompt_key": cp["key"],
+                    "prompt_text_hi": cp["hi"], "prompt_text_en": cp.get("en", ""),
+                    "category": cp.get("category", ""), "complexity_tier": cp.get("tier", 1),
+                    "sort_order": ci,
                 }).insert(ignore_permissions=1)
 
     # seed the single settings doc
@@ -1254,6 +1263,7 @@ def setup_workspace(cards=None, charts=None):
                  ("Attendance Summary", "Attendance Summary", "Report"),
                  ("Module Tests", "Module Test", "DocType"),
                  ("Test Attempts", "Test Attempt", "DocType"),
+                 ("Dialect Captures", "Dialect Capture", "DocType"),
                  ("AI Review Queue", "AI Review Queue", "Report"),
                  ("AI Chats", "AI Conversation", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]

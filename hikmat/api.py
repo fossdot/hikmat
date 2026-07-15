@@ -303,6 +303,15 @@ def _track_json(t, with_content):
             dialogues.append({"who": d.who or "🙂", "line": d.line, "lineHi": d.line_hi,
                               "then": d.followup, "replies": replies})
 
+        capture = []
+        for p in frappe.get_all("Dialect Prompt", filters={"lesson": l.name},
+                                fields=["prompt_key", "prompt_text_hi", "prompt_text_en",
+                                        "category", "complexity_tier"],
+                                order_by="sort_order asc, creation asc"):
+            capture.append({"key": p.prompt_key, "hi": p.prompt_text_hi,
+                            "en": p.prompt_text_en or "", "category": p.category or "",
+                            "tier": _int(p.complexity_tier) or 1})
+
         code = []
         for c in frappe.get_all("Lesson Code", filters={"parent": l.name},
                                 fields=["prompt", "prompt_hi", "teach", "teach_hi", "code", "choices", "answer"],
@@ -379,6 +388,7 @@ def _track_json(t, with_content):
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
             "email": email, "quiz": quiz, "read": read, "reply": reply,
+            "capture": capture,
         }
         # optional per-lesson explainer video (YouTube link or file URL) — keys absent when unset
         if (l.get("video") or "").strip():
@@ -688,6 +698,100 @@ def report_doubt(student=None, token=None, track=None, lesson=None, activity=Non
     _notify_facilitators(_("🙋 Doubt from {0}: {1}").format(who, (question or "")[:80]),
                          "Lesson Doubt", doc.name)
     return {"ok": True, "name": doc.name}
+
+
+# ---------------------------------------------------------------------------
+# Dialect capture ("Speak & Write") — a learner records a prompt in her own
+# boli and writes down what she said. The audio is kept as a PRIVATE File on
+# the Dialect Capture row (Desk-only review — never served to guests), the
+# written form rides in dialect_transcription. Untrusted input → same
+# hardening as submit_attempt: rate caps, active-student + token check,
+# clamps, client_id idempotency for the offline outbox.
+# ---------------------------------------------------------------------------
+_CAPTURE_AUDIO_MAX = 8 * 1024 * 1024   # 8MB ≈ a 3-minute 16kHz WAV, the client's hard limit
+
+# upload mimetype → stored file extension (anything unrecognised is kept as .bin)
+_CAPTURE_EXT = {"audio/wav": ".wav", "audio/webm": ".webm",
+                "audio/mp4": ".m4a", "audio/mpeg": ".mp3"}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_dialect_capture(student=None, token=None, track=None, lesson=None,
+                           prompt_key=None, prompt_text_hi=None, transcription=None,
+                           duration_secs=0, client_id=None):
+    """Record one spoken dialect capture (multipart POST, file field 'audio').
+    Thin wrapper: reads the upload off the request, then hands everything to
+    _save_dialect_capture so tests can hit the real logic without a request."""
+    f = frappe.request.files.get("audio") if getattr(frappe, "request", None) else None
+    audio_bytes = f.read() if f else None
+    mimetype = f.mimetype if f else None
+    return _save_dialect_capture(audio_bytes, mimetype, student=student, token=token,
+                                 track=track, lesson=lesson, prompt_key=prompt_key,
+                                 prompt_text_hi=prompt_text_hi, transcription=transcription,
+                                 duration_secs=duration_secs, client_id=client_id)
+
+
+def _save_dialect_capture(audio_bytes, mimetype, student=None, token=None, track=None,
+                          lesson=None, prompt_key=None, prompt_text_hi=None,
+                          transcription=None, duration_secs=0, client_id=None):
+    """Validate + store one capture. Requires a real logged-in student (audio of a
+    child is personal data — no anonymous/guest captures, unlike report_doubt).
+    client_id makes the write idempotent so the offline outbox can retry safely."""
+    if not _rate_ok("capture:" + _client_ip(), 600, 3600):   # captures are rarer than attempts
+        return {"ok": False, "error": "rate_limited"}
+    if not student:
+        student = _session_student()                         # online client authed by session, may omit id
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
+    if not sinfo or not sinfo.active:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):                      # campus token OR online session
+        return {"ok": False, "error": "auth"}
+    if not _rate_ok("capture-stu:" + str(student), 60, 3600):
+        return {"ok": False, "error": "rate_limited"}
+    if client_id:                                            # already saved this exact clip? done.
+        if frappe.db.get_value("Dialect Capture", {"client_id": client_id}, "name"):
+            return {"ok": True, "dedup": True}
+    if not audio_bytes or len(audio_bytes) > _CAPTURE_AUDIO_MAX:
+        return {"ok": False, "error": "bad_audio"}
+    transcription = (transcription or "").strip()
+    if not transcription:
+        return {"ok": False, "error": "bad_transcription"}
+
+    track = (track or "")[:140]
+    lesson = (lesson or "")[:140]
+    prompt_key = (prompt_key or "")[:60]
+    # resolve the authored prompt if it still exists; a dangling key never fails the
+    # write — the denormalized prompt text keeps the row meaningful after a reseed
+    prompt = None
+    if track and lesson and prompt_key:
+        pname = f"{track}-{lesson}-{prompt_key}"             # Dialect Prompt autoname: {lesson doc}-{key}
+        if frappe.db.exists("Dialect Prompt", pname):
+            prompt = pname
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Dialect Capture", "client_id": (client_id or "")[:64] or None,
+            "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
+            "track": track, "lesson": lesson,
+            "prompt_key": prompt_key, "prompt": prompt,
+            "prompt_text_hi": (prompt_text_hi or "")[:500],
+            "dialect_transcription": transcription[:2000],
+            "duration_secs": max(0, min(600, _int(duration_secs))),   # the client stops at 3 min
+            "captured_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with a retry of the same client_id
+        frappe.db.rollback()
+        return {"ok": True, "dedup": True}
+    ext = _CAPTURE_EXT.get((mimetype or "").split(";")[0].strip().lower(), ".bin")
+    file_doc = frappe.get_doc({
+        "doctype": "File", "attached_to_doctype": "Dialect Capture",
+        "attached_to_name": doc.name, "is_private": 1,
+        "file_name": f"{doc.name}{ext}", "content": audio_bytes,
+    }).insert(ignore_permissions=True)
+    doc.db_set("audio_file", file_doc.file_url, update_modified=False)
+    frappe.db.commit()
+    return {"ok": True, "id": doc.name}
 
 
 @frappe.whitelist(allow_guest=True)
