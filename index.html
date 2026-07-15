@@ -1742,10 +1742,19 @@ function renderBand(band){
 
 // SUBJECT screen — the tracks (topics) for one band+subject
 function renderSubject(band, subj){
+  // Match the visibility the subject card counts with (published, non-empty).
+  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key && c.published && c.lessons.length);
+  // Single-topic subject: "choose a topic" would be a choice of one — go straight to its
+  // lessons. Back must return to the subject list (renderBand), NOT here: re-entering
+  // renderSubject would instantly re-skip forward and trap the back button. As soon as a
+  // subject has a second topic, the chooser below reappears on its own.
+  if(tracks.length === 1){
+    renderTrack(tracks[0], { label: "← " + tx(band.title, band.titleHi), fn: () => renderBand(band) });
+    return;
+  }
   stopSpeech();
   rerender = () => renderSubject(band, subj);
   root.innerHTML = "";
-  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key);
   const s = el(`<div class="screen">
     <div class="maphead"><div>
       <h2>${iconFor("subject:"+subj.key, subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
