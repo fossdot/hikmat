@@ -25,7 +25,9 @@
   "stt_endpoint",
   "tts_endpoint",
   "tts_voice",
-  "attendance_min_minutes"
+  "attendance_min_minutes",
+  "sec_boli",
+  "boli"
  ],
  "fields": [
   {
@@ -144,13 +146,25 @@
    "fieldname": "attendance_min_minutes",
    "fieldtype": "Int",
    "label": "Attendance minimum (minutes/day)"
+  },
+  {
+   "fieldname": "sec_boli",
+   "fieldtype": "Section Break",
+   "label": "Boli (Bhojpuri AI corpus)"
+  },
+  {
+   "description": "JSON of Boli tunables — XP values, unlock thresholds, lease TTL, marker set and the Devanagari style guide. Edit to tune the corpus project without a redeploy; blank falls back to built-in defaults.",
+   "fieldname": "boli",
+   "fieldtype": "Code",
+   "label": "Boli config (JSON)",
+   "options": "JSON"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-06-28 13:27:40.552473",
+ "modified": "2026-07-23 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Hikmat Settings",
