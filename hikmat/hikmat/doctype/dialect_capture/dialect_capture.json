@@ -1,0 +1,340 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-07-14 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "cohort",
+  "operator",
+  "speaker",
+  "prompt_section",
+  "track",
+  "lesson",
+  "prompt_key",
+  "prompt",
+  "prompt_text_hi",
+  "prompt_type",
+  "category",
+  "tier",
+  "audio_section",
+  "dialect_transcription",
+  "audio_file",
+  "duration_secs",
+  "sample_rate",
+  "device_id",
+  "speaker_section",
+  "speaker_relation",
+  "speaker_age_band",
+  "speaker_gender",
+  "village_or_block",
+  "consent_section",
+  "consent_status",
+  "public_ok",
+  "pipeline_section",
+  "status",
+  "rework_rounds",
+  "claimed_by",
+  "claim_expires",
+  "quality_section",
+  "noise_level",
+  "code_mix",
+  "speech_style",
+  "pii_suspected",
+  "gem",
+  "is_gold",
+  "gold_wrong_variant",
+  "meta_section",
+  "client_id",
+  "captured_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student (recorder account)",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "cohort",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Cohort",
+   "options": "Cohort"
+  },
+  {
+   "fieldname": "operator",
+   "fieldtype": "Link",
+   "label": "Operator (device user, pair mode)",
+   "options": "Student"
+  },
+  {
+   "fieldname": "speaker",
+   "fieldtype": "Link",
+   "label": "Speaker",
+   "options": "Boli Speaker"
+  },
+  {
+   "fieldname": "prompt_section",
+   "fieldtype": "Section Break",
+   "label": "Prompt"
+  },
+  {
+   "fieldname": "track",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Track key"
+  },
+  {
+   "fieldname": "lesson",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Lesson key"
+  },
+  {
+   "fieldname": "prompt_key",
+   "fieldtype": "Data",
+   "label": "Prompt key"
+  },
+  {
+   "fieldname": "prompt",
+   "fieldtype": "Link",
+   "label": "Prompt",
+   "options": "Dialect Prompt"
+  },
+  {
+   "fieldname": "prompt_text_hi",
+   "fieldtype": "Small Text",
+   "label": "Prompt (Hindi)"
+  },
+  {
+   "default": "in_class",
+   "fieldname": "prompt_type",
+   "fieldtype": "Select",
+   "label": "Prompt type",
+   "options": "in_class\nelder_home\nimage\nfree"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "tier",
+   "fieldtype": "Int",
+   "label": "Complexity tier (1-6)"
+  },
+  {
+   "fieldname": "audio_section",
+   "fieldtype": "Section Break",
+   "label": "Recording"
+  },
+  {
+   "description": "Legacy: the recorder's own transcription (pre-Boli). New captures leave this blank; transcription lives in Boli Transcription.",
+   "fieldname": "dialect_transcription",
+   "fieldtype": "Small Text",
+   "label": "Legacy self-transcription"
+  },
+  {
+   "fieldname": "audio_file",
+   "fieldtype": "Attach",
+   "label": "Audio recording"
+  },
+  {
+   "fieldname": "duration_secs",
+   "fieldtype": "Int",
+   "label": "Duration (s)"
+  },
+  {
+   "fieldname": "sample_rate",
+   "fieldtype": "Int",
+   "label": "Sample rate (Hz)"
+  },
+  {
+   "fieldname": "device_id",
+   "fieldtype": "Data",
+   "label": "Device id"
+  },
+  {
+   "fieldname": "speaker_section",
+   "fieldtype": "Section Break",
+   "label": "Speaker & provenance"
+  },
+  {
+   "fieldname": "speaker_relation",
+   "fieldtype": "Select",
+   "label": "Speaker relation",
+   "options": "\nself\nfamily-elder\nneighbor\nother"
+  },
+  {
+   "fieldname": "speaker_age_band",
+   "fieldtype": "Select",
+   "label": "Speaker age band",
+   "options": "\n13-15\n16-18\n19-25\n26-40\n41-60\n60+"
+  },
+  {
+   "fieldname": "speaker_gender",
+   "fieldtype": "Select",
+   "label": "Speaker gender",
+   "options": "\nFemale\nMale\nOther"
+  },
+  {
+   "fieldname": "village_or_block",
+   "fieldtype": "Link",
+   "label": "Village / block",
+   "options": "Boli Village"
+  },
+  {
+   "fieldname": "consent_section",
+   "fieldtype": "Section Break",
+   "label": "Consent"
+  },
+  {
+   "default": "self_consented",
+   "fieldname": "consent_status",
+   "fieldtype": "Select",
+   "label": "Consent status",
+   "options": "\nself_consented\nguardian_consented\nverbal_elder_consent\nmissing"
+  },
+  {
+   "default": "0",
+   "fieldname": "public_ok",
+   "fieldtype": "Check",
+   "label": "OK for public dataset"
+  },
+  {
+   "fieldname": "pipeline_section",
+   "fieldtype": "Section Break",
+   "label": "Pipeline"
+  },
+  {
+   "default": "recorded",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "recorded\ntranscribed\nin_verification\nverified\ncurated\nexported\nrejected\ninternal_only\npii_hold\nescalated"
+  },
+  {
+   "default": "0",
+   "fieldname": "rework_rounds",
+   "fieldtype": "Int",
+   "label": "Rework rounds"
+  },
+  {
+   "fieldname": "claimed_by",
+   "fieldtype": "Link",
+   "label": "Claimed by",
+   "options": "Student"
+  },
+  {
+   "fieldname": "claim_expires",
+   "fieldtype": "Datetime",
+   "label": "Claim expires"
+  },
+  {
+   "fieldname": "quality_section",
+   "fieldtype": "Section Break",
+   "label": "Quality (curation)"
+  },
+  {
+   "fieldname": "noise_level",
+   "fieldtype": "Select",
+   "label": "Noise level",
+   "options": "\nclean\nsome\nheavy"
+  },
+  {
+   "fieldname": "code_mix",
+   "fieldtype": "Select",
+   "label": "Code-mix",
+   "options": "\nnone\nsome\nheavy"
+  },
+  {
+   "fieldname": "speech_style",
+   "fieldtype": "Select",
+   "label": "Speech style",
+   "options": "\nread\nprompted\nspontaneous"
+  },
+  {
+   "default": "0",
+   "fieldname": "pii_suspected",
+   "fieldtype": "Check",
+   "label": "PII suspected"
+  },
+  {
+   "default": "0",
+   "fieldname": "gem",
+   "fieldtype": "Check",
+   "label": "Gem (exemplary)"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_gold",
+   "fieldtype": "Check",
+   "label": "Gold-standard (verifier check)"
+  },
+  {
+   "fieldname": "gold_wrong_variant",
+   "fieldtype": "Small Text",
+   "label": "Gold wrong-variant transcription"
+  },
+  {
+   "fieldname": "meta_section",
+   "fieldtype": "Section Break",
+   "label": "Meta"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client id (idempotency)",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "captured_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Captured on"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Dialect Capture",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name"
+}

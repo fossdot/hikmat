@@ -125,6 +125,22 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तीन सब्ज़ियों के नाम।",
+      "en": "Name three vegetables in your boli.",
+      "category": "market_money",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मुझे आलू और प्याज़ चाहिए।",
+      "en": "Say: I want potatoes and onions.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -243,6 +259,22 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — जो फल तुम्हें सबसे अच्छा लगता है, उसका नाम।",
+      "en": "Say the name of your favourite fruit.",
+      "category": "feelings",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — ये आम बहुत मीठा है।",
+      "en": "Say: this mango is very sweet.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -360,6 +392,22 @@
       "fix": "some",
       "teach": "Salt cannot be counted, so use 'some'.",
       "teachHi": "नमक गिना नहीं जाता, इसलिए 'some' लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — हल्दी, जीरा और नमक के नाम।",
+      "en": "Say the names of turmeric, cumin and salt.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — आज घर में चावल के साथ क्या बना?",
+      "en": "Tell what was cooked with rice at home today.",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -480,6 +528,22 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आधा किलो प्याज़ दे दो।",
+      "en": "Say: give me half a kilo of onions.",
+      "category": "market_money",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में गिनकर सुनाओ — एक से दस तक।",
+      "en": "Count from one to ten in your boli.",
+      "category": "time_numbers",
+      "tier": 2
+     }
     ]
    },
    {
@@ -598,6 +662,22 @@
       "teach": "With he or she, add 's' to the verb.",
       "teachHi": "He या She के साथ verb में 's' लगता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — भैया, दस रुपये वापस दो।",
+      "en": "Say: bhaiya, give back ten rupees.",
+      "category": "market_money",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — बीस रुपये में क्या-क्या मिल जाएगा?",
+      "en": "Ask: what all can I get for twenty rupees?",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -713,6 +793,22 @@
       "fix": "gives",
       "teach": "With he or she, add 's' to the verb.",
       "teachHi": "He या She के साथ verb में 's' लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — एक किलो आलू कितने का है?",
+      "en": "Ask: how much is one kilo of potatoes?",
+      "category": "questions",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — ये साग ताज़ा है कि नहीं?",
+      "en": "Ask: is this saag fresh or not?",
+      "category": "questions",
+      "tier": 3
      }
     ]
    },
@@ -832,6 +928,22 @@
       "teach": "With he or she, add 's' to the verb.",
       "teachHi": "He या She के साथ verb में 's' लगता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — थोड़ा कम कर दो, हम रोज़ के ग्राहक हैं।",
+      "en": "Say: lower the price a little, I am a regular customer.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — मोल-भाव या बाज़ार पर कोई कहावत, जो घर में बोली जाती है।",
+      "en": "Share a saying about bargaining or the market that is spoken at home.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -947,6 +1059,22 @@
       "fix": "carries",
       "teach": "With he or she, add 's' to the verb.",
       "teachHi": "He या She के साथ verb में 's' लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर आलू सस्ता हो तो दो किलो लूँगी, नहीं तो एक ही।",
+      "en": "Say: if potatoes are cheap I will take two kilos, otherwise just one.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछली बार दुकान पर क्या-क्या खरीदा था।",
+      "en": "Tell in your own words what all you bought at the shop last time.",
+      "category": "market_money",
+      "tier": 4
      }
     ]
    },
@@ -1068,6 +1196,22 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — तराज़ू पर ठीक से तौला है न?",
+      "en": "Ask: you have weighed it properly on the scales, right?",
+      "category": "questions",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — पहले के ज़माने में हाट-बाज़ार कैसा होता था?",
+      "en": "Ask an elder at home and record: what was the haat-bazaar like in the old days?",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    },
    {
@@ -1184,6 +1328,22 @@
       "fix": "sends",
       "teach": "With he, she or it, add 's' to the verb.",
       "teachHi": "He, She या It के साथ verb में 's' लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूरी बात करो — नमस्ते बोलो, दाम पूछो, पैसे दो और धन्यवाद कहकर विदा लो।",
+      "en": "Act out a full polite purchase: greet, ask the price, pay, and say thanks and goodbye.",
+      "category": "market_money",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले हाट या मेले की पूरी बात, जैसे अपनी सहेली को बताती हो।",
+      "en": "Freely narrate the story of your last haat or mela, as if telling a friend.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -1315,6 +1475,22 @@
       "teach": "Use an before a vowel sound like old.",
       "teachHi": "स्वर ध्वनि जैसे old से पहले an आता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक-एक करके बोलो — तुम्हारे घर के कमरों के नाम।",
+      "en": "Name the rooms of your house in your boli.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — तुम रात में कहाँ सोती हो?",
+      "en": "Say where you sleep at night.",
+      "category": "questions",
+      "tier": 2
+     }
     ]
    },
    {
@@ -1432,6 +1608,22 @@
       "fix": "cleaned",
       "teach": "For past time, use the past verb form.",
       "teachHi": "बीते समय के लिए verb का past रूप लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "रसोई की तीन चीज़ों के नाम अपनी बोली में बोलो।",
+      "en": "Name three kitchen things in your boli.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — आज घर में खाने में क्या बना?",
+      "en": "Tell what was cooked at home today.",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -1551,6 +1743,22 @@
       "teach": "With she, use has not have.",
       "teachHi": "She के साथ has आता है, have नहीं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — कुर्सी और चौकी को तुम्हारे घर में क्या बोलते हैं?",
+      "en": "Say what chair and low stool are called in your home.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — खटिया और लालटेन को वे क्या कहते हैं?",
+      "en": "Ask an elder at home what they call the cot and lantern, and record it.",
+      "category": "culture",
+      "tier": 2
+     }
     ]
    },
    {
@@ -1663,6 +1871,22 @@
       "fix": "has",
       "teach": "With father, use has not have.",
       "teachHi": "father के साथ has आता है, have नहीं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में अपना नाम बताओ — जैसे घर में बताती हो।",
+      "en": "Say your name in your boli, the way you do at home.",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर में कौन-कौन रहता है?",
+      "en": "Tell who all live in your house.",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -1777,6 +2001,22 @@
       "teach": "For past time, use the past verb form.",
       "teachHi": "बीते समय के लिए verb का past रूप लगता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — सुबह उठकर सबसे पहले क्या करती हो?",
+      "en": "Tell what you do first after waking up.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "जैसे तुम रोज़ बोलती हो, वैसे कहो — मैं स्कूल जा रही हूँ।",
+      "en": "Say 'I am going to school' the way you say it every day.",
+      "category": "directions_travel",
+      "tier": 2
+     }
     ]
    },
    {
@@ -1889,6 +2129,22 @@
       "fix": "sleeps",
       "teach": "With she, add s to the verb.",
       "teachHi": "She के साथ verb में s लगता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "सुबह किसी बड़े से मिलने पर अपनी बोली में क्या कहती हो? बोलकर सुनाओ।",
+      "en": "Say your morning greeting to an elder in your boli.",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — शाम होने पर तुम्हारे घर में क्या-क्या होता है?",
+      "en": "Tell what happens at your home in the evening.",
+      "category": "time_numbers",
+      "tier": 3
      }
     ]
    },
@@ -2006,6 +2262,22 @@
       "teach": "With she, use has not have.",
       "teachHi": "She के साथ has आता है, have नहीं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — घर के किस काम में तुम हाथ बँटाती हो?",
+      "en": "Tell which housework you help with.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "पानी भरने जाते समय घरवालों को अपनी बोली में कैसे बताओगी? कहकर सुनाओ।",
+      "en": "Say how you tell your family you are going to fetch water.",
+      "category": "directions_travel",
+      "tier": 3
+     }
     ]
    },
    {
@@ -2118,6 +2390,22 @@
       "fix": "at",
       "teach": "Use at with home.",
       "teachHi": "home के साथ at आता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में प्यार से माँगकर दिखाओ — थोड़ा पानी दे दो।",
+      "en": "Politely ask for some water in your boli.",
+      "category": "greetings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — अगर समय मिले तो मुझे थोड़ा पढ़ा देना।",
+      "en": "Say: if you get time, please teach me a little.",
+      "category": "school_learning",
+      "tier": 4
      }
     ]
    },
@@ -2236,6 +2524,22 @@
       "teach": "For past time, use the past verb form.",
       "teachHi": "बीते समय के लिए verb का past रूप लगता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — खाने में तुम्हें सबसे अच्छा क्या लगता है, और क्यों?",
+      "en": "Tell your favourite food and why you like it.",
+      "category": "feelings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — खाना खा लिया, अब हाथ धोकर बर्तन रखने जा रही हूँ।",
+      "en": "Say: I have eaten, now I will wash my hands and put the dishes away.",
+      "category": "home_family",
+      "tier": 4
+     }
     ]
    },
    {
@@ -2348,6 +2652,22 @@
       "fix": "is",
       "teach": "With he, use is not are.",
       "teachHi": "He के साथ is आता है, are नहीं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "शाम को माँ से जो बातचीत होती है, वैसी दो-तीन लाइन अपनी बोली में सुनाओ।",
+      "en": "Act out two or three lines of an evening chat with your mother, in your boli.",
+      "category": "home_family",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले तीज-त्योहार पर तुम्हारे घर में क्या-क्या हुआ?",
+      "en": "Freely narrate what happened at your home during the last festival.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -2479,6 +2799,22 @@
       "teach": "For past time like yesterday, use the past form of the verb.",
       "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक-एक करके बोलो — कलम, किताब, बस्ता।",
+      "en": "Say pen, book, school bag one by one in your boli.",
+      "category": "school_learning",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मेरे बस्ते में एक कलम है।",
+      "en": "Say: there is a pen in my bag.",
+      "category": "school_learning",
+      "tier": 2
+     }
     ]
    },
    {
@@ -2597,6 +2933,22 @@
       "teach": "After a number more than one, add s to the noun.",
       "teachHi": "Ek se zyada sankhya ke baad noun mein s lagao."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में माँगकर देखो — ज़रा अपनी पेंसिल देना।",
+      "en": "Ask to borrow a pencil politely.",
+      "category": "school_learning",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "जब कोई कुछ दे, तो अपनी बोली में धन्यवाद कैसे कहती हो? बोलकर सुनाओ।",
+      "en": "How do you say thank you in your boli?",
+      "category": "greetings",
+      "tier": 1
+     }
     ]
    },
    {
@@ -2709,6 +3061,22 @@
       "fix": "an",
       "teach": "Before a vowel sound like honest, use an.",
       "teachHi": "Honest jaisi swar dhwani se pehle an lagta hai."
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — मैडम या मास्टर जी को तुम क्या कहकर बुलाती हो?",
+      "en": "What do you call your teacher in your boli?",
+      "category": "school_learning",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "सोचो कोई नई सहेली मिली है — अपनी बोली में उससे पूछो, तुम्हारा नाम क्या है?",
+      "en": "Ask a new friend her name in your boli.",
+      "category": "greetings",
+      "tier": 2
      }
     ]
    },
@@ -2828,6 +3196,22 @@
       "teach": "Use in class, not at class.",
       "teachHi": "Class ke andar ke liye in class bolte hain, at nahi."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — खिड़की खोल दो, बहुत गरमी लग रही है।",
+      "en": "Say: open the window, it is very hot.",
+      "category": "school_learning",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारी कक्षा में क्या-क्या दिखता है?",
+      "en": "Describe what you see in your classroom.",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -2946,6 +3330,22 @@
       "teach": "For past time like yesterday, use the past form.",
       "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — कौन-सा विषय सबसे अच्छा लगता है, और क्यों?",
+      "en": "Which subject do you like most, and why?",
+      "category": "feelings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — आज हिंदी और गणित की पढ़ाई हुई।",
+      "en": "Say: today we studied Hindi and maths.",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -3059,6 +3459,22 @@
       "teach": "For past time like yesterday, use the past form.",
       "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मैं लिख रही हूँ, और वह पढ़ रही है।",
+      "en": "Say: I am writing and she is reading.",
+      "category": "school_learning",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — कक्षा में तुम दिन भर क्या-क्या करती हो?",
+      "en": "Tell freely what all you do in class during the day.",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -3171,6 +3587,22 @@
       "fix": "on",
       "teach": "With days of the week, use on, not in.",
       "teachHi": "Din ke saath on lagta hai, in nahi."
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आज कौन-सा दिन है और स्कूल कितने बजे लगता है?",
+      "en": "Say what day it is today and what time school starts.",
+      "category": "time_numbers",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कोई कहावत बोलो जो समय या सुबह-शाम के बारे में हो।",
+      "en": "Say a proverb in your boli about time or morning/evening.",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -3286,6 +3718,22 @@
       "teach": "With a plural like students, do not add s to the verb.",
       "teachHi": "Students jaise bahuvachan ke saath verb mein s nahi lagta."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — क्या मैं पानी पीने जाऊँ?",
+      "en": "Ask permission: may I go to drink water?",
+      "category": "questions",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में माँगो — मैडम जी, आज जल्दी घर जाना है, जाने दीजिए।",
+      "en": "Ask: madam, I need to go home early today, please let me go.",
+      "category": "questions",
+      "tier": 4
+     }
     ]
    },
    {
@@ -3400,6 +3848,22 @@
       "fix": "asks",
       "teach": "With he or she, add s to the verb.",
       "teachHi": "He ya she ke saath verb mein s lagta hai."
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — मैडम जी, यह समझ नहीं आया, फिर से समझा दीजिए।",
+      "en": "Ask the teacher to explain again because you did not understand.",
+      "category": "questions",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — जब पढ़ाई में कुछ मुश्किल लगे, तो तुम क्या कहती हो और किससे पूछती हो?",
+      "en": "What do you say and whom do you ask when something feels hard in class?",
+      "category": "feelings",
+      "tier": 4
      }
     ]
    },
@@ -3517,6 +3981,22 @@
       "teach": "With a plural like two students, use were, not was.",
       "teachHi": "Bahuvachan ke saath were lagta hai, was nahi."
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — आज स्कूल में सुबह से छुट्टी तक क्या-क्या हुआ?",
+      "en": "Narrate freely your whole school day, from morning till closing.",
+      "category": "school_learning",
+      "tier": 6
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — वे अपने स्कूल के दिनों की कोई बात सुनाएँ।",
+      "en": "Record an elder at home telling a story from their own school days.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    }
   ]
@@ -3624,6 +4104,22 @@
       "line": "A computer is a machine that helps us do work. Can you see the screen?",
       "lineHi": "कंप्यूटर एक मशीन है जो हमारे काम में मदद करती है। क्या आपको स्क्रीन दिख रही है?"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द बोलो — 'बिजली' को तुम्हारे घर में क्या कहते हैं?",
+      "en": "Your word for electricity.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — बत्ती जला दो।",
+      "en": "Turn on the light.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -3719,6 +4215,22 @@
       "line": "We use the mouse to point and the speaker to hear sound. Can you find the mouse?",
       "lineHi": "हम माउस से इशारा करते हैं और स्पीकर से आवाज़ सुनते हैं। क्या आप माउस ढूँढ सकती हैं?"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में गिनाओ — अपने घर की तीन चीज़ों के नाम।",
+      "en": "Name three things in your home.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — यह तार यहाँ लगा दो।",
+      "en": "Attach this wire here.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -3809,6 +4321,22 @@
       ],
       "line": "To read more, scroll down. To move a file, drag and select it.",
       "lineHi": "और पढ़ने के लिए नीचे स्क्रॉल कीजिए। फ़ाइल हटाने के लिए उसे खींचिए और चुनिए।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — इसे धीरे से दबाओ।",
+      "en": "Press this gently.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — हाथ से तुम घर में क्या-क्या काम करती हो?",
+      "en": "What work do you do with your hands at home?",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -3903,6 +4431,22 @@
       "line": "When you finish a line, press Enter to go to the next line.",
       "lineHi": "जब एक पंक्ति पूरी हो जाए, तो अगली पंक्ति पर जाने के लिए एंटर दबाइए।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द बोलो — 'उँगली' को तुम क्या कहती हो?",
+      "en": "Your word for finger.",
+      "category": "health_body",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मुझे लिखना आता है।",
+      "en": "I know how to write.",
+      "category": "school_learning",
+      "tier": 2
+     }
     ]
    },
    {
@@ -3995,6 +4539,22 @@
       ],
       "line": "Click the menu to see a list of choices, then close the window.",
       "lineHi": "विकल्पों की सूची देखने के लिए मेन्यू पर क्लिक कीजिए, फिर विंडो बंद कीजिए।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — यह तस्वीर देखो, कितनी सुंदर है!",
+      "en": "Look at this picture, how beautiful!",
+      "category": "feelings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर की दीवार पर क्या-क्या टँगा है?",
+      "en": "What hangs on the walls of your home?",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -4089,6 +4649,22 @@
       "line": "Before you go, please save your work so we do not lose the file.",
       "lineHi": "जाने से पहले, कृपया अपना काम सहेज लीजिए ताकि फ़ाइल खो न जाए।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — तुम्हारा नाम क्या है और लोग तुम्हें क्या बुलाते हैं?",
+      "en": "Your name and what people call you.",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — घर में अपनी चीज़ें कहाँ सँभालकर रखती हो?",
+      "en": "Where do you keep your things safe at home?",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -4178,6 +4754,22 @@
       ],
       "line": "This old file is wrong. Please delete it and rename the correct one.",
       "lineHi": "यह पुरानी फ़ाइल गलत है। कृपया इसे मिटाइए और सही फ़ाइल का नाम बदलिए।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — यह गलत हो गया, फिर से करती हूँ।",
+      "en": "This went wrong, I'll do it again.",
+      "category": "school_learning",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — कोई काम बिगड़ जाए तो घर में लोग क्या कहते हैं?",
+      "en": "What do people at home say when a task goes wrong?",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -4295,6 +4887,22 @@
       "fix": "is",
       "teach": "One website needs 'is', not 'are'.",
       "teachHi": "एक website → 'is', 'are' नहीं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — यह चीज़ कहाँ मिलेगी?",
+      "en": "Ask: where can I find this thing?",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — गाँव में कोई नई खबर कैसे फैलती है?",
+      "en": "How does news spread in your village?",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -4581,6 +5189,22 @@
        }
       ]
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मामा के घर संदेश भेजना है।",
+      "en": "I need to send a message to uncle's house.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — दूर के रिश्तेदार को अपना हालचाल कैसे बताओगी?",
+      "en": "How would you tell a faraway relative your news?",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -4779,6 +5403,22 @@
        }
       ]
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मैं चिट्ठी लिख रही हूँ।",
+      "en": "I am writing a letter.",
+      "category": "school_learning",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारी जान-पहचान में सबसे सुंदर लिखाई किसकी है?",
+      "en": "Who has the most beautiful handwriting you know?",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -4874,6 +5514,22 @@
       "line": "Click this cell in the last column to show the total.",
       "lineHi": "कुल जोड़ दिखाने के लिए आखिरी कॉलम के इस सेल पर क्लिक कीजिए।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आधा किलो टमाटर और एक किलो आलू दे दो।",
+      "en": "Give me half a kilo of tomatoes and a kilo of potatoes.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — घर में अनाज का हिसाब कौन रखता है, और कैसे?",
+      "en": "Who keeps count of the grain at home, and how?",
+      "category": "time_numbers",
+      "tier": 3
+     }
     ]
    },
    {
@@ -4967,6 +5623,22 @@
       "line": "When you finish work, please log out of your account.",
       "lineHi": "जब काम पूरा हो जाए, तो कृपया अपने खाते से लॉगआउट कीजिए।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — ताला लगा दो, चाबी सँभालकर रखना।",
+      "en": "Lock it, keep the key safe.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — कोई बात राज़ रखनी हो तो तुम क्या कहती हो?",
+      "en": "What do you say when a thing must be kept secret?",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -5059,6 +5731,22 @@
       ],
       "line": "This app is old. Please update it to the new version.",
       "lineHi": "यह ऐप पुराना है। कृपया इसे नए वर्ज़न में अपडेट कीजिए।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — यह नया वाला कैसे चलता है?",
+      "en": "Ask: how does this new one work?",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — मोबाइल पर तुम्हारे घर के लोग क्या-क्या देखते हैं?",
+      "en": "What do people at your home watch on the phone?",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -5155,6 +5843,22 @@
       "line": "The device battery is low. Please bring the charger.",
       "lineHi": "डिवाइस की बैटरी कम है। कृपया चार्जर लाइए।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में गिनाओ — खेत या घर के तीन औज़ारों के नाम।",
+      "en": "Name three tools from the farm or home.",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — यह मशीन खराब हो गई है, बनवानी पड़ेगी।",
+      "en": "This machine has broken, it needs repairing.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -5248,6 +5952,22 @@
       ],
       "line": "The signal is weak here. Please move closer to the router.",
       "lineHi": "यहाँ सिग्नल कमज़ोर है। कृपया राउटर के पास जाइए।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — यहाँ नेटवर्क नहीं आता, छत पर चलो।",
+      "en": "There's no network here, let's go to the roof.",
+      "category": "directions_travel",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — फ़ोन पर बात करने के लिए कहाँ जाना पड़ता है?",
+      "en": "Where do you have to go to talk on the phone?",
+      "category": "directions_travel",
+      "tier": 3
      }
     ]
    },
@@ -5445,6 +6165,22 @@
        }
       ]
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — यह फोटो सबको भेज दो।",
+      "en": "Send this photo to everyone.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — गाँव से शहर कोई चीज़ भेजनी हो तो कैसे भेजते हैं?",
+      "en": "How do you send something from the village to the city?",
+      "category": "directions_travel",
+      "tier": 3
+     }
     ]
    },
    {
@@ -5538,6 +6274,22 @@
       ],
       "line": "We lost a file. Can you restore it from the backup?",
       "lineHi": "हमने एक फ़ाइल खो दी। क्या आप बैकअप से उसे वापस ला सकती हैं?"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — ज़रूरी कागज़ सँभालकर रखो, नहीं तो बाद में पछताओगे।",
+      "en": "Keep important papers safe, or you'll regret it later.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — बारिश आने से पहले घर में क्या-क्या सँभालते हैं?",
+      "en": "What do you put away at home before the rain comes?",
+      "category": "farming_weather",
+      "tier": 4
      }
     ]
    },
@@ -5714,6 +6466,22 @@
       "teach": "With 'she', use 'is'.",
       "teachHi": "she → 'is'।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — चाय बनाने का पूरा तरीका, शुरू से आख़िर तक।",
+      "en": "Narrate the full way to make tea, start to finish.",
+      "category": "home_family",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — पहले हाथ धोओ, फिर खाना खाओ।",
+      "en": "First wash your hands, then eat.",
+      "category": "health_body",
+      "tier": 3
+     }
     ]
    },
    {
@@ -5888,6 +6656,22 @@
       "fix": "is",
       "teach": "One number needs 'is'.",
       "teachHi": "एक number → 'is'।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो और खुद जवाब भी दो — आलू कितने का किलो है?",
+      "en": "Ask and answer: how much is a kilo of potatoes?",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — घर में किसे क्या बुलाते हो — जैसे माँ, दादी, चाचा?",
+      "en": "What do you call each family member, like mother, grandmother, uncle?",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -6066,6 +6850,22 @@
       "teach": "With 'she', use 'makes'.",
       "teachHi": "she → 'makes'।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर बारिश हुई तो हम मेला नहीं जाएँगे।",
+      "en": "If it rains, we won't go to the fair.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — रोज़ सुबह उठकर तुम क्या-क्या करती हो, एक-एक करके।",
+      "en": "Narrate your morning routine, step by step.",
+      "category": "home_family",
+      "tier": 5
+     }
     ]
    },
    {
@@ -6243,6 +7043,22 @@
       "teach": "With 'he', use 'tests'.",
       "teachHi": "he → 'tests'।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर सिलाई उधड़ जाए तो फिर से सिलनी पड़ती है।",
+      "en": "If the stitching comes undone, it has to be sewn again.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — कोई चीज़ बिगड़ी और तुमने ठीक कर दी — क्या हुआ था?",
+      "en": "Tell about a time something broke and you fixed it.",
+      "category": "feelings",
+      "tier": 5
+     }
     ]
    },
    {
@@ -6348,6 +7164,22 @@
       "line": "Write a query to find every record where the field 'city' is Motihari.",
       "lineHi": "एक क्वेरी लिखिए जो हर वह रिकॉर्ड ढूँढे जहाँ 'शहर' फ़ील्ड मोतिहारी हो।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में गिनाओ — तुम्हारे घर में कौन-कौन रहता है, सबके नाम और रिश्ते।",
+      "en": "List who lives in your home — names and relations.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बोलकर बनाओ — बाज़ार की पूरी लिस्ट, क्या-क्या लाना है।",
+      "en": "Say aloud your full market list of things to buy.",
+      "category": "market_money",
+      "tier": 4
+     }
     ]
    },
    {
@@ -6440,6 +7272,22 @@
       ],
       "line": "Artificial intelligence helps a robot make smart choices.",
       "lineHi": "आर्टिफ़िशियल इंटेलिजेंस एक रोबोट को समझदार चुनाव करने में मदद करती है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — बड़े-बुज़ुर्ग बादल देखकर कैसे बताते हैं कि बारिश होगी?",
+      "en": "How do elders predict rain by looking at the clouds?",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — मौसम की कोई पुरानी कहावत।",
+      "en": "Ask an elder at home and record an old weather saying.",
+      "category": "culture",
+      "tier": 4
      }
     ]
    },
@@ -6657,6 +7505,22 @@
        }
       ]
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अनजान आदमी की बात पर झट से भरोसा मत करो।",
+      "en": "Don't trust a stranger's words too quickly.",
+      "category": "culture",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — अनजान नंबर से फ़ोन आए तो तुम क्या कहोगी?",
+      "en": "What would you say if a call came from an unknown number?",
+      "category": "questions",
+      "tier": 4
+     }
     ]
    },
    {
@@ -6838,6 +7702,22 @@
        }
       ]
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — हम सब मिलकर यह काम समय पर पूरा करेंगे।",
+      "en": "Together we will finish this work on time.",
+      "category": "school_learning",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में खुलकर सुनाओ — बड़ी होकर तुम क्या काम करना चाहती हो, और क्यों?",
+      "en": "Free narration: what work do you want to do when you grow up, and why?",
+      "category": "feelings",
+      "tier": 6
+     }
     ]
    }
   ]
@@ -6934,6 +7814,22 @@
       ],
       "answer": "ball"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में अपना नाम बताओ।",
+      "en": "Say your name in your boli.",
+      "category": "greetings",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "घर की किसी एक चीज़ का नाम अपनी बोली में बोलो।",
+      "en": "Name one thing in your home in your boli.",
+      "category": "home_family",
+      "tier": 1
+     }
     ]
    },
    {
@@ -7015,6 +7911,22 @@
       ],
       "answer": "yellow",
       "emoji": "🍌"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — तुम्हें कौन-सा रंग सबसे अच्छा लगता है?",
+      "en": "Which colour do you like the most?",
+      "category": "feelings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — बारिश के बाद खेत कैसा दिखता है?",
+      "en": "How does the field look after rain?",
+      "category": "farming_weather",
+      "tier": 2
      }
     ]
    },
@@ -7177,6 +8089,22 @@
       "teach": "Two hands have ten fingers.",
       "teachHi": "दो हाथों में दस उँगलियाँ होती हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में गिनकर बताओ — घर में कितने लोग हैं?",
+      "en": "Count and say how many people are in your home.",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — एक किलो आलू कितने का है?",
+      "en": "How much is one kilo of potatoes?",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -7271,6 +8199,22 @@
        "father"
       ],
       "answer": "sister"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — घर में सबसे छोटा कौन है?",
+      "en": "Who is the youngest in your home?",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — वे बच्चों को प्यार से क्या कहकर बुलाते हैं?",
+      "en": "Ask an elder at home and record what they lovingly call the children.",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -7367,6 +8311,22 @@
       ],
       "answer": "rice"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आज घर में क्या बना?",
+      "en": "What was cooked at home today?",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मेले में तुम कौन-सा फल खरीदोगी?",
+      "en": "Which fruit will you buy at the fair?",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -7462,6 +8422,22 @@
       ],
       "answer": "sit"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — सुबह उठकर तुम सबसे पहले क्या करती हो?",
+      "en": "What do you do first after waking up in the morning?",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — सहेलियों के साथ तुम कौन-कौन से खेल खेलती हो?",
+      "en": "Tell freely about the games you play with your friends.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    }
   ]
@@ -7530,6 +8506,22 @@
       "answer": "5",
       "emoji": "✋"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में 1 से 10 तक गिनकर सुनाओ।",
+      "en": "Count from 1 to 10 in your boli.",
+      "category": "time_numbers",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — तुम्हारे घर में कितने लोग हैं?",
+      "en": "Say how many people are in your home.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -7579,6 +8571,22 @@
       "answer": "5",
       "teach": "Adding zero keeps the number the same.",
       "teachHi": "शून्य जोड़ने से संख्या वही रहती है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — दो आम और दो आम मिलाकर कितने हुए?",
+      "en": "Say: two mangoes plus two mangoes make how many?",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "गिनकर बताओ अपनी बोली में — घर में कितनी बकरियाँ या मुर्गियाँ हैं?",
+      "en": "Count and say how many goats or hens are at home.",
+      "category": "farming_weather",
+      "tier": 2
      }
     ]
    },
@@ -7653,6 +8661,22 @@
       "answer": "square",
       "emoji": "🟦"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — रोटी गोल होती है या चौकोर?",
+      "en": "Say whether a roti is round or square.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — आँगन में कौन-कौन सी चीज़ें गोल दिखती हैं?",
+      "en": "Name the round things you see in your courtyard.",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -7712,6 +8736,22 @@
       "teach": "6 take away 2 leaves 4.",
       "teachHi": "6 में से 2 गए, 4 बचे।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — पाँच लड्डू थे, दो खा लिए, अब कितने बचे?",
+      "en": "Say: there were five laddus, ate two, how many are left?",
+      "category": "time_numbers",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — आज घर में खाने में क्या-क्या बना?",
+      "en": "Tell in your boli what was cooked at home today.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -7769,6 +8809,22 @@
       "teach": "19 then 20.",
       "teachHi": "19 के बाद 20 आता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में 11 से 20 तक गिनकर सुनाओ।",
+      "en": "Count from 11 to 20 in your boli.",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — गिनती वाला कोई पुराना गीत या खेल की बोली।",
+      "en": "Ask an elder at home and record an old counting song or game chant.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -7825,6 +8881,22 @@
       "answer": "3",
       "teach": "3 is fewer than 6.",
       "teachHi": "3, 6 से कम हैं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — हाथी बड़ा होता है या बकरी?",
+      "en": "Say which is bigger, an elephant or a goat.",
+      "category": "questions",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — आम ज़्यादा पसंद है या अमरूद, और क्यों?",
+      "en": "Say which you like more, mango or guava, and why.",
+      "category": "feelings",
+      "tier": 3
      }
     ]
    },
@@ -7924,6 +8996,22 @@
       "teach": "1 rupee and 2 rupees make 3 rupees.",
       "teachHi": "1 रुपया और 2 रुपये मिलकर 3 रुपये।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "बाज़ार में जैसे पूछती हो, वैसे अपनी बोली में कहो — एक किलो आलू कितने का है?",
+      "en": "Ask like in the market: how much is one kilo of potatoes?",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछली बार बाज़ार या मेले गई थी तो क्या-क्या देखा और क्या खरीदा?",
+      "en": "Tell freely about your last trip to the market or fair — what you saw and bought.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    }
   ]
@@ -8021,6 +9109,22 @@
       ],
       "answer": "2"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आँख, कान और नाक को क्या बोलते हैं?",
+      "en": "Say the words for eye, ear and nose in your boli.",
+      "category": "health_body",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "बताओ अपनी बोली में — तुम अपने हाथों से क्या-क्या करती हो?",
+      "en": "Tell what things you do with your hands.",
+      "category": "health_body",
+      "tier": 2
+     }
     ]
    },
    {
@@ -8102,6 +9206,22 @@
        "goat"
       ],
       "answer": "fish"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — गाय, बकरी और चिड़िया को क्या कहते हैं?",
+      "en": "Say the words for cow, goat and bird in your boli.",
+      "category": "farming_weather",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर या गाँव में कौन-सा जानवर रहता है?",
+      "en": "Tell which animal lives in your home or village.",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -8191,6 +9311,22 @@
       "teach": "Grass is soft and green.",
       "teachHi": "घास मुलायम और हरी होती है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे आँगन या खेत में कौन-सा पेड़ है?",
+      "en": "Tell which tree grows in your courtyard or field.",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "सुनाओ अपनी बोली में — फूल या पेड़ वाला कोई छोटा गाना या तुकबंदी।",
+      "en": "Sing or say a little song or rhyme about flowers or trees in your boli.",
+      "category": "culture",
+      "tier": 2
+     }
     ]
    },
    {
@@ -8273,6 +9409,22 @@
       "answer": "vegetable",
       "teach": "A green vegetable is healthy food.",
       "teachHi": "हरी सब्ज़ी सेहतमंद भोजन है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आज घर में खाने में क्या बना?",
+      "en": "Tell what food was cooked at home today (open-ended).",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — एक किलो आलू कितने का है?",
+      "en": "Ask the price of one kilo of potatoes, like at the market.",
+      "category": "market_money",
+      "tier": 3
      }
     ]
    },
@@ -8362,6 +9514,22 @@
       "teach": "We drink clean water.",
       "teachHi": "हम साफ़ पानी पीते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम पीने का पानी कहाँ से लाती हो?",
+      "en": "Tell where you fetch drinking water from.",
+      "category": "health_body",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — खाने से पहले हाथ धोना क्यों ज़रूरी है?",
+      "en": "Say why washing hands before eating is important.",
+      "category": "health_body",
+      "tier": 3
+     }
     ]
    },
    {
@@ -8450,6 +9618,22 @@
       "teach": "A cycle has two wheels.",
       "teachHi": "साइकिल में दो पहिए होते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — तुम स्कूल कैसे जाती हो?",
+      "en": "Say how you travel to school.",
+      "category": "directions_travel",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "सुनाओ अपनी बोली में — बस, मेले या कहीं घूमने जाने की कोई बात।",
+      "en": "Freely narrate a small story about a bus ride, a fair, or an outing (open-ended).",
+      "category": "directions_travel",
+      "tier": 3
+     }
     ]
    }
   ]
@@ -8528,6 +9712,22 @@
       "teach": "Use 'have' with I.",
       "teachHi": "I के साथ 'have' आता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक-एक करके बोलो — गाय, बकरी और मुर्गी को तुम क्या कहती हो?",
+      "en": "Say the words for cow, goat and hen in your boli.",
+      "category": "farming_weather",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — सुबह उठकर सबसे पहले क्या करती हो?",
+      "en": "What is the first thing you do after waking up?",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -8580,6 +9780,22 @@
       "fix": "ate",
       "teach": "Past tense of eat is ate.",
       "teachHi": "eat का भूतकाल ate है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — कल शाम खाने में क्या बना था?",
+      "en": "What was cooked for dinner yesterday evening?",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — अभी इस वक़्त घर में कौन क्या कर रहा होगा?",
+      "en": "What is everyone at home doing right now?",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -8650,6 +9866,22 @@
       "teach": "After a verb, use an adverb to tell how: slowly.",
       "teachHi": "verb के बाद कैसे बताने के लिए adverb slowly लगता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — बारिश वाला दिन तुम्हें कैसा लगता है?",
+      "en": "How does a rainy day feel to you?",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बोलो — बाज़ार का ताज़ा साग देखने में कैसा होता है?",
+      "en": "Describe how fresh greens in the market look.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -8719,6 +9951,22 @@
       "teach": "Use 'the' with the best (superlative): the best.",
       "teachHi": "सबसे अच्छे (superlative) के साथ 'the' आता है: the best।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछकर दिखाओ — एक किलो आलू और वो बड़ा वाला कद्दू कितने का है?",
+      "en": "Ask the price of a kilo of potatoes and that big pumpkin.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछली बार बाज़ार गई तो क्या-क्या देखा और खरीदा?",
+      "en": "Tell about your last market trip — what you saw and bought.",
+      "category": "market_money",
+      "tier": 4
+     }
     ]
    },
    {
@@ -8787,6 +10035,22 @@
       "fix": "They",
       "teach": "For more than one person, use 'They'.",
       "teachHi": "एक से अधिक लोगों के लिए 'They' आता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारी सबसे अच्छी सहेली को क्या-क्या करना पसंद है?",
+      "en": "What does your best friend like to do?",
+      "category": "feelings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — वे बचपन में कौन-कौन से खेल खेलते थे?",
+      "en": "Record an elder telling which games they played as children.",
+      "category": "culture",
+      "tier": 4
      }
     ]
    },
@@ -8870,6 +10134,22 @@
       "teach": "Use 'in' with parts of the day: in the morning.",
       "teachHi": "दिन के हिस्सों के साथ 'in': in the morning।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — घर से स्कूल तक का रास्ता कैसे जाता है, क्या-क्या रास्ते में पड़ता है?",
+      "en": "Explain the route from home to school and what falls on the way.",
+      "category": "directions_travel",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले की पूरी बात, कहाँ गई, किसके साथ, क्या-क्या हुआ।",
+      "en": "Freely narrate your last mela visit — where, with whom, what happened.",
+      "category": "culture",
+      "tier": 6
+     }
     ]
    }
   ]
@@ -8931,6 +10211,22 @@
       ],
       "answer": "81"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक से दस तक गिनती बोलकर सुनाओ।",
+      "en": "Count from one to ten in your boli.",
+      "category": "time_numbers",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मुझे दो दर्जन केले चाहिए।",
+      "en": "Say: I need two dozen bananas.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -8981,6 +10277,22 @@
        "6"
       ],
       "answer": "3"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "तुम्हारी बोली में 'आधा' और 'पाव' को क्या कहते हैं? बोलकर बताओ।",
+      "en": "What do you call 'half' and 'quarter' in your boli?",
+      "category": "time_numbers",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मुझे आधा किलो चीनी दे दो।",
+      "en": "Say: Give me half a kilo of sugar.",
+      "category": "market_money",
+      "tier": 2
      }
     ]
    },
@@ -9039,6 +10351,22 @@
       "teach": "5 × 4 = 20, and 23 − 20 = 3, so the remainder is 3.",
       "teachHi": "5 × 4 = 20, और 23 − 20 = 3, इसलिए शेषफल 3 है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — ये लड्डू सब बच्चों में बराबर बाँट दो।",
+      "en": "Say: Share these laddoos equally among all the children.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर में खाना सबको कैसे परोसा जाता है?",
+      "en": "Tell in your boli how food is served to everyone at home.",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -9095,6 +10423,22 @@
       "answer": "0.3",
       "teach": "3/10 means three tenths, which is 0.3.",
       "teachHi": "3/10 का मतलब तीन दसवाँ भाग, यानी 0.3।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अभी साढ़े तीन बज गए हैं।",
+      "en": "Say: It is half past three now.",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — पुराने ज़माने में पैसा-आना कैसे गिनते थे?",
+      "en": "Ask an elder at home and record: how did people count money (paisa, anna) in the old days?",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -9155,6 +10499,22 @@
       "teach": "25 = 5 × 5, so 25 is a multiple of 5.",
       "teachHi": "25 = 5 × 5, इसलिए 25, 5 का गुणज है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — एक किलो आलू कितने का है, और आधा किलो कितने का?",
+      "en": "Ask: How much is one kilo of potatoes, and how much is half a kilo?",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कोई कहावत सुनाओ जिसमें गिनती आती हो — जैसे 'नौ दो ग्यारह होना'।",
+      "en": "Share a saying from your boli that has numbers in it, like 'nau do gyarah hona'.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -9213,6 +10573,22 @@
       "answer": "50%",
       "teach": "One half is the same as 50%.",
       "teachHi": "आधा, 50% के बराबर होता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में मोल-भाव करके दिखाओ — दुकानदार से दाम थोड़ा कम कराना है।",
+      "en": "Show how you would bargain in your boli to get the shopkeeper to lower the price a little.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछली बार हाट-बाज़ार गई तो क्या-क्या देखा और ख़रीदा?",
+      "en": "Freely narrate in your boli: what did you see and buy the last time you went to the haat/market?",
+      "category": "market_money",
+      "tier": 6
      }
     ]
    }
@@ -9318,6 +10694,22 @@
       "teach": "Boiling water turns into steam (a gas).",
       "teachHi": "उबलता पानी भाप (गैस) बनता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — पानी, बर्फ़ और भाप को तुम क्या-क्या कहते हो?",
+      "en": "Say the words for water, ice and steam in your boli.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — चूल्हे पर पानी उबलता है तो क्या दिखता है?",
+      "en": "Tell what you see when water boils on the stove.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -9403,6 +10795,22 @@
        "12"
       ],
       "answer": "8"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — सूरज, चाँद और तारों को क्या कहते हो?",
+      "en": "Say the words for sun, moon and stars in your boli.",
+      "category": "culture",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — रात के आसमान में तुम्हें क्या-क्या दिखता है?",
+      "en": "Tell what you see in the night sky.",
+      "category": "farming_weather",
+      "tier": 2
      }
     ]
    },
@@ -9502,6 +10910,22 @@
       "teach": "Roots hold the plant and take in water from the soil.",
       "teachHi": "जड़ें पौधे को थामती हैं और मिट्टी से पानी लेती हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आजकल खेत में कौन-कौन सी फसल लगी है?",
+      "en": "Say which crops are growing in the fields these days.",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — घर के पास कौन सा पेड़ है और उस पर क्या-क्या लगता है?",
+      "en": "Tell about a tree near your home and what grows on it.",
+      "category": "farming_weather",
+      "tier": 3
+     }
     ]
    },
    {
@@ -9599,6 +11023,22 @@
       "answer": "the brain",
       "teach": "The brain controls the body and helps us think.",
       "teachHi": "मस्तिष्क शरीर को नियंत्रित करता है और सोचने में मदद करता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — खूब दौड़ने के बाद साँस और दिल का क्या हाल होता है?",
+      "en": "Say what happens to your breath and heartbeat after running hard.",
+      "category": "health_body",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — जैसे किसी से हाल पूछती हो: तबीयत कैसी है? कहाँ दर्द है?",
+      "en": "Ask after someone's health the way you would in your boli.",
+      "category": "health_body",
+      "tier": 3
      }
     ]
    },
@@ -9698,6 +11138,22 @@
       "teach": "Cool vapour turns into tiny drops that make clouds. This is condensation.",
       "teachHi": "ठंडी जलवाष्प छोटी बूँदें बनकर बादल बनाती है। इसे संघनन कहते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — बारिश आने से पहले आसमान और हवा कैसी हो जाती है?",
+      "en": "Describe how the sky and wind change before it rains.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — बारिश या बादल पर कोई पुरानी कहावत।",
+      "en": "Ask an elder at home for an old saying about rain or clouds and record it.",
+      "category": "culture",
+      "tier": 4
+     }
     ]
    },
    {
@@ -9796,6 +11252,22 @@
       "teach": "Drinking clean water keeps our body healthy.",
       "teachHi": "साफ़ पानी पीना हमारे शरीर को स्वस्थ रखता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आज घर में क्या बना, और तुम्हें सबसे अच्छा क्या लगता है?",
+      "en": "Tell what was cooked at home today and what you like best.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — किसी त्योहार के खाने की पूरी बात: क्या-क्या बना, कैसे बना, किसके साथ खाया।",
+      "en": "Freely narrate a festival meal — what was made, how, and who you ate with.",
+      "category": "culture",
+      "tier": 6
+     }
     ]
    }
   ]
@@ -9872,6 +11344,22 @@
       "teach": "After 'have' use the past participle 'gone'.",
       "teachHi": "'have' के बाद 'gone' आता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द कहो — तुम्हारे गाँव में 'पानी' को क्या बोलते हैं?",
+      "en": "Say one word — what is 'water' called in your village speech?",
+      "category": "culture",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं स्कूल जा रही हूँ।",
+      "en": "Say in your dialect: I am going to school.",
+      "category": "school_learning",
+      "tier": 2
+     }
     ]
    },
    {
@@ -9940,6 +11428,22 @@
       "fix": "eaten",
       "teach": "After 'has' use the past participle 'eaten'.",
       "teachHi": "'has' के बाद past participle 'eaten' आता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अभी तुम क्या कर रही हो?",
+      "en": "Say in your dialect what you are doing right now.",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — कल शाम को घर में क्या बना था?",
+      "en": "Tell in your dialect what was cooked at home yesterday evening.",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -10010,6 +11514,22 @@
       "teach": "In reported speech, 'will' changes to 'would'.",
       "teachHi": "Reported speech में 'will' बदलकर 'would' हो जाता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आज सुबह माँ या दीदी ने तुमसे क्या कहा?",
+      "en": "Report in your dialect what your mother or sister said to you this morning.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — बाज़ार में दुकानदार ने दाम के बारे में क्या बोला?",
+      "en": "Retell in your dialect what the shopkeeper said about the price at the market.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -10078,6 +11598,22 @@
       "fix": "by",
       "teach": "In passive voice, name the doer with 'by'.",
       "teachHi": "Passive voice में करने वाले को 'by' से बताते हैं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — तुम्हारे घर में रोटी कैसे बनाई जाती है?",
+      "en": "Explain in your dialect how roti is made at your home.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — खेत में धान कैसे रोपा जाता है, बारिश हो तो क्या बदलता है?",
+      "en": "Describe in your dialect how paddy is planted, and what changes if it rains.",
+      "category": "farming_weather",
+      "tier": 4
      }
     ]
    },
@@ -10161,6 +11697,22 @@
       "teach": "She kept demanding education even when people tried to stop her, which shows courage.",
       "teachHi": "उसने खतरे के बावजूद शिक्षा की माँग जारी रखी, यही उसका साहस दिखाता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले या त्योहार की पूरी बात, जो-जो याद हो।",
+      "en": "Freely narrate in your dialect everything you remember about the last fair or festival.",
+      "category": "culture",
+      "tier": 6
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — अपनी बोली की कोई पुरानी कहावत या गीत।",
+      "en": "Ask an elder at home and record an old saying or song in your dialect.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    }
   ]
@@ -10226,6 +11778,22 @@
       "teach": "3 × 2 + 1 = 7.",
       "teachHi": "3 × 2 + 1 = 7।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक से दस तक गिनती सुनाओ।",
+      "en": "Count from one to ten in your boli.",
+      "category": "time_numbers",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — एक किलो आलू कितने का है?",
+      "en": "Ask how much a kilo of potatoes costs.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -10284,6 +11852,22 @@
       "answer": "4x² + 3x",
       "teach": "Add like terms: x² + 3x² = 4x², and 2x + x = 3x.",
       "teachHi": "Like terms जोड़ो: x² + 3x² = 4x², और 2x + x = 3x।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आज घर में खाने में क्या-क्या बना?",
+      "en": "Say what dishes were cooked at home today.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "तौल के शब्द — आधा, पाव, डेढ़, ढाई — अपनी बोली में बोलकर सुनाओ।",
+      "en": "Say the weight words (half, quarter, one-and-a-half, two-and-a-half) in your boli.",
+      "category": "market_money",
+      "tier": 2
      }
     ]
    },
@@ -10344,6 +11928,22 @@
       "teach": "x − 2 = 0 gives x = 2; x − 3 = 0 gives x = 3.",
       "teachHi": "x − 2 = 0 से x = 2; x − 3 = 0 से x = 3।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे खेत या आँगन में क्या-क्या उगता है?",
+      "en": "Tell what grows in your field or courtyard.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "कोई कहावत जो खेत, फसल या मौसम पर हो — अपनी बोली में सुनाओ।",
+      "en": "Share a saying or proverb about fields, crops, or weather in your boli.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -10403,6 +12003,22 @@
       "teach": "Same base divided: subtract the powers, 6 − 2 = 4, so x⁴.",
       "teachHi": "एक ही base का भाग: powers घटाओ, 6 − 2 = 4, तो x⁴।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — अगर इस बार बारिश दुगुनी हो जाए, तो खेत और गाँव का क्या होगा?",
+      "en": "Say what would happen to the fields and village if the rain doubled this year.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — एक मुट्ठी धान से कितना अनाज बढ़ जाता है?",
+      "en": "Ask an elder at home how much grain grows from one handful of paddy, and record it.",
+      "category": "farming_weather",
+      "tier": 4
+     }
     ]
    },
    {
@@ -10461,6 +12077,22 @@
       "answer": "14",
       "teach": "Terms are 5, 8, 11, 14. The 4th term is 14.",
       "teachHi": "पद हैं 5, 8, 11, 14। चौथा पद 14 है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — हफ्ते के दिनों के नाम, और तुम्हारे यहाँ हाट किस दिन लगता है?",
+      "en": "Say the days of the week and which day the weekly haat is held in your area.",
+      "category": "time_numbers",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले हाट या मेले के दिन की पूरी बात, सुबह से शाम तक।",
+      "en": "Narrate freely the whole story of your last haat or fair day, from morning to evening.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -10560,6 +12192,22 @@
       "teach": "Speed = distance / time.",
       "teachHi": "चाल = दूरी / समय।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — 'दौड़ना' को तुम्हारे गाँव में क्या कहते हैं?",
+      "en": "What is the word for 'running' in your village?",
+      "category": "directions_travel",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — ठेला अटक गया है, धक्का दो!",
+      "en": "The cart is stuck, push it!",
+      "category": "directions_travel",
+      "tier": 2
+     }
     ]
    },
    {
@@ -10644,6 +12292,22 @@
        "neon"
       ],
       "answer": "oxygen"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — दाल में नमक थोड़ा कम है।",
+      "en": "There is a little less salt in the dal.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "बहुत छोटी चीज़ के लिए तुम्हारी बोली में क्या कहते हैं? जैसे 'रत्ती भर' — बोलकर बताओ।",
+      "en": "Say the word/phrase in your boli for something very tiny, like 'a speck'.",
+      "category": "culture",
+      "tier": 2
      }
     ]
    },
@@ -10733,6 +12397,22 @@
       "teach": "One watt is one joule per second.",
       "teachHi": "एक वाट एक जूल प्रति सेकंड होता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — आज खेत में बहुत काम किया, अब थक गई हूँ।",
+      "en": "I worked a lot in the field today, now I am tired.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — मेहनत पर कोई कहावत।",
+      "en": "Ask an elder at home and record a proverb about hard work.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -10820,6 +12500,22 @@
       "answer": "ray",
       "teach": "A ray is a narrow beam of light.",
       "teachHi": "किरण प्रकाश की एक पतली रेखा है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तालाब के पानी में चाँद कैसा दिखता है?",
+      "en": "How does the moon look in the pond water?",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — शीशे में अपना चेहरा देखकर तुम क्या बोलती हो?",
+      "en": "What do you say when you see your face in the mirror?",
+      "category": "feelings",
+      "tier": 3
      }
     ]
    },
@@ -10909,6 +12605,22 @@
       "teach": "A battery stores chemical energy and supplies electric energy.",
       "teachHi": "बैटरी रासायनिक ऊर्जा जमा करके विद्युत ऊर्जा देती है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — बिजली चली गई, जल्दी ढिबरी जला दो।",
+      "en": "The power went out, quickly light the lamp.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — जिस रात बिजली नहीं थी, उस रात घर में क्या-क्या हुआ?",
+      "en": "Tell about a night without electricity — what happened at home?",
+      "category": "home_family",
+      "tier": 5
+     }
     ]
    },
    {
@@ -10996,6 +12708,22 @@
       "answer": "salt",
       "teach": "Acid + base → salt + water. This is neutralisation.",
       "teachHi": "अम्ल + क्षार → नमक + पानी। यह उदासीनीकरण है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर बाज़ार का आम खट्टा निकले तो दुकानदार से क्या कहोगी?",
+      "en": "If the mango from the market turns out sour, what will you tell the shopkeeper?",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — घर में अचार कैसे बनता है, शुरू से आखिर तक।",
+      "en": "Narrate how pickle is made at home, from start to finish.",
+      "category": "home_family",
+      "tier": 6
      }
     ]
    }
@@ -11093,6 +12821,22 @@
       ],
       "answer": "in files"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक-एक शब्द कहो — घर के औज़ारों के नाम, जैसे हँसिया, कुदाल, चूल्हा।",
+      "en": "Say the names of household tools in your boli, one by one.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर या गाँव में कौन-कौन सी मशीन चलती है?",
+      "en": "Name the machines that run in your home or village.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -11131,6 +12875,22 @@
        "charge the phone"
       ],
       "answer": "send messages"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — फ़ोन पर कोई हाल-चाल कैसे पूछता है?",
+      "en": "How does someone ask 'how are you' on the phone in your boli?",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — मोबाइल पर तुम्हें क्या देखना-सुनना अच्छा लगता है?",
+      "en": "Say what you like to watch or listen to on a mobile.",
+      "category": "feelings",
+      "tier": 2
      }
     ]
    },
@@ -11218,6 +12978,22 @@
       "answer": "so it is not lost",
       "teach": "Saving stores your work so it is not lost.",
       "teachHi": "सहेजने से आपका काम सुरक्षित रहता है और खो नहीं जाता।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — मेरी किताब कहाँ रखी है?",
+      "en": "Ask: where is my book kept?",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — घर में अनाज, कपड़े और बर्तन कहाँ-कहाँ रखे जाते हैं?",
+      "en": "Tell where grain, clothes and utensils are kept at home.",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    },
@@ -11307,6 +13083,22 @@
       "teach": "SUM adds all the numbers in a column.",
       "teachHi": "SUM किसी स्तंभ की सभी संख्याओं को जोड़ देता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — एक किलो आलू कितने का है?",
+      "en": "Ask: how much is one kilo of potatoes?",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — दो किलो चावल का दाम कैसे जोड़ोगी? गिनकर सुनाओ।",
+      "en": "Explain, counting aloud, how you would total the price of two kilos of rice.",
+      "category": "time_numbers",
+      "tier": 3
+     }
     ]
    },
    {
@@ -11395,6 +13187,22 @@
       "teach": "A mistake in code is called a bug.",
       "teachHi": "कोड में हुई ग़लती को बग कहते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — चाय बनाने के सारे कदम, एक-एक करके, शुरू से आख़िर तक।",
+      "en": "Narrate all the steps of making tea, one by one, start to finish.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में समझाओ — तुम्हारे घर से खेत या बाज़ार तक कैसे जाते हैं, कहाँ-कहाँ मुड़ना है?",
+      "en": "Explain the route from your home to the field or market, turn by turn.",
+      "category": "directions_travel",
+      "tier": 4
+     }
     ]
    },
    {
@@ -11482,6 +13290,22 @@
       "answer": "with respect",
       "teach": "A good digital citizen treats others with respect.",
       "teachHi": "एक अच्छा डिजिटल नागरिक दूसरों के साथ सम्मान से पेश आता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर कोई अनजान आदमी तुमसे कुछ पूछे तो तुम क्या जवाब दोगी?",
+      "en": "Say what you would reply if a stranger asked you something.",
+      "category": "feelings",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — कोई कहावत या किस्सा जो सिखाता है कि सोच-समझकर भरोसा करना चाहिए।",
+      "en": "Narrate a saying or story from your boli that teaches to trust carefully.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -11627,6 +13451,22 @@
       "teach": "We hear with our ears and see with our eyes.",
       "teachHi": "हम कानों से सुनते हैं और आँखों से देखते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — हाथ, पैर और सिर को क्या कहते हैं?",
+      "en": "Say the words for hand, leg and head in your boli.",
+      "category": "health_body",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं आज ठीक हूँ, मज़े में हूँ।",
+      "en": "Say: I am fine today, feeling good.",
+      "category": "feelings",
+      "tier": 2
+     }
     ]
    },
    {
@@ -11755,6 +13595,22 @@
       "teach": "The story says Ali must take the medicine two times a day.",
       "teachHi": "कहानी कहती है अली को दवा दिन में दो बार लेनी है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — नमस्ते डॉक्टर साहब!",
+      "en": "Greet the doctor in your boli.",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "डॉक्टर से अपनी बोली में कैसे कहोगी — मेरा सिर दुख रहा है?",
+      "en": "Tell the doctor: my head is hurting.",
+      "category": "health_body",
+      "tier": 2
+     }
     ]
    },
    {
@@ -11873,6 +13729,22 @@
       "answer": "Weak and tired",
       "teach": "Meena has a cold, so she feels weak and tired.",
       "teachHi": "मीना को जुकाम है, इसलिए वह कमज़ोर और थकी महसूस करती है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मुझे खाँसी हो गई है, दवा चाहिए।",
+      "en": "Say: I have a cough, I need medicine.",
+      "category": "health_body",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — बुखार में घर पर क्या पीने को देते हैं?",
+      "en": "Tell what people at home give to drink during fever.",
+      "category": "health_body",
+      "tier": 3
      }
     ]
    },
@@ -11993,6 +13865,22 @@
       "teach": "The chemist gives Sita a bottle of syrup for her cough.",
       "teachHi": "दवा दुकानदार सीता को उसकी खाँसी के लिए सिरप की बोतल देता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "दुकान पर अपनी बोली में पूछो — यह सिरप कितने का है?",
+      "en": "Ask at the shop: how much is this syrup?",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — यह दवा दिन में दो बार, खाना खाकर लेनी है।",
+      "en": "Say: take this medicine twice a day, after food.",
+      "category": "time_numbers",
+      "tier": 3
+     }
     ]
    },
    {
@@ -12111,6 +13999,22 @@
       "answer": "Good sleep and clean habits",
       "teach": "Exercise, fruit, good sleep and clean habits keep Rina healthy.",
       "teachHi": "व्यायाम, फल, अच्छी नींद और साफ़ आदतें रीना को सेहतमंद रखती हैं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — सुबह उठकर सबसे पहले क्या-क्या करती हो?",
+      "en": "Tell what you do first thing after waking up.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — खेलने-कूदने के बाद तुम्हें कैसा लगता है?",
+      "en": "Describe how you feel after playing and running around.",
+      "category": "feelings",
+      "tier": 3
      }
     ]
    },
@@ -12231,6 +14135,22 @@
       "teach": "The nurse checks the weight and gives the baby a vaccine.",
       "teachHi": "नर्स वज़न जाँचती है और बच्चे को टीका लगाती है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर बच्चा रोए तो घर में उसे कैसे चुप कराते हैं?",
+      "en": "Say how people at home soothe a crying baby.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — छोटे बच्चे के लिए कौन-सी लोरी गाते हैं?",
+      "en": "Ask an elder at home and record a lullaby sung for babies.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    },
    {
@@ -12350,6 +14270,22 @@
       "teach": "First wash a cut with clean water, then put a bandage.",
       "teachHi": "पहले कट को साफ़ पानी से धोओ, फिर पट्टी बाँधो।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — अगर किसी को चोट लग जाए तो सबसे पहले क्या करोगी?",
+      "en": "Explain what you would do first if someone gets hurt.",
+      "category": "health_body",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में ज़ोर से कहो — जल्दी आओ, पानी और पट्टी ले आओ!",
+      "en": "Call out: come quickly, bring water and a bandage!",
+      "category": "health_body",
+      "tier": 3
+     }
     ]
    },
    {
@@ -12468,6 +14404,22 @@
       "answer": "A glass of milk",
       "teach": "Milk, dal, rice and vegetables give Kavita iron and strength.",
       "teachHi": "दूध, दाल, चावल और सब्ज़ी कविता को आयरन और ताकत देते हैं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — दाल-भात के साथ और क्या खाना तुम्हें अच्छा लगता है?",
+      "en": "Tell what you like to eat along with dal and rice.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले तिहार में घर में क्या-क्या पकवान बने, पूरी बात।",
+      "en": "Narrate freely: what dishes were made at home last festival.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -12609,6 +14561,22 @@
       "teach": "Fifty minus thirty is twenty, so the change is twenty rupees.",
       "teachHi": "पचास में से तीस घटाओ तो बीस, तो बाक़ी बीस रुपये हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — 'दस रुपया' कैसे बोलती हो? बस एक शब्द या दो।",
+      "en": "Say 'ten rupees' in your boli.",
+      "category": "market_money",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — एक किलो आलू कितने का है?",
+      "en": "Ask the price of a kilo of potatoes.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -12738,6 +14706,22 @@
       "teach": "The story says a bank keeps your money safe.",
       "teachHi": "कहानी कहती है बैंक आपके पैसे को सुरक्षित रखता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — बैंक कब खुलता है?",
+      "en": "Ask when the bank opens.",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मुझे नया खाता खोलना है।",
+      "en": "Say you want to open a new account.",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -12856,6 +14840,22 @@
       "answer": "In a box",
       "teach": "Meena saves ten rupees in a box every week.",
       "teachHi": "मीना हर हफ़्ते डिब्बे में दस रुपये बचाती है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — गुल्लक में पैसे कैसे जमा करते हैं?",
+      "en": "Explain how one saves coins in a piggy bank.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — बचत पर तुम्हारे गाँव में कौन-सी कहावत चलती है?",
+      "en": "Share a local saying or proverb about saving.",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -12976,6 +14976,22 @@
       "teach": "Radha enters her secret PIN to get money.",
       "teachHi": "राधा पैसे पाने के लिए अपना गुप्त पिन डालती है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — सबसे पास वाला एटीएम कहाँ है?",
+      "en": "Ask where the nearest ATM is.",
+      "category": "directions_travel",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में समझाओ — पिन किसी को क्यों नहीं बताना चाहिए?",
+      "en": "Explain why you should never share your PIN.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -13094,6 +15110,22 @@
       "answer": "With her phone",
       "teach": "Guddi scans the code and pays with her phone.",
       "teachHi": "गुड्डी कोड स्कैन करके अपने फ़ोन से भुगतान करती है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — फ़ोन से पैसे भेजते समय क्या-क्या करते हैं?",
+      "en": "Describe the steps of sending money by phone.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — भैया, क्यूआर कोड कहाँ है? स्कैन कर लूँ?",
+      "en": "Ask a shopkeeper where the QR code is so you can scan it.",
+      "category": "market_money",
+      "tier": 3
      }
     ]
    },
@@ -13214,6 +15246,22 @@
       "teach": "Kamla keeps the receipt as proof that she paid.",
       "teachHi": "कमला भुगतान के सबूत के तौर पर रसीद रखती है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — बिल भरने के बाद रसीद क्यों माँगनी चाहिए?",
+      "en": "Explain why you should ask for a receipt after paying a bill.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — पहले ज़माने में बिजली का बिल कैसे भरते थे?",
+      "en": "Ask an elder at home how bills were paid in the old days, and record it.",
+      "category": "home_family",
+      "tier": 5
+     }
     ]
    },
    {
@@ -13333,6 +15381,22 @@
       "teach": "The women's group meets every month to save and give loans.",
       "teachHi": "महिला समूह बचत करने और क़र्ज़ देने के लिए हर महीने मिलता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — समूह में मिलकर बचत करने से क्या फ़ायदा होता है?",
+      "en": "Explain the benefit of saving together in a group.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — तुम्हारे गाँव में महिलाएँ समूह बनाकर क्या-क्या करती हैं?",
+      "en": "Talk freely about what women's groups do in your village.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    },
    {
@@ -13451,6 +15515,22 @@
       "answer": "She says no",
       "teach": "Anita is careful and never shares her secret PIN.",
       "teachHi": "अनीता सावधान रहती है और अपना गुप्त पिन कभी नहीं बताती।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर कोई फ़ोन पर ओटीपी माँगे तो तुम क्या कहोगी?",
+      "en": "Say what you would reply if someone asks for your OTP on the phone.",
+      "category": "market_money",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — मेले या बाज़ार की कोई बात, जब किसी ने समझदारी से पैसे बचाए।",
+      "en": "Freely narrate a fair or market story where someone cleverly saved money.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -13595,6 +15675,22 @@
       "teach": "The story says to look left and right before crossing the road.",
       "teachHi": "कहानी कहती है सड़क पार करने से पहले बाएँ और दाएँ देखो।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — साइकिल और बैलगाड़ी को तुम्हारे गाँव में क्या कहते हैं?",
+      "en": "Say the local words for bicycle and bullock cart in your boli.",
+      "category": "directions_travel",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं घर जा रही हूँ।",
+      "en": "Say 'I am going home' in your boli.",
+      "category": "directions_travel",
+      "tier": 2
+     }
     ]
    },
    {
@@ -13722,6 +15818,22 @@
       "teach": "A map helps you find your way when you are lost.",
       "teachHi": "जब आप खो जाएँ तो नक्शा रास्ता ढूँढने में मदद करता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "बताओ, तुम्हारी बोली में दाएँ और बाएँ को क्या बोलते हैं?",
+      "en": "Say the words for right and left in your boli.",
+      "category": "directions_travel",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — स्कूल किधर है?",
+      "en": "Ask 'which way is the school?' in your boli.",
+      "category": "questions",
+      "tier": 2
+     }
     ]
    },
    {
@@ -13840,6 +15952,22 @@
       "answer": "By the window",
       "teach": "Rekha got a seat by the window of the bus.",
       "teachHi": "रेखा को बस में खिड़की के पास सीट मिली।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — मोतिहारी वाली बस कब आएगी?",
+      "en": "Ask 'when will the Motihari bus come?' in your boli.",
+      "category": "questions",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "बस का इंतज़ार लंबा हो तो लोग क्या बतियाते हैं? अपनी बोली में एक बात कहकर दिखाओ।",
+      "en": "Say one line of typical waiting-time chit-chat at the bus stand in your boli.",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -13960,6 +16088,22 @@
       "teach": "Munni went to coach number five to board her train.",
       "teachHi": "मुन्नी अपनी रेलगाड़ी में चढ़ने के लिए पाँच नंबर के डिब्बे में गई।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — यह गाड़ी कितने बजे खुलेगी?",
+      "en": "Ask 'what time does this train leave?' in your boli.",
+      "category": "time_numbers",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "टिकट खिड़की पर जैसे बोलती हो, वैसे अपनी बोली में कहो — एक टिकट बेतिया का दे दीजिए।",
+      "en": "Ask for one ticket to Bettiah at the counter, in your boli.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -14078,6 +16222,22 @@
       "answer": "Twenty rupees",
       "teach": "The short auto ride cost Sunita twenty rupees.",
       "teachHi": "छोटी ऑटो सवारी सुनीता को बीस रुपये की पड़ी।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — भैया, बाज़ार तक कितना लोगे?",
+      "en": "Ask an auto driver how much he will charge to the market, in your boli.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "थोड़ा मोल-भाव करके दिखाओ — अपनी बोली में कहो कि इतना ज़्यादा नहीं, कुछ कम करो।",
+      "en": "Bargain in your boli — say that's too much, lower the fare a bit.",
+      "category": "market_money",
+      "tier": 3
      }
     ]
    },
@@ -14198,6 +16358,22 @@
       "teach": "Anju waited for the green signal before crossing.",
       "teachHi": "अंजू ने पार करने से पहले हरी बत्ती का इंतज़ार किया।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — सड़क पार करते समय क्या-क्या देखना चाहिए?",
+      "en": "Explain in your boli what to check before crossing the road.",
+      "category": "directions_travel",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "सोचो, कोई छोटा बच्चा सड़क किनारे खेल रहा है — अपनी बोली में उसे प्यार से समझाओ।",
+      "en": "Gently warn a small child playing near the road, in your boli.",
+      "category": "directions_travel",
+      "tier": 4
+     }
     ]
    },
    {
@@ -14317,6 +16493,22 @@
       "teach": "Bela went to the hospital to meet the nurse.",
       "teachHi": "बेला नर्स से मिलने अस्पताल गई।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर से मंदिर या बाज़ार कैसे जाते हैं? रास्ता समझाओ।",
+      "en": "Describe in your boli the route from your home to the temple or market.",
+      "category": "directions_travel",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले की बात, वहाँ क्या-क्या देखा?",
+      "en": "Open-ended: tell about the last mela you went to and what you saw, in your boli.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    },
    {
@@ -14435,6 +16627,22 @@
       "answer": "To reach before dark",
       "teach": "Farida left early to reach her village before dark.",
       "teachHi": "फ़रीदा अँधेरा होने से पहले पहुँचने के लिए जल्दी निकली।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर सुबह वाली बस छूट गई, तो हम कैसे जाएँगे?",
+      "en": "Say in your boli: if we miss the morning bus, how will we go?",
+      "category": "directions_travel",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "कोई सफ़र जो तुम्हें अच्छा याद है — कहाँ गई थी, किसके साथ, क्या हुआ? अपनी बोली में पूरा किस्सा सुनाओ।",
+      "en": "Open-ended free narration: tell the full story of a trip you remember, in your boli.",
+      "category": "directions_travel",
+      "tier": 6
      }
     ]
    }
@@ -14574,6 +16782,22 @@
       "teach": "Her first program prints the word Hello.",
       "teachHi": "उसका पहला प्रोग्राम Hello छापता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "किसी से मिलते ही सबसे पहले क्या बोलती हो? अपनी बोली में वह एक शब्द कहो।",
+      "en": "Say the first word you greet someone with, in your boli.",
+      "category": "greetings",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — छोटे भाई या बहन को पानी लाने को कैसे कहती हो?",
+      "en": "How do you tell a younger sibling to fetch water, in your boli?",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -14693,6 +16917,22 @@
       "teach": "A variable stores a value we can use later.",
       "teachHi": "वेरिएबल एक मान रखता है जिसे हम बाद में इस्तेमाल करते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — तुम्हारा नाम क्या है?",
+      "en": "Ask 'what is your name?' in your boli.",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में तुम्हें प्यार से किस नाम से बुलाते हैं? अपनी बोली में बताओ।",
+      "en": "Tell us the pet name your family calls you, in your boli.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -14807,6 +17047,22 @@
       "teach": "The program asks for your name using input.",
       "teachHi": "प्रोग्राम input से तुम्हारा नाम पूछता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — बाज़ार में एक किलो आलू का दाम कैसे पूछोगी?",
+      "en": "Ask the price of a kilo of potatoes at the market, in your boli.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में कोई मेहमान आए तो उनसे क्या पूछती हो? अपनी बोली में एक सवाल बोलो।",
+      "en": "Say one question you'd ask a guest at home, in your boli.",
+      "category": "questions",
+      "tier": 3
+     }
     ]
    },
    {
@@ -14912,6 +17168,22 @@
       "emoji": "🔀",
       "teach": "else runs when the if condition is false.",
       "teachHi": "else तब चलता है जब if गलत हो।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर बारिश हो जाए तो तुम क्या करती हो, और धूप रहे तो क्या?",
+      "en": "Say what you do if it rains, and what you do if it's sunny, in your boli.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — कोई कहावत जिसमें 'अगर-मगर' या शर्त की बात हो।",
+      "en": "Share a saying in your boli that talks about 'if' or a condition.",
+      "category": "culture",
+      "tier": 4
      }
     ]
    },
@@ -15020,6 +17292,22 @@
       "answer": "To repeat work",
       "teach": "A loop repeats the work for us.",
       "teachHi": "लूप हमारे लिए काम दोहराता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "रोज़ सुबह उठकर कौन-कौन से काम बार-बार करती हो? अपनी बोली में एक-एक करके बताओ।",
+      "en": "Describe, step by step, the chores you repeat every morning, in your boli.",
+      "category": "home_family",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले या त्योहार की पूरी बात, जो-जो हुआ था।",
+      "en": "Freely narrate everything that happened at the last fair or festival, in your boli.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -15149,6 +17437,22 @@
       "teach": "AI learns from many examples, called data.",
       "teachHi": "AI कई उदाहरणों (डेटा) से सीखता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द कहो — मोबाइल को तुम्हारे घर में क्या बोलते हैं?",
+      "en": "Say in your boli — what do people at home call a mobile phone? (one word)",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "नमस्ते बोलकर अपनी बोली में अपना नाम बताओ — जैसे फोन को बता रही हो।",
+      "en": "Greet and say your name in your boli, as if telling a phone.",
+      "category": "greetings",
+      "tier": 2
+     }
     ]
    },
    {
@@ -15266,6 +17570,22 @@
       "teach": "A clear, exact prompt gets a better answer.",
       "teachHi": "साफ़ और सटीक प्रॉम्प्ट बेहतर जवाब देता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — आज बारिश होगी क्या?",
+      "en": "Ask in your boli — will it rain today?",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "सोचो फोन दुकानदार है — अपनी बोली में पूछो, आलू कितने का किलो है?",
+      "en": "Pretend the phone is a shopkeeper — ask in your boli how much a kilo of potatoes costs.",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -15366,6 +17686,22 @@
       "teach": "AI can be wrong, so check important answers.",
       "teachHi": "AI गलत हो सकता है, इसलिए ज़रूरी जवाब जाँचो।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — फोन पर अनजान आदमी को घर की बात क्यों नहीं बतानी चाहिए?",
+      "en": "Explain in your boli why you shouldn't tell a stranger on the phone about your home.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "तुम्हारे गाँव में सोच-समझकर बोलने पर कोई कहावत है? अपनी बोली में सुनाओ।",
+      "en": "Share a village proverb in your boli about speaking carefully.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -15460,6 +17796,22 @@
       "teach": "AI helps understand voice, translate, and find the way.",
       "teachHi": "AI आवाज़ समझने, अनुवाद और रास्ता खोजने में मदद करता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — अगर फोन तुम्हारी बोली समझ ले, तो उससे क्या-क्या करवाओगी?",
+      "en": "Say in your boli — if the phone understood your dialect, what all would you get it to do?",
+      "category": "feelings",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — सुबह से शाम तक का अपना पूरा दिन, जैसे किसी दोस्त को बता रही हो।",
+      "en": "Narrate your whole day, morning to evening, in your boli as if telling a friend.",
+      "category": "home_family",
+      "tier": 6
+     }
     ]
    }
   ]
@@ -15526,6 +17878,22 @@
       ],
       "answer": "ग"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — नमस्ते! जैसे तुम गाँव में किसी से कहती हो।",
+      "en": "Say hello the way you greet someone in your village.",
+      "category": "greetings",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बोलो — आम, इमली, ऊख। घर पर इनको क्या कहते हो?",
+      "en": "Say mango, tamarind, sugarcane — as you call them at home.",
+      "category": "farming_weather",
+      "tier": 1
+     }
     ]
    },
    {
@@ -15577,6 +17945,22 @@
       "answer": "ग",
       "emoji": "🪴"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — कटोरा, घड़ा, खाट। घर की इन चीज़ों को क्या बोलती हो?",
+      "en": "Say bowl, pot, cot — the words you use for these things at home.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "बताओ अपनी बोली में — तुम्हारा नाम क्या है?",
+      "en": "Say what your name is, in your dialect.",
+      "category": "questions",
+      "tier": 2
+     }
     ]
    },
    {
@@ -15627,6 +18011,22 @@
       ],
       "answer": "पानी",
       "emoji": "💧"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — दीदी, पानी पी लो।",
+      "en": "Say: Didi, drink some water.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — तुम कहाँ जा रही हो?",
+      "en": "Ask: where are you going?",
+      "category": "questions",
+      "tier": 2
      }
     ]
    },
@@ -15688,6 +18088,22 @@
       "teach": "रवि और माँ दोनों घर पर हैं।",
       "teachHi": "रवि और माँ दोनों घर पर हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — जल, घर, हल। इनको तुम क्या कहती हो?",
+      "en": "Say water, house, plough — as you call them.",
+      "category": "farming_weather",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — चलो, घर चलते हैं।",
+      "en": "Say: come, let's go home.",
+      "category": "directions_travel",
+      "tier": 2
+     }
     ]
    },
    {
@@ -15738,6 +18154,22 @@
       ],
       "answer": "पीला (yellow)",
       "emoji": "🍌"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — हरी सब्ज़ी, लाल टमाटर, पीला नींबू।",
+      "en": "Say: green vegetables, red tomato, yellow lemon.",
+      "category": "market_money",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हें कौन-सा रंग सबसे अच्छा लगता है, और क्यों?",
+      "en": "Say which colour you like best and why.",
+      "category": "feelings",
+      "tier": 3
      }
     ]
    },
@@ -15807,6 +18239,22 @@
       "teach": "तीन और दो मिलकर पाँच होते हैं।",
       "teachHi": "तीन और दो मिलकर पाँच होते हैं।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "गिनकर सुनाओ अपनी बोली में — एक से दस तक।",
+      "en": "Count from one to ten in your dialect.",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — एक किलो आलू कितने का है?",
+      "en": "Ask: how much is one kilo of potatoes?",
+      "category": "market_money",
+      "tier": 3
+     }
     ]
    },
    {
@@ -15866,6 +18314,22 @@
       "teach": "पिताजी, माँ, भाई और मैं — कुल चार।",
       "teachHi": "पिताजी, माँ, भाई और मैं — कुल चार।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर में कौन-कौन रहता है?",
+      "en": "Say who all live in your house.",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — बचपन में वे कौन-सा खेल खेलते थे?",
+      "en": "Ask an elder at home what game they played as a child, and record it.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -15906,6 +18370,22 @@
       "answer": "fed the puppy / पिल्ले को खिलाया",
       "teach": "गुड्डी दयालु है — उसने भूखे पिल्ले को खाना दिया।",
       "teachHi": "गुड्डी दयालु है — उसने भूखे पिल्ले को खाना दिया।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — प्यासे कौवे की कहानी, अपने ढंग से।",
+      "en": "Tell the story of the thirsty crow in your own way.",
+      "category": "culture",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — कल घर में क्या-क्या हुआ?",
+      "en": "Tell freely what happened at home yesterday.",
+      "category": "home_family",
+      "tier": 3
      }
     ]
    }
@@ -16005,6 +18485,22 @@
       "answer": "taste / स्वाद",
       "emoji": "🍬"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — आँख, कान और नाक को क्या-क्या कहते हैं?",
+      "en": "Say the words for eye, ear and nose in your boli.",
+      "category": "health_body",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — तुम्हें कौन सी खुशबू सबसे अच्छी लगती है?",
+      "en": "Which smell do you like the most?",
+      "category": "feelings",
+      "tier": 2
+     }
     ]
    },
    {
@@ -16080,6 +18576,22 @@
       ],
       "answer": "yes / हाँ",
       "emoji": "💧"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "गाय, बकरी और चिड़िया — अपनी बोली में इनके नाम बोलो।",
+      "en": "Say the names of cow, goat and bird in your boli.",
+      "category": "farming_weather",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर या आँगन में कौन-कौन से जानवर हैं?",
+      "en": "Which animals are there in your home or courtyard?",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -16157,6 +18669,22 @@
       "answer": "at night / रात में",
       "emoji": "😴"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — सुबह उठकर सबसे पहले क्या करती हो?",
+      "en": "What do you do first thing after waking up in the morning?",
+      "category": "time_numbers",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — रात में आसमान में क्या-क्या दिखता है?",
+      "en": "What can you see in the sky at night?",
+      "category": "farming_weather",
+      "tier": 2
+     }
     ]
    },
    {
@@ -16233,6 +18761,22 @@
       "answer": "after rain / बारिश के बाद",
       "emoji": "🌈"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "बाहर बारिश हो रही है — अपनी बोली में कहो: छाता लेकर जाओ!",
+      "en": "It is raining — say 'take the umbrella' in your boli.",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछली बारिश के दिन क्या-क्या हुआ था?",
+      "en": "Tell openly what happened on the last rainy day.",
+      "category": "farming_weather",
+      "tier": 3
+     }
     ]
    },
    {
@@ -16306,6 +18850,22 @@
       ],
       "answer": "hot / गरम",
       "emoji": "🍵"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — चाय बहुत गरम है, धीरे-धीरे पियो।",
+      "en": "The tea is very hot, drink it slowly.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — जाड़े में ठंड से बचने के लिए क्या पहनती हो?",
+      "en": "What do you wear in winter to stay warm?",
+      "category": "health_body",
+      "tier": 2
      }
     ]
    },
@@ -16383,6 +18943,22 @@
       "answer": "float / तैरेगी",
       "emoji": "⛵"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — बाल्टी में पानी भर दो।",
+      "en": "Fill the bucket with water.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "पानी या बारिश पर कोई कहावत गाँव में कहते हैं? अपनी बोली में सुनाओ।",
+      "en": "Share a village saying about water or rain in your boli.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    },
    {
@@ -16456,6 +19032,22 @@
       ],
       "answer": "pull / खिंचाव",
       "emoji": "🔔"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — दरवाज़ा धीरे से खोलो, ज़ोर से मत खींचो।",
+      "en": "Open the door gently, don't pull it hard.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — कुएँ से पानी कैसे खींचते थे?",
+      "en": "Ask an elder at home and record: how did they draw water from the well?",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -16533,6 +19125,22 @@
       "answer": "winter / सर्दी",
       "emoji": "🧣"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हें कौन सा मौसम सबसे अच्छा लगता है, और क्यों?",
+      "en": "Which season do you like best, and why?",
+      "category": "feelings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — गरमी या बरसात के दिनों की कोई मज़ेदार बात।",
+      "en": "Freely narrate a fun memory from the summer or rainy days.",
+      "category": "culture",
+      "tier": 3
+     }
     ]
    }
   ]
@@ -16597,6 +19205,22 @@
       "teach": "'Mohan' is a masculine name, so use 'जाता'.",
       "teachHi": "'मोहन' पुल्लिंग है, इसलिए 'जाता' आएगा।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक-एक करके बोलो — घर की तीन चीज़ों के नाम।",
+      "en": "Name three things in your house, one by one.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "बाज़ार में मिलने वाली दो सब्ज़ियों के नाम अपनी बोली में बोलो।",
+      "en": "Say the names of two vegetables from the market.",
+      "category": "market_money",
+      "tier": 1
+     }
     ]
    },
    {
@@ -16644,6 +19268,22 @@
       "fix": "मनाते",
       "teach": "'हम' (we) is plural, so use 'मनाते'.",
       "teachHi": "'हम' बहुवचन है, इसलिए 'मनाते' आएगा।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में अपना नाम बताओ — ठीक वैसे, जैसे घर में बोलती हो।",
+      "en": "Say your name in your boli, just like you say it at home.",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — यह मेरी सहेली है।",
+      "en": "Say: this is my friend.",
+      "category": "home_family",
+      "tier": 2
      }
     ]
    },
@@ -16695,6 +19335,22 @@
       "teach": "'Sita' is singular feminine, so use 'पढ़ती'.",
       "teachHi": "'सीता' एकवचन स्त्रीलिंग है, इसलिए 'पढ़ती' आएगा।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मैं खाना खा रही हूँ।",
+      "en": "Say: I am eating food.",
+      "category": "home_family",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — सुबह उठकर तुम सबसे पहले क्या करती हो?",
+      "en": "Tell what you do first after waking up in the morning.",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -16743,6 +19399,22 @@
       "fix": "अच्छा",
       "teach": "'लड़का' is masculine, so the adjective is 'अच्छा'.",
       "teachHi": "'लड़का' पुल्लिंग है, इसलिए विशेषण 'अच्छा' होगा।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — यह आम बहुत मीठा है।",
+      "en": "Say: this mango is very sweet.",
+      "category": "market_money",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "आज का मौसम कैसा है? अपनी बोली में बताओ।",
+      "en": "Describe today's weather.",
+      "category": "farming_weather",
+      "tier": 3
      }
     ]
    },
@@ -16794,6 +19466,22 @@
       "teach": "'बच्ची' (girl) is feminine, so use 'छोटी'.",
       "teachHi": "'बच्ची' स्त्रीलिंग है, इसलिए 'छोटी' आएगा।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — गाय दूध देती है।",
+      "en": "Say: the cow gives milk.",
+      "category": "farming_weather",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — तुम्हारे घर में कौन-कौन रहता है?",
+      "en": "Tell who all live in your house.",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -16843,6 +19531,22 @@
       "teach": "Plural of 'किताब' is 'किताबें'.",
       "teachHi": "'किताब' का बहुवचन 'किताबें' होता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — एक किलो आलू कितने का है?",
+      "en": "Ask: how much is one kilo of potatoes?",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "तुम्हारी कक्षा में कितने बच्चे हैं? अपनी बोली में गिनकर बताओ।",
+      "en": "Count and tell how many children are in your class.",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -16890,6 +19594,22 @@
       "fix": "खरीदूँगी।",
       "teach": "'अगले हफ़्ते' (next week) is future, so use 'खरीदूँगी'.",
       "teachHi": "'अगले हफ़्ते' भविष्यत् काल है, इसलिए 'खरीदूँगी' आएगा।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — कल तुमने क्या-क्या किया?",
+      "en": "Tell what all you did yesterday.",
+      "category": "time_numbers",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "बड़ी होकर तुम क्या बनना चाहती हो? अपनी बोली में बताओ।",
+      "en": "Tell what you want to become when you grow up.",
+      "category": "feelings",
+      "tier": 4
      }
     ]
    },
@@ -16940,6 +19660,22 @@
       "fix": "अस्त",
       "teach": "The opposite of 'उदय' (rise) is 'अस्त' (set).",
       "teachHi": "'उदय' का विलोम 'अस्त' है — सूरज शाम को अस्त होता है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — तुम्हारी बोली की एक कहावत।",
+      "en": "Ask an elder at home and record a saying in your boli.",
+      "category": "culture",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले या तीज-त्योहार की पूरी बात।",
+      "en": "Narrate freely about the last fair or festival.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -17031,6 +19767,22 @@
       "answer": "1947",
       "emoji": "🇮🇳"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — अपने गाँव का नाम, और अपने जिले का नाम।",
+      "en": "Say the name of your village and your district.",
+      "category": "directions_travel",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं भारत में रहती हूँ, मेरा घर यहाँ है।",
+      "en": "Say: I live in India, my home is here.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -17105,6 +19857,22 @@
        "Chennai"
       ],
       "answer": "Jaipur"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — तुम कौन गाँव से आई हो?",
+      "en": "Ask: which village have you come from?",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — हम पटना जा रहे हैं।",
+      "en": "Say: we are going to Patna.",
+      "category": "directions_travel",
+      "tier": 2
      }
     ]
    },
@@ -17181,6 +19949,22 @@
       ],
       "answer": "Kosi",
       "emoji": "🏞️"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — नदी में पानी बहुत बढ़ गया है।",
+      "en": "Say: the water in the river has risen a lot.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "बरसात में तुम्हारे गाँव की नदी या पोखर कैसी हो जाती है? अपनी बोली में बताओ।",
+      "en": "Describe what your village river or pond becomes like in the rains.",
+      "category": "farming_weather",
+      "tier": 3
      }
     ]
    },
@@ -17277,6 +20061,22 @@
       "teach": "Gandhi used peaceful protest (satyagraha) to win justice.",
       "teachHi": "गांधी ने न्याय पाने के लिए शांतिपूर्ण सत्याग्रह का उपयोग किया।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — पंद्रह अगस्त को तुम्हारे स्कूल में क्या-क्या होता है?",
+      "en": "Tell what all happens at your school on 15th August.",
+      "category": "culture",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — पुराने ज़माने की कोई बात, उन्हीं की बोली में।",
+      "en": "Ask an elder at home and record an old-times story, in their own boli.",
+      "category": "culture",
+      "tier": 5
+     }
     ]
    },
    {
@@ -17351,6 +20151,22 @@
        "Judge"
       ],
       "answer": "Prime Minister"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "वोट वाले दिन गाँव में कैसा माहौल रहता है? अपनी बोली में बताओ।",
+      "en": "Describe the atmosphere in the village on voting day.",
+      "category": "culture",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो — मुखिया जी से कहाँ मिल सकते हैं?",
+      "en": "Ask: where can one meet the mukhiya (village head)?",
+      "category": "questions",
+      "tier": 3
      }
     ]
    },
@@ -17447,6 +20263,22 @@
       "teach": "The Right to Education gives every child free schooling.",
       "teachHi": "शिक्षा का अधिकार हर बच्चे को निःशुल्क शिक्षा देता है।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — पढ़ना-लिखना हर बच्चे का हक है।",
+      "en": "Say: education is every child's right.",
+      "category": "school_learning",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अगर स्कूल में तुम्हें अपनी बात कहने का मौका मिले, तो क्या कहोगी? अपनी बोली में बताओ।",
+      "en": "If you got a chance to speak up at school, what would you say?",
+      "category": "feelings",
+      "tier": 4
+     }
     ]
    },
    {
@@ -17523,6 +20355,22 @@
       "answer": "water",
       "emoji": "💧"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — तुम्हारे घर से स्कूल तक का रास्ता, मोड़-मोड़ बताते हुए।",
+      "en": "Explain the route from your home to school, turn by turn.",
+      "category": "directions_travel",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — बाज़ार किधर पड़ता है और वहाँ पहुँचने में कितना समय लगता है?",
+      "en": "Say which way the market is and how long it takes to get there.",
+      "category": "directions_travel",
+      "tier": 4
+     }
     ]
    },
    {
@@ -17598,6 +20446,22 @@
       ],
       "answer": "spins on its axis",
       "emoji": "🔄"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — सुबह सूरज किधर से निकलता है और शाम को कहाँ डूबता है?",
+      "en": "Say where the sun rises in the morning and where it sets in the evening.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — रात के आसमान में तुम्हें क्या-क्या दिखता है, और देखकर कैसा लगता है?",
+      "en": "Freely narrate what you see in the night sky and how it makes you feel.",
+      "category": "feelings",
+      "tier": 6
      }
     ]
    }
@@ -17689,6 +20553,22 @@
       "answer": "a laptop",
       "emoji": "💻"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — मोबाइल को तुम्हारे गाँव में क्या बोलते हैं?",
+      "en": "What do people in your village call a mobile phone?",
+      "category": "school_learning",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं कंप्यूटर सीख रही हूँ।",
+      "en": "Say: I am learning the computer.",
+      "category": "school_learning",
+      "tier": 2
+     }
     ]
    },
    {
@@ -17765,6 +20645,22 @@
       "answer": "keyboard",
       "emoji": "⌨️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बोलो — हाथ, आँख और कान को क्या कहते हैं?",
+      "en": "Name hand, eye and ear in your boli.",
+      "category": "health_body",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में गिनाओ — तुम्हारे घर के हिस्से, जैसे आँगन और छत।",
+      "en": "List the parts of your house, like the courtyard and roof.",
+      "category": "home_family",
+      "tier": 2
+     }
     ]
    },
    {
@@ -17840,6 +20736,22 @@
       ],
       "answer": "speaker",
       "emoji": "🔊"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — खाना बन गया क्या?",
+      "en": "Ask: is the food ready?",
+      "category": "questions",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछो और खुद जवाब भी दो — तुम कहाँ जा रही हो?",
+      "en": "Ask and then answer yourself: where are you going?",
+      "category": "questions",
+      "tier": 3
      }
     ]
    },
@@ -17925,6 +20837,22 @@
       "answer": "Shift",
       "emoji": "⬆️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में पूछो — तुम्हारा नाम क्या है?",
+      "en": "Ask: what is your name?",
+      "category": "greetings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — मैं अपना नाम कीबोर्ड से लिखना सीख गई।",
+      "en": "Say: I learned to type my name on the keyboard.",
+      "category": "school_learning",
+      "tier": 3
+     }
     ]
    },
    {
@@ -18000,6 +20928,22 @@
       "answer": "desktop",
       "emoji": "🖥️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — भैया, मुझे वह वाला दिखाओ, यह नहीं।",
+      "en": "Say at a shop: show me that one, not this one.",
+      "category": "market_money",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "बताओ अपनी बोली में — घर से स्कूल का रास्ता किधर से जाता है?",
+      "en": "Describe the way from your home to school.",
+      "category": "directions_travel",
+      "tier": 3
+     }
     ]
    },
    {
@@ -18073,6 +21017,22 @@
       ],
       "answer": "it is removed",
       "emoji": "🗑️"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — घर में अनाज और कपड़े कहाँ सँभालकर रखते हैं?",
+      "en": "Where are grain and clothes kept safely at home?",
+      "category": "home_family",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — तुम्हारी बोली की एक पुरानी कहावत।",
+      "en": "Ask an elder at home and record an old proverb in your boli.",
+      "category": "culture",
+      "tier": 4
      }
     ]
    },
@@ -18150,6 +21110,22 @@
       "answer": "font size",
       "emoji": "🔠"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — पिछली होली की बात, रंग और मस्ती सब।",
+      "en": "Tell about last Holi — the colours and all the fun.",
+      "category": "culture",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "ज़रा बताओ अपनी बोली में — कौन-सा रंग सबसे अच्छा लगता है, और क्यों?",
+      "en": "Which colour do you like best, and why?",
+      "category": "feelings",
+      "tier": 4
+     }
     ]
    },
    {
@@ -18224,6 +21200,22 @@
       "answer": "hard to guess",
       "emoji": "🛡️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में समझाओ — घर की चाबी की बात अनजान लोगों को क्यों नहीं बताते?",
+      "en": "Explain why we don't tell strangers about the house key.",
+      "category": "home_family",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में खुलकर सुनाओ — कंप्यूटर सीखकर तुम आगे क्या-क्या करना चाहती हो?",
+      "en": "Tell freely: what all do you want to do after learning computers?",
+      "category": "feelings",
+      "tier": 6
+     }
     ]
    }
   ]
@@ -18278,6 +21270,22 @@
       "answer": "हिम + आलय",
       "emoji": "🏔️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द बोलो — सुबह को तुम क्या कहती हो?",
+      "en": "Say the word for 'morning' in your boli.",
+      "category": "time_numbers",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "किसी बड़े से मिलने पर अपनी बोली में कैसे नमस्ते करती हो? बोलकर बताओ।",
+      "en": "How do you greet an elder in your boli?",
+      "category": "greetings",
+      "tier": 2
+     }
     ]
    },
    {
@@ -18318,6 +21326,22 @@
       "answer": "द्विगु",
       "emoji": "🔺"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में रसोई की तीन चीज़ों के नाम बोलो।",
+      "en": "Name three kitchen things in your boli.",
+      "category": "home_family",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "बताओ अपनी बोली में — तुम्हारे गाँव में हाट-बाज़ार को क्या कहते हैं?",
+      "en": "What is the weekly market called in your village?",
+      "category": "market_money",
+      "tier": 2
+     }
     ]
    },
    {
@@ -18357,6 +21381,22 @@
        "hidden / छिपाई जाती हैं"
       ],
       "answer": "compared / तुलना होती है"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में किसी की तारीफ़ करो — जैसे 'चाँद जैसी सुंदर'।",
+      "en": "Praise someone in your boli using a comparison, like 'beautiful as the moon'.",
+      "category": "feelings",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "कोई कहावत जो तुम्हारे घर में बोली जाती है — अपनी बोली में सुनाओ।",
+      "en": "Share any saying spoken in your home, in your boli.",
+      "category": "culture",
+      "tier": 3
      }
     ]
    },
@@ -18400,6 +21440,22 @@
       "answer": "शृंगार रस",
       "emoji": "🌸"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — जब बहुत खुश होती हो तो मुँह से क्या निकलता है?",
+      "en": "What do you say in your boli when you are very happy?",
+      "category": "feelings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — आज तुम्हारा मन कैसा है, और क्यों?",
+      "en": "Say how you are feeling today and why, in your boli.",
+      "category": "feelings",
+      "tier": 3
+     }
     ]
    },
    {
@@ -18440,6 +21496,22 @@
       ],
       "answer": "rarely seen / बहुत कम दिखना",
       "emoji": "🌙"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — उनकी एक पुरानी कहावत।",
+      "en": "Ask an elder at home for an old saying and record it.",
+      "category": "culture",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में एक मज़ेदार कहावत सुनाओ और उसका मतलब भी बताओ।",
+      "en": "Share a funny saying in your boli and explain its meaning.",
+      "category": "culture",
+      "tier": 4
      }
     ]
    },
@@ -18482,6 +21554,22 @@
       ],
       "answer": "निर्जीव"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — गरमी में क्या अच्छा लगता है और सरदी में क्या?",
+      "en": "Say what you like in summer and what in winter, in your boli.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "घर की दो चीज़ें बताओ अपनी बोली में — एक बड़ी और एक छोटी।",
+      "en": "Name two things at home in your boli — one big, one small.",
+      "category": "home_family",
+      "tier": 3
+     }
     ]
    },
    {
@@ -18522,6 +21610,22 @@
       "answer": "for his honesty / उसकी ईमानदारी के लिए",
       "teach": "ईमानदारी का फल मीठा होता है — यही कहानी का संदेश है।",
       "teachHi": "ईमानदारी का फल मीठा होता है — यही कहानी का संदेश है।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम स्कूल क्यों जाती हो? क्या सीखना सबसे अच्छा लगता है?",
+      "en": "Why do you go to school, and what do you most like learning?",
+      "category": "school_learning",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — स्कूल के एक दिन की बात, सुबह से लौटने तक।",
+      "en": "Narrate one school day in your boli, from morning till coming home.",
+      "category": "school_learning",
+      "tier": 5
      }
     ]
    },
@@ -18575,6 +21679,22 @@
       "fix": "है।",
       "teach": "The subject is singular, so use 'है'.",
       "teachHi": "कर्ता एकवचन है, इसलिए 'है' आएगा, 'हैं' नहीं।"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — अगर कल बारिश हो गई तो तुम क्या करोगी?",
+      "en": "Say what you will do if it rains tomorrow, in your boli.",
+      "category": "farming_weather",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में सुनाओ — पिछले मेले या त्योहार की पूरी बात, जो-जो हुआ था।",
+      "en": "Freely narrate everything that happened at the last fair or festival, in your boli.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }
@@ -18685,6 +21805,22 @@
       "teach": "Ordinary people breaking an unjust law peacefully shook British rule.",
       "teachHi": "आम लोगों द्वारा अन्यायी कानून को शांति से तोड़ना अंग्रेज़ी शासन को हिला गया।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में एक शब्द कहो — तुम्हारे गाँव में 'देश' या 'वतन' को क्या बोलते हैं?",
+      "en": "Say the word for 'country/homeland' in your boli.",
+      "category": "culture",
+      "tier": 1
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — पंद्रह अगस्त को झंडे के पास सब एक-दूसरे से क्या बोलते हैं?",
+      "en": "Say what people greet each other with at the flag hoisting on Independence Day.",
+      "category": "greetings",
+      "tier": 2
+     }
     ]
    },
    {
@@ -18769,6 +21905,22 @@
       "answer": "the common people",
       "emoji": "💰"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — जब कोई बात ठीक नहीं लगती, तो तुम क्या बोलती हो?",
+      "en": "Say what you say when something feels unfair.",
+      "category": "feelings",
+      "tier": 2
+     },
+     {
+      "key": "cap2",
+      "hi": "घर में किसी बड़े से पूछकर रिकॉर्ड करो — पुराने ज़माने की एक कहावत, अपनी बोली में।",
+      "en": "Ask an elder at home and record an old-time proverb in your boli.",
+      "category": "culture",
+      "tier": 2
+     }
     ]
    },
    {
@@ -18843,6 +21995,22 @@
       ],
       "answer": "for future generations",
       "emoji": "♻️"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे गाँव में पानी कहाँ-कहाँ से आता है?",
+      "en": "Tell where water comes from in your village.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में गिनाओ — पेड़ से हमें क्या-क्या मिलता है?",
+      "en": "List the things we get from trees.",
+      "category": "farming_weather",
+      "tier": 2
      }
     ]
    },
@@ -18919,6 +22087,22 @@
       ],
       "answer": "irrigation",
       "emoji": "💦"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में बताओ — तुम्हारे खेत या गाँव में कौन-कौन सी फ़सल होती है?",
+      "en": "Tell which crops grow in your field or village.",
+      "category": "farming_weather",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में कहो — बारिश देर से आए तो किसान आपस में क्या बातें करते हैं?",
+      "en": "Say what farmers say to each other when the rains are late.",
+      "category": "farming_weather",
+      "tier": 3
      }
     ]
    },
@@ -19004,6 +22188,22 @@
       "answer": "the Election Commission",
       "emoji": "🗳️"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — चुनाव के दिन गाँव में क्या-क्या होता है?",
+      "en": "Describe what happens in the village on election day.",
+      "category": "culture",
+      "tier": 3
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूछकर दिखाओ — 'तुम वोट देने कब जाओगी?'",
+      "en": "Ask in your boli: 'When will you go to vote?'",
+      "category": "questions",
+      "tier": 3
+     }
     ]
    },
    {
@@ -19086,6 +22286,22 @@
       ],
       "answer": "1950",
       "emoji": "📅"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में कहो — घर या स्कूल का एक नियम, और वह क्यों ज़रूरी है।",
+      "en": "State one rule from home or school and why it matters.",
+      "category": "school_learning",
+      "tier": 4
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — अगर गाँव में सबको बराबर हक़ मिले, तो क्या बदल जाएगा?",
+      "en": "Say what would change if everyone in the village got equal rights.",
+      "category": "feelings",
+      "tier": 4
      }
     ]
    },
@@ -19182,6 +22398,22 @@
       "teach": "Small savings pooled together can fund a loan that changes a life.",
       "teachHi": "छोटी-छोटी बचत मिलकर ऐसा ऋण बन सकती है जो ज़िंदगी बदल दे।"
      }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में मोल-भाव करके दिखाओ — जैसे सब्ज़ी वाले से दाम कम करा रही हो।",
+      "en": "Act out bargaining with a vegetable seller in your boli.",
+      "category": "market_money",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में बताओ — पैसे बचाने के लिए घर में लोग क्या-क्या करते हैं?",
+      "en": "Tell what people at home do to save money.",
+      "category": "market_money",
+      "tier": 4
+     }
     ]
    },
    {
@@ -19257,6 +22489,22 @@
       ],
       "answer": "import",
       "emoji": "🛳️"
+     }
+    ],
+    "capture": [
+     {
+      "key": "cap1",
+      "hi": "अपनी बोली में सुनाओ — जब कोई नई चीज़ (मोबाइल, कपड़ा) पहली बार घर आई, तो क्या हुआ?",
+      "en": "Narrate what happened when a new thing (phone, clothes) first came home.",
+      "category": "market_money",
+      "tier": 5
+     },
+     {
+      "key": "cap2",
+      "hi": "अपनी बोली में पूरी बात सुनाओ — पिछले मेले या त्योहार में जो-जो हुआ, शुरू से आख़िर तक।",
+      "en": "Freely narrate everything that happened at the last fair or festival, start to finish.",
+      "category": "culture",
+      "tier": 6
      }
     ]
    }

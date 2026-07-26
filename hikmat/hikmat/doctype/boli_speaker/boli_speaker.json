@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CHM-SPK-.####",
+ "creation": "2026-07-23 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "relation",
+  "age_band",
+  "gender",
+  "village_or_block",
+  "consent_status",
+  "active"
+ ],
+ "fields": [
+  {
+   "description": "Set only when the speaker is a learner. This link is the ONLY place a real name can be resolved (Student is System-Manager-only). Elders' names are never stored.",
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "label": "Student (real-name mapping — PA only)",
+   "options": "Student"
+  },
+  {
+   "fieldname": "relation",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Relation",
+   "options": "\nself\nfamily-elder\nneighbor\nother"
+  },
+  {
+   "fieldname": "age_band",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Age band",
+   "options": "\n13-15\n16-18\n19-25\n26-40\n41-60\n60+"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nFemale\nMale\nOther"
+  },
+  {
+   "fieldname": "village_or_block",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Village / block",
+   "options": "Boli Village"
+  },
+  {
+   "fieldname": "consent_status",
+   "fieldtype": "Select",
+   "label": "Consent status",
+   "options": "\nself_consented\nguardian_consented\nverbal_elder_consent\nmissing"
+  },
+  {
+   "default": "1",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Boli Speaker",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -152,6 +152,8 @@ doc_events = {
 	# Module-test banks ride inside the cached courses payload → bust on edit.
 	# (Child-table question edits save the parent, so the parent hook covers them.)
 	"Module Test": _bust,
+	# Dialect prompts ride inside the cached courses payload → bust on edit.
+	"Dialect Prompt": _bust,
 	# Stamp who/when a facilitator recorded an evaluation outcome in Desk.
 	"Evaluation": {"before_save": "hikmat.api.stamp_evaluation"},
 	# Offline cohorts must carry a start date (server-side twin of mandatory_depends_on).

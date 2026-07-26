@@ -24,14 +24,14 @@
     --line: #e7dccb;          /* soft warm outline */
     --primary: #f47b20;       /* Saffron — main action / spark */
     --primary-d: #994700;     /* deep saffron — AA text + accent */
-    --grape: #006972;         /* Deep Teal — secondary/journey (name kept for cascade) */
-    --grape-d: #004f56;       /* teal depth */
+    --teal: #006972; --secondary: var(--teal); --grape: var(--teal);         /* Deep Teal — secondary/journey (name kept for cascade) */
+    --teal-d: #004f56; --secondary-d: var(--teal-d); --grape-d: var(--teal-d);       /* teal depth */
     --gold: #ffb800;          /* Marigold — rewards / progress */
     --good: #2ec27e;
     --good-d: #157a4b;        /* AA on white + the #eafaf2 success tint (was #1e9d62) */
     --bad: #ff5a5f;
     --bad-d: #ba1a1a;         /* Radiant error — AA on white + #fff0f0 tint */
-    --r: 14px;
+    --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-pill: 999px; --r: var(--r-md);
     /* Radiant soft 'colored depth' shadows */
     --shadow-sm: 0 2px 6px rgba(153,71,0,.10);
     --shadow: 0 6px 18px rgba(153,71,0,.12);
@@ -97,14 +97,16 @@
     border-bottom: 1px solid var(--line);
   }
   .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 18px; }
+  .brand .brandwrap { display:inline-flex; align-items:center; gap:9px; }
+  .brand #topBack { margin:0; padding:8px 15px; font-size:15px; }
   .brand .logo { font-size: 24px; display:inline-flex; align-items:center; }
   .brand .logo .logoimg { height:28px; width:auto; max-width:120px; object-fit:contain; vertical-align:middle; border-radius:6px; }
   .stats { display: flex; gap: 8px; align-items:center; }
   .pill {
-    padding: 6px 13px; border-radius: 999px; background:#fff; border:2px solid var(--line);
+    padding: 6px 13px; border-radius: var(--r-pill); background:#fff; border:2px solid var(--line);
     font-weight: 800; font-size: 14px; display:flex; align-items:center; gap:6px; color:var(--ink);
   }
-  .pill.star { border-color:#ffe2a8; color:#e08a00; }
+  .pill.star { border-color:#ffe2a8; color:#994700; }
   /* glossy gold star (CSS-drawn so it isn't the pale 🌟 emoji) */
   .staricon { font-size:1.12em; line-height:1; background:linear-gradient(180deg,#ffe14d,#ffab00);
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
@@ -112,9 +114,17 @@
   .pill.coin { border-color:#ffd9c2; color:var(--primary-d); }
   .toggle {
     background: #fff; border: 2px solid var(--line); color:var(--muted); cursor:pointer;
-    padding: 6px 13px; border-radius: 999px; font-weight:800; font-size: 12px;
+    padding: 6px 13px; border-radius: var(--r-pill); font-weight:800; font-size: 12px;
   }
   .toggle.on { background: var(--grape); color: #fff; border-color: var(--grape-d); }
+  /* grouped utilities: one segmented control instead of loose toggles */
+  .utilcluster { display:inline-flex; align-items:center; gap:2px; padding:3px; background:#fff;
+    border:2px solid var(--line); border-radius:var(--r-pill); box-shadow:var(--shadow-sm); }
+  .utilcluster .toggle { border:0; box-shadow:none; background:transparent; padding:6px 10px; }
+  .utilcluster .toggle.on { background:var(--secondary); color:#fff; }
+  [data-theme="dark"] .utilcluster { background:#2a2240; border-color:var(--line); }
+  [data-theme="dark"] .utilcluster .toggle { background:transparent; box-shadow:none; }
+  [data-theme="dark"] .utilcluster .toggle.on { background:var(--secondary); }
   .screen { padding: 30px 28px; }
 
   /* tactile button base */
@@ -128,17 +138,19 @@
   .hero p { color: var(--muted); margin: 0; font-size: 15px; font-weight:700;}
   .themes { display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:14px; }
   .theme {
-    border-radius: 20px; padding: 22px 20px; cursor:pointer; color:#fff;
-    text-align:left; font: inherit; position:relative; overflow:hidden; border:0;
-    background: linear-gradient(160deg,#ffa24d,#f47b20);
+    border-radius: var(--r-lg); padding: 20px 18px; cursor:pointer; color:var(--ink);
+    text-align:left; font: inherit; position:relative; overflow:hidden;
+    background: var(--card); border:1.5px solid var(--line);
     box-shadow:var(--shadow-primary); transition: transform .08s, box-shadow .08s;
   }
-  .theme:active { transform: translateY(5px); box-shadow:var(--shadow-primary); }
-  .theme.locked { background: #efeae2; color:#aaa39a; box-shadow:var(--shadow-sm); cursor: not-allowed; }
+  .theme:active { transform: translateY(4px); box-shadow:var(--shadow-sm); }
+  .theme.locked { background: #efeae2; color:#aaa39a; border-color:#e2dccf; box-shadow:var(--shadow-sm); cursor: not-allowed; }
   .theme.locked:active { transform:none; box-shadow:var(--shadow-sm); }
-  .theme .big { font-size: 40px; }
-  .theme h3 { margin: 10px 0 2px; font-size: 19px; font-weight:900; }
-  .theme small { opacity:.92; font-weight:700; }
+  .theme .big { width:56px; height:56px; border-radius:16px; background:#fff; display:grid; place-items:center; font-size:30px; border:2px solid var(--tc,var(--line)); box-shadow:0 4px 10px rgba(0,0,0,.06); }
+  .theme.locked .big { border-color:#e2dccf; background:#f4f1ea; }
+  .theme h3 { margin: 12px 0 2px; font-size: 19px; font-weight:900; color:inherit; }
+  .theme small { opacity:1; font-weight:700; color:var(--muted); }
+  .theme.locked small { color:#aaa39a; }
   .theme .lock { position:absolute; top:16px; right:18px; font-size:18px;}
 
   /* LEVEL MAP — the journey path */
@@ -196,30 +208,41 @@
   .step { position:absolute; left:0; right:0; z-index:1; }                        /* top + height set inline */
   .node {
     position:absolute; top:0; border:0; cursor:pointer;                           /* left/width/height/border-radius set inline */
-    display:grid; place-items:center; font-size:28px; color:#fff;
-    background: linear-gradient(160deg,#2f97a1,var(--grape));
-    box-shadow:var(--shadow-teal); transition: transform .08s, box-shadow .08s;
+    display:grid; place-items:center; font-size:30px; color:var(--ink);
+    background:#fff;
+    box-shadow: 0 0 0 3px var(--secondary), 0 6px 14px rgba(0,0,0,.12); transition: transform .1s, box-shadow .1s;
   }
+  [data-theme="dark"] .node { background:#241f36; color:var(--ink); }
+  .node .iconsvg { line-height:0; }
+  .node .iconsvg svg { width:40px; height:40px; display:block; }
+  .node .statebadge { position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; display:grid; place-items:center; z-index:3; border:2px solid var(--card); box-shadow:0 2px 5px rgba(0,0,0,.2); }
+  .node .statebadge svg { width:13px; height:13px; display:block; }
+  .node .statebadge.done { background:var(--good-d); }
+  .node .statebadge.locked { background:#a99f90; }
   .node .num {                                                                    /* number rides on the node, so it follows the curve */
-    position:absolute; top:-6px; left:-6px; min-width:20px; height:20px; padding:0 4px;
-    border-radius:999px; background:#fff; color:var(--ink); font-size:11px; font-weight:900;
+    position:absolute; top:-7px; left:-7px; min-width:21px; height:21px; padding:0 5px;
+    border-radius:999px; background:var(--secondary); color:#fff; font-size:11px; font-weight:900; border:2px solid var(--card);
     display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,.2); z-index:3;
   }
-  .step.locked .node .num { color:#b7b0a6; }
-  .node:active { transform: translateY(4px); box-shadow:var(--shadow-teal); }
-  .step.done .node { background: linear-gradient(160deg,#46d68f,var(--good)); box-shadow:var(--shadow-sm); }
-  .step.locked .node { background:#e7e1d8; color:#b7b0a6; box-shadow:var(--shadow-sm); cursor:not-allowed; }
+  .step.locked .node .num { background:#b7b0a6; }
+  .node:active { transform: translateY(3px) scale(.97); }
+  .step.done .node { box-shadow: 0 0 0 3px var(--good-d), 0 6px 14px rgba(0,0,0,.10); }
+  .step.done .node .num { background:var(--good-d); }
+  .step.locked .node { background:#f3efe7; box-shadow: 0 0 0 3px #ded6c7, 0 4px 10px rgba(0,0,0,.06); cursor:not-allowed; }
+  .step.locked .node .iconsvg svg { filter:grayscale(1) opacity(.45); }
+  [data-theme="dark"] .step.locked .node { background:#2a2440; box-shadow:0 0 0 3px #4a4266, 0 4px 10px rgba(0,0,0,.3); }
   .step.locked .node:active { transform:none; box-shadow:var(--shadow-sm); }
   /* hover: unlocked nodes lift & brighten; the label leans in; locked ones give a little "no" nudge */
-  .step:not(.locked) .node:hover:not(:active) { transform: translateY(-4px) scale(1.06); filter: brightness(1.07); }
+  .step:not(.locked) .node:hover:not(:active) { transform: translateY(-4px) scale(1.06); }
   .step:not(.locked):hover .label { color: var(--primary-d); }
   .step:not(.locked):hover .node { cursor:pointer; }
   .step.locked .node:hover { animation: nudge .32s ease; }
   @keyframes nudge { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 60%{transform:translateX(4px)} 80%{transform:translateX(-2px)} }
-  .step.current .node { background: linear-gradient(160deg,#ff9a5a,var(--primary)); box-shadow:var(--shadow-primary); animation: pulse 1.6s ease-in-out infinite; }
+  .step.current .node { box-shadow: 0 0 0 3px var(--primary), 0 6px 16px rgba(244,123,32,.4); animation: pulse 1.6s ease-in-out infinite; }
+  .step.current .node .num { background:var(--primary); }
   @keyframes pulse {
-    0%,100%{ box-shadow:0 6px 0 var(--primary-d), 0 0 0 0 rgba(255,150,0,.5),  0 0 16px 2px rgba(255,170,60,.35); }
-    50%    { box-shadow:0 6px 0 var(--primary-d), 0 0 0 13px rgba(255,150,0,0), 0 0 28px 7px rgba(255,170,60,.6);  }
+    0%,100%{ box-shadow: 0 0 0 3px var(--primary), 0 0 0 0 rgba(244,123,32,.45), 0 6px 16px rgba(244,123,32,.35); }
+    50%    { box-shadow: 0 0 0 3px var(--primary), 0 0 0 12px rgba(244,123,32,0), 0 6px 20px rgba(244,123,32,.5); }
   }
   .starttag {
     position:absolute; top:-21px; left:50%; transform:translateX(-50%);
@@ -322,7 +345,8 @@
   .rostercard .rn { font-size:15px; text-align:center; }
   [data-theme="dark"] .rostercard { background:#2a2240; border-color:var(--line); box-shadow:var(--shadow-sm); }
   /* "🙋 Help Needed" top-bar button + its confirmation toast */
-  .toggle.helpneed { background:var(--grape); color:#fff; border-color:var(--grape); font-weight:900; }
+  .toggle.helpneed { background:var(--grape); color:#fff; border-color:var(--grape); font-weight:900; white-space:nowrap; }
+  .toggle.helpneed .iconsvg svg, .toggle.helpneed svg { filter:brightness(0) invert(1); vertical-align:middle; }
   .toggle.helpneed:hover { filter:brightness(1.06); }
   #hkToast { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:9999; background:#2c2440; color:#fff;
              border-radius:999px; padding:11px 18px; font-weight:800; font-size:14px; max-width:90%; text-align:center;
@@ -401,7 +425,7 @@
   .feedback.good { color:var(--good-d); }
   .feedback.bad { color:var(--bad-d); }
   .actionrow { display:flex; gap:12px; justify-content:center; margin-top:22px; flex-wrap:wrap;}
-  .btn { border:0; border-radius:999px; padding:14px 28px; font-size:16px; font-weight:900; cursor:pointer;
+  .btn { border:0; border-radius:var(--r-pill); padding:14px 28px; font-size:16px; font-weight:900; cursor:pointer;
          background:#fff; color:var(--ink); box-shadow:var(--shadow-sm); transition: transform .06s, box-shadow .06s; }
   .btn:active { transform: translateY(3px); box-shadow:var(--shadow-sm); }
   .btn.primary { background:linear-gradient(135deg,#ffa24d,var(--primary)); color:#fff; box-shadow:var(--shadow-primary); }
@@ -431,6 +455,37 @@
   .bubble.me { background:var(--grape); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
   .bubble small { display:block; opacity:.7; font-size:12px; margin-top:4px; font-weight:600;}
 
+  /* DIALECT CAPTURE — record your own boli, then write it down */
+  .capbox { text-align:center; max-width:520px; margin:6px auto 14px; }
+  .capprompt { font-size:24px; font-weight:900; line-height:1.55; color:var(--ink); }
+  .capgloss { color:var(--muted); font-size:15px; font-weight:700; margin-top:6px; }
+  .capbtn { display:inline-flex; align-items:center; justify-content:center; gap:10px; margin-top:14px;
+    min-width:200px; min-height:64px; padding:14px 30px; border:0; border-radius:999px; cursor:pointer;   /* ≥48px touch target */
+    font-size:19px; font-weight:900; color:#fff; background:linear-gradient(135deg,#ffa24d,var(--primary));
+    box-shadow:var(--shadow-primary); transition:transform .06s, box-shadow .06s; }
+  .capbtn:active { transform:translateY(3px); }
+  .capbtn.stop { background:var(--bad-d); box-shadow:var(--shadow-sm); }   /* #ba1a1a — AA 4.5:1+ with white text */
+  .caprec { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:6px 14px; border-radius:999px;
+    background:#fff0f0; border:2px solid var(--bad); color:var(--bad-d); font-weight:900; font-size:15px; }  /* --bad-d on #fff0f0 — AA */
+  [data-theme="dark"] .caprec { background:#3a1f24; border-color:var(--bad); color:#ffb4ab; }
+  .capdot { width:12px; height:12px; border-radius:50%; background:var(--bad-d); animation:capblink 1.1s ease-in-out infinite; }
+  [data-theme="dark"] .capdot { background:#ffb4ab; }
+  @keyframes capblink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  @media (prefers-reduced-motion:reduce){ .capdot{ animation:none; } }
+  .captimer { font-size:36px; font-weight:900; font-variant-numeric:tabular-nums; color:var(--ink); margin-top:10px; }
+  .capaudio { display:block; width:100%; max-width:420px; margin:12px auto; }
+  .captext { display:block; width:100%; max-width:520px; margin:6px auto; min-height:96px; font-size:18px; line-height:1.7;
+    padding:12px 14px; border:2px solid var(--line); border-radius:14px; background:var(--card); color:var(--ink);
+    font-family:inherit; resize:vertical; }
+  .cappending { display:inline-flex; align-items:center; gap:6px; margin:8px auto 0; background:#fff7e6; color:#5b4a1a;
+    border:1px solid #ffd86b; border-radius:999px; padding:5px 13px; font-weight:800; font-size:13px; }   /* #5b4a1a on #fff7e6 — AA */
+  .cappending[hidden] { display:none; }   /* author display would otherwise defeat the hidden attribute */
+  [data-theme="dark"] .cappending { background:#3a3316; border-color:#7a6a3a; color:#ffd86b; }
+  .dialectnote { color:var(--muted); font-size:12.5px; font-weight:600; margin:10px 2px 0; line-height:1.5; }
+  .linkbtn { background:none; border:0; padding:0; font:inherit; font-weight:800; color:var(--primary-d);
+    cursor:pointer; text-decoration:underline; }
+  [data-theme="dark"] .linkbtn { color:#ffb474; }
+
   /* MASCOT — Roshni, the guide */
   .mascotrow { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
   .mascot { width:96px; flex:0 0 auto; transform-origin:center bottom; animation: float 3s ease-in-out infinite; }
@@ -440,13 +495,35 @@
   .mascot.m-happy { animation: hop .55s ease; }
   @keyframes hop { 0%{transform:translateY(0)} 30%{transform:translateY(-16px)} 55%{transform:translateY(0)} 78%{transform:translateY(-7px)} 100%{transform:translateY(0)} }
   .mascot.m-sad { animation:none; transform: rotate(-5deg); }
+  .mascot.m-cheer { animation: cheer .75s ease; }
+  @keyframes cheer { 0%{transform:translateY(0) rotate(0)} 24%{transform:translateY(-18px) rotate(-6deg)} 50%{transform:translateY(0) rotate(0)} 72%{transform:translateY(-9px) rotate(5deg)} 100%{transform:translateY(0) rotate(0)} }
+  .mascot.m-surprised { animation: mpop .4s ease; }
+  @keyframes mpop { 0%{transform:scale(1)} 42%{transform:scale(1.13)} 100%{transform:scale(1)} }
+  .mascot.m-think { transform: rotate(4deg); }
+  .fx-cheer path { transform-box:fill-box; transform-origin:center; animation: twinkle 1.1s ease-in-out infinite; }
   body.speaking .mascot { animation: nod .45s ease-in-out infinite; }
   @keyframes nod { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg)} }
   .lid { transform-box: fill-box; transform-origin:center; animation: blink 4.5s infinite; }
   @keyframes blink { 0%,93%,100%{transform:scaleY(0)} 96%{transform:scaleY(1)} }
-  .m-open, .m-frown { display:none; }
-  .mascot.m-happy .m-smile { display:none; }  .mascot.m-happy .m-open { display:block; }
-  .mascot.m-sad .m-smile { display:none; }    .mascot.m-sad .m-frown { display:block; }
+  /* Roshni expressions — default: open eyes, relaxed brows, gentle smile */
+  .eyes-happy, .eyes-wide, .eyes-wink, .brows-worried, .brows-raised,
+  .m-open, .m-frown, .m-o, .m-small, .m-grin,
+  .fx-cheer, .fx-think { display:none; }   /* unscoped so the hero's .roshni (not .mascot) also shows only the default smile */
+  .mascot.m-happy .eyes-open{display:none} .mascot.m-happy .eyes-happy{display:block}
+  .mascot.m-happy .m-smile{display:none}   .mascot.m-happy .m-open{display:block}
+  .mascot.m-cheer .eyes-open{display:none} .mascot.m-cheer .eyes-happy{display:block}
+  .mascot.m-cheer .m-smile{display:none}   .mascot.m-cheer .m-grin{display:block}
+  .mascot.m-cheer .fx-cheer{display:block}
+  .mascot.m-sad .brows-default{display:none} .mascot.m-sad .brows-worried{display:block}
+  .mascot.m-sad .m-smile{display:none}       .mascot.m-sad .m-frown{display:block}
+  .mascot.m-surprised .eyes-open{display:none} .mascot.m-surprised .eyes-wide{display:block}
+  .mascot.m-surprised .brows-default{display:none} .mascot.m-surprised .brows-raised{display:block}
+  .mascot.m-surprised .m-smile{display:none} .mascot.m-surprised .m-o{display:block}
+  .mascot.m-think .brows-default{display:none} .mascot.m-think .brows-raised{display:block}
+  .mascot.m-think .m-smile{display:none}       .mascot.m-think .m-small{display:block}
+  .mascot.m-think .fx-think{display:block}
+  .mascot.m-wink .eyes-open{display:none} .mascot.m-wink .eyes-wink{display:block}
+  .mascot.m-wink .m-smile{display:none}   .mascot.m-wink .m-open{display:block}
   .bubble2 { position:relative; background:#fff; border:2px solid var(--line); border-radius:18px;
              padding:14px 18px; box-shadow:var(--shadow-sm); flex:1; }
   .bubble2::before { content:""; position:absolute; left:-9px; top:50%; margin-top:-9px; width:16px; height:16px;
@@ -560,15 +637,17 @@
   <div id="topnav"></div>
   <div id="app">
     <div class="topbar">
-      <div class="brand"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></div>
+      <div class="brand" id="brandSlot"><button class="backbtn" id="topBack" style="display:none">← <span id="backLabel"></span></button><span class="brandwrap" id="brandWrap"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></span></div>
       <div class="stats">
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
         <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
-        <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
-        <button class="toggle" id="langToggle" title="Language / भाषा">🌐 EN</button>
-        <button class="toggle" id="hiToggle" title="Show the Hindi guide / हिंदी गाइड दिखाओ">Guide</button>
-        <button class="toggle helpneed" id="helpNeedBtn" title="Help Needed / मदद चाहिए">🙋 Help</button>
+        <div class="utilcluster">
+          <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
+          <button class="toggle" id="langToggle" title="Language / भाषा">EN</button>
+          <button class="toggle" id="hiToggle" title="Show the Hindi guide / हिंदी गाइड दिखाओ">Guide</button>
+        </div>
+        <button class="toggle helpneed" id="helpNeedBtn" title="Help Needed / मदद चाहिए">Help</button>
       </div>
     </div>
     <div id="root"></div>
@@ -607,6 +686,12 @@ window.HIKMAT_ICONS = {
 
   "track:work": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-wrk-bd" x1="10" y1="22" x2="54" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e8e0d2"/></linearGradient><linearGradient id="hk-wrk-hd" x1="24" y1="12" x2="40" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f0e3cf"/></linearGradient></defs><path d="M24 16h16a3 3 0 0 1 3 3v5H21v-5a3 3 0 0 1 3-3z" fill="url(#hk-wrk-hd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><rect x="28" y="13" width="8" height="6" rx="2" fill="none" stroke="#00000026" stroke-width="1.6"/><rect x="10" y="22" width="44" height="30" rx="6" fill="url(#hk-wrk-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M10 34c8 4 14 5 22 5s14-1 22-5" fill="none" stroke="#00000018" stroke-width="1.6"/><rect x="27" y="34" width="10" height="7" rx="2" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><rect x="14" y="25" width="10" height="3" rx="1.5" fill="#fff" opacity=".5"/></svg>`,
 
+  "track:health": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-hlth-bd" x1="32" y1="14" x2="32" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f7eef1"/></linearGradient></defs><path d="M15 22h34v30a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3z" fill="url(#hk-hlth-bd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><rect x="19" y="31" width="8" height="7" rx="1.5" fill="#bfe6ff" stroke="#00000022" stroke-width="1.2"/><rect x="37" y="31" width="8" height="7" rx="1.5" fill="#bfe6ff" stroke="#00000022" stroke-width="1.2"/><rect x="27" y="43" width="10" height="12" rx="1.5" fill="#ff9fb2" stroke="#00000022" stroke-width="1.3"/><circle cx="32" cy="19" r="9" fill="#fff" stroke="#00000022" stroke-width="1.4"/><path d="M32 14v10M27 19h10" stroke="#ef476f" stroke-width="3.2" stroke-linecap="round"/><rect x="18" y="26" width="7" height="3" rx="1.5" fill="#fff" opacity=".55"/></svg>`,
+
+  "track:money": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-mny-bd" x1="32" y1="24" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eaf5ee"/></linearGradient><radialGradient id="hk-mny-cn" cx="43" cy="43" r="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe79a"/><stop offset="1" stop-color="#f2b134"/></radialGradient></defs><path d="M12 26l20-12 20 12z" fill="#fff" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 26h40" stroke="#00000022" stroke-width="1.6"/><path d="M17 28v16M25 28v16M39 28v16M47 28v16" stroke="#16a34a" stroke-width="3" stroke-linecap="round" opacity=".9"/><path d="M10 44h44v5a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2z" fill="url(#hk-mny-bd)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><circle cx="43" cy="43" r="11" fill="url(#hk-mny-cn)" stroke="#00000022" stroke-width="1.5"/><path d="M39 39h8M39 42h8M39 39c5 0 6 6 0 6h-2l7 6" fill="none" stroke="#9a6a12" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><rect x="20" y="16" width="7" height="3" rx="1.5" fill="#fff" opacity=".5"/></svg>`,
+
+  "track:travel": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-trv-bd" x1="32" y1="14" x2="32" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e8f4fd"/></linearGradient><linearGradient id="hk-trv-wn" x1="14" y1="20" x2="50" y2="32" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9bd3f5"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs><rect x="10" y="16" width="44" height="30" rx="8" fill="url(#hk-trv-bd)" stroke="#00000026" stroke-width="1.6"/><path d="M15 24h34v9a2 2 0 0 1-2 2H17a2 2 0 0 1-2-2z" fill="url(#hk-trv-wn)" stroke="#00000018" stroke-width="1.2" stroke-linejoin="round"/><path d="M27 24v11M40 24v11" stroke="#fff" stroke-width="1.8" opacity=".7"/><rect x="45" y="38" width="7" height="4" rx="2" fill="#ffd36b" stroke="#00000018" stroke-width="1"/><circle cx="21" cy="47" r="5" fill="#3a3a3a" stroke="#00000026" stroke-width="1.4"/><circle cx="43" cy="47" r="5" fill="#3a3a3a" stroke="#00000026" stroke-width="1.4"/><circle cx="21" cy="47" r="1.8" fill="#fff"/><circle cx="43" cy="47" r="1.8" fill="#fff"/><rect x="14" y="19" width="9" height="3" rx="1.5" fill="#fff" opacity=".55"/></svg>`,
+
   "lifeskills": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-lfs-c" cx="32" cy="26" r="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7d6"/><stop offset="1" stop-color="#f2b134"/></radialGradient><linearGradient id="hk-lfs-p" x1="32" y1="14" x2="32" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe0ec"/></linearGradient></defs><path d="M32 50V34" stroke="#7cc36a" stroke-width="3" stroke-linecap="round"/><path d="M32 42c-6 0-11-3-11-3s3 6 11 6" fill="#8fd17a" stroke="#00000018" stroke-width="1.2" stroke-linejoin="round"/><g stroke="#00000022" stroke-width="1.5" stroke-linejoin="round"><path d="M32 26c-3-6-1-12-1-12s5 3 6 8z" fill="url(#hk-lfs-p)"/><path d="M32 26c3-6 1-12 1-12s-5 3-6 8z" fill="url(#hk-lfs-p)"/><path d="M32 26c6-3 12-1 12-1s-3 5-8 6z" fill="url(#hk-lfs-p)"/><path d="M32 26c-6-3-12-1-12-1s3 5 8 6z" fill="url(#hk-lfs-p)"/><path d="M32 26c-2 6-7 9-7 9s-1-6 3-10z" fill="url(#hk-lfs-p)"/><path d="M32 26c2 6 7 9 7 9s1-6-3-10z" fill="url(#hk-lfs-p)"/></g><circle cx="32" cy="26" r="5.5" fill="url(#hk-lfs-c)" stroke="#00000022" stroke-width="1.5"/><circle cx="30" cy="24" r="1.5" fill="#fff" opacity=".8"/></svg>`,
 
   "brand": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-brand-fl" cx="32" cy="22" r="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7d6"/><stop offset=".5" stop-color="#ffc24d"/><stop offset="1" stop-color="#f2882d"/></radialGradient><linearGradient id="hk-brand-bw" x1="14" y1="38" x2="50" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb15a"/><stop offset="1" stop-color="#d4762b"/></linearGradient><radialGradient id="hk-brand-gl" cx="32" cy="24" r="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe08a" stop-opacity=".7"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/></radialGradient></defs><circle cx="32" cy="26" r="20" fill="url(#hk-brand-gl)"/><path d="M32 8c-2 6-6 8-6 14a6 6 0 0 0 12 0c0-6-4-8-6-14z" fill="url(#hk-brand-fl)" stroke="#d4762b" stroke-width="1.2" stroke-linejoin="round"/><path d="M32 16c-1 3-3 4-3 7a3 3 0 0 0 6 0c0-3-2-4-3-7z" fill="#fff7d6" opacity=".9"/><path d="M14 40h36c0 6-8 10-18 10S14 46 14 40z" fill="url(#hk-brand-bw)" stroke="#a85a1e" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 41c5-1 9-1 12 1-3 3-7 3-11 2z" fill="url(#hk-brand-bw)" stroke="#a85a1e" stroke-width="1.4" stroke-linejoin="round"/><path d="M18 42c6 3 22 3 28 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg>`,
@@ -641,6 +726,9 @@ window.HIKMAT_ICONS = {
 };
 
 window.HIKMAT_ICONS = Object.assign(window.HIKMAT_ICONS || {}, {
+  "boli": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-boli-c" x1="32" y1="10" x2="32" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#0891b2"/></linearGradient></defs><rect x="23" y="10" width="18" height="30" rx="9" fill="url(#hk-boli-c)" stroke="#00000026" stroke-width="1.6"/><path d="M28 19h8M28 25h8M28 31h8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M17 31a15 15 0 0 0 30 0" fill="none" stroke="#0e7490" stroke-width="2.6" stroke-linecap="round"/><path d="M32 46v7" stroke="#0e7490" stroke-width="2.6" stroke-linecap="round"/><rect x="23" y="52" width="18" height="4.5" rx="2.2" fill="#3a3a3a" stroke="#00000026" stroke-width="1.2"/><rect x="26" y="13" width="4" height="11" rx="2" fill="#fff" opacity=".5"/></svg>`,
+  "video": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-vid-sc" x1="8" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient></defs><rect x="8" y="16" width="40" height="32" rx="7" fill="url(#hk-vid-sc)" stroke="#00000026" stroke-width="1.6"/><path d="M26 25l12 7-12 7z" fill="#ef476f" stroke="#00000018" stroke-width="1" stroke-linejoin="round"/><path d="M50 25l8-5v24l-8-5z" fill="#9fc6ee" stroke="#00000022" stroke-width="1.6" stroke-linejoin="round"/><rect x="12" y="19" width="9" height="3" rx="1.5" fill="#fff" opacity=".5"/></svg>`,
+  "help": `<svg viewBox="0 0 64 64"><path d="M22 34V16a3.5 3.5 0 0 1 7 0v13h1.5V11a3.5 3.5 0 0 1 7 0v18H39V15a3.5 3.5 0 0 1 7 0v23c0 9.4-6.4 16-16 16-5.5 0-9.4-2.2-12.3-6.8l-6.8-10.8c-1.9-3 2-6.6 4.9-4.4L22 39z" fill="#ffc24d" stroke="#c98a1e" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
   "sound-on": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sndon-sp" x1="12" y1="20" x2="34" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fc1f0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M12 26h8l12-10v32L20 38h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-sndon-sp)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 27l8-6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><path d="M40 24c3 5 3 11 0 16" fill="none" stroke="#f2b134" stroke-width="3" stroke-linecap="round"/><path d="M47 18c5 8 5 20 0 28" fill="none" stroke="#e8714f" stroke-width="3" stroke-linecap="round"/></svg>`,
   "sound-off": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sndoff-sp" x1="12" y1="20" x2="34" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fc1f0"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M12 26h8l12-10v32L20 38h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-sndoff-sp)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 27l8-6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><g stroke="#e8543a" stroke-width="3.6" stroke-linecap="round"><path d="M41 23l14 18"/><path d="M55 23L41 41"/></g></svg>`,
   "theme-light": `<svg viewBox="0 0 64 64"><defs><radialGradient id="hk-thl-c" cx="32" cy="30" r="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe79a"/><stop offset="1" stop-color="#f2b134"/></radialGradient></defs><g stroke="#e0951f" stroke-width="3.4" stroke-linecap="round"><path d="M32 6v7"/><path d="M32 51v7"/><path d="M6 32h7"/><path d="M51 32h7"/><path d="M13 13l5 5"/><path d="M46 46l5 5"/><path d="M51 13l-5 5"/><path d="M18 46l-5 5"/></g><circle cx="32" cy="32" r="13" fill="url(#hk-thl-c)" stroke="#d99a1f" stroke-width="1.6"/><path d="M26 26c2-2 5-3 8-3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".7"/></svg>`,
@@ -710,6 +798,10 @@ let COURSES = [
           { who:"🧑‍🦱", line:"Do you want anything else?", lineHi:"क्या आपको और कुछ चाहिए?",
             replies:[ {text:"No, that is all. Thank you.", ok:true}, {text:"I am hungry now.", ok:false}, {text:"It is raining.", ok:false} ],
             then:"Okay! Have a nice day." },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में कहो — बाज़ार में तुम क्या-क्या खरीदती हो?", en:"What do you buy at the market?", category:"market_money", tier:3 },
+          { key:"cap2", hi:"अपनी बोली में बताओ — तुम्हें कौन-सा फल सबसे अच्छा लगता है, और क्यों?", en:"Which fruit do you like best, and why?", category:"market_money", tier:4 },
         ] },
       { key:"veg", title:"Veg & Staples", titleHi:"सब्ज़ी और अनाज",
         words:[
@@ -748,6 +840,9 @@ let COURSES = [
           { who:"👩", line:"Please close the door.", lineHi:"कृपया दरवाज़ा बंद करो।",
             replies:[ {text:"Okay, I will close it.", ok:true}, {text:"I want two apples.", ok:false}, {text:"It is raining.", ok:false} ],
             then:"Thank you!" },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में बताओ — सुबह उठकर घर में सबसे पहले क्या करती हो?", en:"What do you do first at home in the morning?", category:"home_family", tier:4 },
         ] },
     ]
   },
@@ -770,6 +865,10 @@ let COURSES = [
           { who:"👩‍🏫", line:"Open your book, please.", lineHi:"अपनी किताब खोलो।",
             replies:[ {text:"Yes, teacher.", ok:true}, {text:"Goodbye!", ok:false}, {text:"I am hungry.", ok:false} ],
             then:"Let us begin." },
+        ],
+        capture:[
+          { key:"cap1", hi:"अपनी बोली में कहो — स्कूल में तुम्हें क्या सबसे अच्छा लगता है?", en:"What do you like best at school?", category:"school_learning", tier:3 },
+          { key:"cap2", hi:"अपनी बोली में बताओ — तुम्हारी सबसे अच्छी सहेली कौन है?", en:"Who is your best friend?", category:"feelings", tier:2 },
         ] },
     ]
   },
@@ -1055,6 +1154,7 @@ const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
 const READ_LEVEL  = { id:"read",  name:"Read & Answer",     nameHi:"पढ़ो और बताओ",  sub:"Read, then answer", subHi:"पढ़ो, फिर उत्तर दो", ico:"📃", type:"read" };
 const REPLY_LEVEL = { id:"reply", name:"Reply to the Email", nameHi:"ईमेल का जवाब दो", sub:"Read it, then reply", subHi:"पढ़ो, फिर जवाब दो", ico:"📨", type:"reply" };
+const CAPTURE_LEVEL = { id:"capture", name:"Speak & Write", nameHi:"बोलो और लिखो", sub:"Record your boli", subHi:"अपनी बोली रिकॉर्ड करो", ico:"🎤", type:"capture" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
@@ -1068,6 +1168,8 @@ function levelsFor(lesson){
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
   if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
   if(lesson && lesson.reply && lesson.reply.length) lv = lv.concat([REPLY_LEVEL]);
+  // The per-lesson "capture" activity moved to the standalone Boli (भोजपुरी AI) tab; the
+  // lesson.capture[] arrays stay as the Boli prompt bank (boliPrompts()) — not shown in lessons.
   return lv;
 }
 
@@ -1365,22 +1467,64 @@ function mascotSVG(){ return `<svg viewBox="0 0 120 142" xmlns="http://www.w3.or
   <circle cx="60" cy="58" r="33" fill="#f1b785"/>
   <path d="M27 56 Q28 23 60 23 Q92 23 93 56 Q80 39 60 39 Q40 39 27 56 Z" fill="#2b2233"/>
   <circle cx="60" cy="44" r="2.4" fill="#c0392b"/>
-  <circle cx="43" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
-  <circle cx="77" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
-  <ellipse cx="49" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
-  <ellipse cx="71" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
-  <circle cx="50" cy="59" r="3.4" fill="#2b2233"/>
-  <circle cx="72" cy="59" r="3.4" fill="#2b2233"/>
-  <circle cx="51.4" cy="57.4" r="1.1" fill="#fff"/>
-  <circle cx="73.4" cy="57.4" r="1.1" fill="#fff"/>
-  <rect class="lid" x="42" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
-  <rect class="lid" x="64" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
-  <path d="M43 49 Q49 46 55 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M65 49 Q71 46 77 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle class="cheek" cx="43" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
+  <circle class="cheek" cx="77" cy="67" r="6" fill="#ff9ec2" opacity=".55"/>
+  <g class="eyes eyes-open">
+    <ellipse cx="49" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
+    <ellipse cx="71" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
+    <circle cx="50" cy="59" r="3.4" fill="#2b2233"/>
+    <circle cx="72" cy="59" r="3.4" fill="#2b2233"/>
+    <circle cx="51.4" cy="57.4" r="1.1" fill="#fff"/>
+    <circle cx="73.4" cy="57.4" r="1.1" fill="#fff"/>
+    <rect class="lid" x="42" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
+    <rect class="lid" x="64" y="50" width="14" height="9" rx="4" fill="#f1b785"/>
+  </g>
+  <g class="eyes eyes-happy">
+    <path d="M43 60 Q49 51 55 60" stroke="#2b2233" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M65 60 Q71 51 77 60" stroke="#2b2233" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  <g class="eyes eyes-wide">
+    <circle cx="49" cy="58" r="8.6" fill="#fff" stroke="#2b2233" stroke-width="1"/>
+    <circle cx="71" cy="58" r="8.6" fill="#fff" stroke="#2b2233" stroke-width="1"/>
+    <circle cx="50" cy="59" r="3.9" fill="#2b2233"/>
+    <circle cx="72" cy="59" r="3.9" fill="#2b2233"/>
+    <circle cx="51.6" cy="57.2" r="1.3" fill="#fff"/>
+    <circle cx="73.6" cy="57.2" r="1.3" fill="#fff"/>
+  </g>
+  <g class="eyes eyes-wink">
+    <ellipse cx="49" cy="58" rx="6.5" ry="7.5" fill="#fff"/>
+    <circle cx="50" cy="59" r="3.4" fill="#2b2233"/>
+    <circle cx="51.4" cy="57.4" r="1.1" fill="#fff"/>
+    <path d="M65 60 Q71 53 77 60" stroke="#2b2233" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  <g class="brows brows-default">
+    <path d="M43 49 Q49 46 55 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M65 49 Q71 46 77 49" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  <g class="brows brows-worried">
+    <path d="M43 47 Q49 51 55 51" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M65 51 Q71 51 77 47" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  <g class="brows brows-raised">
+    <path d="M43 44 Q49 41 55 44" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M65 44 Q71 41 77 44" stroke="#2b2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
   <path d="M60 62 Q62 67 59 69" stroke="#d99a6c" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path class="m-smile" d="M50 75 Q60 84 70 75" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path class="m-open" d="M52 74 Q60 90 68 74 Q60 80 52 74 Z" fill="#a0392b"/>
-  <path class="m-frown" d="M50 80 Q60 73 70 80" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path class="mouth m-smile" d="M50 75 Q60 84 70 75" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path class="mouth m-open" d="M52 74 Q60 90 68 74 Q60 80 52 74 Z" fill="#a0392b"/>
+  <path class="mouth m-frown" d="M50 80 Q60 73 70 80" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse class="mouth m-o" cx="60" cy="79" rx="6" ry="7.5" fill="#a0392b"/>
+  <path class="mouth m-small" d="M54 78 Q60 81 66 78" stroke="#a0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <g class="mouth m-grin"><path d="M47 74 Q60 93 73 74 Z" fill="#a0392b"/><path d="M50 75 Q60 79 70 75" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round"/></g>
+  <g class="fx fx-cheer">
+    <path d="M18 33 l2.2 5.4 5.4 2.2 -5.4 2.2 -2.2 5.4 -2.2 -5.4 -5.4 -2.2 5.4 -2.2 z" fill="#ffd23f"/>
+    <path d="M101 41 l1.7 4.2 4.2 1.7 -4.2 1.7 -1.7 4.2 -1.7 -4.2 -4.2 -1.7 4.2 -1.7 z" fill="#ffd23f"/>
+  </g>
+  <g class="fx fx-think">
+    <circle cx="93" cy="41" r="3.1" fill="#9fb0c0"/>
+    <circle cx="101" cy="33" r="2.3" fill="#9fb0c0"/>
+    <circle cx="107" cy="27" r="1.6" fill="#9fb0c0"/>
+  </g>
 </svg>`; }
 
 let lastHi = "";   // the Hindi help line for the current prompt
@@ -1412,7 +1556,7 @@ function updateHiLine(){
 function setMood(mood){
   const m = document.getElementById("mascot");
   if(!m) return;
-  m.classList.remove("m-happy","m-sad");
+  m.classList.remove("m-happy","m-sad","m-surprised","m-think","m-cheer","m-wink");
   if(mood){ void m.offsetWidth; m.classList.add("m-"+mood); }
 }
 // render the primary action(s) into the pinned bottom bar
@@ -1425,7 +1569,7 @@ function starRow(earned){
 // lane; a smooth SVG curve is drawn through their centres; labels sit in a fixed column.
 // items: [{ cls, face, extras, label, sub, starsHtml, onClick }]
 // node shapes cycle so the trail isn't the same circle over and over (kept cohesive: same size/colour)
-const NODE_SHAPES = ["50%", "30%", "46% 54% 52% 48% / 53% 45% 55% 47%", "50% / 38%"];
+const NODE_SHAPES = ["50%"];
 function renderPath(items){
   const wrap = $("#path");
   wrap.innerHTML = "";
@@ -1451,7 +1595,7 @@ function renderPath(items){
     const p = pts[i];
     const shape = NODE_SHAPES[i % NODE_SHAPES.length];
     const step = el(`<div class="step ${it.cls||''}" style="top:${TOP + i*ROW}px; height:${D}px">
-      <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${it.num != null ? esc(String(it.num)) : i+1}</span>${it.extras||""}</button>
+      <button class="node" style="left:${p.x - NR}px; width:${D}px; height:${D}px; border-radius:${shape}">${it.face}<span class="num">${it.num != null ? esc(String(it.num)) : i+1}</span>${it.cls==="done" ? '<span class="statebadge done"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' : (it.cls==="locked" ? '<span class="statebadge locked"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="#fff"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#fff" stroke-width="2.4"/></svg></span>' : "")}${it.extras||""}</button>
       <div class="labelblock" style="left:${p.x + NR + LABELGAP}px; height:${D}px">
         <div class="label">${esc(it.label)}</div>
         <div class="ls">${it.sub||""}</div>
@@ -1464,10 +1608,16 @@ function renderPath(items){
 }
 // the back button lives above the card; pass null to hide it (home screen)
 function setBack(label, fn){
-  const n = document.getElementById("topnav"); if(!n) return;
-  if(!label){ n.innerHTML = ""; return; }
-  n.innerHTML = `<button class="backbtn">${esc(label)}</button>`;
-  n.querySelector("button").onclick = () => { sfx.back(); fn(); };
+  var bw = document.getElementById("brandWrap");
+  var bb = document.getElementById("topBack");
+  var bl = document.getElementById("backLabel");
+  if(!bb) return;
+  if(!label){ bb.style.display="none"; if(bw) bw.style.display=""; bb.onclick=null; return; }
+  var clean = String(label).split(String.fromCharCode(8592)).join("").trim();
+  if(bl) bl.textContent = clean;
+  bb.style.display=""; if(bw) bw.style.display="none";
+  bb.setAttribute("aria-label", tx("Back","वापस") + ": " + clean);
+  bb.onclick = function(){ sfx.back(); fn(); };
 }
 
 function refreshTop(){
@@ -1493,9 +1643,9 @@ function refreshTop(){
   const ht = $("#hiToggle");
   if(ht){ ht.classList.toggle("on", state.hindi); ht.textContent = tx("Guide","गाइड") + (state.hindi ? " ✓" : ""); ht.title = tx("Show the Hindi guide","हिंदी गाइड दिखाओ"); }
   const hn = $("#helpNeedBtn");
-  if(hn) hn.textContent = "🙋 " + tx("Help Needed","मदद चाहिए");
+  if(hn){ hn.innerHTML = iconFor("help","🙋") + " " + esc(tx("Help","मदद")); hn.title = tx("Help Needed","मदद चाहिए"); hn.setAttribute("aria-label", tx("Help Needed","मदद चाहिए")); }
   const lt = $("#langToggle");
-  if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.innerHTML = iconFor("lang","🌐") + " " + (state.lang==="hi" ? "हिं" : "EN"); }
+  if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.textContent = (state.lang==="hi" ? "हिं" : "EN"); }
   mountRoshniFab();   // floating Roshni voice assistant — appears once AI is on + a student is logged in
 }
 $("#hiToggle").onclick = () => {
@@ -1508,7 +1658,36 @@ $("#hiToggle").onclick = () => {
   flashToast(msg); srSay(msg);
   if(state.hindi) sayHi("हिंदी गाइड चालू");
 };
-$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save(); refreshTop(); rerender(); logTool("lang_switch"); };
+// A language switch re-renders the current screen, which would otherwise wipe anything typed but
+// not yet submitted (signup name/PIN, a compose/transcribe textarea, a ticked consent box).
+// Snapshot the on-screen fields, re-render in the new language, then restore what was entered.
+function snapshotInputs(){
+  const map = {}; let i = 0;
+  root.querySelectorAll("input, textarea, select").forEach(f => {
+    const key = f.id || f.name || ((f.type || f.tagName) + ":" + i); i++;
+    map[key] = (f.type === "checkbox" || f.type === "radio") ? { checked: f.checked } : { value: f.value };
+  });
+  return map;
+}
+function restoreInputs(map){
+  if(!map) return; let i = 0;
+  root.querySelectorAll("input, textarea, select").forEach(f => {
+    const key = f.id || f.name || ((f.type || f.tagName) + ":" + i); i++;
+    const s = map[key]; if(!s) return;
+    if(f.type === "checkbox" || f.type === "radio"){ if(typeof s.checked === "boolean") f.checked = s.checked; }
+    else if(typeof s.value === "string" && s.value !== "") f.value = s.value;
+  });
+}
+$("#langToggle").onclick = () => {
+  const keep = snapshotInputs();                 // preserve typed-but-unsubmitted input across the re-render
+  state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save();
+  refreshTop();
+  const ret = rerender();
+  restoreInputs(keep);                                                     // synchronous renderers: fields exist immediately
+  if(ret && typeof ret.then === "function") ret.then(() => restoreInputs(keep));  // async renderers: after their data loads
+  requestAnimationFrame(() => restoreInputs(keep));                        // catch renderers that fill fields a tick later
+  logTool("lang_switch");
+};
 $("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); logTool("theme"); };
 $("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); logTool("hear_screen"); };
 $("#helpNeedBtn").onclick = () => helpNeeded();
@@ -1536,7 +1715,7 @@ function trackCard(course, back){
   // anything already started remains fully accessible (soft lock, like belt gates)
   const blocker = (!locked && earned===0) ? prevTestBlocker(course) : null;
   const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
-      style="${locked?"":`background:linear-gradient(160deg,${col(course.color)}dd,${col(course.color)})`}">
+      style="${locked?"":`--tc:${col(course.color)};background:${col(course.color)}14;border-color:${col(course.color)}55`}">
     ${locked ? `<span class="lock">🔒</span>` : (blocker ? `<span class="lock">🔒</span>` : "")}
     <div class="big">${iconFor(["track:"+course.key, "subject:"+course.subject], course.icon)}</div>
     <h3>${esc(tx(course.title, course.titleHi))}</h3>
@@ -1556,7 +1735,7 @@ function bandCard(band){
   const tracks = bandTracks(band.key).filter(c=>c.published && c.lessons.length);
   if(!tracks.length) return null;
   const {earned, max} = progressOf(tracks);
-  const node = el(`<button class="theme band" style="background:linear-gradient(160deg,${col(band.color)}dd,${col(band.color)})">
+  const node = el(`<button class="theme band" style="--tc:${col(band.color)};background:${col(band.color)}14;border-color:${col(band.color)}55">
     <div class="big">${iconFor("band:"+band.key, band.icon)}</div>
     <h3>${esc(tx(band.title, band.titleHi))}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : esc(tx(band.subtitle, band.subtitleHi))}</small>
@@ -1569,7 +1748,7 @@ function subjectCard(band, subj){
   const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key && c.published && c.lessons.length);
   const {earned, max} = progressOf(tracks);
   const lessons = tracks.reduce((a,c)=>a+c.lessons.length,0);
-  const node = el(`<button class="theme" style="background:linear-gradient(160deg,${col(subj.color)}dd,${col(subj.color)})">
+  const node = el(`<button class="theme" style="--tc:${col(subj.color)};background:${col(subj.color)}14;border-color:${col(subj.color)}55">
     <div class="big">${iconFor("subject:"+subj.key, subj.icon)}</div>
     <h3>${esc(tx(subj.title, subj.titleHi))}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(lessons+" lessons", lessons+" पाठ")}</small>
@@ -1583,7 +1762,7 @@ function lifeSkillsCard(){
   const tracks = lifeSkillsTracks();
   if(!tracks.length) return null;
   const {earned, max} = progressOf(tracks);
-  const node = el(`<button class="theme" style="background:linear-gradient(160deg,#fb7185dd,#e11d48)">
+  const node = el(`<button class="theme" style="--tc:#e11d48;background:#e11d4814;border-color:#e11d4855">
     <div class="big">${iconFor("lifeskills","🌼")}</div>
     <h3>${tx("Life Skills","जीवन कौशल")}</h3>
     <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx("Everyday English for home, market, school & work","घर, बाज़ार, स्कूल और काम की अंग्रेज़ी")}</small>
@@ -1669,6 +1848,9 @@ function renderHome(){
     }
     host.appendChild(grid);
   }
+  // Bhojpuri AI — a SEPARATE class project (data work), never mixed into the lessons above.
+  host.appendChild(el(`<div class="sectionhead">${tx("🎙️ Bhojpuri AI","🎙️ भोजपुरी AI")}</div>`));
+  const bgrid = el(`<div class="themes"></div>`); bgrid.appendChild(boliCard()); host.appendChild(bgrid);
   refreshTop();
 }
 
@@ -1698,10 +1880,19 @@ function renderBand(band){
 
 // SUBJECT screen — the tracks (topics) for one band+subject
 function renderSubject(band, subj){
+  // Match the visibility the subject card counts with (published, non-empty).
+  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key && c.published && c.lessons.length);
+  // Single-topic subject: "choose a topic" would be a choice of one — go straight to its
+  // lessons. Back must return to the subject list (renderBand), NOT here: re-entering
+  // renderSubject would instantly re-skip forward and trap the back button. As soon as a
+  // subject has a second topic, the chooser below reappears on its own.
+  if(tracks.length === 1){
+    renderTrack(tracks[0], { label: "← " + tx(band.title, band.titleHi), fn: () => renderBand(band) });
+    return;
+  }
   stopSpeech();
   rerender = () => renderSubject(band, subj);
   root.innerHTML = "";
-  const tracks = bandTracks(band.key).filter(c=>c.subject===subj.key);
   const s = el(`<div class="screen">
     <div class="maphead"><div>
       <h2>${iconFor("subject:"+subj.key, subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
@@ -1922,7 +2113,7 @@ function renderTrack(course, back){
     return {
       cls,
       num: i+1,               // keep lesson numbering stable even when a video node sits above
-      face: done ? "✓" : "📚",
+      face: iconFor("act:learn","📚"),
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(ls.title, ls.titleHi),
       sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
@@ -1934,7 +2125,7 @@ function renderTrack(course, back){
   if(course.videoUrl){
     items.unshift({
       cls: (state.videosSeen||{})[course.key] ? "done" : "",
-      num: "▶", face: "📺",
+      num: "▶", face: iconFor("video","📺"),
       label: tx(course.videoTitle || "Watch the video", course.videoTitleHi || course.videoTitle || "वीडियो देखो"),
       sub: videoNodeSub(course),
       onClick: () => { sfx.enter(); renderVideo(course, back); },
@@ -1950,7 +2141,7 @@ function renderTrack(course, back){
     items.push({
       cls: tcls,
       num: course.lessons.length + 1,
-      face: !allDone ? "🔒" : (tp && tp.passed ? "✓" : "🏆"),
+      face: iconFor("star","🏆"),
       extras: tcls==="current" ? `<span class="starttag">${tx("TEST","परीक्षा")}</span><span class="sparkle">✨</span>` : "",
       label: tx("Module Test","मॉड्यूल परीक्षा"),
       sub: !allDone ? tx("Finish all lessons first","पहले सभी पाठ पूरे करो")
@@ -2132,7 +2323,7 @@ function renderLessonMap(course, lesson, back){
     const cls = !unlocked ? "locked" : (i===currentIdx ? "current" : (earned>0 ? "done" : ""));
     return {
       cls,
-      face: !unlocked ? "🔒" : (earned>0 ? "✓" : lv.ico),
+      face: iconFor("act:"+lv.id, lv.ico),
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(lv.name, lv.nameHi),
       sub: tx(lv.sub, lv.subHi),
@@ -2146,7 +2337,7 @@ function renderLessonMap(course, lesson, back){
   if(lesson.videoUrl){
     items.unshift({
       cls: (state.videosSeen||{})[course.key + "::" + lesson.key] ? "done" : "",
-      num: "▶", face: "📺",
+      num: "▶", face: iconFor("video","📺"),
       label: tx(lesson.videoTitle || "Watch the video", lesson.videoTitleHi || lesson.videoTitle || "वीडियो देखो"),
       sub: videoNodeSub(lesson),
       onClick: () => { sfx.enter(); renderVideo(course, back, lesson); },
@@ -2160,6 +2351,7 @@ function renderLessonMap(course, lesson, back){
 function startLevel(course, lesson, lv, back){
   const rounds = buildRounds(lv, lesson);
   let idx = 0, score = 0;
+  let tileDraft = null;   // preserves an in-progress spell/phrase tile layout across a language switch (same round)
   actStart(course, lesson, lv);                                        // dwell clock starts
   if(getStars(course.key, lesson.key, lv.id) > 0) logTool("replay");   // she's back for practice
   const backToLesson = () => { actEnd(false); renderLessonMap(course, lesson, back); };
@@ -2171,7 +2363,7 @@ function startLevel(course, lesson, lv, back){
   function header(){
     return `<div class="screen gameplay">
       <div class="maphead">
-        <div><div style="font-weight:800;font-size:20px">${lv.ico} ${tx(lv.name, lv.nameHi)}</div></div>
+        <div><h2 style="margin:0">${iconFor("act:"+lv.id, lv.ico)} ${esc(tx(lv.name, lv.nameHi))}</h2></div>
       </div>
       <div class="progress"><div id="bar" style="width:${(idx/rounds.length)*100}%"></div></div>
       <div id="body" class="gamebody"></div>
@@ -2190,6 +2382,7 @@ function startLevel(course, lesson, lv, back){
   }
   function next(correct){
     if(correct){ score++; state.coins += 5; }
+    tileDraft = null;               // the tile layout belongs to the round we're leaving
     idx++; save(); refreshTop();
     if(idx>=rounds.length) finish();
     else runRound();
@@ -2214,6 +2407,7 @@ function startLevel(course, lesson, lv, back){
     if(lv.type==="email")  return roundEmail(r);
     if(lv.type==="read")   return roundRead(r);
     if(lv.type==="reply")  return roundReply(r);
+    if(lv.type==="capture") return roundCapture(r);
   }
 
   // --- LEARN: flashcard, see + hear + Hindi, then "Got it"
@@ -2262,7 +2456,8 @@ function startLevel(course, lesson, lv, back){
 
   // --- SPELL: show picture, build word from letter tiles
   function roundSpell(it){
-    const letters = shuffle(it.en.split(""));
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;   // restore the tile layout after a language switch
+    const letters = _d ? _d.letters.slice() : shuffle(it.en.split(""));
     mount(`${head(tx("Spell the word","शब्द लिखो"), tx("Tap the letters in order","अक्षरों को सही क्रम में छुओ"),"अक्षरों को सही क्रम में लगाओ।")}
       <div class="display"><div class="emoji">${esc(it.emoji)}</div><div class="hi">${esc(it.hi)}</div></div>
       <div class="center" style="margin-bottom:10px"><button class="speakbtn" id="say">🔊 ${tx("Hear it","सुनो")}</button></div>
@@ -2274,12 +2469,13 @@ function startLevel(course, lesson, lv, back){
     $("#say").onclick=()=>speak(it.en);
     announce(() => speak(it.en));
     const tray=$("#tray"), bank=$("#bank");
-    let built=[];
+    let built = _d ? _d.built.slice() : [];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
       built.forEach((ch,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(ch)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
       remaining().forEach((ch,i)=>{ const t=el(`<button type="button" class="tile">${esc(ch)}</button>`); t.onclick=()=>{built.push(ch);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==it.en.length;
+      tileDraft = { idx, letters: letters.slice(), built: built.slice() };   // keep the draft current for a language switch
     }
     function remaining(){ const used={}; built.forEach(c=>used[c]=(used[c]||0)+1); const out=[]; const tmp={...used};
       letters.forEach(c=>{ if(tmp[c]){tmp[c]--;} else out.push(c); }); return out; }
@@ -2298,7 +2494,8 @@ function startLevel(course, lesson, lv, back){
 
   // --- PHRASE: arrange word tiles into a sentence
   function roundPhrase(r){
-    const words = shuffle(r.words.slice());
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;   // restore the tile layout after a language switch
+    const words = _d ? _d.words.slice() : shuffle(r.words.slice());
     mount(`${head(tx("Make the sentence","वाक्य बनाओ"), tx("Put the words in the right order","शब्दों को सही क्रम में लगाओ"), r.hintHi)}
       <div class="display"><div class="emoji">${esc(r.emoji)}</div></div>
       <div class="tray" id="tray"></div>
@@ -2308,12 +2505,13 @@ function startLevel(course, lesson, lv, back){
       <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
     announce(() => sayHi(r.hintHiSpoken));
     const tray=$("#tray"), bank=$("#bank");
-    let built=[];
+    let built = _d ? _d.built.slice() : [];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
       built.forEach((w,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(w)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
       remaining().forEach(w=>{ const t=el(`<button type="button" class="tile">${esc(w)}</button>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==r.words.length;
+      tileDraft = { idx, words: words.slice(), built: built.slice() };   // keep the draft current for a language switch
     }
     function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
       words.forEach(w=>{ if(tmp[w]){tmp[w]--;} else out.push(w); }); return out; }
@@ -2693,6 +2891,191 @@ function startLevel(course, lesson, lv, back){
     };
   }
 
+  // --- CAPTURE: speak the prompt in your own boli, record it, then write what you said.
+  // ready → recording (MM:SS timer, auto-stop at 3 min) → review (play back + re-record +
+  // transcription) → save (upload now, or buffer in the IndexedDB outbox and sync later).
+  // Guests get the full practice flow but nothing is stored. Mic failure never bricks the
+  // lesson: Retry + Skip are always offered.
+  function roundCapture(r){
+    const CAP_MAX_SECS = 180;
+    let capBlob = null, capClientId = null, capTick = null, capSecs = 0, recStart = 0, stopping = false, myGen = 0;
+    function mmss(s){ const m = Math.floor(s/60), x = s%60; return (m<10?"0":"")+m+":"+(x<10?"0":"")+x; }
+    function promptBox(noSay){
+      return `<div class="capbox">
+        <div class="capprompt" lang="hi">${esc(r.hi)}</div>
+        ${r.en ? `<div class="capgloss">${esc(r.en)}</div>` : ""}
+        ${noSay ? "" : `<div style="margin-top:10px"><button class="speakbtn" id="capSay">🔊 ${tx("Hear it","सुनो")}</button></div>`}
+      </div>`;
+    }
+    function wireSay(){ const b = document.getElementById("capSay"); if(b) b.onclick = () => speak(r.hi, "hi"); }
+    function pendingChip(){ return `<div class="center"><div class="cappending" id="capPending" hidden></div></div>`; }
+    function showPending(){   // "⏳ N recordings waiting to upload" — only when the outbox has clips
+      capOutboxCount().then(n => {
+        const p = document.getElementById("capPending");
+        if(p && n > 0){ p.hidden = false; p.textContent = "⏳ " + tx(n + (n>1 ? " recordings" : " recording") + " waiting to upload", n + " रिकॉर्डिंग अपलोड बाकी"); }
+      });
+    }
+    // NOTE: roshniBusy is reset by whichever path releases the mic (finishRecording, the tick
+    // abort, or the startRec catch) — never here, so a genuine Roshni turn isn't clobbered.
+    function cleanup(){ if(capTick){ clearInterval(capTick); capTick = null; } }
+    function leave(ok){ cleanup(); capURL(null); next(ok); }   // release the playback objectURL when the round ends
+
+    function showReady(){
+      mount(`${head(tx("🎤 Speak in your boli","🎤 अपनी बोली में बोलो"), tx("Press record and answer out loud","रिकॉर्ड दबाओ और बोलकर जवाब दो"), "अपनी बोली में बोलकर जवाब दो।")}
+        ${promptBox()}
+        <div class="capbox"><button class="capbtn" id="capRec">⏺ ${tx("Record","रिकॉर्ड करो")}</button></div>
+        ${pendingChip()}
+        <div class="feedback" id="fb"></div>`);
+      setFooter("");
+      // keep each slot in its own script: the Devanagari prompt goes only in the hi slot, so the
+      // 🔊 button never reads Devanagari with an English voice. The prompt is also spoken in 'hi'
+      // via the announce()/speak() below regardless of UI language.
+      setNarration(tx("Speak in your own boli.","अपनी बोली में बोलो।"), "अपनी बोली में बोलो। " + r.hi);
+      wireSay(); showPending();
+      if(idx===0) announce(() => speak(r.hi, "hi"));
+      else speak(r.hi, "hi", { queue:true, gap:2000 });
+      $("#capRec").onclick = startRecording;
+    }
+
+    async function startRecording(){
+      if(roshniBusy) return;             // the shared recorder is mid-use (Roshni's mic)
+      roshniBusy = true;                 // …and block Roshni's mic while we hold it
+      stopSpeech();                      // don't let the prompt's TTS bleed into the recording
+      try { await startRec(); }
+      catch(e){ roshniBusy = false; return showMicError(); }
+      _capGen++; myGen = _capGen;
+      capSecs = 0; recStart = Date.now(); stopping = false;
+      showRecording();
+    }
+
+    function showRecording(){
+      mount(`${head(tx("🎤 Speak now!","🎤 अब बोलो!"), tx("Say your answer, then press stop","अपना जवाब बोलो, फिर रोको दबाओ"), "अब बोलो! फिर रोको दबाओ।")}
+        ${promptBox(true)}
+        <div class="capbox">
+          <div class="caprec" role="status"><span class="capdot" aria-hidden="true"></span> ${tx("Recording…","रिकॉर्डिंग हो रही है…")}</div>
+          <div class="captimer" id="capTimer">00:00</div>
+          <div><button class="capbtn stop" id="capStop">⏹ ${tx("Stop","रोको")}</button></div>
+        </div>`);
+      setFooter("");
+      const narr = tx("Recording. Say your answer, then press stop.","रिकॉर्डिंग हो रही है। अपना जवाब बोलो, फिर रोको दबाओ।");
+      // set the narration text WITHOUT auto-speaking: on a standalone/PWA build setNarration would
+      // speak it aloud a moment into the recording and that TTS would bleed into the clip. The top
+      // 🔊 button still reads it on demand via hearNarration().
+      narration = { en: narr, hi: narr };
+      srSay(tx("Recording started","रिकॉर्डिंग शुरू हो गई"));
+      $("#capStop").onclick = () => { sfx.tap(); finishRecording(); };
+      capTick = setInterval(() => {
+        const tEl = document.getElementById("capTimer");
+        if(!tEl){   // navigated away mid-recording (Back / language toggle) → release the mic
+          if(capTick){ clearInterval(capTick); capTick = null; }
+          if(_capGen === myGen){ stopRec(); roshniBusy = false; }   // only if no newer recording took over
+          return;
+        }
+        capSecs = Math.floor((Date.now() - recStart)/1000);
+        tEl.textContent = mmss(Math.min(capSecs, CAP_MAX_SECS));
+        if(capSecs >= CAP_MAX_SECS) finishRecording();   // auto-stop at 3 minutes
+      }, 250);
+    }
+
+    async function finishRecording(){
+      if(stopping) return;               // stop button + auto-stop can't double-fire
+      stopping = true;
+      if(capTick){ clearInterval(capTick); capTick = null; }
+      capSecs = Math.min(Math.max(1, Math.round((Date.now() - recStart)/1000)), CAP_MAX_SECS);
+      const blob = await stopRec();
+      roshniBusy = false;
+      srSay(tx("Recording stopped","रिकॉर्डिंग रुक गई"));
+      if(!blob || !blob.size) return showMicError();   // nothing captured → same friendly retry path
+      capBlob = blob;
+      capClientId = uid();   // one id per recording — reused across Save retries so the server dedups instead of duplicating
+      showReview();
+    }
+
+    function showReview(){
+      const url = capURL(capBlob);
+      mount(`${head(tx("✍️ Now write what you said","✍️ अब जो कहा, वही लिखो"), tx("Listen back, then write it in your boli","सुनो, फिर अपनी बोली में लिखो"), "जो कहा गया, वही लिखो।")}
+        ${promptBox()}
+        <div class="capbox">
+          <audio class="capaudio" controls src="${escAttr(url)}"></audio>
+          <label class="fieldlabel" for="capText">${tx("What you said, in your boli","जो कहा, अपनी बोली में")}</label>
+          <textarea id="capText" class="captext" lang="hi" rows="3" placeholder="${escAttr(tx("Write what was said…","जो कहा गया, वही लिखो…"))}"></textarea>
+        </div>
+        ${pendingChip()}
+        <div class="feedback" id="fb"></div>`);
+      setFooter(`<button class="btn ghost" id="capRedo">↺ ${tx("Re-record","फिर रिकॉर्ड करो")}</button>
+        <button class="btn primary" id="capSave" disabled>${tx("Save →","सेव करो →")}</button>`);
+      const narr = tx("Listen to your recording, then write what you said.","अपनी रिकॉर्डिंग सुनो, फिर जो कहा वही लिखो।");
+      setNarration(narr, narr);
+      wireSay(); showPending();
+      const ta = $("#capText"), saveBtn = $("#capSave");
+      ta.oninput = () => { saveBtn.disabled = !ta.value.trim(); };
+      $("#capRedo").onclick = () => { sfx.tap(); capBlob = null; capClientId = null; capURL(null); showReady(); };
+      saveBtn.onclick = () => { const t = ta.value.trim(); if(t) doSave(t); };
+      announce(() => speak(narr, state.lang==="hi" ? "hi" : "en"));
+    }
+
+    async function doSave(text){
+      const fb = $("#fb"), saveBtn = $("#capSave");
+      if(saveBtn) saveBtn.disabled = true;
+      if(!currentStudent){
+        // guest: full practice, nothing stored — one soft nudge that a profile keeps recordings
+        sfx.correct(); setMood("happy");
+        flashToast(tx("Nice practice! Sign in and your recordings will be saved.","बढ़िया अभ्यास! साइन इन करोगी तो रिकॉर्डिंग सेव होगी।"));
+        return leave(true);
+      }
+      if(fb){ fb.textContent = tx("Saving…","सेव हो रहा है…"); fb.className = "feedback"; }
+      let blob = capBlob, type = (capBlob && capBlob.type) || "audio/webm";
+      try { blob = await toWav16k(capBlob); type = "audio/wav"; }
+      catch(e){ blob = capBlob; type = (capBlob && capBlob.type) || "audio/webm"; }   // can't decode → send the raw recording
+      const fields = { student: currentStudent.id, token: currentStudent.token || "",
+                       track: course.key, lesson: lesson.key, prompt_key: r.key,
+                       prompt_text_hi: r.hi, transcription: text,
+                       duration_secs: capSecs, client_id: capClientId };
+      const res = await uploadCapture(fields, blob, type);
+      if(res !== "transient"){
+        // sent — or a permanent reject the server will never accept (don't trap her on it)
+        sfx.correct(); setMood("happy");
+        leave(true); syncCaptures(); return;
+      }
+      // offline / server busy → buffer in the outbox and move on
+      const n = await capOutboxCount();
+      const stored = n < CAPTURE_OUTBOX_CAP &&
+                     await capOutboxPut({ client_id: fields.client_id, blob, type, fields, created: Date.now() });
+      if(stored){
+        sfx.correct(); setMood("happy");
+        flashToast(tx("Saved — will upload when online","रिकॉर्डिंग सेव हुई — इंटरनेट आने पर भेजी जाएगी"));
+        leave(true); syncCaptures(); return;
+      }
+      // outbox full (or unusable): never drop her voice silently — explain, let her retry or skip
+      const msg = tx("No internet, and " + CAPTURE_OUTBOX_CAP + " recordings are already waiting. Try again near the internet, or skip this one.",
+                     "इंटरनेट नहीं है, और " + CAPTURE_OUTBOX_CAP + " रिकॉर्डिंग पहले से बाकी हैं। इंटरनेट के पास फिर कोशिश करो, या इसे छोड़ दो।");
+      if(fb){ fb.textContent = msg; fb.className = "feedback bad"; }
+      srSay(msg);
+      setFooter(`<button class="btn ghost" id="capSkip">${tx("Skip →","छोड़ो →")}</button>
+        <button class="btn primary" id="capRetry">${tx("Try again","फिर कोशिश करो")}</button>`);
+      $("#capSkip").onclick = () => { sfx.next(); leave(true); };
+      $("#capRetry").onclick = () => { sfx.tap(); doSave(text); };
+    }
+
+    function showMicError(){
+      cleanup();
+      mount(`${head(tx("🎤 Mic didn't start","🎤 माइक नहीं चला"), tx("Ask your teacher to allow the microphone","शिक्षक से माइक चालू करने को कहो"), "माइक नहीं चला — फिर कोशिश करो या छोड़ दो।")}
+        ${promptBox()}
+        <div class="feedback bad" id="fb">माइक शुरू नहीं हुआ — फिर कोशिश करो, या इसे छोड़ दो।<br><small>The microphone did not start — try again, or skip this one.</small></div>`);
+      setFooter(`<button class="btn ghost" id="capSkip">${tx("Skip →","छोड़ो →")}</button>
+        <button class="btn primary" id="capRetry">🎤 ${tx("Try again","फिर कोशिश करो")}</button>`);
+      const narr = tx("The microphone did not start. Try again, or skip.","माइक नहीं चला। फिर कोशिश करो, या छोड़ दो।");
+      setNarration(narr, narr);
+      srSay(narr);
+      wireSay();
+      announce(() => speak("माइक नहीं चला। फिर कोशिश करो, या छोड़ दो।", "hi"));   // Hindi-first, out loud
+      $("#capRetry").onclick = () => { sfx.tap(); startRecording(); };
+      $("#capSkip").onclick = () => { sfx.next(); leave(false); };   // never brick the lesson
+    }
+
+    showReady();
+  }
+
   // --- finish: award stars
   function finish(){
     clearAnnounce();
@@ -2709,7 +3092,7 @@ function startLevel(course, lesson, lv, back){
     if(stars>=1) sfx.complete(); else sfx.wrong();
     root.innerHTML="";
     root.appendChild(el(`<div class="screen result">
-      <div class="mascot big ${stars>=1?"m-happy":"m-sad"}">${mascotSVG()}</div>
+      <div class="mascot big ${stars>=2?"m-cheer":(stars>=1?"m-happy":"m-sad")}">${mascotSVG()}</div>
       <h2>${stars>=2?tx("Shabash!","शाबाश!"):tx("Good try!","अच्छी कोशिश!")} ${stars>=2?"🏆":""}</h2>
       <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
       <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
@@ -3004,7 +3387,7 @@ function renderTestResult(course, back, r){
   const failMsg = tx("Good try — you need "+(course.test.passPct||60)+"% to pass.",
                      "अच्छी कोशिश — पास होने के लिए "+(course.test.passPct||60)+"% चाहिए।");
   root.appendChild(el(`<div class="screen result">
-    <div class="mascot big ${r.passed?"m-happy":"m-sad"}">${mascotSVG()}</div>
+    <div class="mascot big ${r.passed?"m-cheer":"m-sad"}">${mascotSVG()}</div>
     <h2>${r.passed ? passMsg : failMsg}</h2>
     <div class="earn pop">${r.pct}%</div>
     <div class="muted">${tx("You got "+r.score+" of "+r.n, r.n+" में से "+r.score+" सही")}</div>
@@ -3107,6 +3490,7 @@ function buildRounds(lv, lesson){
   if(lv.type==="email") return (lesson.email||[]).slice();
   if(lv.type==="read") return (lesson.read||[]).slice();
   if(lv.type==="reply") return (lesson.reply||[]).slice();
+  if(lv.type==="capture") return (lesson.capture||[]).slice();
   return [];
 }
 
@@ -3312,7 +3696,7 @@ function openDoubt(){
   const sheet = el(`<div class="sheetwrap" id="doubtWrap">
     <div class="sheet doubtsheet" role="dialog" aria-modal="true" aria-label="${tx('Help from Roshni','रोशनी से मदद')}">
       <div class="doubthead">
-        <div class="mascot small m-happy">${mascotSVG()}</div>
+        <div class="mascot small m-think">${mascotSVG()}</div>
         <div class="doubttitle">
           <div class="doubtq">${tx("What do you need? 💛","तुम्हें क्या चाहिए? 💛")}</div>
           <div class="doubtsub">${esc(roshniLine)}</div>
@@ -3544,6 +3928,405 @@ async function syncDoubts(){
 window.addEventListener("online", syncDoubts);
 
 // ============================================================
+//  DIALECT CAPTURE outbox — recorded clips are audio blobs, too big for the
+//  localStorage queues, so they buffer in IndexedDB (mirrors the ttsDB pattern)
+//  and flush with the same offline-queue contract as attempts/doubts.
+// ============================================================
+const CAPTURE_OUTBOX_CAP = 8;      // shared-laptop guard: at most 8 clips wait on-device
+let _capGen = 0;                   // recording generation — a stale timer must not stop a newer recording
+let _capObjURL = null;             // the review screen's playback URL (one live at a time)
+function capURL(blob){             // create the playback URL, revoking the previous one; capURL(null) just revokes
+  if(_capObjURL){ try { URL.revokeObjectURL(_capObjURL); } catch(e){} _capObjURL = null; }
+  if(blob) _capObjURL = URL.createObjectURL(blob);
+  return _capObjURL;
+}
+let _capDB = null;
+function capDB(){
+  return new Promise(res => {
+    if(_capDB) return res(_capDB);
+    try {
+      const rq = indexedDB.open("hikmat_capture_db", 2);   // v2 adds the boli_intray store for the Bhojpuri AI tab
+      rq.onupgradeneeded = () => { const db = rq.result;
+        try { if(!db.objectStoreNames.contains("outbox")) db.createObjectStore("outbox", { keyPath:"client_id" }); } catch(e){}
+        try { if(!db.objectStoreNames.contains("boli_intray")) db.createObjectStore("boli_intray", { keyPath:"clip" }); } catch(e){} };
+      rq.onsuccess = () => { _capDB = rq.result; res(_capDB); };
+      rq.onerror = () => res(null);
+    } catch(e){ res(null); }
+  });
+}
+function capOutboxPut(rec){        // rec = { client_id, blob, type, fields, created }
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(false);
+    try { const t = db.transaction("outbox","readwrite").objectStore("outbox").put(rec);
+          t.onsuccess = () => res(true); t.onerror = () => res(false); }
+    catch(e){ res(false); }
+  });
+}
+function capOutboxAll(){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res([]);
+    try { const t = db.transaction("outbox","readonly").objectStore("outbox").getAll();
+          t.onsuccess = () => res(t.result || []); t.onerror = () => res([]); }
+    catch(e){ res([]); }
+  });
+}
+function capOutboxDelete(id){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(false);
+    try { const t = db.transaction("outbox","readwrite").objectStore("outbox").delete(id);
+          t.onsuccess = () => res(true); t.onerror = () => res(false); }
+    catch(e){ res(false); }
+  });
+}
+function capOutboxCount(){
+  return new Promise(async res => {
+    const db = await capDB(); if(!db) return res(0);
+    try { const t = db.transaction("outbox","readonly").objectStore("outbox").count();
+          t.onsuccess = () => res(t.result || 0); t.onerror = () => res(0); }
+    catch(e){ res(0); }
+  });
+}
+// POST one clip. Returns "ok" (sent/deduped) | "permanent" (server will never accept it —
+// drop) | "transient" (offline / rate-limited / server error — keep and retry later).
+async function uploadCapture(fields, blob, type){
+  try {
+    const fd = new FormData();
+    const t = String(type || "");
+    const ext = t === "audio/wav" ? ".wav" : t.indexOf("webm") >= 0 ? ".webm" :
+                t.indexOf("mp4") >= 0 ? ".m4a" : t.indexOf("mpeg") >= 0 ? ".mp3" : ".bin";
+    fd.append("audio", blob, "clip" + ext);
+    for(const k in fields) fd.append(k, fields[k]);
+    const r = await fetch(apiURL("submit_dialect_capture"), { method:"POST", headers: postHeaders(), body: fd });
+    if(!r.ok) return "transient";                                  // HTTP/network error → retry later
+    let m = null; try { m = (await r.json()).message; } catch(e){}
+    if(m && m.ok) return "ok";                                     // saved (or server-side dedup)
+    const err = m && m.error;
+    if(err === "unknown_student" || err === "bad_audio" || err === "bad_transcription") return "permanent";
+    return "transient";                                            // rate_limited / anything unrecognised → retry
+  } catch(e){ return "transient"; }                                // offline → keep for next time
+}
+let _syncingCaps = false;
+async function syncCaptures(){
+  if(_syncingCaps) return;           // serialize runs so concurrent calls can't double-upload
+  _syncingCaps = true;
+  try {
+    const items = await capOutboxAll();
+    for(const it of items){
+      // refresh the auth token for the signed-in student's OWN clips: a token renewed since the clip
+      // was buffered (e.g. after a re-login) would otherwise leave it permanently "auth"-rejected and
+      // trapped in the outbox. Guarded by student id so one girl's clip is never sent as another's.
+      if(currentStudent && it.fields && it.fields.student === currentStudent.id) it.fields.token = currentStudent.token || "";
+      const res = await uploadCapture(it.fields, it.blob, it.type);
+      if(res === "ok" || res === "permanent") await capOutboxDelete(it.client_id);
+      // transient → keep for next time
+    }
+  } catch(e){ /* best-effort: whatever remains retries on the next trigger */ }
+  finally { _syncingCaps = false; }
+}
+window.addEventListener("online", syncCaptures);
+
+// ============================================================
+//  BOLI (भोजपुरी AI) — the Bhojpuri corpus project. A SEPARATE section from the
+//  learning bands: lessons stay untouched and nothing here ever gates a lesson.
+//  Four simple tasks — बोल Record → लिख Transcribe → जांच Verify → सजा Curate.
+//  Record reuses the capture outbox. Transcribe/Verify act on OTHER girls' clips,
+//  so we prefetch a small batch + its audio into IndexedDB (works offline) and
+//  queue completed answers to flush when back online. Curate/gamification = Phase 2.
+// ============================================================
+let _boliRecIdx = 0;
+const BOLI_OUT_QUEUE = "hikmat_boli_out";
+const BOLI_CARD = "border-radius:16px;padding:16px;background:#00000010;margin:10px 0";
+
+// prefetched clips + their audio blobs (offline-workable), keyed by clip id
+function intrayPut(rec){ return new Promise(async res => { const db = await capDB(); if(!db) return res(false);
+  try { const t = db.transaction("boli_intray","readwrite").objectStore("boli_intray").put(rec); t.onsuccess=()=>res(true); t.onerror=()=>res(false); } catch(e){ res(false); } }); }
+function intrayAll(kind){ return new Promise(async res => { const db = await capDB(); if(!db) return res([]);
+  try { const t = db.transaction("boli_intray","readonly").objectStore("boli_intray").getAll(); t.onsuccess=()=>res((t.result||[]).filter(r=>!kind||r.kind===kind)); t.onerror=()=>res([]); } catch(e){ res([]); } }); }
+function intrayDelete(clip){ return new Promise(async res => { const db = await capDB(); if(!db) return res(false);
+  try { const t = db.transaction("boli_intray","readwrite").objectStore("boli_intray").delete(clip); t.onsuccess=()=>res(true); t.onerror=()=>res(false); } catch(e){ res(false); } }); }
+
+// outbound answers (small JSON — transcriptions & verifications), same offline contract as attempts
+function _boliOutRead(){ try { return JSON.parse(localStorage.getItem(BOLI_OUT_QUEUE)) || []; } catch(e){ return []; } }
+function _boliOutSave(q){ try { localStorage.setItem(BOLI_OUT_QUEUE, JSON.stringify(q)); } catch(e){} }
+function boliEnqueue(item){ const q=_boliOutRead(); q.push(item); _boliOutSave(q); flushBoli(); }
+let _flushingBoli = false;
+async function flushBoli(){
+  if(_flushingBoli) return; const q=_boliOutRead(); if(!q.length) return; _flushingBoli=true;
+  const remaining=[];
+  try {
+    for(const it of q){
+      try {
+        const method = it.kind==="verify" ? "submit_verification" : "submit_transcription";
+        const p = { ...it.params };
+        if(currentStudent){ p.student = currentStudent.id; p.token = currentStudent.token || ""; }
+        const r = await fetch(apiURL(method), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
+        if(!r.ok){ remaining.push(it); continue; }                    // network / HTTP → retry later
+        let m=null; try { m=(await r.json()).message; } catch(e){}
+        if(m && m.ok===false && m.error==="rate_limited") remaining.push(it);   // transient → retry
+        // ok / dedup / stale / permanent rejection → drop so it can't loop forever
+      } catch(e){ remaining.push(it); }                               // offline → keep for next time
+    }
+    const seen=new Set(q.map(x=>x.cid)); _boliOutRead().forEach(x=>{ if(!seen.has(x.cid)) remaining.push(x); });
+    _boliOutSave(remaining);
+  } finally { _flushingBoli=false; }
+}
+window.addEventListener("online", flushBoli);
+
+// the prompt bank = every lesson's capture[] across the curriculum
+function boliPrompts(){
+  const out=[];
+  (COURSES||[]).forEach(c=>(c.lessons||[]).forEach(l=>(l.capture||[]).forEach(p=>{
+    if(p && p.hi) out.push({ track:c.key, lesson:l.key, key:p.key, hi:p.hi, en:p.en||"", category:p.category||"", tier:p.tier||1 });
+  })));
+  return out;
+}
+
+function boliCard(){
+  const node = el(`<button class="theme" style="--tc:#0891b2;background:#0891b214;border-color:#0891b255">
+    <div class="big">${iconFor("boli","🎙️")}</div>
+    <h3>${tx("Bhojpuri AI","भोजपुरी AI")}</h3>
+    <small>${tx("Build a Bhojpuri voice AI — our class project","भोजपुरी वॉइस AI बनाओ — हमारा क्लास प्रोजेक्ट")}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); renderBoliProject(); };
+  return node;
+}
+
+function boliNeedLogin(){
+  stopSpeech(); root.innerHTML=""; setBack(tx("Back","वापस"), renderBoliProject);
+  const s = el(`<div class="screen"><div style="${BOLI_CARD};text-align:center">
+    <p>${tx("Log in to join the project.","प्रोजेक्ट में शामिल होने के लिए लॉग इन करो।")}</p></div></div>`);
+  const b = el(`<button class="btn primary">${tx("Log in","लॉग इन")}</button>`);
+  b.onclick = () => { sfx.tap(); startLogin(); };
+  s.firstElementChild.appendChild(b); root.appendChild(s); refreshTop(); moveFocusToTop();
+}
+
+async function renderBoliProject(){
+  stopSpeech(); rerender = renderBoliProject; root.innerHTML="";
+  setBack(tx("Home","होम"), renderHome);
+  const intro = tx("We are building a Bhojpuri AI together. Every recording you add or check helps.",
+                   "हम मिलकर एक भोजपुरी AI बना रहे हैं। तुम्हारा हर रिकॉर्ड और जाँच मदद करती है।");
+  root.appendChild(el(`<div class="screen">
+    <div class="hero hero-guide"><div class="roshni">${mascotSVG()}</div>
+      <div class="herotext"><h1>${tx("Bhojpuri AI","भोजपुरी AI")} 🎙️</h1><p>${esc(intro)}</p></div></div>
+    <div id="boliMeter" style="${BOLI_CARD}"></div>
+    <div class="sectionhead">${tx("Project tasks","प्रोजेक्ट के काम")}</div>
+    <div id="boliTasks" class="themes"></div>
+    <div id="boliMine" class="center" style="margin:12px 0"></div>
+  </div>`));
+  setNarration(intro, intro);
+  const mkTask = (ico,en,hi,subEn,subHi,fn,locked) => {
+    const b = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
+        style="${locked?"":"--tc:#0284c7;background:#0284c714;border-color:#0284c755"}">
+      ${locked?`<span class="lock">🔒</span>`:""}
+      <div class="big">${ico}</div><h3>${esc(tx(en,hi))}</h3>
+      <small>${locked?tx("Coming soon","जल्द आ रहा है"):esc(tx(subEn,subHi))}</small></button>`);
+    if(!locked) b.onclick = () => { sfx.enter(); fn(); };
+    return b;
+  };
+  const tasks = $("#boliTasks");
+  tasks.appendChild(mkTask("🗣️","Speak","बोल","Record a prompt in your boli","अपनी बोली में बोलो", renderBoliRecord, false));
+  tasks.appendChild(mkTask("✍️","Write","लिख","Type what you hear","जो सुनो वही लिखो", renderBoliTranscribe, false));
+  tasks.appendChild(mkTask("✅","Check","जांच","Check a friend's writing","किसी की लिखाई जाँचो", renderBoliVerify, false));
+  tasks.appendChild(mkTask("🏷️","Sort","सजा","Tag the best recordings","अच्छी रिकॉर्डिंग चुनो", null, true));
+  refreshTop(); moveFocusToTop();
+  // Corpus Meter + my stats (needs backend; degrades gracefully offline)
+  const home = await api("boli_home", currentStudent ? { student:currentStudent.id, token:currentStudent.token||"" } : {});
+  const meter = $("#boliMeter"); if(!meter) return;
+  if(home && home.meter){
+    const mins=home.meter.verifiedMinutes||0, clips=home.meter.verifiedClips||0;
+    const goals=[600,1500,3000,6000]; const goal=goals.find(g=>g>mins)||goals[goals.length-1];
+    const pct=Math.min(100, Math.round(100*mins/goal));
+    meter.innerHTML = `<div style="font-weight:800">💠 ${tx("Corpus so far","अब तक का संग्रह")}: ${clips} ${tx("clips","क्लिप")} · ${mins} ${tx("min","मिनट")}</div>
+      <div style="background:#00000022;border-radius:999px;height:14px;margin-top:8px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a)"></div></div>
+      <small>${tx("Next goal","अगला लक्ष्य")}: ${Math.round(goal/60)} ${tx("hours","घंटे")}</small>`;
+    if(home.mine) $("#boliMine").textContent = tx(
+      `You: ${home.mine.recorded} recorded · ${home.mine.transcribed} written · ${home.mine.verified} checked · 💎 ${home.mine.gems}`,
+      `तुम: ${home.mine.recorded} रिकॉर्ड · ${home.mine.transcribed} लिखे · ${home.mine.verified} जाँचे · 💎 ${home.mine.gems}`);
+  } else {
+    meter.innerHTML = `<div>${tx("Come online to see the class progress.","क्लास की प्रगति देखने के लिए ऑनलाइन आओ।")}</div>`;
+  }
+}
+
+// --- बोल Record ---
+// The recording session lives OUTSIDE the render fn, so a language switch (which
+// re-invokes rerender = renderBoliRecord) rebuilds the screen with translated text but
+// KEEPS the same prompt, the recorded clip, the elder toggle and the ticked checklist —
+// it re-renders the current stage in place instead of restarting the activity.
+let _boliRecSession = null;
+let _boliTxDraft = null;     // in-progress transcription text, preserved across a language switch
+function renderBoliRecord(){
+  if(!currentStudent) return boliNeedLogin();
+  const prompts = boliPrompts();
+  stopSpeech(); rerender = renderBoliRecord; root.innerHTML="";
+  setBack(tx("Back","वापस"), () => { _boliRecSession = null; capURL(null); renderBoliProject(); });
+  if(!prompts.length){ root.appendChild(el(`<div class="screen"><p class="center">${tx("No prompts yet.","अभी कोई प्रॉम्प्ट नहीं।")}</p></div>`)); refreshTop(); return; }
+  // reuse an in-progress session (e.g. after a language switch); else start a fresh prompt
+  if(!_boliRecSession) _boliRecSession = { p: prompts[(_boliRecIdx++) % prompts.length], stage:"ready", blob:null, type:null, secs:0, elder:false, checks:null };
+  const S = _boliRecSession, p = S.p;
+  root.appendChild(el(`<div class="screen"><div style="${BOLI_CARD};text-align:center">
+    <div style="font-size:1.4rem;font-weight:800;line-height:1.6">${esc(p.hi)}</div>
+    <div id="boliRecBody" style="margin-top:16px"></div></div></div>`));
+  const body = $("#boliRecBody");
+  refreshTop(); moveFocusToTop();
+
+  function ready(){
+    S.stage="ready"; S.blob=null; S.checks=null;
+    setNarration(tx("Say this in your boli, then record.","इसे अपनी बोली में बोलो, फिर रिकॉर्ड करो।"), p.hi);
+    body.innerHTML="";
+    const hear = el(`<button class="btn ghost">🔊 ${tx("Hear","सुनो")}</button>`); hear.onclick=()=>{ sfx.tap(); speak(p.hi,"hi"); };
+    const eldL = el(`<label style="display:block;margin:12px 0"><input type="checkbox"${S.elder?" checked":""}> ${tx("This is an elder / neighbour's voice","यह किसी बड़े/पड़ोसी की आवाज़ है")}</label>`);
+    eldL.querySelector("input").onchange = e => { S.elder = e.target.checked; };
+    const rec = el(`<button class="btn primary" style="font-size:1.2rem;padding:14px 22px">🎙️ ${tx("Record","रिकॉर्ड")}</button>`);
+    rec.onclick = startRecording;
+    [hear, eldL, rec].forEach(x=>body.appendChild(x));
+  }
+  async function startRecording(){
+    if(roshniBusy){ flashToast(tx("Mic busy — try again","माइक व्यस्त — फिर से")); return; }
+    try { roshniBusy=true; await startRec(); } catch(e){ roshniBusy=false; return micErr(); }
+    S.stage="recording";
+    const gen = ++_capGen, t0 = Date.now();
+    body.innerHTML = `<div style="font-size:2rem;font-weight:800">● <span id="boliTimer">0:00</span></div>`;
+    setNarration("", "");                                   // silence — don't record the narrator
+    const stop = el(`<button class="btn primary" style="font-size:1.2rem;padding:14px 22px;margin-top:12px">⏹️ ${tx("Stop","रोको")}</button>`);
+    body.appendChild(stop);
+    const timer = setInterval(()=>{ if(gen!==_capGen){ clearInterval(timer); return; }
+      const d=Math.floor((Date.now()-t0)/1000); const tv=$("#boliTimer"); if(tv) tv.textContent=Math.floor(d/60)+":"+String(d%60).padStart(2,"0");
+      if(d>=180){ clearInterval(timer); doStop(); } }, 500);
+    async function doStop(){ if(gen!==_capGen) return; clearInterval(timer); S.secs=Math.round((Date.now()-t0)/1000);
+      S.blob = await stopRec(); roshniBusy=false; S.type = S.blob?S.blob.type:null; if(!S.blob) return micErr(); review(); }
+    stop.onclick = doStop;
+  }
+  function review(){
+    S.stage="review";
+    setNarration(tx("Listen back, tick the boxes, then save.","अपनी रिकॉर्डिंग सुनो, बॉक्स चुनो, फिर सेव करो।"), p.hi);
+    body.innerHTML="";
+    const au = el(`<audio controls src="${capURL(S.blob)}" style="width:100%"></audio>`);
+    const checksEn = ["No full names or phone numbers were said","Quiet enough to hear clearly"];
+    const checksHi = ["कोई पूरा नाम या फ़ोन नंबर नहीं बोला गया","साफ़ सुनने लायक शांति है"];
+    if(S.elder){ checksEn.push("I asked their permission first"); checksHi.push("मैंने पहले उनकी अनुमति ली"); }
+    if(!S.checks || S.checks.length !== checksEn.length) S.checks = checksEn.map(()=>false);
+    const boxes=[]; const list = el(`<div style="text-align:left;margin:12px 0"></div>`);
+    checksEn.forEach((c,i)=>{ const l=el(`<label style="display:block;margin:8px 0"><input type="checkbox"${S.checks[i]?" checked":""}> ${esc(tx(c,checksHi[i]))}</label>`);
+      const cb=l.querySelector("input"); cb.onchange=()=>{ S.checks[i]=cb.checked; }; boxes.push(cb); list.appendChild(l); });
+    const redo = el(`<button class="btn ghost">↺ ${tx("Re-record","फिर से")}</button>`); redo.onclick=()=>{ S.blob=null; S.checks=null; capURL(null); ready(); };
+    const save = el(`<button class="btn primary">✅ ${tx("Save","सेव")}</button>`);
+    save.onclick = async () => { if(!boxes.every(b=>b.checked)){ flashToast(tx("Please tick all the boxes","कृपया सभी बॉक्स चुनो")); return; } save.disabled=true; await saveClip(); };
+    [au, list, redo, save].forEach(x=>body.appendChild(x));
+  }
+  async function saveClip(){
+    let wav=S.blob, isWav=false; try { const w=await toWav16k(S.blob); if(w){ wav=w; isWav=true; } } catch(e){}
+    const cid = uid();
+    const fields = { student: currentStudent.id, token: currentStudent.token||"",
+      track: p.track, lesson: p.lesson, prompt_key: p.key, prompt_text_hi: p.hi,
+      prompt_type: S.elder?"elder_home":"in_class", category: p.category, tier: p.tier,
+      speaker_relation: S.elder?"family-elder":"self",
+      consent_status: S.elder?"verbal_elder_consent":"self_consented",
+      duration_secs: S.secs, sample_rate: isWav?16000:0, client_id: cid };
+    if(await capOutboxCount() >= CAPTURE_OUTBOX_CAP){ await syncCaptures(); }
+    if(await capOutboxCount() >= CAPTURE_OUTBOX_CAP){ flashToast(tx("Too many clips waiting — connect to upload","बहुत क्लिप बाकी — अपलोड के लिए ऑनलाइन आओ")); return; }
+    await capOutboxPut({ client_id: cid, blob: wav, type: isWav?"audio/wav":S.type, fields, created: Date.now() });
+    capURL(null); syncCaptures(); sfx.correct(); flashToast(tx("Saved! Shukriya 🙏","सेव हो गया! शुक्रिया 🙏"));
+    _boliRecSession = null;                                 // a fresh prompt next time
+    renderBoliProject();
+  }
+  function micErr(){ roshniBusy=false; S.stage="ready"; S.blob=null; body.innerHTML=""; body.appendChild(el(`<p>${tx("Mic not available.","माइक उपलब्ध नहीं।")}</p>`)); const r=el(`<button class="btn primary">${tx("Try again","फिर से")}</button>`); r.onclick=ready; body.appendChild(r); }
+
+  // (re-)enter at the preserved stage — a language switch keeps the recording + checklist
+  if(S.stage==="review" && S.blob){ review(); }
+  else {
+    if(S.stage==="recording"){ _capGen++; try { stopRec(); } catch(e){} roshniBusy=false; S.stage="ready"; S.blob=null; }  // lang switch mid-record: drop the partial, free the mic
+    ready();
+  }
+}
+
+// --- लिख Transcribe / जांच Verify (shared work screen over prefetched clips) ---
+function renderBoliTranscribe(){ if(!currentStudent) return boliNeedLogin(); boliWorkScreen("transcribe", renderBoliTranscribe); }
+function renderBoliVerify(){ if(!currentStudent) return boliNeedLogin(); boliWorkScreen("verify", renderBoliVerify); }
+
+async function boliFetchWork(kind){
+  if(!navigator.onLine) return;
+  const r = await api("get_boli_queue", { student:currentStudent.id, token:currentStudent.token||"", kind, batch:5 });
+  if(!r || !r.ok || !Array.isArray(r.items)) return;
+  for(const it of r.items){
+    let blob=null;
+    try {
+      const q = new URLSearchParams({ student:currentStudent.id, token:currentStudent.token||"", clip:it.clip });
+      const resp = await fetch(apiURL("get_boli_audio")+"?"+q);
+      if(resp.ok){ const b=await resp.blob(); if(b && b.size) blob=b; }
+    } catch(e){}
+    if(blob) await intrayPut({ clip:it.clip, kind, blob, item:it, ts:Date.now() });
+  }
+}
+
+async function boliWorkScreen(kind, selfFn){
+  stopSpeech(); rerender = selfFn; root.innerHTML="";
+  setBack(tx("Back","वापस"), renderBoliProject);
+  root.appendChild(el(`<div class="screen"><div id="boliWork"><p class="center">${tx("Loading…","लोड हो रहा है…")}</p></div></div>`));
+  refreshTop(); moveFocusToTop();
+  const have = await intrayAll(kind);
+  if(have.length < 2) await boliFetchWork(kind);
+  showOne();
+
+  async function showOne(){
+    const host = $("#boliWork"); if(!host) return; host.innerHTML="";
+    const list = await intrayAll(kind);
+    if(!list.length){
+      host.appendChild(el(`<div style="${BOLI_CARD};text-align:center"><p>${navigator.onLine
+        ? tx("No work right now — check back soon! 🙏","अभी कोई काम नहीं — बाद में आना! 🙏")
+        : tx("No saved work. Come online to get more.","कोई सेव काम नहीं। ऑनलाइन आकर और लाओ।")}</p></div>`));
+      const more = el(`<button class="btn ghost">↻ ${tx("Get more","और लाओ")}</button>`);
+      more.onclick = async () => { host.innerHTML=`<p class="center">${tx("Loading…","लोड हो रहा है…")}</p>`; await boliFetchWork(kind); showOne(); };
+      host.appendChild(more); return;
+    }
+    const rec = list[0], it = rec.item, url = URL.createObjectURL(rec.blob);
+    const card = el(`<div style="${BOLI_CARD}">
+      <div style="font-weight:700;margin-bottom:6px">${esc(it.prompt_text_hi||"")}</div>
+      <audio id="boliAudio" controls loop src="${url}" style="width:100%"></audio>
+      <div class="center" style="margin:6px 0"><button class="btn ghost" id="boliSlow">🐢 0.75×</button>
+        <button class="btn ghost" id="boliBack3">⏪ 3s</button></div>
+      <div id="boliAct" style="margin-top:8px"></div></div>`);
+    host.appendChild(card);
+    const au = card.querySelector("#boliAudio");
+    card.querySelector("#boliSlow").onclick = () => { au.playbackRate = au.playbackRate===1 ? 0.75 : 1; sfx.tap(); };
+    card.querySelector("#boliBack3").onclick = () => { au.currentTime = Math.max(0,(au.currentTime||0)-3); au.play().catch(()=>{}); };
+    const act = card.querySelector("#boliAct");
+    const done = async () => { try { URL.revokeObjectURL(url); } catch(e){} await intrayDelete(rec.clip); showOne(); };
+
+    if(kind==="transcribe"){
+      setNarration(tx("Listen, then type what she says in Devanagari.","सुनो, फिर देवनागरी में लिखो।"), it.prompt_text_hi||"");
+      const ta = el(`<textarea lang="hi" rows="3" style="width:100%;font-size:1.2rem" placeholder="${tx("Type what you hear…","जो सुनो वो लिखो…")}"></textarea>`);
+      if(_boliTxDraft && _boliTxDraft.clip === it.clip) ta.value = _boliTxDraft.text;   // survive a language switch
+      ta.oninput = () => { _boliTxDraft = { clip: it.clip, text: ta.value }; };
+      const save = el(`<button class="btn primary">✅ ${tx("Save","सेव")}</button>`);
+      const skip = el(`<button class="btn ghost">${tx("Skip","छोड़ो")}</button>`);
+      save.onclick = async () => { const t=ta.value.trim(); if(!t){ flashToast(tx("Type something first","पहले कुछ लिखो")); return; }
+        boliEnqueue({ kind:"transcribe", cid:uid(), params:{ clip:it.clip, text:t, client_id:uid() } });
+        _boliTxDraft = null; sfx.correct(); flashToast(tx("Saved 🙏","सेव 🙏")); await done(); };
+      skip.onclick = async () => { _boliTxDraft = null; sfx.tap(); await done(); };
+      [ta, save, skip].forEach(x=>act.appendChild(x));
+    } else {
+      setNarration(tx("Listen. Does the writing match her words?","सुनो। क्या लिखाई उसकी आवाज़ से मिलती है?"), it.prompt_text_hi||"");
+      const txt = (it.transcription && it.transcription.text) || "";
+      act.appendChild(el(`<div style="background:#00000012;border-radius:12px;padding:10px;font-size:1.2rem;margin-bottom:8px">${esc(txt)}</div>`));
+      const send = (verdict, reason) => async () => {
+        boliEnqueue({ kind:"verify", cid:uid(), params:{ clip:it.clip, transcription:(it.transcription&&it.transcription.id)||"", verdict, reason:reason||"", client_id:uid() } });
+        sfx.correct(); await done();
+      };
+      const yes = el(`<button class="btn primary">✅ ${tx("Sahi","सही")}</button>`);
+      const no  = el(`<button class="btn ghost">❌ ${tx("Galat","ग़लत")}</button>`);
+      const idk = el(`<button class="btn ghost">🤷 ${tx("Pata nahi","पता नहीं")}</button>`);
+      yes.onclick = send("accept");
+      idk.onclick = send("escalate");
+      no.onclick = () => { act.innerHTML = `<div style="margin-bottom:6px">${tx("What's wrong?","क्या ग़लत है?")}</div>`;
+        [["wrong_words","Wrong words","ग़लत शब्द"],["spelling_style","Spelling","वर्तनी"],["missing_markers","Missing tags","टैग नहीं"],["bad_audio","Can't hear","सुनाई नहीं"]]
+          .forEach(([r,en,hi])=>{ const b=el(`<button class="btn ghost">${esc(tx(en,hi))}</button>`); b.onclick=send("reject",r); act.appendChild(b); }); };
+      [yes, no, idk].forEach(x=>act.appendChild(x));
+    }
+  }
+}
+
+// ============================================================
 //  ATTENDANCE — the device banks a logged-in student's ACTIVE screen time and
 //  flushes small deltas to the server (offline-queued, idempotent). Facilitator
 //  report only: nothing about attendance is EVER shown to a student — no timers,
@@ -3734,6 +4517,42 @@ async function mergeServerProgress(){
 
 // SIGN UP — a learner creates their own profile (name + avatar + optional PIN), then plays.
 const AVATARS = ["🙂","👧","🧒","👩","😀","🦋","🌸","🌟","🐱","🦊","🐥","🚀"];
+// Soft, plain-language note on why some lessons record her boli — opened from the
+// "Learn more →" link on the signup screens. A sheet overlay (like Roshni's), fully offline.
+function openDialectNote(){
+  if(document.getElementById("dialectNoteWrap")) return;
+  sfx.tap(); stopSpeech();
+  const opener = document.activeElement;   // restore focus here when the sheet closes
+  const noteHi = "हिकमत के कुछ पाठ आपसे आपकी अपनी बोली में बोलने और लिखने को कहते हैं। इन रिकॉर्डिंग को हम सुरक्षित रूप से सहेजते हैं और हिकमत के पाठ बेहतर बनाने के लिए इस्तेमाल करते हैं। अगर आप किसी और की आवाज़ रिकॉर्ड करें, तो पहले उनसे अनुमति ले लें।";
+  const noteEn = "Some Hikmat lessons ask you to speak and write in your own dialect. We save these recordings safely and use them to make Hikmat's lessons better. If you record someone else's voice, please ask their permission first.";
+  const sheet = el(`<div class="sheetwrap" id="dialectNoteWrap">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="${escAttr(tx("About your recordings","आपकी रिकॉर्डिंग के बारे में"))}">
+      <div class="doubthead">
+        <div class="mascot small m-think">${mascotSVG()}</div>
+        <div class="doubttitle">
+          <div class="doubtq">${tx("About your recordings 🎤","आपकी रिकॉर्डिंग के बारे में 🎤")}</div>
+        </div>
+      </div>
+      <p style="font-size:16px; line-height:1.7; font-weight:600; margin:0 0 12px" lang="hi">${esc(noteHi)}</p>
+      <p style="font-size:14px; line-height:1.6; font-weight:600; color:var(--muted); margin:0 0 16px">${esc(noteEn)}</p>
+      <button class="btn ghost wide" id="dnBack">← ${tx("Back","वापस")}</button>
+    </div>
+  </div>`);
+  document.body.appendChild(sheet);
+  const close = () => { sfx.back(); sheet.remove(); try { opener && opener.focus(); } catch(e){} };
+  sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
+  sheet.addEventListener("keydown", e => { if(e.key === "Escape"){ e.preventDefault(); close(); } });
+  $("#dnBack").onclick = close;
+  const dnBack = $("#dnBack"); if(dnBack) dnBack.focus();   // move focus into the dialog (keyboard + screen reader)
+  srSay(tx(noteEn, noteHi));
+  speak(tx(noteEn, noteHi), state.lang==="hi" ? "hi" : "en");
+}
+// the one soft line + link shown on both signup screens
+function dialectNoteLine(id){
+  return `<div class="dialectnote">${tx("Sometimes we save recordings of your dialect to help make Hikmat better.","कभी-कभी हम आपकी बोली की रिकॉर्डिंग सहेजते हैं, ताकि हिकमत को और बेहतर बना सकें।")}
+    <button type="button" class="linkbtn" id="${escAttr(id)}">${tx("Learn more →","और जानें →")}</button></div>`;
+}
+
 function renderSignup(){
   stopSpeech(); rerender = renderSignup; root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderLogin);
@@ -3761,6 +4580,7 @@ function renderSignup(){
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="suConsent">
         <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      ${dialectNoteLine("suDialectMore")}
       <div class="feedback bad" id="suErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
@@ -3797,6 +4617,7 @@ function renderSignup(){
   setTimeout(() => name.focus(), 60);
   $("#suLogin").onclick = () => { sfx.back(); renderLogin(); };
   $("#suOnline").onclick = () => { sfx.tap(); renderOnlineSignup(); };
+  $("#suDialectMore").onclick = openDialectNote;
   $("#suGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
     const nm = name.value.trim();
@@ -3959,6 +4780,7 @@ function renderOnlineSignup(){
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="osConsent">
         <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      ${dialectNoteLine("osDialectMore")}
       <div class="feedback bad" id="osErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px"><button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button></div>
@@ -3989,6 +4811,7 @@ function renderOnlineSignup(){
   }
   setTimeout(() => code.focus(), 60);
   $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+  $("#osDialectMore").onclick = openDialectNote;
   const submit = async () => {
     const un = user.value.trim().toLowerCase();
     if(!userOK()){ err.textContent = tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -"); return; }
@@ -4290,13 +5113,13 @@ function mountRoshniFab(){
   document.body.appendChild(fab);
 }
 function openRoshni(){
-  if(!(SETTINGS.aiEnabled && currentStudent) || document.getElementById("roshniWrap")) return;
+  if(roshniBusy || !(SETTINGS.aiEnabled && currentStudent) || document.getElementById("roshniWrap")) return;   // roshniBusy: the shared recorder is mid-use (a capture recording or a Roshni turn) — don't tear it down
   sfx.tap(); stopSpeech(); setMood("happy");
   const voice = !!SETTINGS.voiceEnabled, convoId = uid();
   const sheet = el(`<div class="sheetwrap" id="roshniWrap">
     <div class="sheet doubtsheet" role="dialog" aria-modal="true" aria-label="${tx('Roshni','रोशनी')}">
       <div class="doubthead">
-        <div class="mascot small m-happy">${mascotSVG()}</div>
+        <div class="mascot small m-think">${mascotSVG()}</div>
         <div class="doubttitle">
           <div class="doubtq">${tx("Ask Roshni 💛","रोशनी से पूछो 💛")}</div>
           <div class="doubtsub">${voice ? tx("Tap the mic and speak in Hindi.","माइक दबाओ और हिंदी में बोलो।") : tx("Type your question in Hindi.","अपना सवाल हिंदी में लिखो।")}</div>
@@ -4400,6 +5223,7 @@ refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 4
   syncDoubts();              // flush any doubts logged while offline
   syncEvents();              // flush any wrong-answer events queued while offline
   syncAttendance();          // flush any attendance pings queued while offline
+  syncCaptures();            // flush any dialect recordings buffered while offline
 });
 loadFromBackend().then(async ok => {
   backendLive = ok;

@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-07-23 12:00:00.000000",
+ "description": "Append-only XP event stream. The server inserts rows on pipeline events; rows are never edited or deleted in normal operation.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "event",
+  "points",
+  "clip",
+  "dedup_key",
+  "awarded_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student (beneficiary)",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name"
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event",
+   "options": "recorded\noperator_assist\ntranscription_verified\nspeaker_credit\nverification_match\ngold_passed\ncuration_done\ngem_awarded\nelder_verified\nclassroom_present",
+   "reqd": 1
+  },
+  {
+   "fieldname": "points",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Points"
+  },
+  {
+   "fieldname": "clip",
+   "fieldtype": "Link",
+   "label": "Clip",
+   "options": "Dialect Capture"
+  },
+  {
+   "fieldname": "dedup_key",
+   "fieldtype": "Data",
+   "label": "Dedup key",
+   "no_copy": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "awarded_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Awarded on"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Boli XP Ledger",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name"
+}

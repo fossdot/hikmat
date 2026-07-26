@@ -907,7 +907,8 @@ def seed_content():
     courses = _load_curriculum()
     seed_structure()   # bands + subjects must exist before tracks Link to them
     # clean slate (dev): remove existing curriculum docs, then recreate
-    for dt in ["Dialogue", "Lesson", "Track"]:
+    # (prompts Link to Lesson, so they go first)
+    for dt in ["Dialect Prompt", "Dialogue", "Lesson", "Track"]:
         for n in frappe.get_all(dt, pluck="name"):
             frappe.delete_doc(dt, n, force=1, ignore_permissions=1)
 
@@ -972,6 +973,14 @@ def seed_content():
                                  "is_correct": 1 if r["ok"] else 0} for r in dl["replies"]],
                 }).insert(ignore_permissions=1)
 
+            for ci, cp in enumerate(les.get("capture", [])):
+                frappe.get_doc({
+                    "doctype": "Dialect Prompt", "lesson": lesson.name, "prompt_key": cp["key"],
+                    "prompt_text_hi": cp["hi"], "prompt_text_en": cp.get("en", ""),
+                    "category": cp.get("category", ""), "complexity_tier": cp.get("tier", 1),
+                    "sort_order": ci,
+                }).insert(ignore_permissions=1)
+
     # seed the single settings doc
     s = frappe.get_single("Hikmat Settings")
     if not s.app_name:
@@ -979,6 +988,8 @@ def seed_content():
         s.tagline_en = "Learn English by playing"
         s.tagline_hi = "खेल-खेल में अंग्रेज़ी सीखो"
         s.default_language = "en"
+        s.default_sound = 1               # sound on by default (the field default; set it explicitly
+                                          # so a doc created before the field existed still gets it)
         s.save(ignore_permissions=1)
 
     frappe.db.commit()
@@ -1254,6 +1265,7 @@ def setup_workspace(cards=None, charts=None):
                  ("Attendance Summary", "Attendance Summary", "Report"),
                  ("Module Tests", "Module Test", "DocType"),
                  ("Test Attempts", "Test Attempt", "DocType"),
+                 ("Dialect Captures", "Dialect Capture", "DocType"),
                  ("AI Review Queue", "AI Review Queue", "Report"),
                  ("AI Chats", "AI Conversation", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]

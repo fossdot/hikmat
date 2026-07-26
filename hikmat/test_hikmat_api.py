@@ -625,13 +625,15 @@ class TestLessonReply(FrappeTestCase):
 	def test_track_json_exports_reply(self):
 		key = "reply-export-t"
 		def _rm():
+			# children first — frappe.db.delete on the Lesson does NOT cascade, and a
+			# leftover child row would double the reply count on the next suite run
+			frappe.db.delete("Lesson Reply", {"parent": key + "-l1"})
 			frappe.db.delete("Lesson", {"track": key})
 			frappe.db.delete("Track", {"name": key})
 			frappe.db.commit()
 			api.clear_content_cache()
 		self.addCleanup(_rm)
-		if frappe.db.exists("Track", key):
-			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		_rm()   # clean before AND after — an earlier run may have baked orphans in
 		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "Reply T",
 		                        "published": 1}).insert(ignore_permissions=True)
 		import json as _json
@@ -659,13 +661,13 @@ class TestLessonReply(FrappeTestCase):
 	def test_reply_export_survives_bad_spec_json(self):
 		key = "reply-badspec-t"
 		def _rm():
+			frappe.db.delete("Lesson Reply", {"parent": key + "-l1"})
 			frappe.db.delete("Lesson", {"track": key})
 			frappe.db.delete("Track", {"name": key})
 			frappe.db.commit()
 			api.clear_content_cache()
 		self.addCleanup(_rm)
-		if frappe.db.exists("Track", key):
-			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		_rm()   # clean before AND after — an earlier run may have baked orphans in
 		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "Reply B",
 		                        "published": 1}).insert(ignore_permissions=True)
 		frappe.get_doc({"doctype": "Lesson", "track": track.name, "lesson_key": "l1",
@@ -676,3 +678,328 @@ class TestLessonReply(FrappeTestCase):
 		t = next(c for c in api._build_courses() if c["key"] == key)
 		r = t["lessons"][0]["reply"][0]
 		self.assertEqual(r["slots"], [])   # malformed spec → empty slots; game skips the round
+
+
+class TestDialectCapture(FrappeTestCase):
+	"""Dialect capture (Speak & Write): _save_dialect_capture hardening, private-File
+	audio storage, prompt Link resolution, curriculum export. Mirrors the
+	explicit-cleanup style — nothing test-made may survive into the live DB."""
+
+	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32   # tiny fake clip; content is opaque to the server
+
+	def _mk_student(self, name):
+		def _rm():
+			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
+				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
+				for cap in clips:                        # Files point at the captures — remove first
+					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
+					                          "attached_to_name": cap})
+				if clips:
+					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
+					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
+					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
+				frappe.db.delete("Boli Verification", {"verifier": s})
+				frappe.db.delete("Boli Transcription", {"author": s})
+				frappe.db.delete("Boli XP Ledger", {"student": s})
+				frappe.db.delete("Boli Speaker", {"student": s})
+				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
+				              "claim_expires=null where claimed_by=%s", s)
+				frappe.db.delete("Dialect Capture", {"student": s})
+				frappe.db.delete("Student", {"name": s})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		return frappe.get_doc({"doctype": "Student", "student_name": name,
+		                       "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
+
+	def _mk_lesson_with_prompt(self, key):
+		def _rm():
+			frappe.db.delete("Dialect Prompt", {"lesson": key + "-l1"})
+			frappe.db.delete("Lesson", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		if frappe.db.exists("Track", key):
+			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
+		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "DC Track",
+		                        "published": 1}).insert(ignore_permissions=True)
+		lesson = frappe.get_doc({"doctype": "Lesson", "track": track.name, "lesson_key": "l1",
+		                         "title": "L1", "published": 1}).insert(ignore_permissions=True)
+		prompt = frappe.get_doc({"doctype": "Dialect Prompt", "lesson": lesson.name,
+		                         "prompt_key": "cap1", "prompt_text_hi": "तुम कहाँ जा रही हो?",
+		                         "prompt_text_en": "Where are you going?",
+		                         "category": "questions", "complexity_tier": 3,
+		                         "sort_order": 0}).insert(ignore_permissions=True)
+		return track, lesson, prompt
+
+	def test_save_capture_stores_doc_and_private_file(self):
+		stu = self._mk_student("Cap Happy Girl")
+		tok = api._token_for(stu.name)
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
+		                              track="t1", lesson="l1", prompt_key="cap1",
+		                              prompt_text_hi="तुम कहाँ जा रही हो?",
+		                              transcription="हम कहाँ जाइत बानी",
+		                              duration_secs=12, client_id="t-cap-1")
+		self.assertTrue(r.get("ok"))
+		doc = frappe.get_doc("Dialect Capture", r["id"])
+		self.assertEqual(doc.student, stu.name)
+		self.assertEqual(doc.student_name, "Cap Happy Girl")
+		self.assertEqual(doc.dialect_transcription, "हम कहाँ जाइत बानी")
+		self.assertEqual(doc.duration_secs, 12)
+		f = frappe.get_doc("File", {"attached_to_doctype": "Dialect Capture",
+		                            "attached_to_name": doc.name})
+		self.assertEqual(f.is_private, 1)            # a child's voice never lands in /files
+		self.assertTrue(doc.audio_file)
+		self.assertEqual(doc.audio_file, f.file_url)
+		self.assertTrue(doc.audio_file.startswith("/private/files/"))
+
+	def test_save_capture_dedups_client_id(self):
+		stu = self._mk_student("Cap Dedup Girl")
+		tok = api._token_for(stu.name)
+		kw = dict(student=stu.name, token=tok, track="t1", lesson="l1",
+		          transcription="दू बेर ना", client_id="t-cap-d1")
+		r1 = api._save_dialect_capture(self.WAV, "audio/wav", **kw)
+		self.assertTrue(r1.get("ok"))
+		r2 = api._save_dialect_capture(self.WAV, "audio/wav", **kw)
+		self.assertTrue(r2.get("dedup"))
+		self.assertEqual(frappe.db.count("Dialect Capture", {"client_id": "t-cap-d1"}), 1)
+
+	def test_save_capture_rejects_missing_or_oversize_audio(self):
+		stu = self._mk_student("Cap Audio Girl")
+		tok = api._token_for(stu.name)
+		r = api._save_dialect_capture(None, None, student=stu.name, token=tok,
+		                              transcription="कुछ")
+		self.assertEqual(r.get("error"), "bad_audio")
+		big = b"\x00" * (8 * 1024 * 1024 + 1)
+		r = api._save_dialect_capture(big, "audio/wav", student=stu.name, token=tok,
+		                              transcription="कुछ")
+		self.assertEqual(r.get("error"), "bad_audio")
+
+	def test_save_capture_allows_blank_transcription_now(self):
+		# Boli moved transcription OUT of recording (stage 2 is a different student), so a
+		# blank transcription no longer fails — the clip is stored at status=recorded.
+		stu = self._mk_student("Cap Text Girl")
+		tok = api._token_for(stu.name)
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
+		                              transcription="", client_id="t-cap-blank")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-blank"},
+		                          ["status", "dialect_transcription"], as_dict=True)
+		self.assertEqual(row.status, "recorded")
+		self.assertIn(row.dialect_transcription, (None, ""))
+
+	def test_save_capture_rejects_unknown_student_and_bad_token(self):
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student="nope-xyz",
+		                              transcription="कुछ")
+		self.assertEqual(r.get("error"), "unknown_student")
+		stu = self._mk_student("Cap Auth Girl")
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name,
+		                              token="forged", transcription="कुछ")
+		self.assertEqual(r.get("error"), "auth")
+
+	def test_save_capture_clamps_duration_and_transcription(self):
+		stu = self._mk_student("Cap Clamp Girl")
+		tok = api._token_for(stu.name)
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
+		                              track="t1", lesson="l1",
+		                              transcription="ब" * 3000, duration_secs=999999,
+		                              client_id="t-cap-c1")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-c1"},
+		                          ["duration_secs", "dialect_transcription"], as_dict=True)
+		self.assertEqual(row.duration_secs, 600)     # nothing outlives the 3-min recorder by much
+		self.assertEqual(len(row.dialect_transcription), 2000)
+
+	def test_save_capture_resolves_prompt_link(self):
+		_track, _lesson, prompt = self._mk_lesson_with_prompt("dc-cap-t1")
+		stu = self._mk_student("Cap Link Girl")
+		tok = api._token_for(stu.name)
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
+		                              track="dc-cap-t1", lesson="l1", prompt_key="cap1",
+		                              prompt_text_hi="तुम कहाँ जा रही हो?",
+		                              transcription="तूं कहाँ जात बाड़ू", client_id="t-cap-l1")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-l1"},
+		                          ["prompt", "prompt_text_hi"], as_dict=True)
+		self.assertEqual(row.prompt, prompt.name)
+		# a dangling key never fails the write — the denormalized text still lands
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
+		                              track="dc-cap-t1", lesson="l1", prompt_key="gone9",
+		                              prompt_text_hi="मिट गया प्रश्न",
+		                              transcription="फिर भी बोलनी", client_id="t-cap-l2")
+		self.assertTrue(r.get("ok"))
+		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-l2"},
+		                          ["prompt", "prompt_text_hi"], as_dict=True)
+		self.assertFalse(row.prompt)
+		self.assertEqual(row.prompt_text_hi, "मिट गया प्रश्न")
+
+	def test_track_json_exports_capture_prompts(self):
+		self._mk_lesson_with_prompt("dc-cap-exp")
+		api.clear_content_cache()
+		t = next(c for c in api._build_courses() if c["key"] == "dc-cap-exp")
+		les = t["lessons"][0]
+		self.assertEqual(les["capture"], [{"key": "cap1", "hi": "तुम कहाँ जा रही हो?",
+		                                   "en": "Where are you going?",
+		                                   "category": "questions", "tier": 3}])
+
+
+def _ledger_points(student, event):
+	"""Total Boli XP points a student earned for one event kind."""
+	return sum(frappe.get_all("Boli XP Ledger", filters={"student": student, "event": event},
+	                          pluck="points"))
+
+
+class TestBoliPipeline(FrappeTestCase):
+	"""Boli stages 2–3: transcribe → 2-accept verify, cross-student queue leasing, the
+	rework→escalate loop, server-authoritative XP + dedup, and the v7 legacy migration.
+	The pipeline commits, so (like TestDialectCapture) every fixture is cleaned explicitly."""
+
+	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
+
+	def _mk_student(self, name):
+		def _rm():
+			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
+				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
+				for cap in clips:
+					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
+					                          "attached_to_name": cap})
+				if clips:
+					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
+					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
+					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
+				frappe.db.delete("Boli Verification", {"verifier": s})
+				frappe.db.delete("Boli Transcription", {"author": s})
+				frappe.db.delete("Boli XP Ledger", {"student": s})
+				frappe.db.delete("Boli Speaker", {"student": s})
+				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
+				              "claim_expires=null where claimed_by=%s", s)
+				frappe.db.delete("Dialect Capture", {"student": s})
+				frappe.db.delete("Student", {"name": s})
+			frappe.db.commit()
+		self.addCleanup(_rm)
+		doc = frappe.get_doc({"doctype": "Student", "student_name": name, "active": 1,
+		                      "gender": "Female", "age": 15}).insert(ignore_permissions=True)
+		return doc, api._token_for(doc.name)
+
+	def _record(self, student, token, cid):
+		r = api._save_dialect_capture(self.WAV, "audio/wav", student=student, token=token,
+		                              track="boli-t", lesson="l1", prompt_text_hi="कहाँ?",
+		                              duration_secs=30, client_id=cid)
+		self.assertTrue(r.get("ok"), r)
+		return r["id"]
+
+	def test_transcribe_two_accepts_verifies_and_pays(self):
+		rec, rtok = self._mk_student("Boli Rec A")
+		txr, ttok = self._mk_student("Boli Txr A")
+		v1, v1tok = self._mk_student("Boli Ver A1")
+		v2, v2tok = self._mk_student("Boli Ver A2")
+		clip = self._record(rec.name, rtok, "b-rec-a")
+
+		r = api.submit_transcription(student=txr.name, token=ttok, clip=clip,
+		                             text="कहाँ जात बाड़ू", client_id="b-tx-a")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "in_verification")
+
+		r = api.submit_verification(student=v1.name, token=v1tok, clip=clip,
+		                            verdict="accept", client_id="b-vf-a1")
+		self.assertTrue(r.get("ok"))
+		self.assertFalse(r.get("verified"))               # one accept is not enough
+		r = api.submit_verification(student=v2.name, token=v2tok, clip=clip,
+		                            verdict="accept", client_id="b-vf-a2")
+		self.assertTrue(r.get("verified"))
+
+		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "verified")
+		self.assertEqual(_ledger_points(txr.name, "transcription_verified"), 20)
+		self.assertEqual(_ledger_points(rec.name, "recorded"), 5)
+		self.assertEqual(_ledger_points(rec.name, "speaker_credit"), 10)   # self recording
+		self.assertEqual(_ledger_points(v1.name, "verification_match"), 5)
+		self.assertEqual(_ledger_points(v2.name, "verification_match"), 5)
+		self.assertEqual(api._total_gems(txr.name), 20)   # gems fold in the Boli ledger
+
+	def test_dedup_does_not_double_pay(self):
+		rec, rtok = self._mk_student("Boli Rec B")
+		txr, ttok = self._mk_student("Boli Txr B")
+		v1, v1tok = self._mk_student("Boli Ver B1")
+		v2, v2tok = self._mk_student("Boli Ver B2")
+		clip = self._record(rec.name, rtok, "b-rec-b")
+		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="ठीक बा",
+		                         client_id="b-tx-b")
+		api.submit_verification(student=v1.name, token=v1tok, clip=clip, verdict="accept",
+		                        client_id="b-vf-b1")
+		api.submit_verification(student=v2.name, token=v2tok, clip=clip, verdict="accept",
+		                        client_id="b-vf-b2")
+		# a retried accept (same client_id) must not add a second vote or re-pay
+		r = api.submit_verification(student=v2.name, token=v2tok, clip=clip, verdict="accept",
+		                            client_id="b-vf-b2")
+		self.assertTrue(r.get("dedup"))
+		self.assertEqual(frappe.db.count("Boli XP Ledger",
+		                                 {"student": txr.name, "event": "transcription_verified"}), 1)
+
+	def test_cannot_touch_own_clip_or_transcription(self):
+		rec, rtok = self._mk_student("Boli Rec C")
+		txr, ttok = self._mk_student("Boli Txr C")
+		clip = self._record(rec.name, rtok, "b-rec-c")
+		r = api.submit_transcription(student=rec.name, token=rtok, clip=clip, text="x",
+		                             client_id="b-tx-c0")
+		self.assertEqual(r.get("error"), "own_clip")       # can't transcribe your own recording
+		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="अपना",
+		                         client_id="b-tx-c1")
+		r = api.submit_verification(student=rec.name, token=rtok, clip=clip, verdict="accept",
+		                            client_id="b-vf-c0")
+		self.assertEqual(r.get("error"), "own_clip")       # can't verify your own recording
+		r = api.submit_verification(student=txr.name, token=ttok, clip=clip, verdict="accept",
+		                            client_id="b-vf-c1")
+		self.assertEqual(r.get("error"), "own_transcription")   # nor what you wrote
+
+	def test_queue_excludes_own_and_leases_transcribe(self):
+		rec, rtok = self._mk_student("Boli Rec D")
+		txr, ttok = self._mk_student("Boli Txr D")
+		tx2, t2tok = self._mk_student("Boli Txr D2")
+		clip = self._record(rec.name, rtok, "b-rec-d")
+		q = api.get_boli_queue(student=rec.name, token=rtok, kind="transcribe", batch=50)
+		self.assertNotIn(clip, [i["clip"] for i in q["items"]])   # never her own clip
+		q = api.get_boli_queue(student=txr.name, token=ttok, kind="transcribe", batch=50)
+		self.assertIn(clip, [i["clip"] for i in q["items"]])
+		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "claimed_by"), txr.name)
+		q = api.get_boli_queue(student=tx2.name, token=t2tok, kind="transcribe", batch=50)
+		self.assertNotIn(clip, [i["clip"] for i in q["items"]])   # live-leased → hidden
+
+	def test_reject_reworks_then_escalates(self):
+		rec, rtok = self._mk_student("Boli Rec E")
+		txr, ttok = self._mk_student("Boli Txr E")
+		vr, vtok = self._mk_student("Boli Ver E")
+		clip = self._record(rec.name, rtok, "b-rec-e")
+		for i in range(2):                                 # two reject rounds re-open the clip
+			api.submit_transcription(student=txr.name, token=ttok, clip=clip,
+			                         text="कोशिश %d" % i, client_id="b-tx-e%d" % i)
+			r = api.submit_verification(student=vr.name, token=vtok, clip=clip, verdict="reject",
+			                            reason="wrong_words", client_id="b-vf-e%d" % i)
+			self.assertTrue(r.get("rework"), r)
+			self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "recorded")
+		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "rework_rounds"), 2)
+		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="आखिरी",
+		                         client_id="b-tx-e2")
+		r = api.submit_verification(student=vr.name, token=vtok, clip=clip, verdict="reject",
+		                            reason="bad_audio", client_id="b-vf-e2")
+		self.assertTrue(r.get("escalated"), r)             # cap reached → forced PA adjudication
+		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "escalated")
+
+	def test_v7_migration_is_idempotent(self):
+		from hikmat.patches import v7_boli
+		rec, rtok = self._mk_student("Boli Legacy Girl")
+		clip = frappe.get_doc({"doctype": "Dialect Capture", "student": rec.name,
+		                       "student_name": rec.student_name, "status": "recorded",
+		                       "dialect_transcription": "पुराना बोली", "client_id": "b-legacy-1",
+		                       "captured_on": frappe.utils.now()}).insert(ignore_permissions=True).name
+		frappe.db.commit()
+		v7_boli._migrate_legacy_captures()
+		frappe.db.commit()
+		self.assertEqual(frappe.db.count("Boli Transcription", {"clip": clip}), 1)
+		row = frappe.db.get_value("Dialect Capture", clip,
+		                          ["status", "speaker", "speaker_relation"], as_dict=True)
+		self.assertEqual(row.status, "in_verification")
+		self.assertTrue(row.speaker)
+		self.assertEqual(row.speaker_relation, "self")
+		v7_boli._migrate_legacy_captures()                 # re-running changes nothing
+		frappe.db.commit()
+		self.assertEqual(frappe.db.count("Boli Transcription", {"clip": clip}), 1)

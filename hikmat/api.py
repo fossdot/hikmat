@@ -303,6 +303,15 @@ def _track_json(t, with_content):
             dialogues.append({"who": d.who or "🙂", "line": d.line, "lineHi": d.line_hi,
                               "then": d.followup, "replies": replies})
 
+        capture = []
+        for p in frappe.get_all("Dialect Prompt", filters={"lesson": l.name},
+                                fields=["prompt_key", "prompt_text_hi", "prompt_text_en",
+                                        "category", "complexity_tier"],
+                                order_by="sort_order asc, creation asc"):
+            capture.append({"key": p.prompt_key, "hi": p.prompt_text_hi,
+                            "en": p.prompt_text_en or "", "category": p.category or "",
+                            "tier": _int(p.complexity_tier) or 1})
+
         code = []
         for c in frappe.get_all("Lesson Code", filters={"parent": l.name},
                                 fields=["prompt", "prompt_hi", "teach", "teach_hi", "code", "choices", "answer"],
@@ -379,6 +388,7 @@ def _track_json(t, with_content):
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
             "email": email, "quiz": quiz, "read": read, "reply": reply,
+            "capture": capture,
         }
         # optional per-lesson explainer video (YouTube link or file URL) — keys absent when unset
         if (l.get("video") or "").strip():
@@ -579,12 +589,16 @@ def _active_milestones():
 
 
 def _total_gems(student):
-    """A student's global gem total 💎 = SUM of coins over every attempt (score*5 +
-    stars*10 each) — mirrors the client's state.coins, and unlike stars it keeps
-    growing on replays, so practice counts toward the next belt."""
+    """A student's global gem total 💎 = SUM of coins over every lesson attempt
+    (score*5 + stars*10 each) PLUS every Boli XP Ledger award — mirrors the client's
+    state.coins, and unlike stars it keeps growing on replays and on corpus work, so
+    both practice and dialect contributions count toward the next belt."""
     r = frappe.db.sql(
         "select coalesce(sum(coins), 0) from `tabLesson Attempt` where student=%s", student)
-    return int(r[0][0]) if r else 0
+    base = int(r[0][0]) if r else 0
+    b = frappe.db.sql(
+        "select coalesce(sum(points), 0) from `tabBoli XP Ledger` where student=%s", student)
+    return base + (int(b[0][0]) if b else 0)
 
 
 def _check_milestones(student, sinfo):
@@ -688,6 +702,547 @@ def report_doubt(student=None, token=None, track=None, lesson=None, activity=Non
     _notify_facilitators(_("🙋 Doubt from {0}: {1}").format(who, (question or "")[:80]),
                          "Lesson Doubt", doc.name)
     return {"ok": True, "name": doc.name}
+
+
+# ---------------------------------------------------------------------------
+# Boli (बोली) — the Champaran Bhojpuri corpus pipeline (Record → Transcribe →
+# Verify → Curate). Recording is stage 1; a clip only enters the corpus and
+# pays full XP once independent students verify its transcription. Every XP
+# value, threshold and lease timing lives in Hikmat Settings.boli so PAs tune
+# them without a redeploy — _boli_cfg() overlays that JSON on these defaults.
+# ---------------------------------------------------------------------------
+_BOLI_DEFAULTS = {
+    "xp_recorded": 5, "xp_operator_assist": 2, "xp_transcription_verified": 20,
+    "xp_speaker_credit": 10, "xp_verification_match": 5, "xp_gold_passed": 5,
+    "xp_curation_done": 5, "xp_gem_awarded": 25, "xp_elder_verified": 30,
+    "xp_classroom_present": 2,
+    "verifier_unlock": 15,               # own accepted transcriptions before Verify unlocks
+    "curator_unlock_verified": 10, "curator_unlock_verifications": 20,
+    "gold_check_pct": 10, "verifier_accuracy_floor": 0.6,
+    "accepts_to_verify": 2, "max_rework_rounds": 2,
+    "queue_batch": 8, "lease_ttl_secs": 6 * 3600,   # long lease: cloud + intermittent internet
+}
+
+
+def _boli_cfg():
+    """Boli tunables: the defaults above overlaid with the Hikmat Settings `boli` JSON
+    blob (PA-editable, no redeploy). A missing/invalid setting simply falls back."""
+    cfg = dict(_BOLI_DEFAULTS)
+    try:
+        raw = frappe.db.get_single_value("Hikmat Settings", "boli")
+        if raw:
+            cfg.update(json.loads(raw) if isinstance(raw, str) else dict(raw))
+    except Exception:
+        pass
+    return cfg
+
+
+def _award_xp(student, event, points, clip=None, dedup_key=None, student_name=None):
+    """Append one server-authored Boli XP row — the ledger is the single source of truth
+    for corpus XP, folded into gems by _total_gems(). Idempotent on dedup_key so replays
+    and retries never double-award (e.g. dedup_key='verified:<clip>')."""
+    if not student or not _int(points):
+        return
+    if dedup_key and frappe.db.get_value("Boli XP Ledger", {"dedup_key": dedup_key}, "name"):
+        return
+    if student_name is None:
+        student_name = frappe.db.get_value("Student", student, "student_name")
+    try:
+        frappe.get_doc({
+            "doctype": "Boli XP Ledger", "student": student, "student_name": student_name,
+            "event": event, "points": _int(points), "clip": clip,
+            "dedup_key": (dedup_key or "")[:140] or None, "awarded_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with the same dedup_key
+        frappe.db.rollback()
+
+
+_AGE_BANDS = [(13, 15, "13-15"), (16, 18, "16-18"), (19, 25, "19-25"),
+              (26, 40, "26-40"), (41, 60, "41-60")]
+
+
+def _age_to_band(age):
+    age = _int(age)
+    if not age:
+        return None
+    for lo, hi, band in _AGE_BANDS:
+        if lo <= age <= hi:
+            return band
+    return "60+" if age > 60 else None
+
+
+def _valid_village(v):
+    v = (v or "").strip()
+    return v if (v and frappe.db.exists("Boli Village", v)) else None
+
+
+_SPK_RELATIONS = ("self", "family-elder", "neighbor", "other")
+
+
+def _resolve_boli_speaker(student, relation=None, age_band=None, gender=None,
+                          village=None, consent_status=None):
+    """Return a Boli Speaker for this clip. A 'self' clip reuses (or creates once) the
+    learner's own pseudonymous CHM-SPK id so all her recordings share one speaker; a
+    family/neighbour speaker is a fresh pseudonymous row carrying demographics only —
+    never a name (Boli Speaker.student is the sole real-name link, and elders get none)."""
+    relation = (relation or "self").strip().lower()
+    if relation not in _SPK_RELATIONS:
+        relation = "other"
+    village = _valid_village(village)
+    if relation == "self":
+        existing = frappe.db.get_value("Boli Speaker", {"student": student, "relation": "self"}, "name")
+        if existing:
+            return existing
+        ag = frappe.db.get_value("Student", student, ["age", "gender"], as_dict=True) or {}
+        return frappe.get_doc({
+            "doctype": "Boli Speaker", "student": student, "relation": "self",
+            "age_band": age_band or _age_to_band(ag.get("age")),
+            "gender": gender or ag.get("gender"),
+            "village_or_block": village, "consent_status": consent_status or "self_consented",
+        }).insert(ignore_permissions=True).name
+    return frappe.get_doc({
+        "doctype": "Boli Speaker", "relation": relation,
+        "age_band": age_band or None, "gender": gender or None,
+        "village_or_block": village, "consent_status": consent_status or "verbal_elder_consent",
+    }).insert(ignore_permissions=True).name
+
+
+_PROMPT_TYPES = ("in_class", "elder_home", "image", "free")
+
+
+# ---------------------------------------------------------------------------
+# Boli stage 1 — Record ("बोल"). A learner records a prompt in someone's boli
+# (herself, or a family elder / neighbour) and the clip enters the pipeline at
+# status=recorded. Transcription is NO LONGER done here — a *different* student
+# transcribes it in stage 2. Audio is a PRIVATE File on the Dialect Capture row
+# (Desk-only, never served to guests). Untrusted input → same hardening as
+# submit_attempt: rate caps, active-student + token check, clamps, client_id
+# idempotency for the offline outbox.
+# ---------------------------------------------------------------------------
+_CAPTURE_AUDIO_MAX = 8 * 1024 * 1024   # 8MB ≈ a 3-minute 16kHz WAV, the client's hard limit
+
+# upload mimetype → stored file extension (anything unrecognised is kept as .bin)
+_CAPTURE_EXT = {"audio/wav": ".wav", "audio/webm": ".webm",
+                "audio/mp4": ".m4a", "audio/mpeg": ".mp3"}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_dialect_capture(student=None, token=None, track=None, lesson=None,
+                           prompt_key=None, prompt_text_hi=None, transcription=None,
+                           duration_secs=0, client_id=None, operator=None, prompt_type=None,
+                           category=None, tier=None, speaker_relation=None, speaker_age_band=None,
+                           speaker_gender=None, village_or_block=None, consent_status=None,
+                           public_ok=0, sample_rate=0, device_id=None):
+    """Record one spoken dialect capture (multipart POST, file field 'audio').
+    Thin wrapper: reads the upload off the request, then hands everything to
+    _save_dialect_capture so tests can hit the real logic without a request."""
+    f = frappe.request.files.get("audio") if getattr(frappe, "request", None) else None
+    audio_bytes = f.read() if f else None
+    mimetype = f.mimetype if f else None
+    return _save_dialect_capture(audio_bytes, mimetype, student=student, token=token,
+                                 track=track, lesson=lesson, prompt_key=prompt_key,
+                                 prompt_text_hi=prompt_text_hi, transcription=transcription,
+                                 duration_secs=duration_secs, client_id=client_id,
+                                 operator=operator, prompt_type=prompt_type, category=category,
+                                 tier=tier, speaker_relation=speaker_relation,
+                                 speaker_age_band=speaker_age_band, speaker_gender=speaker_gender,
+                                 village_or_block=village_or_block, consent_status=consent_status,
+                                 public_ok=public_ok, sample_rate=sample_rate, device_id=device_id)
+
+
+def _save_dialect_capture(audio_bytes, mimetype, student=None, token=None, track=None,
+                          lesson=None, prompt_key=None, prompt_text_hi=None,
+                          transcription=None, duration_secs=0, client_id=None, operator=None,
+                          prompt_type=None, category=None, tier=None, speaker_relation=None,
+                          speaker_age_band=None, speaker_gender=None, village_or_block=None,
+                          consent_status=None, public_ok=0, sample_rate=0, device_id=None):
+    """Validate + store one capture. Requires a real logged-in student (audio of a
+    child is personal data — no anonymous/guest captures, unlike report_doubt).
+    client_id makes the write idempotent so the offline outbox can retry safely."""
+    if not _rate_ok("capture:" + _client_ip(), 600, 3600):   # captures are rarer than attempts
+        return {"ok": False, "error": "rate_limited"}
+    if not student:
+        student = _session_student()                         # online client authed by session, may omit id
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
+    if not sinfo or not sinfo.active:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):                      # campus token OR online session
+        return {"ok": False, "error": "auth"}
+    if not _rate_ok("capture-stu:" + str(student), 60, 3600):
+        return {"ok": False, "error": "rate_limited"}
+    if client_id:                                            # already saved this exact clip? done.
+        if frappe.db.get_value("Dialect Capture", {"client_id": client_id}, "name"):
+            return {"ok": True, "dedup": True}
+    if not audio_bytes or len(audio_bytes) > _CAPTURE_AUDIO_MAX:
+        return {"ok": False, "error": "bad_audio"}
+
+    # Recording no longer carries a transcription (that's stage 2, done by a different
+    # student). A legacy client that still posts one keeps it in the legacy field.
+    transcription = (transcription or "").strip()
+
+    prompt_type = (prompt_type or "in_class").strip().lower()
+    if prompt_type not in _PROMPT_TYPES:
+        prompt_type = "in_class"
+    relation = (speaker_relation or "self").strip().lower()
+    third_party = relation != "self" or prompt_type == "elder_home"
+    consent_status = (consent_status or "").strip() or ("self_consented" if not third_party else "")
+    # Someone else's voice (elder / neighbour) may not enter the corpus without a
+    # recorded consent attestation — the client collects it on the pre-submit checklist.
+    if third_party and consent_status in ("", "missing"):
+        return {"ok": False, "error": "consent_required"}
+
+    track = (track or "")[:140]
+    lesson = (lesson or "")[:140]
+    prompt_key = (prompt_key or "")[:60]
+    # resolve the authored prompt if it still exists; a dangling key never fails the
+    # write — the denormalized prompt text keeps the row meaningful after a reseed
+    prompt = None
+    if track and lesson and prompt_key:
+        pname = f"{track}-{lesson}-{prompt_key}"             # Dialect Prompt autoname: {lesson doc}-{key}
+        if frappe.db.exists("Dialect Prompt", pname):
+            prompt = pname
+    # fall back to the prompt's own category / tier when the client didn't send them
+    if prompt and (not category or not tier):
+        pinfo = frappe.db.get_value("Dialect Prompt", prompt,
+                                    ["category", "complexity_tier"], as_dict=True) or {}
+        category = category or pinfo.get("category")
+        tier = tier or pinfo.get("complexity_tier")
+
+    speaker = _resolve_boli_speaker(student, relation=relation, age_band=speaker_age_band,
+                                    gender=speaker_gender, village=village_or_block,
+                                    consent_status=consent_status)
+    spk = frappe.db.get_value("Boli Speaker", speaker,
+                              ["age_band", "gender", "village_or_block"], as_dict=True) or {}
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Dialect Capture", "client_id": (client_id or "")[:64] or None,
+            "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
+            "operator": operator if (operator and frappe.db.exists("Student", operator)) else None,
+            "speaker": speaker, "speaker_relation": relation,
+            "speaker_age_band": spk.get("age_band"), "speaker_gender": spk.get("gender"),
+            "village_or_block": spk.get("village_or_block"),
+            "track": track, "lesson": lesson,
+            "prompt_key": prompt_key, "prompt": prompt,
+            "prompt_text_hi": (prompt_text_hi or "")[:500],
+            "prompt_type": prompt_type, "category": (category or "")[:140], "tier": _int(tier),
+            "dialect_transcription": transcription[:2000] or None,
+            "consent_status": consent_status or "self_consented",
+            "public_ok": 1 if _int(public_ok) else 0,
+            "status": "recorded",
+            "duration_secs": max(0, min(600, _int(duration_secs))),   # the client stops at 3 min
+            "sample_rate": max(0, _int(sample_rate)), "device_id": (device_id or "")[:64],
+            "captured_on": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:                       # raced with a retry of the same client_id
+        frappe.db.rollback()
+        return {"ok": True, "dedup": True}
+    ext = _CAPTURE_EXT.get((mimetype or "").split(";")[0].strip().lower(), ".bin")
+    file_doc = frappe.get_doc({
+        "doctype": "File", "attached_to_doctype": "Dialect Capture",
+        "attached_to_name": doc.name, "is_private": 1,
+        "file_name": f"{doc.name}{ext}", "content": audio_bytes,
+    }).insert(ignore_permissions=True)
+    doc.db_set("audio_file", file_doc.file_url, update_modified=False)
+    frappe.db.commit()
+    # Recording pays a little now; the big XP lands when the clip is verified.
+    cfg = _boli_cfg()
+    _award_xp(student, "recorded", cfg["xp_recorded"], clip=doc.name,
+              dedup_key="recorded:" + doc.name, student_name=sinfo.get("student_name"))
+    if operator and operator != student and frappe.db.exists("Student", operator):
+        _award_xp(operator, "operator_assist", cfg["xp_operator_assist"], clip=doc.name,
+                  dedup_key="operator:" + doc.name)
+    return {"ok": True, "id": doc.name}
+
+
+# ---------------------------------------------------------------------------
+# Boli stage 2 (Transcribe "लिख") + stage 3 (Verify "जांच"). These act on OTHER
+# students' clips — the app's first shared, mutable, cross-student work queue.
+# Connectivity is intermittent (cloud), so the client prefetches a batch and
+# works offline; transcription takes a short EXCLUSIVE lease (one transcriber per
+# clip, auto-released on expiry) while verification is deliberately lease-free (a
+# clip needs two INDEPENDENT accepts). Server-wins: a submission against an
+# already-resolved clip is kept as data but changes no outcome. All endpoints are
+# allow_guest (campus students are Frappe "Guest") — real auth is _authorized().
+# ---------------------------------------------------------------------------
+_BOLI_QUEUE_KINDS = ("transcribe", "verify")
+_VERDICTS = ("accept", "reject", "escalate")
+
+
+def _boli_latest_transcription(clip):
+    """The most recent transcription for a clip (name/text/author/version), or None."""
+    rows = frappe.get_all("Boli Transcription", filters={"clip": clip},
+                          fields=["name", "text", "author", "version"],
+                          order_by="version desc", limit=1)
+    return rows[0] if rows else None
+
+
+@frappe.whitelist(allow_guest=True)
+def get_boli_queue(student=None, token=None, kind=None, batch=None):
+    """Hand a student a batch of clips to work on for `kind` (transcribe|verify) — never
+    her own recording/transcription, never a clip she has already handled at this stage.
+    Transcribe items are leased to her (exclusive, TTL from config); verify items are
+    not (independent votes). The client caches these + their audio for offline work."""
+    kind = (kind or "").strip().lower()
+    if kind not in _BOLI_QUEUE_KINDS:
+        return {"ok": False, "error": "bad_kind"}
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+    cfg = _boli_cfg()
+    n = max(1, min(20, _int(batch) or cfg["queue_batch"]))
+    now = frappe.utils.now()
+    items = []
+    if kind == "transcribe":
+        rows = frappe.db.sql("""
+            select dc.name, dc.prompt_text_hi, dc.prompt_type, dc.duration_secs
+            from `tabDialect Capture` dc
+            where dc.status = 'recorded' and dc.student != %(me)s
+              and (dc.claim_expires is null or dc.claim_expires < %(now)s)
+              and dc.audio_file is not null and dc.audio_file != ''
+              and not exists (select 1 from `tabBoli Transcription` bt
+                              where bt.clip = dc.name and bt.author = %(me)s)
+            order by dc.captured_on asc limit %(n)s
+        """, {"me": student, "now": now, "n": n}, as_dict=True)
+        expires = frappe.utils.add_to_date(now, seconds=cfg["lease_ttl_secs"])
+        for r in rows:
+            frappe.db.set_value("Dialect Capture", r.name,
+                                {"claimed_by": student, "claim_expires": expires},
+                                update_modified=False)
+            items.append({"clip": r.name, "prompt_text_hi": r.prompt_text_hi,
+                          "prompt_type": r.prompt_type, "duration_secs": r.duration_secs,
+                          "lease_expires": str(expires)})
+        frappe.db.commit()
+    else:  # verify — no lease; a clip wants several independent judges
+        rows = frappe.db.sql("""
+            select dc.name, dc.prompt_text_hi, dc.prompt_type, dc.duration_secs
+            from `tabDialect Capture` dc
+            where dc.status = 'in_verification' and dc.student != %(me)s
+              and dc.audio_file is not null and dc.audio_file != ''
+              and not exists (select 1 from `tabBoli Transcription` bt
+                              where bt.clip = dc.name and bt.author = %(me)s)
+              and not exists (select 1 from `tabBoli Verification` bv
+                              where bv.clip = dc.name and bv.verifier = %(me)s)
+            order by dc.captured_on asc limit %(n)s
+        """, {"me": student, "n": n}, as_dict=True)
+        for r in rows:
+            tr = _boli_latest_transcription(r.name)
+            if not tr:
+                continue
+            items.append({"clip": r.name, "prompt_text_hi": r.prompt_text_hi,
+                          "prompt_type": r.prompt_type, "duration_secs": r.duration_secs,
+                          "transcription": {"id": tr["name"], "text": tr["text"]}})
+    return {"ok": True, "kind": kind, "items": items}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_boli_audio(student=None, token=None, clip=None):
+    """Stream one clip's PRIVATE audio to an authorized student for transcribe/verify.
+    Campus students aren't Frappe users, so /private/files can't serve them — access is
+    gated on the bearer token + the work context (never her own clip; a recorded clip
+    must be leased to her). The client fetch()es this into an offline blob."""
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+    c = frappe.db.get_value("Dialect Capture", clip,
+                            ["name", "student", "status", "claimed_by", "audio_file"], as_dict=True)
+    if not c or not c.audio_file:
+        return {"ok": False, "error": "not_found"}
+    if c.student == student:
+        return {"ok": False, "error": "own_clip"}
+    allowed = (c.status == "in_verification") or (c.status == "recorded" and c.claimed_by == student)
+    if not allowed:
+        return {"ok": False, "error": "not_available"}
+    fname = frappe.db.get_value("File", {"file_url": c.audio_file, "attached_to_name": c.name}, "name")
+    if not fname:
+        return {"ok": False, "error": "not_found"}
+    fdoc = frappe.get_doc("File", fname)
+    frappe.local.response.filename = fdoc.file_name
+    frappe.local.response.filecontent = fdoc.get_content()
+    frappe.local.response.type = "download"
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_transcription(student=None, token=None, clip=None, text=None,
+                         lint_warnings=None, client_id=None):
+    """Stage 2 — a student types the Devanagari transcription of someone else's clip.
+    Moves the clip to in_verification and releases the transcribe lease. No XP here; the
+    reward lands when two peers verify it (see submit_verification)."""
+    if not _rate_ok("boli-tx:" + _client_ip(), 1200, 3600):
+        return {"ok": False, "error": "rate_limited"}
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+    if client_id:
+        existing = frappe.db.get_value("Boli Transcription", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "name": existing, "dedup": True}
+    text = (text or "").strip()
+    if not text:
+        return {"ok": False, "error": "bad_transcription"}
+    c = frappe.db.get_value("Dialect Capture", clip, ["name", "student", "status"], as_dict=True)
+    if not c:
+        return {"ok": False, "error": "not_found"}
+    if c.student == student:
+        return {"ok": False, "error": "own_clip"}            # can't transcribe your own recording
+    if c.status != "recorded":
+        return {"ok": False, "error": "not_available"}       # already transcribed / verified / resolved
+    ver = _int(frappe.db.sql(
+        "select coalesce(max(version), 0) from `tabBoli Transcription` where clip=%s", clip)[0][0]) + 1
+    try:
+        doc = frappe.get_doc({
+            "doctype": "Boli Transcription", "client_id": (client_id or "")[:64] or None,
+            "clip": clip, "author": student, "text": text[:2000], "version": ver,
+            "lint_warnings": (lint_warnings or "")[:500], "is_final": 0,
+            "submitted_at": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:
+        frappe.db.rollback()
+        existing = frappe.db.get_value("Boli Transcription", {"client_id": client_id}, "name")
+        return {"ok": True, "name": existing, "dedup": True}
+    frappe.db.set_value("Dialect Capture", clip,
+                        {"status": "in_verification", "claimed_by": None, "claim_expires": None},
+                        update_modified=False)
+    frappe.db.commit()
+    return {"ok": True, "name": doc.name, "version": ver}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_verification(student=None, token=None, clip=None, transcription=None,
+                        verdict=None, reason=None, client_id=None):
+    """Stage 3 — a peer judges the latest transcription: accept / reject(+reason) /
+    escalate. accepts_to_verify independent accepts VERIFY the clip (transcriber, speaker
+    and matching verifiers paid); a reject sends it back to be re-transcribed (capped at
+    max_rework_rounds, then it parks for PA); an escalate parks it for PA. The outcome and
+    all XP are decided SERVER-side, never trusted from the client."""
+    if not _rate_ok("boli-vf:" + _client_ip(), 3000, 3600):
+        return {"ok": False, "error": "rate_limited"}
+    verdict = (verdict or "").strip().lower()
+    if verdict not in _VERDICTS:
+        return {"ok": False, "error": "bad_verdict"}
+    if not student:
+        student = _session_student()
+    if not student:
+        return {"ok": False, "error": "unknown_student"}
+    if not _authorized(student, token):
+        return {"ok": False, "error": "auth"}
+    if client_id:
+        existing = frappe.db.get_value("Boli Verification", {"client_id": client_id}, "name")
+        if existing:
+            return {"ok": True, "name": existing, "dedup": True}
+    c = frappe.db.get_value("Dialect Capture", clip,
+                            ["name", "student", "status", "rework_rounds",
+                             "prompt_type", "speaker", "speaker_relation"], as_dict=True)
+    if not c:
+        return {"ok": False, "error": "not_found"}
+    if c.student == student:
+        return {"ok": False, "error": "own_clip"}
+    tr = _boli_latest_transcription(clip)
+    if not tr:
+        return {"ok": False, "error": "not_available"}
+    if tr["author"] == student:
+        return {"ok": False, "error": "own_transcription"}   # can't verify what you wrote
+    if frappe.db.exists("Boli Verification",
+                        {"clip": clip, "transcription": tr["name"], "verifier": student}):
+        return {"ok": True, "dedup": True}                   # one vote per transcription
+    # server-wins: if the clip already left verification, keep the vote as data (audit /
+    # future accuracy) but don't disturb the settled outcome
+    stale = c.status != "in_verification"
+    try:
+        vdoc = frappe.get_doc({
+            "doctype": "Boli Verification", "client_id": (client_id or "")[:64] or None,
+            "clip": clip, "transcription": tr["name"], "verifier": student,
+            "verdict": verdict, "reason": (reason or "")[:40] if verdict == "reject" else "",
+            "is_gold_check": 0, "created_at": frappe.utils.now(),
+        }).insert(ignore_permissions=True)
+    except frappe.DuplicateEntryError:
+        frappe.db.rollback()
+        existing = frappe.db.get_value("Boli Verification", {"client_id": client_id}, "name")
+        return {"ok": True, "name": existing, "dedup": True}
+    frappe.db.commit()
+    if stale:
+        return {"ok": True, "name": vdoc.name, "stale": True}
+
+    cfg = _boli_cfg()
+    result = {"ok": True, "name": vdoc.name}
+    if verdict == "accept":
+        accepts = _int(frappe.db.sql(
+            "select count(distinct verifier) from `tabBoli Verification` "
+            "where clip=%s and transcription=%s and verdict='accept'", (clip, tr["name"]))[0][0])
+        if accepts >= cfg["accepts_to_verify"]:
+            _boli_mark_verified(c, tr, cfg)
+            result["verified"] = True
+    elif verdict == "reject" and _int(c.rework_rounds) < cfg["max_rework_rounds"]:
+        # rework: re-open for transcription (a fresh transcriber redoes it; returning it
+        # to the SAME transcriber's personal inbox is a Phase-2 refinement)
+        frappe.db.set_value("Dialect Capture", clip,
+                            {"status": "recorded", "rework_rounds": _int(c.rework_rounds) + 1,
+                             "claimed_by": None, "claim_expires": None}, update_modified=False)
+        frappe.db.commit()
+        result["rework"] = True
+    else:  # escalate, or a reject once rework is exhausted → forced PA adjudication
+        frappe.db.set_value("Dialect Capture", clip, {"status": "escalated"}, update_modified=False)
+        frappe.db.commit()
+        result["escalated"] = True
+    return result
+
+
+def _boli_mark_verified(c, tr, cfg):
+    """Transition a clip to verified and pay the pipeline: the transcriber earns
+    xp_transcription_verified, each matching (accepting) verifier earns xp_verification_match,
+    the speaker earns a credit when she is a learner, and an elder recording pays the
+    recorder the elder bonus. Every award is idempotent via a per-clip dedup_key so a
+    double-trip never double-pays."""
+    frappe.db.set_value("Dialect Capture", c.name, {"status": "verified"}, update_modified=False)
+    frappe.db.set_value("Boli Transcription", tr["name"], {"is_final": 1}, update_modified=False)
+    frappe.db.commit()
+    _award_xp(tr["author"], "transcription_verified", cfg["xp_transcription_verified"],
+              clip=c.name, dedup_key="verified:" + c.name)
+    for v in frappe.get_all("Boli Verification",
+                            filters={"clip": c.name, "transcription": tr["name"], "verdict": "accept"},
+                            pluck="verifier"):
+        _award_xp(v, "verification_match", cfg["xp_verification_match"],
+                  clip=c.name, dedup_key="vmatch:%s:%s" % (c.name, v))
+    spk_student = frappe.db.get_value("Boli Speaker", c.speaker, "student") if c.speaker else None
+    if spk_student:
+        _award_xp(spk_student, "speaker_credit", cfg["xp_speaker_credit"],
+                  clip=c.name, dedup_key="speaker:" + c.name)
+    if (c.speaker_relation or "") == "family-elder" or (c.prompt_type or "") == "elder_home":
+        _award_xp(c.student, "elder_verified", cfg["xp_elder_verified"],
+                  clip=c.name, dedup_key="elder:" + c.name)
+
+
+@frappe.whitelist(allow_guest=True)
+def boli_home(student=None, token=None):
+    """Powers the भोजपुरी AI / Bhojpuri AI tab: the shared Corpus Meter (always) plus, when
+    authed, this student's own contribution counts + gems. The meter is the class's single
+    shared motivator — cooperation over competition."""
+    m = frappe.db.sql("""
+        select count(*) as clips, coalesce(sum(duration_secs), 0) as secs
+        from `tabDialect Capture` where status in ('verified', 'curated', 'exported')
+    """, as_dict=True)[0]
+    out = {"ok": True, "meter": {"verifiedClips": _int(m.clips),
+                                 "verifiedMinutes": round(_int(m.secs) / 60)}}
+    if not student:
+        student = _session_student()
+    if student and _authorized(student, token):
+        out["mine"] = {
+            "recorded": _int(frappe.db.count("Dialect Capture", {"student": student})),
+            "transcribed": _int(frappe.db.count("Boli Transcription", {"author": student})),
+            "verified": _int(frappe.db.count("Boli Verification", {"verifier": student})),
+            "gems": _total_gems(student),
+        }
+    return out
 
 
 @frappe.whitelist(allow_guest=True)
