@@ -1658,7 +1658,36 @@ $("#hiToggle").onclick = () => {
   flashToast(msg); srSay(msg);
   if(state.hindi) sayHi("हिंदी गाइड चालू");
 };
-$("#langToggle").onclick = () => { state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save(); refreshTop(); rerender(); logTool("lang_switch"); };
+// A language switch re-renders the current screen, which would otherwise wipe anything typed but
+// not yet submitted (signup name/PIN, a compose/transcribe textarea, a ticked consent box).
+// Snapshot the on-screen fields, re-render in the new language, then restore what was entered.
+function snapshotInputs(){
+  const map = {}; let i = 0;
+  root.querySelectorAll("input, textarea, select").forEach(f => {
+    const key = f.id || f.name || ((f.type || f.tagName) + ":" + i); i++;
+    map[key] = (f.type === "checkbox" || f.type === "radio") ? { checked: f.checked } : { value: f.value };
+  });
+  return map;
+}
+function restoreInputs(map){
+  if(!map) return; let i = 0;
+  root.querySelectorAll("input, textarea, select").forEach(f => {
+    const key = f.id || f.name || ((f.type || f.tagName) + ":" + i); i++;
+    const s = map[key]; if(!s) return;
+    if(f.type === "checkbox" || f.type === "radio"){ if(typeof s.checked === "boolean") f.checked = s.checked; }
+    else if(typeof s.value === "string" && s.value !== "") f.value = s.value;
+  });
+}
+$("#langToggle").onclick = () => {
+  const keep = snapshotInputs();                 // preserve typed-but-unsubmitted input across the re-render
+  state.lang = state.lang==="hi" ? "en" : "hi"; state.prefsTouched=true; save();
+  refreshTop();
+  const ret = rerender();
+  restoreInputs(keep);                                                     // synchronous renderers: fields exist immediately
+  if(ret && typeof ret.then === "function") ret.then(() => restoreInputs(keep));  // async renderers: after their data loads
+  requestAnimationFrame(() => restoreInputs(keep));                        // catch renderers that fill fields a tick later
+  logTool("lang_switch");
+};
 $("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); logTool("theme"); };
 $("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); logTool("hear_screen"); };
 $("#helpNeedBtn").onclick = () => helpNeeded();
@@ -2322,6 +2351,7 @@ function renderLessonMap(course, lesson, back){
 function startLevel(course, lesson, lv, back){
   const rounds = buildRounds(lv, lesson);
   let idx = 0, score = 0;
+  let tileDraft = null;   // preserves an in-progress spell/phrase tile layout across a language switch (same round)
   actStart(course, lesson, lv);                                        // dwell clock starts
   if(getStars(course.key, lesson.key, lv.id) > 0) logTool("replay");   // she's back for practice
   const backToLesson = () => { actEnd(false); renderLessonMap(course, lesson, back); };
@@ -2352,6 +2382,7 @@ function startLevel(course, lesson, lv, back){
   }
   function next(correct){
     if(correct){ score++; state.coins += 5; }
+    tileDraft = null;               // the tile layout belongs to the round we're leaving
     idx++; save(); refreshTop();
     if(idx>=rounds.length) finish();
     else runRound();
@@ -2425,7 +2456,8 @@ function startLevel(course, lesson, lv, back){
 
   // --- SPELL: show picture, build word from letter tiles
   function roundSpell(it){
-    const letters = shuffle(it.en.split(""));
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;   // restore the tile layout after a language switch
+    const letters = _d ? _d.letters.slice() : shuffle(it.en.split(""));
     mount(`${head(tx("Spell the word","शब्द लिखो"), tx("Tap the letters in order","अक्षरों को सही क्रम में छुओ"),"अक्षरों को सही क्रम में लगाओ।")}
       <div class="display"><div class="emoji">${esc(it.emoji)}</div><div class="hi">${esc(it.hi)}</div></div>
       <div class="center" style="margin-bottom:10px"><button class="speakbtn" id="say">🔊 ${tx("Hear it","सुनो")}</button></div>
@@ -2437,12 +2469,13 @@ function startLevel(course, lesson, lv, back){
     $("#say").onclick=()=>speak(it.en);
     announce(() => speak(it.en));
     const tray=$("#tray"), bank=$("#bank");
-    let built=[];
+    let built = _d ? _d.built.slice() : [];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
       built.forEach((ch,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(ch)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
       remaining().forEach((ch,i)=>{ const t=el(`<button type="button" class="tile">${esc(ch)}</button>`); t.onclick=()=>{built.push(ch);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==it.en.length;
+      tileDraft = { idx, letters: letters.slice(), built: built.slice() };   // keep the draft current for a language switch
     }
     function remaining(){ const used={}; built.forEach(c=>used[c]=(used[c]||0)+1); const out=[]; const tmp={...used};
       letters.forEach(c=>{ if(tmp[c]){tmp[c]--;} else out.push(c); }); return out; }
@@ -2461,7 +2494,8 @@ function startLevel(course, lesson, lv, back){
 
   // --- PHRASE: arrange word tiles into a sentence
   function roundPhrase(r){
-    const words = shuffle(r.words.slice());
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;   // restore the tile layout after a language switch
+    const words = _d ? _d.words.slice() : shuffle(r.words.slice());
     mount(`${head(tx("Make the sentence","वाक्य बनाओ"), tx("Put the words in the right order","शब्दों को सही क्रम में लगाओ"), r.hintHi)}
       <div class="display"><div class="emoji">${esc(r.emoji)}</div></div>
       <div class="tray" id="tray"></div>
@@ -2471,12 +2505,13 @@ function startLevel(course, lesson, lv, back){
       <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
     announce(() => sayHi(r.hintHiSpoken));
     const tray=$("#tray"), bank=$("#bank");
-    let built=[];
+    let built = _d ? _d.built.slice() : [];
     function redraw(){
       tray.innerHTML=""; bank.innerHTML="";
       built.forEach((w,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(w)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
       remaining().forEach(w=>{ const t=el(`<button type="button" class="tile">${esc(w)}</button>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
       $("#check").disabled = built.length!==r.words.length;
+      tileDraft = { idx, words: words.slice(), built: built.slice() };   // keep the draft current for a language switch
     }
     function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
       words.forEach(w=>{ if(tmp[w]){tmp[w]--;} else out.push(w); }); return out; }
