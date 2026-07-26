@@ -507,8 +507,8 @@
   @keyframes blink { 0%,93%,100%{transform:scaleY(0)} 96%{transform:scaleY(1)} }
   /* Roshni expressions — default: open eyes, relaxed brows, gentle smile */
   .eyes-happy, .eyes-wide, .eyes-wink, .brows-worried, .brows-raised,
-  .mascot .m-open, .mascot .m-frown, .mascot .m-o, .mascot .m-small, .mascot .m-grin,
-  .fx-cheer, .fx-think { display:none; }
+  .m-open, .m-frown, .m-o, .m-small, .m-grin,
+  .fx-cheer, .fx-think { display:none; }   /* unscoped so the hero's .roshni (not .mascot) also shows only the default smile */
   .mascot.m-happy .eyes-open{display:none} .mascot.m-happy .eyes-happy{display:block}
   .mascot.m-happy .m-smile{display:none}   .mascot.m-happy .m-open{display:block}
   .mascot.m-cheer .eyes-open{display:none} .mascot.m-cheer .eyes-happy{display:block}
