@@ -540,29 +540,13 @@ def seed_milestones():
 
 def setup_evaluation_report():
     """Facilitator 'Pending Evaluations' list: who reached a belt and is waiting for an
-    in-person rubric evaluation — oldest wait first, so nobody is left locked."""
-    name = "Pending Evaluations"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        e.name           AS "Evaluation:Link/Evaluation:160",
-        e.student_name   AS "Student::140",
-        e.cohort         AS "Cohort::120",
-        e.campus         AS "Campus::140",
-        e.milestone      AS "Milestone::110",
-        e.threshold_gems AS "Threshold:Int:100",
-        e.gems_at_reach  AS "Gems:Int:90",
-        e.reached_on     AS "Reached:Datetime:160"
-    FROM `tabEvaluation` e
-    WHERE e.status = 'Pending'
-    ORDER BY e.reached_on ASC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Evaluation",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Pending Evaluations' ready ===")
+    in-person rubric evaluation — oldest wait first, so nobody is left locked.
+
+    The SQL moved to hikmat/hikmat/report/pending_evaluations/ so that `student_name`
+    (and the other plain-Data columns) can be escaped for the grid and formula-guarded
+    for the export — see _adopt_script_report. Defined ABOVE _adopt_script_report in this
+    file, so the import is resolved at call time, not at def time."""
+    _adopt_script_report("Pending Evaluations", "pending_evaluations")
 
 
 def seed_operational_defaults():
@@ -606,12 +590,25 @@ def seed_operational_defaults():
 
 def wipe_demo_data():
     """Production-cutover reset: erase ALL learner data — students (and their linked
-    Website Users), attempts, doubts, learning events, evaluations, AI chats — while
-    keeping content, milestones, cohorts, campuses and settings untouched."""
-    for dt in ("AI Conversation Turn", "AI Conversation", "Learning Event",
-               "Lesson Doubt", "Lesson Attempt", "Evaluation"):
+    Website Users), attempts, doubts, learning events, evaluations, AI chats, and the
+    whole Boli voice trail including the audio bytes on disk — while keeping content,
+    milestones, cohorts, campuses and settings untouched."""
+    from hikmat.api import (_BOLI_DOCTYPES, _LEARNER_DOCTYPES, _erase_boli_data,
+                            _erase_capture_bytes, _purge_orphan_capture_files)
+    # Per student first, via the SAME helper the right-to-erasure endpoint uses, so
+    # every recording's private File cascades instead of being orphaned on disk.
+    # _erase_boli_data RETURNS the audio paths and the caller MUST unlink them after its
+    # commit — dropping that return value erases the rows and leaves the girl's voice on
+    # disk (rows first, bytes last, so an interrupted wipe never loses audio it still has
+    # a row for).
+    paths = []
+    for s in frappe.get_all("Student", pluck="name"):
+        paths += _erase_boli_data(s) or []
+    frappe.db.commit()
+    _erase_capture_bytes(paths)
+    for dt in _LEARNER_DOCTYPES + _BOLI_DOCTYPES:
         if frappe.db.exists("DocType", dt):
-            frappe.db.delete(dt)
+            frappe.db.delete(dt)       # residue whose student link already dangled
     users = [u for u in frappe.get_all("Student", filters={"user": ("!=", "")}, pluck="user") if u]
     frappe.db.delete("Student")
     frappe.db.commit()
@@ -619,82 +616,76 @@ def wipe_demo_data():
         if frappe.db.exists("User", u):
             frappe.delete_doc("User", u, force=1, ignore_permissions=True, delete_permanently=True)
     frappe.db.commit()
+    # The bulk deletes above skip on_trash, so a final sweep reclaims the residue.
+    # min_age_secs=0 ON PURPOSE, and ONLY here: the sweep normally skips recently-written
+    # bytes so that erasing one girl cannot destroy another girl's still-uploading clip.
+    # This function's whole contract is that NO learner audio survives a production
+    # cutover — a 15-minute-old recording left on disk is the exact failure it exists to
+    # prevent, and during a cutover there is no other girl still uploading.
+    files, bytes_removed = _purge_orphan_capture_files(min_age_secs=0)
+    frappe.db.commit()
     print("=== learner data wiped (content/config kept):",
-          frappe.db.count("Student"), "students remain ===")
+          frappe.db.count("Student"), "students remain,",
+          files, "orphan file docs and", bytes_removed, "audio files removed ===")
+
+
+def _adopt_script_report(report_name, folder):
+    """Make the on-disk STANDARD Script Report at hikmat/hikmat/report/<folder>/ the
+    one and only definition of `report_name`, replacing any legacy Query Report row.
+
+    WHY this indirection instead of building the Report row here (the pattern the
+    remaining setup_*_report functions use for reports that were ALWAYS script reports):
+
+    * SEVEN reports used to BE their SQL — the query string lived in the Report
+      row this function's callers inserted. Learner-authored values (`question`,
+      `lesson`, `activity`, `student_name`, `flag_reason`, …) went from that SQL
+      straight into the Desk grid's
+      innerHTML and into the facilitator's spreadsheet. A Query Report offers no
+      place to transform a value, and a SQL-side escape cannot tell a grid render
+      from a CSV export, so it would either keep the stored XSS or corrupt the
+      exported dialect text with HTML entities. Python `execute()` can; see
+      hikmat/report_utils.py.
+    * Once the report body is Python, the DB row must NOT be authored in two places.
+      Seeding it here as well is how a re-seed (`setup_analytics`, a fresh install, a
+      patch) would quietly write back a row without the escaping. So the definition
+      is the .json file that `bench migrate` / install already sync
+      (frappe.model.sync IMPORTABLE_DOCTYPES includes ("core", "report")), and this
+      just imports that same file on demand.
+
+    `import_file_by_path` is what makes it safe to call anywhere: it sets
+    frappe.flags.in_import (a standard report is otherwise refused outside
+    developer_mode) and deletes the old row with for_reload=1, which bypasses
+    Report.on_trash's "cannot delete a Standard Report". Idempotent.
+    """
+    from frappe.modules.import_file import import_file_by_path
+    path = frappe.get_app_path("hikmat", "hikmat", "report", folder, folder + ".json")
+    import_file_by_path(path, force=True, ignore_version=True, reset_permissions=True)
+    frappe.db.commit()
+    print(f"=== report '{report_name}' ready (script report, from {folder}/) ===")
 
 
 def setup_trouble_report():
     """THE teaching-triage report: every lesson-activity ranked by how much students
     struggle with it — success rate, failed attempts, wrong answers, doubts, time
     spent, mid-activity bail-outs — worst first. This is the 'which lesson do I fix /
-    re-teach?' list."""
-    name = "Lesson Trouble Spots"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        a.track    AS "Track::110",
-        a.lesson   AS "Lesson::110",
-        a.activity AS "Activity::100",
-        COUNT(*)                                                   AS "Attempts:Int:80",
-        COUNT(DISTINCT a.student)                                  AS "Learners:Int:80",
-        ROUND(100 * AVG(CASE WHEN a.total > 0
-                             THEN a.score / a.total END))          AS "Success %%:Int:90",
-        SUM(CASE WHEN a.stars = 0 THEN 1 ELSE 0 END)               AS "Failed (0★):Int:100",
-        (SELECT COUNT(*) FROM `tabLearning Event` e
-          WHERE e.kind='wrong_answer' AND e.track=a.track
-            AND e.lesson=a.lesson AND e.activity=a.activity)       AS "Wrong Answers:Int:120",
-        (SELECT COUNT(*) FROM `tabLesson Doubt` d
-          WHERE d.track=a.track AND d.lesson=a.lesson
-            AND d.activity=a.activity)                             AS "Doubts:Int:80",
-        ROUND(AVG(NULLIF(a.duration_secs, 0)) / 60, 1)             AS "Avg mins:Float:90",
-        (SELECT COUNT(*) FROM `tabLearning Event` e
-          WHERE e.kind='dwell' AND e.track=a.track
-            AND e.lesson=a.lesson AND e.activity=a.activity)       AS "Bail-outs:Int:90",
-        MAX(a.attempted_on)                                        AS "Last Played:Datetime:150"
-    FROM `tabLesson Attempt` a
-    GROUP BY a.track, a.lesson, a.activity
-    ORDER BY ROUND(100 * AVG(CASE WHEN a.total > 0 THEN a.score / a.total END)) ASC,
-             SUM(CASE WHEN a.stars = 0 THEN 1 ELSE 0 END) DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Attempt",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Lesson Trouble Spots' ready ===")
+    re-teach?' list.
+
+    The SQL moved to hikmat/hikmat/report/lesson_trouble_spots/ so that the
+    client-supplied track/lesson/activity keys can be escaped for the grid and
+    formula-guarded for the export — see _adopt_script_report."""
+    _adopt_script_report("Lesson Trouble Spots", "lesson_trouble_spots")
 
 
 def setup_hard_questions_report():
     """Question-level drill-down: the exact questions students get wrong, how many
     girls, and WHICH wrong answer they pick most (a shared wrong pick usually means a
-    misleading distractor or a concept that needs re-teaching, not a careless slip)."""
-    name = "Hardest Questions"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        e.question AS "Question::260",
-        e.track    AS "Track::100",
-        e.lesson   AS "Lesson::100",
-        e.activity AS "Activity::90",
-        COUNT(*)                       AS "Times Wrong:Int:100",
-        COUNT(DISTINCT e.student)      AS "Learners:Int:80",
-        (SELECT e2.chosen FROM `tabLearning Event` e2
-          WHERE e2.kind='wrong_answer' AND e2.question=e.question
-            AND e2.track=e.track AND e2.lesson=e.lesson AND e2.activity=e.activity
-          GROUP BY e2.chosen ORDER BY COUNT(*) DESC LIMIT 1) AS "Most-picked Wrong::170",
-        MAX(e.answer)                  AS "Correct Answer::150",
-        MAX(e.occurred_on)             AS "Last Seen:Datetime:150"
-    FROM `tabLearning Event` e
-    WHERE e.kind = 'wrong_answer'
-    GROUP BY e.track, e.lesson, e.activity, e.question
-    ORDER BY COUNT(*) DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Learning Event",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Hardest Questions' ready ===")
+    misleading distractor or a concept that needs re-teaching, not a careless slip).
+
+    The SQL moved to hikmat/hikmat/report/hardest_questions/ so that its SIX
+    client-posted text columns (question, track, lesson, activity, most-picked wrong
+    answer, correct answer) can be escaped for the grid and formula-guarded for the
+    export — see _adopt_script_report."""
+    _adopt_script_report("Hardest Questions", "hardest_questions")
 
 
 def setup_engagement_report():
@@ -704,51 +695,12 @@ def setup_engagement_report():
     Hindi-guide taps (how often she reaches for Hindi support — a girl leaning hard
     on Hindi may need more English scaffolding), mid-activity bail-outs (frustration),
     doubts, and when she was last seen. The 'who needs me this week?' list — most
-    recently active first, so the idle girls sink visibly."""
-    name = "Student Engagement"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        s.name           AS "Student:Link/Student:130",
-        s.student_name   AS "Name::130",
-        s.cohort         AS "Cohort::110",
-        COUNT(a.name)                                      AS "Attempts:Int:80",
-        COUNT(DISTINCT CONCAT(a.track, '/', a.lesson))     AS "Lessons:Int:80",
-        ROUND(AVG(a.stars), 2)                             AS "Avg Stars:Float:85",
-        ROUND((COALESCE(SUM(a.duration_secs), 0)
-             + (SELECT COALESCE(SUM(e.duration_secs), 0) FROM `tabLearning Event` e
-                 WHERE e.student = s.name AND e.kind = 'dwell')) / 60)
-                                                           AS "Minutes:Int:80",
-        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
-          WHERE e.student = s.name AND e.kind = 'tool_use'
-            AND e.tool = 'replay')                         AS "Replays:Int:80",
-        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
-          WHERE e.student = s.name AND e.kind = 'tool_use'
-            AND e.tool IN ('listen_word','hear_screen','hear_again','hear_slow','hear_hindi'))
-                                                           AS "Listen Taps:Int:95",
-        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
-          WHERE e.student = s.name AND e.kind = 'tool_use'
-            AND e.tool = 'lang_switch')                    AS "Lang Switches:Int:110",
-        (SELECT COALESCE(SUM(e.count), 0) FROM `tabLearning Event` e
-          WHERE e.student = s.name AND e.kind = 'tool_use'
-            AND e.tool = 'hindi_guide')                    AS "Hindi Guide:Int:105",
-        (SELECT COUNT(*) FROM `tabLearning Event` e
-          WHERE e.student = s.name AND e.kind = 'dwell')   AS "Bail-outs:Int:85",
-        (SELECT COUNT(*) FROM `tabLesson Doubt` d
-          WHERE d.student = s.name)                        AS "Doubts:Int:75",
-        MAX(a.attempted_on)                                AS "Last Active:Datetime:150"
-    FROM `tabStudent` s
-    LEFT JOIN `tabLesson Attempt` a ON a.student = s.name
-    WHERE s.active = 1
-    GROUP BY s.name, s.student_name, s.cohort
-    ORDER BY MAX(a.attempted_on) DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Student",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Student Engagement' ready ===")
+    recently active first, so the idle girls sink visibly.
+
+    The SQL moved to hikmat/hikmat/report/student_engagement/ so that `student_name`
+    can be escaped for the grid and formula-guarded for the export — see
+    _adopt_script_report."""
+    _adopt_script_report("Student Engagement", "student_engagement")
 
 
 def setup_drilldown_report():
@@ -1022,18 +974,52 @@ def demo_students():
     print("=== demo students ready in 'NGHS Sept-2026' (Sunita has PIN 1234) ===")
 
 
+def erase_cohort_learners(cohort):
+    """Erase every girl in `cohort` and ALL of her data. Returns how many were erased.
+
+    THIS IS A DELETION PATH FOR A CHILD'S RECORD, so it goes through the SAME erasure
+    path as the right-to-erasure endpoint — never its own list of tables.
+    single_center() used to remove only `Lesson Attempt` rows and then force-delete the
+    Student, which left her whole Boli voice trail behind with a dangling `student`
+    link: her Dialect Capture rows stayed in the transcription/verification queues, so
+    a peer was still offered the deleted girl's clip and could download her audio.
+    Re-deriving a table list at each call site is exactly how that happened. If a new
+    learner doctype appears, add it to api._LEARNER_DOCTYPES and every erasure path
+    picks it up at once.
+
+    Split out of single_center() so it can be tested on one throwaway cohort —
+    single_center() itself sweeps every cohort on the site and is not safely testable.
+
+    It delegates to api.delete_student(), the right-to-erasure endpoint, rather than to
+    the individual helpers: that entry point already gets the whole contract right
+    (rows in ONE transaction, the audio bytes unlinked only AFTER the commit, the
+    synthetic Website User, name residue, a resumable half-finished erasure) and it
+    keeps getting it right when that contract changes. Copying five helper calls here is
+    how this function fell behind in the first place. delete_student() is staff-gated,
+    which is correct for a destructive maintenance tool: run it as Administrator.
+    """
+    from hikmat import api
+    removed = 0
+    for stu in frappe.get_all("Student", filters={"cohort": cohort}, pluck="name"):
+        res = api.delete_student(stu) or {}
+        if not res.get("ok"):
+            frappe.throw("could not erase student {0} in cohort {1}: {2}".format(
+                stu, cohort, res.get("error") or "unknown"))
+        removed += 1
+    return removed
+
+
 def single_center(keep="NGHS Sept-2026"):
-    """Collapse to one centre — remove all other cohorts, their students & attempts."""
+    """Collapse to one centre — remove all other cohorts and, via the shared erasure
+    helper above, every girl in them together with ALL of her data."""
+    removed = 0
     for c in frappe.get_all("Cohort", pluck="name"):
         if c == keep:
             continue
-        for stu in frappe.get_all("Student", filters={"cohort": c}, pluck="name"):
-            for att in frappe.get_all("Lesson Attempt", filters={"student": stu}, pluck="name"):
-                frappe.delete_doc("Lesson Attempt", att, force=1, ignore_permissions=1)
-            frappe.delete_doc("Student", stu, force=1, ignore_permissions=1)
+        removed += erase_cohort_learners(c)
         frappe.delete_doc("Cohort", c, force=1, ignore_permissions=1)
     frappe.db.commit()
-    print("=== kept only centre:", keep, "===")
+    print("=== kept only centre:", keep, "—", removed, "students erased ===")
 
 
 # ---------------------------------------------------------------------------
@@ -1111,82 +1097,35 @@ def _card(name, **kw):
 
 
 def setup_student_report():
-    """A student-wise Query Report: one row per student with their progress totals."""
-    name = "Student Progress"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        la.student_name   AS "Name::140",
-        la.cohort         AS "Cohort::130",
-        COUNT(*)                                           AS "Attempts:Int:90",
-        SUM(CASE WHEN la.stars >= 1 THEN 1 ELSE 0 END)     AS "Passed:Int:80",
-        COUNT(DISTINCT CONCAT(la.track, '/', la.lesson))   AS "Lessons:Int:90",
-        ROUND(AVG(la.stars), 2)                            AS "Avg Stars:Float:95",
-        SUM(la.coins)                                      AS "Coins:Int:90",
-        DATE_FORMAT(MAX(la.attempted_on), '%%d-%%m-%%y %%H:%%i') AS "Last Active::130"
-    FROM `tabLesson Attempt` la
-    GROUP BY la.student, la.student_name, la.cohort
-    ORDER BY COUNT(*) DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Attempt",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Student Progress' ready ===")
+    """One row per student with her progress totals — the plainest roll-up in the
+    workspace and the one a facilitator opens first.
+
+    The SQL moved to hikmat/hikmat/report/student_progress/ so that `student_name` and
+    `cohort` can be escaped for the grid and formula-guarded for the export — see
+    _adopt_script_report."""
+    _adopt_script_report("Student Progress", "student_progress")
 
 
 def setup_doubt_report():
     """The facilitator CONFUSION HEATMAP: which lessons/activities make learners tap
     'Roshni, mujhe doubt hai' the most — so a teacher knows where to step in. Sorted by
-    doubt volume, so the hottest spots float to the top."""
-    name = "Confusion Heatmap"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        d.track          AS "Track::130",
-        d.lesson         AS "Lesson::130",
-        d.activity       AS "Activity::120",
-        COUNT(*)                                              AS "Doubts:Int:90",
-        COUNT(DISTINCT d.student)                             AS "Learners:Int:90",
-        SUM(CASE WHEN d.resolved = 0 THEN 1 ELSE 0 END)       AS "Open:Int:80",
-        MAX(d.raised_on)                                      AS "Last Raised:Datetime:160"
-    FROM `tabLesson Doubt` d
-    GROUP BY d.track, d.lesson, d.activity
-    ORDER BY COUNT(*) DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "Lesson Doubt",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'Confusion Heatmap' ready ===")
+    doubt volume, so the hottest spots float to the top.
+
+    The SQL moved to hikmat/hikmat/report/confusion_heatmap/ so that the client-posted
+    track/lesson/activity keys can be escaped for the grid and formula-guarded for the
+    export — see _adopt_script_report."""
+    _adopt_script_report("Confusion Heatmap", "confusion_heatmap")
 
 
 def setup_ai_report():
     """Facilitator REVIEW QUEUE for Roshni-AI: flagged + unreviewed conversations float to
-    the top, then most recent. Opens the conversation to read the (Desk-only) transcript."""
-    name = "AI Review Queue"
-    if frappe.db.exists("Report", name):
-        frappe.delete_doc("Report", name, force=1, ignore_permissions=1)
-    query = """SELECT
-        c.name           AS "Conversation:Link/AI Conversation:150",
-        c.student_name   AS "Name::130",
-        c.cohort         AS "Cohort::120",
-        c.lesson         AS "Lesson::110",
-        c.flagged        AS "Flagged:Check:70",
-        c.flag_reason    AS "Reason::110",
-        c.reviewed       AS "Reviewed:Check:80",
-        c.started_on     AS "When:Datetime:160"
-    FROM `tabAI Conversation` c
-    ORDER BY c.flagged DESC, c.reviewed ASC, c.started_on DESC"""
-    frappe.get_doc({
-        "doctype": "Report", "report_name": name, "ref_doctype": "AI Conversation",
-        "report_type": "Query Report", "is_standard": "No", "module": MODULE,
-        "query": query, "roles": [{"role": "System Manager"}],
-    }).insert(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== report 'AI Review Queue' ready ===")
+    the top, then most recent. Opens the conversation to read the (Desk-only) transcript.
+
+    The SQL moved to hikmat/hikmat/report/ai_review_queue/ so that student_name, cohort,
+    lesson and flag_reason can be escaped for the grid and formula-guarded for the export
+    — see _adopt_script_report. This is the report whose rows are most likely to be
+    adversarial, since it exists to surface conversations that went wrong."""
+    _adopt_script_report("AI Review Queue", "ai_review_queue")
 
 
 def setup_analytics():

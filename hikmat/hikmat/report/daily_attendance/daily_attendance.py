@@ -15,6 +15,11 @@ from datetime import timedelta
 import frappe
 from frappe import _
 
+# `student_name` is learner-authored free text leaving as a "Data" column — the Desk
+# grid assigns it with innerHTML and the export writes it to a spreadsheet cell.
+# See hikmat.report_utils for why those two need DIFFERENT transforms.
+from hikmat.report_utils import guard_rows
+
 MAX_RANGE_DAYS = 62  # keep roster × dates sane
 
 
@@ -69,6 +74,7 @@ def execute(filters=None):
                 "last_ping": d.last_ping if d else None,
                 "device_count": d.device_count if d else 0,
             })
+    guard_rows(rows, "student_name")
 
     columns = [
         {"fieldname": "student", "label": _("Student"), "fieldtype": "Link", "options": "Student", "width": 120},
