@@ -220,7 +220,8 @@ scheduler_events = {
 # Request Events
 # ----------------
 # before_request = ["hikmat.utils.before_request"]
-# after_request = ["hikmat.utils.after_request"]
+# Content-Security-Policy — see set_security_headers() at the bottom of this file.
+after_request = ["hikmat.hooks.set_security_headers"]
 
 # Job Events
 # ----------
@@ -269,4 +270,129 @@ scheduler_events = {
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
+
+
+# ---------------------------------------------------------------------------
+# Content-Security-Policy  (security audit finding C2 — defence in depth)
+# ---------------------------------------------------------------------------
+# WHY THIS EXISTS: Desk writes report/list cell values into the DOM with
+# `innerHTML` (frappe-datatable cellmanager.js), so any student free text that
+# ever slips past server-side escaping executes in the facilitator's session.
+# Escaping the values is the primary fix; this header is the second line of
+# defence so that a *future* missed escape is not automatically an account
+# takeover.
+#
+# Frappe 15 ships no CSP of its own (the only occurrence in the framework is
+# Web Form's frame-ancestors header) and exposes no CSP setting, so we attach
+# ours with the framework's own `after_request` hook rather than bolting a
+# bespoke WSGI/response filter onto the app.
+#
+# The policies live in this file, next to the hook that registers them, so that
+# the whole control is reviewable in one place.
+#
+# NOT COVERED: `/assets/**` (so `/assets/hikmat/game.html`) and public `/files/**`
+# never reach this hook — they are served by werkzeug's SharedData/StaticData
+# middleware in dev and straight off nginx in production. `/private/files/**` does
+# reach it, because that path is served by the app itself. The uncovered /assets
+# path is why the game (one self-contained file full of inline <style>/<script>)
+# keeps working untouched. If an operator ever adds a CSP for /assets at the nginx
+# layer it MUST allow 'unsafe-inline' for both script-src and style-src and allow
+# https://www.youtube.com in frame-src, or the game and its explainer videos break.
+
+#: Enforced on every HTML response. Deliberately narrow: each directive below was
+#: checked against Frappe 15's Desk before being switched on. Nothing else is
+#: named, and `default-src` is deliberately absent, so no other resource type is
+#: restricted and nothing can break by omission.
+CSP_ENFORCED = (
+	# Desk has no <base> tag. An injected one would silently repoint every
+	# relative URL — including /api/method calls — at an attacker's host.
+	"base-uri 'self'; "
+	# No plugin content anywhere in Desk. (app_icon.js wraps inline SVG in an
+	# <object> with no data/src attribute, which fetches nothing and so is not
+	# gated by object-src — verified in a headless browser.)
+	"object-src 'none'; "
+	# Stops injected markup from POSTing the facilitator's data to a foreign
+	# origin. Frappe submits everything over XHR; no template in frappe or
+	# hikmat posts a form cross-origin.
+	"form-action 'self'; "
+	# Frappe sets no X-Frame-Options at all, so this is the only anti-clickjacking
+	# control on Desk. Safe for the game: it embeds YouTube, it is never embedded.
+	"frame-ancestors 'self'"
+)
+
+#: REPORT-ONLY, NOT ENFORCED — and that is a deliberate, documented compromise.
+#:
+#: `script-src-attr 'none'` is the one directive that would actually neutralise
+#: C2's payload: the injected value lands in a datatable cell via innerHTML, and
+#: innerHTML never runs <script>, so the exploit is always an inline event
+#: handler (`<img src=x onerror=…>`, `<svg onload=…>`). script-src-attr blocks
+#: exactly those, while leaving Desk's inline <script> blocks and its eval-based
+#: template compiler alone (script-src-elem/eval are not touched).
+#:
+#: It is not enforced because Frappe's own Desk executes inline handler
+#: attributes, and blocking them breaks controls the facilitator needs:
+#:   * every navbar dropdown Action item, INCLUDING "Log out"
+#:     (frappe/hooks.py:479 standard_navbar_items → navbar.html:101
+#:      `onclick="return {{ item.action }}"`)
+#:   * the awesomebar's `onsubmit="return false;"` (navbar.html:13) — Enter would
+#:     submit the search form and reload the page
+#:   * `onclick="return false;"` on sidebar/dropdown anchors with href="#"
+#:     (page.js:667, list_sidebar_group_by.js:87,232, list_sidebar_stat.html:10)
+#:   * printview.html:17 `onclick="window.print()"`, form_footer.html:6
+#:     scroll-to-top, form.js:1123 "document was modified → Refresh"
+#: A CSP that logs a facilitator out of her own tools — on a shared device in
+#: Champaran, with no admin nearby — is worse than no CSP, so it ships as
+#: report-only: violations appear in the browser console (and at a collector, if
+#: an operator later adds a report-uri) without breaking a single control.
+#:
+#: Path-scoping is NOT a way out: Desk is a single-page app, so whichever policy
+#: arrives with the first /app document governs every screen visited afterwards.
+#: Enforcing it needs an upstream Frappe fix, or an 'unsafe-hashes' allowlist of
+#: those handler bodies — which would silently break Desk on the next Frappe
+#: upgrade, so that stays an explicit operator decision (see below).
+CSP_REPORT_ONLY = "script-src-attr 'none'"
+
+
+def set_security_headers(response=None, **kwargs):
+	"""Attach the CSP headers above to HTML responses (`after_request` hook).
+
+	Both policies can be overridden per site without a code deploy, which is how
+	an operator flips the report-only experiment above into enforcement (or backs
+	out of a policy that broke something) from the hosting dashboard alone:
+
+	    site_config.json:
+	      "hikmat_csp": "<policy>"                    # replaces CSP_ENFORCED
+	      "hikmat_csp_report_only": "<policy>"        # replaces CSP_REPORT_ONLY
+	      "hikmat_csp_report_only": ""                # sends no report-only header
+
+	An empty string disables that header; omit the key to keep the default.
+	"""
+	import frappe
+
+	# HTTPException paths (404, redirects raised as exceptions) hand us either no
+	# response at all or an object with no werkzeug headers. Never raise from here:
+	# frappe logs a hook failure and moves on, so a crash would be invisible.
+	headers = getattr(response, "headers", None)
+	if headers is None:
+		return
+
+	# Only documents can execute injected markup. Restricting to text/html also
+	# means served HTML (e.g. /private/files/x.html) is covered while JSON API
+	# replies and audio downloads are left completely alone.
+	if not (headers.get("Content-Type") or "").startswith("text/html"):
+		return
+
+	conf = getattr(frappe.local, "conf", None) or {}
+
+	enforced = conf.get("hikmat_csp", CSP_ENFORCED)
+	report_only = conf.get("hikmat_csp_report_only", CSP_REPORT_ONLY)
+
+	# Never overwrite a policy the framework already set: Web Form pages emit
+	# their own `frame-ancestors <allowed embedding domains>`, and a second,
+	# stricter header would be intersected with it and silently break embedding.
+	if enforced and "Content-Security-Policy" not in headers:
+		headers["Content-Security-Policy"] = enforced
+
+	if report_only and "Content-Security-Policy-Report-Only" not in headers:
+		headers["Content-Security-Policy-Report-Only"] = report_only
 

@@ -16,7 +16,53 @@ limits, input validation, cached read APIs).
       (no email, no Desk) — see the enrolment model below.
 - [ ] **HTTPS only** (Frappe Cloud does this automatically). Required for the PWA and
       for protecting login tokens in transit.
+- [ ] **Verify the client IP the app derives** — see *Client IP / trusted proxies* below.
+      Zero configuration is correct for the two common topologies, but a managed host or
+      CDN in front needs its ranges added, and **nothing else in the app can tell you it
+      is wrong**.
 - [ ] *(Optional)* IP-allowlist / VPN-gate `/app` if the centre uses fixed locations.
+
+## Client IP / trusted proxies (rate limits + login lockout depend on it)
+
+Every per-IP ceiling — and the per-source half of the PIN lockout — is keyed on the address
+the app derives for the caller. `X-Forwarded-For` is client-supplied text, so it is believed
+**only when the request's socket peer is itself a trusted proxy**; then the chain is walked
+**right to left** (nginx *appends* what it saw), trusted addresses are skipped, and the first
+untrusted entry is the client. Otherwise the header is ignored and the socket peer is used.
+
+- **Default trusted set (no config needed):** loopback + RFC1918 + link-local + IPv6
+  unique-local — exactly where a reverse proxy of ours can sit. A **public** address is
+  never trusted by default. This is already correct for:
+  - a **directly exposed** app (no proxy): the header is ignored, so it cannot be spoofed;
+  - **one nginx on localhost** (standard bench / Frappe Cloud site): the rightmost
+    non-private entry is the real client.
+- **`hikmat_trusted_proxies`** (site config) overrides the set — a list of IPs/CIDRs, e.g.
+  `["203.0.113.0/24", "2001:db8::/32"]`. Add the egress ranges of anything **public** in
+  front of the site (a CDN, an external load balancer, a managed platform's edge). An
+  **empty list** means trust nobody, i.e. ignore `X-Forwarded-For` entirely — that is what
+  the dev bench sets, because gunicorn there listens on localhost and localhost would
+  otherwise be a trusted peer.
+- **`hikmat_trusted_proxy_hops` is obsolete** (it was a hop *count*, wrong in both
+  directions and invisible either way). If a site still carries it, the app logs an error
+  saying so. Remove it.
+- **What an operator must actually verify, once, per deployment:** open
+  `/api/method/hikmat.api.whoami_ip` from a device whose public IP you know, logged in as a
+  System Manager. `client_ip` **must equal that device's public IP**.
+  - If it comes back as a **proxy/edge address** (every client would then share one rate
+    limit bucket — with the fail-closed signup/capture ceilings that can lock a site out),
+    add that proxy's range to `hikmat_trusted_proxies`.
+  - If it echoes a value **you can set yourself** with a spoofed `X-Forwarded-For`, the peer
+    is being trusted when it should not be: set the list to `[]`.
+- **Self-diagnosis:** when the peer is trusted but the whole chain is trusted or unreadable
+  (so no client address exists), the app logs an ERROR naming `hikmat_trusted_proxies` in
+  `logs/hikmat.log`. Grep that file after go-live. A LAN deployment where the learners'
+  devices are themselves on private addresses is the normal case for this warning — fix it
+  by trusting **only** the proxy (`["127.0.0.1"]`), so the LAN clients stay distinct.
+- Ceilings are deliberately generous because a whole classroom NATs to one IP: measured
+  headroom is ≥166 girls/hour on every ceiling except **signup (60/hour)**, which is the
+  tightest. A 30-girl class enrolling at once uses half of it; a 60+ girl mass sign-up
+  behind one IP would be refused (`rate_limited`, retried by the client) — stagger it, or
+  create campus learners in Desk, which does not go through signup.
 
 ## Student auth model (already in code)
 
@@ -24,13 +70,46 @@ limits, input validation, cached read APIs).
   **fail-closed** — a PIN-less profile cannot be logged in (closes the old shared-laptop
   hole where a PIN-less profile opened with zero auth). PINs are **hashed**
   (`pbkdf2:sha256`); legacy plaintext upgrades on next login.
-- Short numeric PINs are fine because login has a per-student **lockout** (8 wrong tries
-  → 5-min cooldown) and PINs only separate kids on shared laptops.
+- Short numeric PINs are fine because login has a **per-account lockout**, and PINs only
+  separate kids on shared laptops. The lockout is keyed on the **account** — the Student
+  docname for `login_student`, the typed name for `login_by_name` — and **never** on the
+  client IP: it used to include the IP, which made it worthless (eight wrong PINs from
+  eight spoofed `X-Forwarded-For` values never tripped it, so a 4-digit PIN was
+  brute-forceable). Two budgets, both cleared by a successful login:
+  - **8 wrong PINs → 5-minute cooldown** (unchanged), which lifts by itself;
+  - **50 wrong PINs in 24h → the profile parks.** This is what actually defeats brute force
+    (~200 days to cover half a 4-digit space, versus ~2 days on the 5-minute counter alone).
+  A per-source ceiling of **600 failed logins/hour** limits spraying many accounts from one
+  place; it counts failures only, so normal logins never touch it.
+  Note `login_by_name` can only key on the name it was given, and **names are not unique** —
+  two girls called *Asha* share that budget (the name is hashed into the cache key, so no
+  child's name sits in Redis). If a duplicate name ever causes trouble, clear it with
+  `clear_login_lockout(name="Asha")` and give one of them a distinct display name.
+- **The trade-off, on purpose:** a per-account lockout means someone can deliberately lock a
+  child out of her own profile. It is priced down as far as it goes — generous budgets (a
+  girl mistyping two or three times is nowhere near them), a bounded 24h window, and a
+  facilitator release valve: **`clear_login_lockout(student=…)`** (or `name=…`, or `ip=…`),
+  System-Manager only, which also reports how many failures it found so you can tell a real
+  lockout from a girl who keeps mistyping. A **provisioned campus laptop is unaffected
+  either way** — it verifies her PIN on-device against the cached roster hash and never
+  calls these endpoints, so the lockout only binds the typed-name/online path.
 - Each student gets a per-student **token** at login/signup, required by
   `submit_attempt` / `get_progress`. Tokens **expire after 90 days** (sliding window — an
   active login refreshes it) and **rotate** when missing/expired. A facilitator can force
   re-login everywhere with **`revoke_student_token(student)`** (Desk-only), e.g. for a
   lost or handed-down laptop.
+- **Unticking `active` on a Student now cuts off her device immediately**, on every
+  endpoint — it is checked in the shared auth path, not per endpoint. (It used to gate
+  only new logins and dialect capture, so a deactivated girl's cached token kept working
+  for up to 90 days unless someone also called `revoke_student_token`.) Deactivate to
+  offboard; `revoke_student_token` is for rotating a token on an account that stays live.
+- **Deactivation is also a pause on her DATA, in both directions.** Her Boli recordings stop
+  being offered to peers and stop streaming the moment she is inactive (the queue, the audio
+  endpoint and both write paths all require the owning Student to exist **and** be active).
+  A clip mid-pipeline keeps its place rather than being rewritten, so reactivating a girl who
+  was switched off by mistake restores it untouched. **Withdrawn consent:** deactivate for an
+  immediate stop, then `delete_student` to erase the bytes — deactivation alone leaves the
+  audio on disk.
 - Login is **by name + PIN** (`login_by_name`, indexed lookup) — the roster is never
   listed publicly and errors are generic (no "does this name exist?" enumeration).
 - Self-signups still require a guardian/teacher **consent** acknowledgement in the UI.
@@ -57,7 +136,22 @@ limits, input validation, cached read APIs).
 
 - Lesson Attempt rows denormalise `student_name`/`cohort` for reporting and grow over
   time. To erase a child's data, use **`hikmat.api.delete_student(student)`**
-  (facilitator/System-Manager only) — it cascades the delete over their attempts.
+  (facilitator/System-Manager only) — it cascades over her attempts, tests, doubts,
+  events, attendance, evaluations, AI chats, her whole Boli voice trail (captures,
+  speaker row, transcriptions, verifications, XP) **including the private audio bytes
+  on disk**, and the Frappe User of an online learner. Clips she only helped record
+  (`operator`) or had leased (`claimed_by`) belong to another child: those references
+  are cleared, not deleted. Deleting a Student from Desk instead is **not** equivalent
+  — Frappe refuses it while a Boli Speaker links to her.
+- **Erasing one girl never costs another one anything.** Her peers keep the gems they
+  earned on her clips (the ledger row is severed, not deleted), and a clip of ANOTHER
+  child that she had only transcribed is handed back to the transcribe queue rather
+  than left stuck mid-pipeline (`api._reopen_stranded_clips`). **Known gap:** if the
+  clip had already reached `verified`/`curated`/`exported`, that outcome stands and the
+  clip keeps its published corpus count but now has **no transcription text** — a PA
+  has to re-transcribe it by hand from the Boli Adjudication Queue. Reopening it
+  automatically would retract a published number and could not pay a replacement
+  transcriber (the XP award is deduped per clip).
 - **Decide and document a retention window** (e.g. purge inactive students' attempts
   after N years) before a full rollout. A scheduled job can be added to
   `scheduler_events` in `hooks.py`.

@@ -21,7 +21,8 @@
    "fieldname": "student",
    "fieldtype": "Link",
    "label": "Student (real-name mapping — PA only)",
-   "options": "Student"
+   "options": "Student",
+   "search_index": 1
   },
   {
    "fieldname": "relation",
@@ -66,7 +67,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-23 12:00:00.000000",
+ "modified": "2026-07-28 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Boli Speaker",

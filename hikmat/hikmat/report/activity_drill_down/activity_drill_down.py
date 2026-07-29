@@ -10,6 +10,12 @@ facilitator narrows to one track, one activity, or one girl.
 import frappe
 from frappe import _
 
+# `track`/`lesson`/`activity` and the denormalised `student_name` all arrive from the
+# game client (submit_attempt / signup_student), i.e. they are learner-authored, and
+# they leave here as "Data" columns straight into innerHTML and into the XLSX export.
+# See hikmat.report_utils for why the grid and the export need DIFFERENT transforms.
+from hikmat.report_utils import guard_rows
+
 
 def execute(filters=None):
     filters = frappe._dict(filters or {})
@@ -56,6 +62,11 @@ def execute(filters=None):
         key = (r.student, r.track, r.lesson, r.activity)
         r.wrong_answers = wrongs.get(key, 0)
         r.doubts = doubts.get(key, 0)
+
+    # AFTER the joins above (those match on the raw stored keys) and BEFORE the chart
+    # below (whose labels are the same student names). `student` and `cohort` stay raw:
+    # they are real docnames the grid renders as links, not learner text.
+    guard_rows(rows, "student_name", "track", "lesson", "activity")
 
     columns = [
         {"fieldname": "student", "label": _("Student"), "fieldtype": "Link", "options": "Student", "width": 120},

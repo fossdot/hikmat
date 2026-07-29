@@ -13,3 +13,6 @@ hikmat.patches.v5_seed_radiant_content
 hikmat.patches.v6_default_sound_on
 hikmat.patches.v7_boli
 hikmat.patches.v8_seed_expanded_curriculum
+hikmat.patches.v9_erase_orphan_boli
+hikmat.patches.v10_guard_report_output
+hikmat.patches.v11_guard_more_reports

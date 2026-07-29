@@ -8,6 +8,12 @@ from datetime import timedelta
 import frappe
 from frappe import _
 
+# `student_name` is whatever a girl typed at sign-up and it leaves here as a "Data"
+# column — straight into the grid's innerHTML and into the PA's XLSX. A real export
+# of THIS report produced live `=HYPERLINK(...)` and `+cmd|' /C calc'!A0` cells from
+# an ordinary guest sign-up name. See hikmat.report_utils.
+from hikmat.report_utils import guard_rows
+
 MAX_RANGE_DAYS = 366
 
 
@@ -63,6 +69,8 @@ def execute(filters=None):
             "last_seen": a.last_seen if a else None,
         })
     rows.sort(key=lambda r: r["attendance_pct"])
+    # before the chart below, whose labels are the same names
+    guard_rows(rows, "student_name")
 
     columns = [
         {"fieldname": "student", "label": _("Student"), "fieldtype": "Link", "options": "Student", "width": 120},

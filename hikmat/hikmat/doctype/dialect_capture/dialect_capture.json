@@ -59,7 +59,8 @@
    "in_list_view": 1,
    "label": "Student (recorder account)",
    "options": "Student",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "student_name",
@@ -78,7 +79,8 @@
    "fieldname": "operator",
    "fieldtype": "Link",
    "label": "Operator (device user, pair mode)",
-   "options": "Student"
+   "options": "Student",
+   "search_index": 1
   },
   {
    "fieldname": "speaker",
@@ -206,7 +208,8 @@
    "fieldname": "consent_status",
    "fieldtype": "Select",
    "label": "Consent status",
-   "options": "\nself_consented\nguardian_consented\nverbal_elder_consent\nmissing"
+   "options": "\nself_consented\nguardian_consented\nverbal_elder_consent\nmissing",
+   "search_index": 1
   },
   {
    "default": "0",
@@ -225,7 +228,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "recorded\ntranscribed\nin_verification\nverified\ncurated\nexported\nrejected\ninternal_only\npii_hold\nescalated"
+   "options": "recorded\ntranscribed\nin_verification\nverified\ncurated\nexported\nrejected\ninternal_only\npii_hold\nescalated",
+   "search_index": 1
   },
   {
    "default": "0",
@@ -237,12 +241,14 @@
    "fieldname": "claimed_by",
    "fieldtype": "Link",
    "label": "Claimed by",
-   "options": "Student"
+   "options": "Student",
+   "search_index": 1
   },
   {
    "fieldname": "claim_expires",
    "fieldtype": "Datetime",
-   "label": "Claim expires"
+   "label": "Claim expires",
+   "search_index": 1
   },
   {
    "fieldname": "quality_section",
@@ -306,13 +312,14 @@
    "fieldname": "captured_on",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Captured on"
+   "label": "Captured on",
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-23 12:00:00.000000",
+ "modified": "2026-07-28 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Dialect Capture",
