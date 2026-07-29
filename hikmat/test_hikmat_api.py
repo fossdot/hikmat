@@ -3661,6 +3661,81 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 		self.assertEqual(api._rate_state(api._login_buckets(acct)[0])[0], api._MAX_PIN_TRIES)
 		self.assertTrue(girl.name)
 
+	# The test ABOVE varies only the IP — which is the one attack whoever wrote the first fix
+	# already had in mind. A cold reviewer then broke the "per-account" lockout in about a
+	# minute by leaving the IP alone and varying the SPELLING instead: tabStudent is
+	# utf8mb4_unicode_ci, so case differences and every zero-weight format character select the
+	# SAME row, while a byte-exact cache key gave each spelling its own 8-try budget (proven:
+	# 70 wrong PINs to one girl, never locked). The two tests below are that attack. Keep both:
+	# a lockout has to be invariant under everything the DATABASE treats as the same account.
+	RESPELLINGS = ("{n}", "{N}", "{l}", "{n}‍", "{n}‌", "{n}​",
+	               "﻿{n}", "{n}⁠", "‎{n}", "{s}")
+
+	def _spellings(self, name):
+		return [t.format(n=name, N=name.upper(), l=name.lower(),
+		                 s=name.replace(" ", "  ")) for t in self.RESPELLINGS]
+
+	def test_respelling_her_name_does_not_buy_a_fresh_lockout_budget(self):
+		"""Rotate the spelling AND the source address on every single try."""
+		girl, _ = self._mk("R3Lock Respell Girl")
+		acct = self._acct("nm", api._login_name_key("R3Lock Respell Girl"))
+		old = getattr(frappe.local, "request", None)
+		self.addCleanup(lambda: setattr(frappe.local, "request", old))
+		self.addCleanup(_use_trusted_proxies(None))
+		errors = []
+		for i, spelling in enumerate(self._spellings("R3Lock Respell Girl"), start=1):
+			frappe.local.request = _fake_request("198.51.100.%d, 127.0.0.1" % i, "127.0.0.1")
+			errors.append(api.login_by_name(name=spelling, pin="70%02d" % i).get("error"))
+		# every spelling authenticates against her row, so they share ONE budget
+		self.assertEqual(errors[:api._MAX_PIN_TRIES], ["bad_login"] * api._MAX_PIN_TRIES)
+		self.assertIn("locked", errors[api._MAX_PIN_TRIES:], errors)
+		self.assertEqual(api._rate_state(api._login_buckets(acct)[0])[0], api._MAX_PIN_TRIES)
+		# and the real PIN is refused while she is locked, however it is spelled
+		frappe.local.request = _fake_request("203.0.113.9, 127.0.0.1", "127.0.0.1")
+		self.assertEqual(api.login_by_name(name="R3LOCK  RESPELL  GIRL",
+		                                   pin=self.PIN).get("error"), "locked")
+		self.assertTrue(girl.name)
+
+	def test_respelling_a_docname_does_not_buy_a_fresh_lockout_budget(self):
+		"""`tabStudent.name` is case-insensitive too, so login_student had the same hole."""
+		girl, _ = self._mk("R3Lock Docname Girl")
+		self._acct("id", girl.name)
+		errors = []
+		for i, spelling in enumerate((girl.name, girl.name.upper(), girl.name.capitalize(),
+		                              girl.name.swapcase(), girl.name.upper(), girl.name,
+		                              girl.name.capitalize(), girl.name.swapcase(),
+		                              girl.name.upper(), girl.name), start=1):
+			errors.append(api.login_student(student=spelling, pin="60%02d" % i).get("error"))
+		self.assertIn("locked", errors, errors)
+		# the canonical docname is what got charged, not the typed casing
+		self.assertEqual(api.login_student(student=girl.name.upper(),
+		                                   pin=self.PIN).get("error"), "locked")
+
+	def test_two_different_girls_never_share_a_lockout_budget(self):
+		"""The canonicalisation must be coarse enough to merge spellings, never so coarse that
+		locking one girl locks another — that would be a denial of service on a child."""
+		one, _ = self._mk("R3Lock Separate One")
+		two, _ = self._mk("R3Lock Separate Two")
+		self._acct("nm", api._login_name_key("R3Lock Separate One"))
+		self._acct("nm", api._login_name_key("R3Lock Separate Two"))
+		for i in range(api._MAX_PIN_TRIES + 1):
+			api.login_by_name(name="R3Lock Separate One", pin="50%02d" % i)
+		self.assertEqual(api.login_by_name(name="R3Lock Separate One",
+		                                   pin=self.PIN).get("error"), "locked")
+		self.assertTrue(api.login_by_name(name="R3Lock Separate Two", pin=self.PIN).get("ok"),
+		                "locking one girl must never lock another")
+		self.assertTrue(one.name and two.name)
+
+	def test_a_girl_whose_stored_name_has_double_spaces_can_still_log_in(self):
+		"""Signup collapses whitespace runs before storing; login only end-stripped, so a girl
+		who typed "Asha  Devi" could never log in again. One normalisation on both sides."""
+		girl, _ = self._mk("R3Lock  Spacey  Girl")
+		self._acct("nm", api._login_name_key("R3Lock  Spacey  Girl"))
+		for typed in ("R3Lock  Spacey  Girl", "R3Lock Spacey Girl", "r3lock spacey girl"):
+			r = api.login_by_name(name=typed, pin=self.PIN)
+			self.assertTrue(r.get("ok"), "%r could not log in: %r" % (typed, r))
+		self.assertTrue(girl.name)
+
 	def test_a_girl_mistyping_her_own_pin_is_not_punished(self):
 		girl, _ = self._mk("R3Lock Mistype Girl")
 		acct = self._acct("nm", "r3lock mistype girl")

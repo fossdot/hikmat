@@ -20,6 +20,7 @@ import json
 import os
 import re
 import time
+import unicodedata
 
 import frappe
 from frappe import _
@@ -408,13 +409,19 @@ def _client_ip():
         if _is_trusted_proxy(ip, nets):
             continue                           # another proxy of ours — keep walking left
         return ip                              # ← the client, as our own proxy saw it
-    if parts:
-        _conf_warn("xff-no-client",
-                   "hikmat: X-Forwarded-For %r from trusted peer %s yielded no client "
-                   "address (%s), so rate limits and the login lockout are keyed on the "
-                   "PROXY — every client shares one bucket. Check `hikmat_trusted_proxies` "
-                   "in site_config.json.", raw, peer,
-                   "unreadable entry %r" % (unusable,) if unusable else "every entry is trusted")
+    # Warn whether or not the header had usable entries. A trusted peer that sends NO
+    # X-Forwarded-For at all (a container with a mapped port, or a proxy that only sets
+    # X-Real-IP) collapses every client onto the peer address exactly as a
+    # trusted-all-the-way-down chain does — and that case used to be skipped by an
+    # `if parts:` guard, so the single most dangerous misconfiguration was the one that
+    # logged nothing. Fail loudly: fail-closed ceilings now hang on this value.
+    _conf_warn("xff-no-client",
+               "hikmat: X-Forwarded-For %r from trusted peer %s yielded no client "
+               "address (%s), so rate limits and the login lockout are keyed on the "
+               "PROXY — every client shares one bucket. Check `hikmat_trusted_proxies` "
+               "in site_config.json.", raw, peer,
+               "unreadable entry %r" % (unusable,) if unusable
+               else ("no X-Forwarded-For header" if not parts else "every entry is trusted"))
     return peer or "unknown"
 
 
@@ -458,7 +465,12 @@ def _rl_warn(bucket, exc, denied):
         if getattr(frappe.local, "_hikmat_rl_warned", False):
             return
         frappe.local._hikmat_rl_warned = True
-        frappe.logger("hikmat").warning(
+        # .error(), NOT .warning(): frappe's default log level is WARNING only on a dev
+        # server and ERROR everywhere else (utils/logger.py), so a .warning() here would be
+        # discarded in production — and this is the ONE new failure mode of the limiter
+        # rewrite (signup and voice capture refused because the cache is down). An outage
+        # that leaves no evidence is indistinguishable from a spoofing attack.
+        frappe.logger("hikmat").error(
             "rate limiter unavailable (%s: %s) — bucket %r %s",
             type(exc).__name__, exc, bucket, "DENIED (fail-closed)" if denied else "ALLOWED (fail-open)")
     except Exception:
@@ -2500,20 +2512,34 @@ def get_students(cohort=None):
 # PIN LOCKOUT — brute-force protection for a 4-digit PIN.
 #
 # THE KEY IS THE WHOLE CONTROL. It must be something the attacker cannot vary while
-# attacking the same girl, which means it must be PER-ACCOUNT and independent of network
-# identity. login_by_name used to key on _client_ip() + name, and that was a proven account
-# takeover: 20 wrong PINs against one account, each sent with a different X-Forwarded-For,
-# never tripped the 8-try lockout, so a 4-digit PIN was brute-forceable. (The IP was also
-# spoofable — fixed separately in _client_ip — but even a perfect IP is the wrong key: an
-# attacker with a phone tether, a VPN or a botnet changes it for free.)
+# attacking the same girl, which means it must be PER-ACCOUNT, independent of network
+# identity, AND CANONICAL IN EXACTLY THE WAY THE DATABASE'S OWN COMPARISON IS. Both halves
+# have been broken here before, each time proven over HTTP in about a minute:
+#   1. it used to include _client_ip() → 20 wrong PINs with 20 spoofed X-Forwarded-For
+#      values never tripped the 8-try ceiling. (The IP was spoofable too — fixed separately
+#      in _client_ip — but even a perfect IP is the wrong key: a phone tether changes it.)
+#   2. it used to be BYTE-EXACT (sha256 of the typed name / the raw docname) while the DB
+#      lookup that actually authenticates the girl is `utf8mb4_unicode_ci`. That collation
+#      is case-insensitive AND gives every zero-weight character NO weight at all, so
+#      RE-SPELLING the account name selected the same row under a DIFFERENT bucket, i.e. a
+#      fresh 8-try + 50/day budget per spelling. Measured on this bench with WEIGHT_STRING()
+#      — U+200B/200C/200D/200E/200F/2060/2061/2062/2063/FEFF/180E/202A–202E/034F all weigh
+#      nothing, and so do the Devanagari marks U+0901/0902/0903/093C/0951–0954. Proven:
+#      7 zero-width spellings x 7 wrong PINs = 49 guesses against ONE girl, never `locked`,
+#      correct PIN still worked; and 12 case spellings of one docname = 84 guesses, never
+#      `locked`, then login_student(DOCNAME.upper(), correct_pin) → {"ok": true}.
+# The fix for (2) is _login_name_key / _login_id_account below: the bucket is keyed on the
+# canonical account, and the row lookup is filtered on the SAME canonical value, so every
+# spelling that can authenticate against a girl shares ONE budget by construction.
 #
 # WHAT "THE ACCOUNT" IS on each endpoint:
-#   * login_student  → the Student docname. Unique, and an opaque hash (Student autoname is
-#     `hash`), so it carries no PII.
-#   * login_by_name  → the NORMALISED NAME she typed. Names are NOT unique, so this bucket
-#     is shared by every girl with that name. That is the honest key anyway: the name is the
-#     only identifier the caller supplies, and it is exactly what an attacker must hold fixed
-#     to attack one girl. The two endpoints therefore have separate budgets (`id:` / `nm:`),
+#   * login_student  → the Student docname AS THE DATABASE RESOLVED IT (not as the caller
+#     spelled it). Unique, and an opaque hash (Student autoname is `hash`), so no PII.
+#   * login_by_name  → the CANONICAL NAME she typed (_login_name_key). Names are NOT unique,
+#     so this bucket is shared by every girl with that name. That is the honest key anyway:
+#     the name is the only identifier the caller supplies, and it is exactly what an attacker
+#     must hold fixed to attack one girl. The two endpoints therefore have separate budgets
+#     (`id:` / `nm:`),
 #     which is deliberate: coupling them would let an attacker who knows one girl's docname
 #     lock every girl who shares her first name.
 #   The name is HASHED into the bucket (not stored raw) for two reasons: a child's real name
@@ -2550,13 +2576,85 @@ _MAX_PIN_FAILS_PER_IP = 600     # per-SOURCE spray ceiling; counts FAILED logins
 _LOGIN_FAIL_IP_WINDOW = 3600    # room of girls logging in normally never touches it
 
 
+def _login_name_key(val):
+    """The CANONICAL form of a TYPED student name: one key for every spelling that is able to
+    authenticate against the same row. This is the whole fix for the proven bypass in (2)
+    above, and it is used for BOTH the lockout bucket and the SQL filter, so the two cannot
+    drift apart again.
+
+    What it does, and why each step:
+      1. `_docname` — a whitelisted argument arrives as parsed JSON, so a dict/list/bool is
+         REJECTED here rather than str()-ed into a junk key (and, historically, rather than
+         reaching the ORM filter as an operator spec).
+      2. the SIGNUP pipeline (`_display_name` = _plain_text + _no_formula_lead), so the key
+         of a typed name is the key of the name signup would have STORED. This is also the
+         fix for a lockout-OUT bug of the same family: signup collapses whitespace runs but
+         login only end-stripped, so a girl who typed "Asha  Devi" at signup could never log
+         in again. ONE normalisation on both sides fixes the bypass and that together.
+      3. every Cf (format) character dropped — the zero-width joiners/marks, the BOM, the
+         word joiner, the bidi controls. The DB cannot see these, so they must not be able to
+         split a budget. Dropping ALL of Cf rather than only the zero-weight ones is
+         deliberate: a key COARSER than the DB comparison can only merge spellings into one
+         budget, never split one, and no invisible character belongs in a login key.
+         (`_plain_text` deliberately KEEPS ZWJ/ZWNJ because they are real Devanagari spelling
+         — that is right for text we store and replay, and wrong for a comparison key.)
+      4. whitespace re-collapsed, because step 3 can leave two spaces adjacent.
+      5. `casefold()`, because the comparison it guards is case-insensitive.
+      6. NFC, chosen deliberately. The worry is that adding a normalisation MariaDB does not
+         perform would put this key out of step with the SQL filter — but measured here,
+         MariaDB gives the nukta U+093C zero weight, so it ALREADY treats 'ड़' spelled U+095C
+         and spelled U+0921 U+093C as one string. NFC therefore cannot make this key finer
+         than the SQL filter; all it does is unify two byte-spellings of the SAME character
+         (and canonically reorder marks), which lets a girl log in from a device whose IME
+         composes differently from the one she signed up on. NFKC is NOT used: it rewrites
+         characters and would corrupt real names.
+
+    What it deliberately does NOT fold: COMBINING MARKS. utf8mb4_unicode_ci compares at
+    primary strength and gives U+0901 candrabindu, U+0902 anusvara, U+0903 visarga, U+093C
+    nukta and U+0951–0954 zero weight, so to the DB 'अंजू' == 'अजू' == 'अजूं'. Folding those in
+    would merge two DIFFERENT girls' names, which is precisely what must not happen to a
+    Hindi roster. They are handled the other way round instead: the endpoint re-checks this
+    key against every candidate row IN PYTHON (see _login_name_candidates), so a mark-only
+    difference no longer authenticates at all. That removes it as a re-spelling axis AND
+    closes a separate flaw proven over HTTP on the way in — Anju typing her own name 'अंजू'
+    was logged in as a DIFFERENT girl, 'अजू', and handed that girl's token."""
+    s = _display_name(_docname(val, 140), 140)   # scalars only, then exactly what signup stores
+    s = "".join(ch for ch in s if unicodedata.category(ch) != "Cf")
+    return unicodedata.normalize("NFC", " ".join(s.split()).casefold())
+
+
 def _login_account_key(kind, value):
     """Bucket suffix for one account. `kind` is "id" (a Student docname) or "nm" (a typed
-    name, hashed — see the note above)."""
+    name, hashed — see the note above).
+
+    `value` MUST already be CANONICAL: the docname the DB resolved to (see
+    _login_id_account) for "id", `_login_name_key(...)` for "nm". Passing the caller's own
+    spelling here is the bypass this module has already been broken by twice."""
     value = str(value or "")
     if kind == "nm":
         value = hashlib.sha256(value.encode("utf-8")).hexdigest()[:20]
     return kind + ":" + value
+
+
+def _login_id_account(student, canon=None):
+    """The bucket for the `id` login form, keyed on the CANONICAL docname.
+
+    `tabStudent.name` is utf8mb4_unicode_ci as well, so 'UCESG77D8G' and 'ucesg77d8g' select
+    the SAME row — proven: 84 wrong PINs across 12 case spellings of one docname never
+    tripped the 8-try ceiling, and login_student(docname.upper(), correct_pin) then returned
+    ok. So the key has to be the name the DATABASE resolved to, never the one typed.
+
+    `canon` is that resolved docname. When the row does NOT exist we still return a bucket
+    (keyed on the canonicalised argument) rather than skipping the lockout, so an unknown id
+    locks after the same 8 tries as a real one: an attacker must not be able to tell an
+    invented Student id from a real one by watching whether a lockout ever appears. The
+    unknown key is HASHED for the same two reasons a name is — an invented id is
+    attacker-controlled text up to the Link width, and it must not bloat the cache keyspace
+    — and prefixed "?" so an operator reading Redis can see it resolved to nobody."""
+    if canon:
+        return _login_account_key("id", canon)
+    return _login_account_key(
+        "id", "?" + hashlib.sha256(_login_name_key(student).encode("utf-8")).hexdigest()[:20])
 
 
 def _login_buckets(account):
@@ -2633,17 +2731,26 @@ def clear_login_lockout(student=None, name=None, ip=None):
     student_name, because she may have been locked on either screen), `name` (the typed
     name — clears that name's buckets), and/or `ip` (the per-source spray counter, for the
     rare case a whole shared classroom IP is blocked). Reports the counts it found so a
-    facilitator can tell a real lockout from a girl who is simply mistyping her PIN."""
+    facilitator can tell a real lockout from a girl who is simply mistyping her PIN.
+
+    BOTH forms go through the same canonicalisation the login endpoints use, so whatever
+    spelling the facilitator happens to type releases the bucket that is actually held: the
+    docname in any case, and a name with the wrong case, a stray zero-width character or a
+    double space in it. A release valve that only worked for one spelling of the name would
+    be no valve at all — it is what makes a per-account lockout tolerable."""
     _require_staff()
     student, name, ip = _docname(student), _docname(name), _norm_ip(ip)
     targets = []
     if student:
-        targets.append(_login_account_key("id", student))
-        sname = frappe.db.get_value("Student", student, "student_name")
-        if sname:
-            targets.append(_login_account_key("nm", str(sname).strip().lower()))
+        row = frappe.db.get_value("Student", student, ["name", "student_name"], as_dict=True)
+        targets.append(_login_id_account(student, row.name if row else None))
+        if row and row.student_name:
+            targets.append(_login_account_key("nm", _login_name_key(row.student_name)))
     if name:
-        targets.append(_login_account_key("nm", name.lower()))
+        key = _login_name_key(name)
+        if key:                                  # a name of nothing but markup/format chars
+            targets.append(_login_account_key("nm", key))
+    targets = list(dict.fromkeys(targets))       # she may be reachable by both routes
     if not (targets or ip):
         return {"ok": False, "error": "no_target"}
     out = {}
@@ -2677,19 +2784,33 @@ def login_student(student, pin=None):
     filter happened to select, returned that girl's name (attribute-enumeration of minors),
     and then rotated the token of EVERY matched row to one shared value via _token_for.
     The lockout was defeated at the same time, because its cache key was str(student):
-    two spellings of one filter are two buckets, so the 8-try ceiling never closed."""
+    two spellings of one filter are two buckets, so the 8-try ceiling never closed.
+
+    _docname is necessary but was NOT sufficient: `tabStudent.name` is utf8mb4_unicode_ci, so
+    re-CASING a real docname still selected her row while keying a brand-new bucket (84
+    guesses proven, then the correct PIN worked). The row is therefore resolved to its
+    canonical name BEFORE the lockout is consulted, and everything downstream — the bucket,
+    the PIN upgrade, the token, the id handed back to the device — uses that canonical name
+    rather than the caller's spelling."""
     student = _docname(student)
     if not student:
         return {"ok": False, "error": "not_found"}      # same answer as a wrong id: no oracle
-    acct = _login_account_key("id", student)            # per-ACCOUNT, never per-IP (see above)
+    # ONE indexed read, before the lockout check, purely to canonicalise the account. A
+    # blocked account still costs no pbkdf2, which is what that ordering was protecting.
+    s = frappe.db.get_value("Student", student,
+                            ["name", "student_name", "login_pin", "active", "avatar", "band"],
+                            as_dict=True)
+    acct = _login_id_account(student, s.name if s else None)   # per-ACCOUNT, never per-IP
     if _login_blocked(acct):
         return {"ok": False, "error": "locked"}
-    s = frappe.db.get_value("Student", student,
-                            ["student_name", "login_pin", "active", "avatar", "band"], as_dict=True)
     if not s or not s.active:
+        # Counted, so an unknown id parks after the same 8 tries as a real one: the presence
+        # or absence of a lockout must not answer "is this a real Student id?".
+        _login_failed(acct)
         return {"ok": False, "error": "not_found"}
+    student = s.name                                    # canonical from here on, never the typed spelling
     if not s.login_pin:                                 # PIN-less profile → un-loginnable; facilitator sets one in Desk
-        return {"ok": False, "error": "no_pin"}
+        return {"ok": False, "error": "no_pin"}         # not counted: there is no secret to guess
     if not _pin_ok(s.login_pin, pin):
         _login_failed(acct)
         return {"ok": False, "error": "wrong_pin"}
@@ -2748,6 +2869,46 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band
             "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token, "band": band or ""}
 
 
+def _login_name_candidates(key):
+    """Active students that `key` (a _login_name_key) is allowed to authenticate against, in
+    the order to try them.
+
+    THE SQL IS ONLY A PREFILTER. The authoritative test is that the row's OWN stored name
+    canonicalises back to the same key, applied here in Python — which is what makes the
+    bucket key and the lookup agree BY CONSTRUCTION rather than by my guessing MariaDB's
+    collation table correctly. A spelling this function rejects cannot authenticate, so it
+    cannot own a separate budget; and a spelling it accepts has, by definition, the same
+    _login_name_key and therefore the same bucket. It also stops the collation's own
+    over-matching from logging one girl into another girl's profile (proven: 'अंजू' + PIN
+    returned the row of a different girl, 'अजू', because the DB gives U+0902 zero weight).
+
+    Two passes, lazily, so an ordinary login stays an INDEXED equality lookup:
+      1. `student_name = key`, indexed (Student.student_name search_index) and, under
+         utf8mb4_unicode_ci, already case- and zero-width-insensitive. Every name stored
+         through signup is found here, because _display_name is _login_name_key minus exactly
+         the folding the collation does for us.
+      2. reached only when nothing in pass 1 matched the PIN: the same lookup with ASCII
+         spaces removed on BOTH sides. This finds a facilitator-created (Desk) row whose name
+         holds an internal double space or a leading space — the collation treats those as
+         significant, so pass 1 cannot see her and she could otherwise never log in at all.
+         Unindexed, but it only runs on a login that has already failed, and the per-account
+         budget bounds how often that can happen.
+    The PIN is checked by the caller, so pbkdf2 is spent only on rows whose NAME really
+    matches — a name the DB over-matches to fifty rows no longer costs fifty hashes."""
+    fields = ["name", "student_name", "login_pin", "avatar", "band"]
+    seen = set()
+    for r in frappe.get_all("Student", filters={"active": 1, "student_name": key}, fields=fields):
+        if _login_name_key(r.student_name) == key:
+            seen.add(r.name)
+            yield r
+    for r in frappe.db.sql("select `name`, student_name, login_pin, avatar, band "
+                           "from `tabStudent` where active = 1 "
+                           "and replace(student_name, ' ', '') = %s",
+                           (key.replace(" ", ""),), as_dict=True):
+        if r.name not in seen and _login_name_key(r.student_name) == key:
+            yield r
+
+
 @frappe.whitelist(allow_guest=True)
 def login_by_name(name, pin=None):
     """Log in by typing your name + PIN — NO roster is shown (cleaner, and doesn't broadcast
@@ -2756,23 +2917,22 @@ def login_by_name(name, pin=None):
 
     The lockout key used to include _client_ip(), which made it worthless: eight wrong PINs
     from eight different X-Forwarded-For values never tripped it, so the 4-digit PIN behind
-    this endpoint was brute-forceable (proven over HTTP). See the PIN LOCKOUT note above for
-    why the key is the typed name, what it costs, and how a facilitator releases it."""
-    # _docname, not .strip(): a whitelisted argument arrives as parsed JSON, so `name` can be
-    # a dict or list. `(name or "").strip()` was an AttributeError → HTTP 500 on any container,
-    # and a container reaching the get_all filter below would be an ORM operator spec
-    # (["like", "%"]) rather than a name.
-    key = _docname(name).lower()
+    this endpoint was brute-forceable (proven over HTTP). Replacing the IP with the typed name
+    was still not enough, because the key was byte-exact while the lookup it guards is not:
+    see _login_name_key for the re-spelling bypass that closed, and for the girl with a double
+    space in her name whom the same normalisation lets back in. See the PIN LOCKOUT note above
+    for what a per-account lockout costs and how a facilitator releases it."""
+    # _login_name_key starts with _docname, not .strip(): a whitelisted argument arrives as
+    # parsed JSON, so `name` can be a dict or list. `(name or "").strip()` was an
+    # AttributeError → HTTP 500 on any container, and a container reaching the get_all filter
+    # would be an ORM operator spec (["like", "%"]) rather than a name.
+    key = _login_name_key(name)
     if not key:
         return {"ok": False, "error": "bad_login"}
     acct = _login_account_key("nm", key)
     if _login_blocked(acct):
         return {"ok": False, "error": "locked"}
-    # Filter by name in SQL (indexed via Student.student_name search_index; case-insensitive
-    # under the default ci collation) instead of loading every active student into Python.
-    cands = frappe.get_all("Student", filters={"active": 1, "student_name": key},
-                           fields=["name", "student_name", "login_pin", "avatar", "band"])
-    match = next((s for s in cands if _pin_ok(s.login_pin, pin)), None)
+    match = next((s for s in _login_name_candidates(key) if _pin_ok(s.login_pin, pin)), None)
     if not match:
         _login_failed(acct)
         return {"ok": False, "error": "bad_login"}
