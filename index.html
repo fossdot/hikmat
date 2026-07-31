@@ -1283,12 +1283,35 @@ function pickVoice(lang){
 }
 let audioHintShown = false;
 let speechEverStarted = false;   // becomes true the first time audio actually plays
+// True in the packaged Android/iOS build (Capacitor serves the bundle from localhost and
+// bundle-game.js injects the backend hook) — as opposed to a file:// double-click or a
+// browser tab. The distinction matters below: the advice has to differ.
+function isPackagedApp(){
+  try {
+    return !!(window.Capacitor || window.HIKMAT_BACKEND
+              || /^https?:\/\/localhost(?::\d+)?$/.test(location.origin) && location.protocol !== "file:");
+  } catch(e){ return false; }
+}
 function showAudioHint(){
   if(audioHintShown || document.getElementById("audiohint")) return;
   audioHintShown = true;
-  const bar = el(`<div id="audiohint" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;display:flex;gap:12px;align-items:center;max-width:92%;">🔇 No sound here? Open this file in <b style="white-space:nowrap">Safari</b> or <b>Chrome</b> to hear the words.<button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:6px 13px;border-radius:8px;cursor:pointer;">OK</button></div>`);
+  // Two different problems wear the same symptom (no sound), and the fix is NOT the same:
+  //  - file:// double-click in a browser that blocks speech → open it in Safari/Chrome;
+  //  - INSIDE the app → there is no "file" and no browser to open, so that advice is
+  //    nonsense. A low-end phone often just has no Text-to-speech voice data installed,
+  //    which is a phone Settings task. Telling a girl to open the app in a browser here
+  //    would be actively misleading, so word it for where she actually is.
+  const msg = isPackagedApp()
+    ? tx("No sound? Ask a teacher to turn on Text-to-speech in the phone's Settings. You can still read and play.",
+         "आवाज़ नहीं आ रही? टीचर से कहो कि फ़ोन की सेटिंग में Text-to-speech चालू कर दें। तुम पढ़कर खेल सकती हो।")
+    : tx("No sound here? Open this file in Safari or Chrome to hear the words.",
+         "यहाँ आवाज़ नहीं? शब्द सुनने के लिए इस फ़ाइल को Safari या Chrome में खोलो।");
+  // block layout, button on its own line: the old flex row collapsed into an unreadable
+  // one-word-per-line column on a 360dp phone, which is the screen this app is FOR.
+  const bar = el(`<div id="audiohint" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;max-width:92%;width:max-content;text-align:center;">🔇 ${esc(msg)}<div style="margin-top:10px"><button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:8px 22px;border-radius:8px;cursor:pointer;font-size:14px;">${tx("OK","ठीक")}</button></div></div>`);
   document.body.appendChild(bar);
   bar.querySelector("button").onclick = () => bar.remove();
+  srSay(msg);
 }
 // --- speech queue: plays utterances one after another so nothing cancels
 //     anything else, and a small batched delay dodges Chrome's cancel→speak race
@@ -3513,6 +3536,15 @@ const BACKEND_BASE = (function(){
   catch(e){ return ""; }
 })();
 function apiURL(m){ return BACKEND_BASE + "/api/method/hikmat.api." + m; }
+// EVERY API call goes through apiFetch, never bare fetch(). In the packaged Android build the
+// WebView's origin is https://localhost while the backend is a REMOTE host, so each request is
+// cross-site — and fetch() defaults to credentials:"same-origin", which sends and stores NO
+// cookie cross-origin. The session would silently never stick (login "works" then forgets),
+// which is the classic "CORS is configured but it still doesn't log in". Harmless for the
+// Frappe-served web build: same-origin treats "include" exactly like "same-origin".
+// The server side of this pair is `allow_cors` + a SameSite=None session cookie — see
+// playstore/06-backend-cors.md; the client half alone is not enough.
+function apiFetch(url, opts){ return fetch(url, Object.assign({ credentials:"include" }, opts || {})); }
 // The game page is static, but the browser may carry a logged-in Frappe session (a
 // facilitator with Desk open, or an online student) — Frappe then REJECTS POSTs that
 // lack the session's CSRF token (400). We fetch the token once (GET, same-origin) and
@@ -3521,7 +3553,7 @@ let CSRF_TOKEN = "";
 function postHeaders(){ return CSRF_TOKEN ? { "X-Frappe-CSRF-Token": CSRF_TOKEN } : {}; }
 async function refreshCsrf(){
   try {
-    const r = await fetch(apiURL("get_csrf"), { headers:{ Accept:"application/json" } });
+    const r = await apiFetch(apiURL("get_csrf"), { headers:{ Accept:"application/json" } });
     if(r.ok) CSRF_TOKEN = ((await r.json()).message || {}).token || "";
   } catch(e){}
 }
@@ -3530,7 +3562,7 @@ async function api(method, params, post){
     const opts = post ? { method:"POST", headers: postHeaders(), body:new URLSearchParams(params||{}) }
                       : { headers:{ Accept:"application/json" } };
     const url = apiURL(method) + (!post && params ? "?" + new URLSearchParams(params) : "");
-    const r = await fetch(url, opts);
+    const r = await apiFetch(url, opts);
     if(!r.ok) return null;
     return (await r.json()).message;
   } catch(e){ return null; }
@@ -3555,9 +3587,9 @@ async function loadFromBackend(){
   // 2) then try live (only succeeds when served from Frappe and online)
   try {
     const [cr, sr, xr] = await Promise.all([
-      fetch(apiURL("get_courses"),   {headers:{Accept:"application/json"}}),
-      fetch(apiURL("get_settings"),  {headers:{Accept:"application/json"}}),
-      fetch(apiURL("get_structure"), {headers:{Accept:"application/json"}}),
+      apiFetch(apiURL("get_courses"),   {headers:{Accept:"application/json"}}),
+      apiFetch(apiURL("get_settings"),  {headers:{Accept:"application/json"}}),
+      apiFetch(apiURL("get_structure"), {headers:{Accept:"application/json"}}),
     ]);
     if(cr.ok){
       const j = await cr.json();
@@ -3615,7 +3647,7 @@ async function syncAttempts(){
   try {
     for(const a of q){
       try {
-        const r = await fetch(apiURL("submit_attempt"), {method:"POST", headers: postHeaders(), body:new URLSearchParams(a)});
+        const r = await apiFetch(apiURL("submit_attempt"), {method:"POST", headers: postHeaders(), body:new URLSearchParams(a)});
         if(!r.ok){ remaining.push(a); continue; }                  // HTTP/network error → retry later
         let body = null; try { body = (await r.json()).message; } catch(e){}
         if(body && body.ok === false && body.error === "rate_limited") remaining.push(a);  // transient → retry
@@ -3652,7 +3684,7 @@ async function syncTests(){
   try {
     for(const t of q){
       try {
-        const r = await fetch(apiURL("submit_test"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(t) });
+        const r = await apiFetch(apiURL("submit_test"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(t) });
         if(!r.ok){ remaining.push(t); continue; }
         let body = null; try { body = (await r.json()).message; } catch(e){}
         if(body && body.ok === false && body.error === "rate_limited"){ remaining.push(t); continue; }
@@ -3802,7 +3834,7 @@ async function syncEvents(){
   try {
     for(const ev of q){
       try {
-        const r = await fetch(apiURL("log_event"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(ev) });
+        const r = await apiFetch(apiURL("log_event"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(ev) });
         if(!r.ok){ remaining.push(ev); continue; }
       } catch(e){ remaining.push(ev); }
     }
@@ -3915,7 +3947,7 @@ async function syncDoubts(){
   try {
     for(const d of q){
       try {
-        const r = await fetch(apiURL("report_doubt"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(d) });
+        const r = await apiFetch(apiURL("report_doubt"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(d) });
         if(!r.ok){ remaining.push(d); continue; }   // network/HTTP error → retry later
         // success, or a permanent rejection → drop (don't loop forever)
       } catch(e){ remaining.push(d); }              // offline → keep for next time
@@ -3996,7 +4028,7 @@ async function uploadCapture(fields, blob, type){
                 t.indexOf("mp4") >= 0 ? ".m4a" : t.indexOf("mpeg") >= 0 ? ".mp3" : ".bin";
     fd.append("audio", blob, "clip" + ext);
     for(const k in fields) fd.append(k, fields[k]);
-    const r = await fetch(apiURL("submit_dialect_capture"), { method:"POST", headers: postHeaders(), body: fd });
+    const r = await apiFetch(apiURL("submit_dialect_capture"), { method:"POST", headers: postHeaders(), body: fd });
     if(!r.ok) return "transient";                                  // HTTP/network error → retry later
     let m = null; try { m = (await r.json()).message; } catch(e){}
     if(m && m.ok) return "ok";                                     // saved (or server-side dedup)
@@ -4059,7 +4091,7 @@ async function flushBoli(){
         const method = it.kind==="verify" ? "submit_verification" : "submit_transcription";
         const p = { ...it.params };
         if(currentStudent){ p.student = currentStudent.id; p.token = currentStudent.token || ""; }
-        const r = await fetch(apiURL(method), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
+        const r = await apiFetch(apiURL(method), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
         if(!r.ok){ remaining.push(it); continue; }                    // network / HTTP → retry later
         let m=null; try { m=(await r.json()).message; } catch(e){}
         if(m && m.ok===false && m.error==="rate_limited") remaining.push(it);   // transient → retry
@@ -4252,7 +4284,7 @@ async function boliFetchWork(kind){
     let blob=null;
     try {
       const q = new URLSearchParams({ student:currentStudent.id, token:currentStudent.token||"", clip:it.clip });
-      const resp = await fetch(apiURL("get_boli_audio")+"?"+q);
+      const resp = await apiFetch(apiURL("get_boli_audio")+"?"+q);
       if(resp.ok){ const b=await resp.blob(); if(b && b.size) blob=b; }
     } catch(e){}
     if(blob) await intrayPut({ clip:it.clip, kind, blob, item:it, ts:Date.now() });
@@ -4437,7 +4469,7 @@ async function syncAttendance(){
   try {
     for(const p of q){
       try {
-        const r = await fetch(apiURL("log_attendance"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
+        const r = await apiFetch(apiURL("log_attendance"), { method:"POST", headers: postHeaders(), body:new URLSearchParams(p) });
         if(!r.ok){ remaining.push(p); continue; }               // network/HTTP error → retry later
         let body = null; try { body = (await r.json()).message; } catch(e){}
         if(body && body.ok === false && body.error === "rate_limited") remaining.push(p);
@@ -4698,7 +4730,7 @@ function renderLogin(){
 // the linked Student via get_my_student. Signup goes through hikmat.signup_online (invite code).
 async function frappeLogin(usr, pwd){
   try {
-    const r = await fetch(BACKEND_BASE + "/api/method/login", {
+    const r = await apiFetch(BACKEND_BASE + "/api/method/login", {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", ...postHeaders() },
       body: new URLSearchParams({ usr, pwd }),
     });
@@ -4870,7 +4902,7 @@ async function pbkdf2Verify(stored, pin){
     return diff === 0;
   } catch(e){ return false; }
 }
-async function frappeLogout(){ try { await fetch(BACKEND_BASE + "/api/method/logout"); } catch(e){} CSRF_TOKEN = ""; }
+async function frappeLogout(){ try { await apiFetch(BACKEND_BASE + "/api/method/logout"); } catch(e){} CSRF_TOKEN = ""; }
 
 function renderCampusLogin(){
   stopSpeech(); rerender = renderCampusLogin; root.innerHTML = "";
@@ -5039,7 +5071,7 @@ async function ttsPlay(text){
   let blob = await ttsCacheGet(key);
   if(!blob){
     try {
-      const r = await fetch(apiURL("ai_tts"), { method:"POST", headers: postHeaders(),
+      const r = await apiFetch(apiURL("ai_tts"), { method:"POST", headers: postHeaders(),
         body: new URLSearchParams({ student: currentStudent.id, token: currentStudent.token || "", text }) });
       const ct = (r.headers.get("content-type") || "");
       if(r.ok && ct.indexOf("json") < 0){ blob = await r.blob(); if(blob && blob.size) ttsCachePut(key, blob); else blob = null; }
@@ -5093,7 +5125,7 @@ async function transcribe(wavBlob){
   fd.append("audio", wavBlob, "clip.wav");
   fd.append("student", currentStudent.id); fd.append("token", currentStudent.token || ""); fd.append("lang", "hi");
   try {
-    const r = await fetch(apiURL("ai_transcribe"), { method:"POST", headers: postHeaders(), body: fd });
+    const r = await apiFetch(apiURL("ai_transcribe"), { method:"POST", headers: postHeaders(), body: fd });
     if(!r.ok) return null;
     const m = (await r.json()).message;
     return (m && m.ok) ? (m.text || "") : null;
