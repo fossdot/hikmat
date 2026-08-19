@@ -590,23 +590,14 @@ def seed_operational_defaults():
 
 def wipe_demo_data():
     """Production-cutover reset: erase ALL learner data — students (and their linked
-    Website Users), attempts, doubts, learning events, evaluations, AI chats, and the
-    whole Boli voice trail including the audio bytes on disk — while keeping content,
-    milestones, cohorts, campuses and settings untouched."""
-    from hikmat.api import (_BOLI_DOCTYPES, _LEARNER_DOCTYPES, _erase_boli_data,
-                            _erase_capture_bytes, _purge_orphan_capture_files)
-    # Per student first, via the SAME helper the right-to-erasure endpoint uses, so
-    # every recording's private File cascades instead of being orphaned on disk.
-    # _erase_boli_data RETURNS the audio paths and the caller MUST unlink them after its
-    # commit — dropping that return value erases the rows and leaves the girl's voice on
-    # disk (rows first, bytes last, so an interrupted wipe never loses audio it still has
-    # a row for).
-    paths = []
-    for s in frappe.get_all("Student", pluck="name"):
-        paths += _erase_boli_data(s) or []
-    frappe.db.commit()
-    _erase_capture_bytes(paths)
-    for dt in _LEARNER_DOCTYPES + _BOLI_DOCTYPES:
+    Website Users), attempts, doubts, learning events, evaluations and AI chats — while
+    keeping content, milestones, cohorts, campuses and settings untouched.
+
+    This used to also walk the Boli voice trail and unlink the audio bytes off disk. That
+    pipeline is gone; v12_remove_boli erases what older builds left behind, so there is no
+    learner media for a cutover to reach any more."""
+    from hikmat.api import _LEARNER_DOCTYPES
+    for dt in _LEARNER_DOCTYPES:
         if frappe.db.exists("DocType", dt):
             frappe.db.delete(dt)       # residue whose student link already dangled
     users = [u for u in frappe.get_all("Student", filters={"user": ("!=", "")}, pluck="user") if u]
@@ -616,17 +607,8 @@ def wipe_demo_data():
         if frappe.db.exists("User", u):
             frappe.delete_doc("User", u, force=1, ignore_permissions=True, delete_permanently=True)
     frappe.db.commit()
-    # The bulk deletes above skip on_trash, so a final sweep reclaims the residue.
-    # min_age_secs=0 ON PURPOSE, and ONLY here: the sweep normally skips recently-written
-    # bytes so that erasing one girl cannot destroy another girl's still-uploading clip.
-    # This function's whole contract is that NO learner audio survives a production
-    # cutover — a 15-minute-old recording left on disk is the exact failure it exists to
-    # prevent, and during a cutover there is no other girl still uploading.
-    files, bytes_removed = _purge_orphan_capture_files(min_age_secs=0)
-    frappe.db.commit()
     print("=== learner data wiped (content/config kept):",
-          frappe.db.count("Student"), "students remain,",
-          files, "orphan file docs and", bytes_removed, "audio files removed ===")
+          frappe.db.count("Student"), "students remain ===")
 
 
 def _adopt_script_report(report_name, folder):
@@ -643,7 +625,7 @@ def _adopt_script_report(report_name, folder):
       innerHTML and into the facilitator's spreadsheet. A Query Report offers no
       place to transform a value, and a SQL-side escape cannot tell a grid render
       from a CSV export, so it would either keep the stored XSS or corrupt the
-      exported dialect text with HTML entities. Python `execute()` can; see
+      exported text with HTML entities. Python `execute()` can; see
       hikmat/report_utils.py.
     * Once the report body is Python, the DB row must NOT be authored in two places.
       Seeding it here as well is how a re-seed (`setup_analytics`, a fresh install, a
@@ -859,8 +841,8 @@ def seed_content():
     courses = _load_curriculum()
     seed_structure()   # bands + subjects must exist before tracks Link to them
     # clean slate (dev): remove existing curriculum docs, then recreate
-    # (prompts Link to Lesson, so they go first)
-    for dt in ["Dialect Prompt", "Dialogue", "Lesson", "Track"]:
+    # (children Link to Lesson, so they go first)
+    for dt in ["Dialogue", "Lesson", "Track"]:
         for n in frappe.get_all(dt, pluck="name"):
             frappe.delete_doc(dt, n, force=1, ignore_permissions=1)
 
@@ -925,13 +907,6 @@ def seed_content():
                                  "is_correct": 1 if r["ok"] else 0} for r in dl["replies"]],
                 }).insert(ignore_permissions=1)
 
-            for ci, cp in enumerate(les.get("capture", [])):
-                frappe.get_doc({
-                    "doctype": "Dialect Prompt", "lesson": lesson.name, "prompt_key": cp["key"],
-                    "prompt_text_hi": cp["hi"], "prompt_text_en": cp.get("en", ""),
-                    "category": cp.get("category", ""), "complexity_tier": cp.get("tier", 1),
-                    "sort_order": ci,
-                }).insert(ignore_permissions=1)
 
     # seed the single settings doc
     s = frappe.get_single("Hikmat Settings")
@@ -980,9 +955,8 @@ def erase_cohort_learners(cohort):
     THIS IS A DELETION PATH FOR A CHILD'S RECORD, so it goes through the SAME erasure
     path as the right-to-erasure endpoint — never its own list of tables.
     single_center() used to remove only `Lesson Attempt` rows and then force-delete the
-    Student, which left her whole Boli voice trail behind with a dangling `student`
-    link: her Dialect Capture rows stayed in the transcription/verification queues, so
-    a peer was still offered the deleted girl's clip and could download her audio.
+    Student, which left the rest of her trail behind with a dangling `student` link that
+    nothing ever noticed — Frappe's Link fields carry no FK constraint.
     Re-deriving a table list at each call site is exactly how that happened. If a new
     learner doctype appears, add it to api._LEARNER_DOCTYPES and every erasure path
     picks it up at once.
@@ -992,8 +966,8 @@ def erase_cohort_learners(cohort):
 
     It delegates to api.delete_student(), the right-to-erasure endpoint, rather than to
     the individual helpers: that entry point already gets the whole contract right
-    (rows in ONE transaction, the audio bytes unlinked only AFTER the commit, the
-    synthetic Website User, name residue, a resumable half-finished erasure) and it
+    (rows in ONE transaction, the synthetic Website User, name residue, and a resumable
+    half-finished erasure) and it
     keeps getting it right when that contract changes. Copying five helper calls here is
     how this function fell behind in the first place. delete_student() is staff-gated,
     which is correct for a destructive maintenance tool: run it as Administrator.
@@ -1204,7 +1178,6 @@ def setup_workspace(cards=None, charts=None):
                  ("Attendance Summary", "Attendance Summary", "Report"),
                  ("Module Tests", "Module Test", "DocType"),
                  ("Test Attempts", "Test Attempt", "DocType"),
-                 ("Dialect Captures", "Dialect Capture", "DocType"),
                  ("AI Review Queue", "AI Review Queue", "Report"),
                  ("AI Chats", "AI Conversation", "DocType"),
                  ("Settings", "Hikmat Settings", "DocType")]

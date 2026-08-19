@@ -11,7 +11,7 @@ A Desk query report has TWO consumers and each is dangerous in a different way:
   frappe-datatable then assigns it with ``$cell.innerHTML = …``
   (``frappe-datatable/src/cellmanager.js``). So anything a girl typed —
   ``<img src=x onerror=…>`` — executes inside a **System Manager** session, on a
-  site holding minors' names, ages, cohorts and voice recordings. This is not
+  site holding minors' names, ages and cohorts. This is not
   theoretical: it was reproduced against the real datatable on real DB bytes.
 * **The CSV / XLSX export.** Excel, LibreOffice and Sheets *evaluate* a cell that
   opens with ``=``, ``+``, ``-`` or ``@`` (and a leading TAB/CR can shift a value
@@ -27,8 +27,8 @@ module.** HTML-escaping the export corrupted the PA's corpus spreadsheet::
 
 frappe's own export cleanup (``xlsxutils.handle_html``) un-escapes only when the
 value contains BOTH ``<`` and ``>``, so bare ``&quot;`` / ``&amp;`` / ``&#39;``
-survive into the file. This project exists to build a Champaran Bhojpuri dialect
-corpus: silently rewriting a girl's words is a data-integrity bug, not a cosmetic
+survive into the file. These girls write Hindi and Bhojpuri, punctuation and emoji
+included: silently rewriting a girl's words is a data-integrity bug, not a cosmetic
 one. So — **escape for the grid, formula-guard (only) for the spreadsheet.**
 
 Ingest already plain-texts student free text (``api._plain_text``); this module is
@@ -100,8 +100,8 @@ def formula_guard(val):
     A leading apostrophe is the universal "treat as text" marker in Excel /
     LibreOffice / Sheets: it is not part of the cell value and is not displayed
     once the file is opened as a spreadsheet. Devanagari, emoji, quotes,
-    apostrophes and ``&`` all pass through byte-for-byte — that is required, the
-    export IS the dialect corpus.
+    apostrophes and ``&`` all pass through byte-for-byte — a facilitator reading
+    the export has to see exactly what the girl typed.
     """
     s = "" if val is None else str(val)
     return "'" + s if s[:1] in _FORMULA_LEAD else s

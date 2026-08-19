@@ -17,7 +17,6 @@ import hashlib
 import hmac
 import ipaddress
 import json
-import os
 import re
 import time
 import unicodedata
@@ -69,9 +68,10 @@ def _docname(val, maxlen=140):
 
     Frappe's whitelist layer hands parameters through as parsed JSON, so a "name" argument
     can arrive as a dict or a list — and frappe.db.get_value(doctype, {...}) treats a dict as
-    a FILTER. Proven: clip={"status": "in_verification"} made get_boli_audio select and stream
-    a clip the caller never named, sidestepping the queue's own-clip / already-seen exclusions
-    (a latent IDOR primitive). Non-strings are REJECTED rather than str()-ed, so a probe fails
+    a FILTER. Proven on the since-removed Boli audio endpoint, where clip={"status":
+    "in_verification"} made it select and stream a document the caller never named — a real
+    IDOR, and the reason every _docname sink still coerces. Non-strings are REJECTED rather
+    than str()-ed, so a probe fails
     as not_found instead of quietly resolving to "{'status': 'in_verification'}"-shaped junk.
     Length is capped because a document name cannot exceed the Link column width anyway."""
     if val is None or isinstance(val, (bool, dict, list, tuple, set, bytes, bytearray)):
@@ -87,7 +87,7 @@ def _docname(val, maxlen=140):
 # With it optional ("<[^>]*>?") the greedy [^>]* swallowed everything after an UNPAIRED "<"
 # to the end of the string, so an ordinary Bhojpuri sentence containing a comparison lost
 # its whole tail with no marker: 'और 1 < 5 क्‍ष दिन‍' came back as 'और 1' — 17 characters and
-# two ZWJ conjuncts silently deleted from the corpus this project exists to build. A lone
+# two ZWJ conjuncts silently deleted from what a girl actually wrote. A lone
 # "<" is not a tag; it is a character she typed, and only the character is dropped (by the
 # unconditional replace() in _plain_text, which is what actually guarantees the result is
 # untaggable — this regex only strips tag BODIES so attributes don't survive as text).
@@ -99,8 +99,8 @@ _TAG_RE = re.compile(r"<[^>]*>")
 # the conjunct — "क्" + ZWJ + "ष" is spelled differently from the plain conjunct "क्ष" — and they
 # finalise a word ("दिन" + ZWJ). They are part of how Hindi and Bhojpuri are actually
 # written. str.isprintable() is False for every Cf character, so the old filter silently
-# deleted them: in an app whose PURPOSE is faithful dialect capture that is corpus
-# corruption, not hygiene. (It also broke ZWJ-compound emoji — the family/profession
+# deleted them: in an app that stores and replays a girl's own Devanagari back to her, that
+# is data corruption, not hygiene. (It also broke ZWJ-compound emoji — the family/profession
 # sequences — which is what an avatar can be.)
 #
 # Everything else invisible stays OUT, on purpose:
@@ -120,8 +120,8 @@ def _plain_text(val):
 
     Deliberately NOT html-escaped. These same strings are replayed to the girl in
     the game, which escapes on render — storing "&lt;img" would show her the entity
-    text. Escaping belongs at the output sink (see the Boli Adjudication Queue
-    report, whose grid assigns cell HTML directly). Dropping every leftover angle
+    text. Escaping belongs at the output sink — any report whose grid assigns cell
+    HTML directly has to escape there. Dropping every leftover angle
     bracket is what makes the result untaggable, even from a payload crafted to
     survive the tag regex — that property must hold whatever else changes here.
 
@@ -167,9 +167,9 @@ def _content_key(val, maxlen=140):
 # bypassable through machinery we do not control. Refusing the payload at ingest is not.
 #
 # ==> WHAT THIS MUST NEVER BE APPLIED TO <==
-# A girl's own PROSE — a transcription, a doubt question, a free prompt she recorded — is
+# A girl's own PROSE — a doubt question, an email she composed, a sentence she typed — is
 # never touched, even if it opens with "=" or "-". Rewriting her words to make a spreadsheet
-# happy would corrupt the Bhojpuri corpus this project exists to build, and "- बाजार में"
+# happy would corrupt what she actually wrote, and "- बाजार में"
 # or "=5" is a legitimate thing to write. Prose stays protected by the OUTPUT guard, which
 # is lossless (it prefixes a cell, it does not edit the stored value). The distinction is
 # exactly: identifier-shaped (a name, a lesson key, a device id, a category slug) → strip
@@ -225,7 +225,7 @@ _RL_PREFIX = "hikmat:rl2:"          # rl2: the rl: keys held pickled values; INC
 #     PIN lockout were spoofable (proven over HTTP: 20 wrong PINs on one account from 20
 #     spoofed headers never tripped the 8-try lockout);
 #   * one hop too low  → we key on our own proxy, so every client on the site collapses
-#     into ONE bucket, and with the fail-closed signup/capture ceilings that is a
+#     into ONE bucket, and with the fail-closed signup/AI ceilings that is a
 #     site-wide lockout.
 # Nothing inside the app could tell those apart, and production having one hop more than
 # configured is entirely plausible (a managed host fronts sites with its own layer). Trust
@@ -468,7 +468,7 @@ def _rl_warn(bucket, exc, denied):
         # .error(), NOT .warning(): frappe's default log level is WARNING only on a dev
         # server and ERROR everywhere else (utils/logger.py), so a .warning() here would be
         # discarded in production — and this is the ONE new failure mode of the limiter
-        # rewrite (signup and voice capture refused because the cache is down). An outage
+        # rewrite (signup and the AI endpoints refused because the cache is down). An outage
         # that leaves no evidence is indistinguishable from a spoofing attack.
         frappe.logger("hikmat").error(
             "rate limiter unavailable (%s: %s) — bucket %r %s",
@@ -491,14 +491,14 @@ def _rate_ok(bucket, limit, seconds, fail_closed=False):
     must never stop a child learning:
       * fail_closed=False (default) → an unavailable limiter ALLOWS the call. Used for the
         cheap, already-authenticated game writes (attempts, module tests, doubts, events,
-        attendance, transcribe/verify). Losing an abuse ceiling for the length of a Redis
-        outage is far less harmful than a room of girls unable to save their work.
+        attendance). Losing an abuse ceiling for the length of a Redis outage is far less
+        harmful than a room of girls unable to save their work.
       * fail_closed=True → an unavailable limiter DENIES the call. Reserved for the paths
         where an uncapped flood is genuinely destructive: signup (pre-auth, mints Student
-        rows + 90-day tokens) and dialect capture (writes audio bytes to disk), plus the AI
-        endpoints (an open-ended LLM must never run uncapped). Lessons keep working while
-        those are refused, and the client's outbox treats `rate_limited` as transient, so a
-        refused capture is retried when the limiter returns rather than lost.
+        rows + 90-day tokens) and the AI endpoints (an open-ended LLM must never run
+        uncapped). Lessons keep working while those are refused, and the client's outbox
+        treats `rate_limited` as transient, so a refused write is retried when the limiter
+        returns rather than lost.
     Either way the outage is logged (see _rl_warn) so it is visible rather than silent.
 
     NOTE the numeric ceilings at the call sites are deliberately generous: a whole
@@ -574,7 +574,7 @@ def _token_for(student_name):
 
     ONE STUDENT, ALWAYS — the coercion + existence check below is a security control, not
     tidiness. frappe.db.set_value(dt, {...}, ...) is an ORM FILTER (that is exactly how
-    _erase_boli_data clears a whole column), so a non-scalar reaching here turns this into a
+    _safe_delete takes a filter dict), so a non-scalar reaching here turns this into a
     BULK UPDATE. Proven on 2026-07-28: login_student passed its caller-supplied `student`
     straight through, and login_student({"student_name": ["like", "R2GATE%"]}, "1234")
     rotated TWO girls' auth_token to ONE shared value and handed it back — i.e. one token
@@ -602,12 +602,10 @@ def _token_ok(student_name, token):
 
     `active` is checked here, in the same single row read, because deactivating a girl is the
     facilitator's normal offboarding lever and it has to cut off her DEVICE, not just future
-    logins. Previously only submit_dialect_capture looked at `active`, so a deactivated
-    student's cached token still worked on every other endpoint for up to _TOKEN_TTL_DAYS
-    (90) unless someone separately called revoke_student_token — boli_home kept serving her
-    private stats and get_boli_queue kept handing her peers' clips. Putting it in the shared
-    auth path means every endpoint inherits it, including the ai_* ones that call _token_ok
-    directly."""
+    logins. It used to be checked by a single endpoint, so a deactivated student's cached
+    token still worked everywhere else for up to _TOKEN_TTL_DAYS (90) unless someone
+    separately called revoke_student_token. Putting it in the shared auth path means every
+    endpoint inherits it, including the ai_* ones that call _token_ok directly."""
     row = frappe.db.get_value("Student", _docname(student_name),
                               ["auth_token", "token_issued_on", "active"], as_dict=True)
     if not row or not row.active or not row.auth_token or not _token_valid(row.token_issued_on):
@@ -664,8 +662,8 @@ def _authorized(student, token):
 # Staff == System Manager. This project has no dedicated facilitator Role: a
 # facilitator IS a Desk user with System Manager. That is the definition used by
 # _facilitator_users() below (who gets the "I'm stuck" bell) and by every report,
-# query-report and number card in setup_data.py (roles=[{"role": "System Manager"}]),
-# and it is how the six Boli doctypes are permissioned. Defining it once, here, means
+# query-report and number card in setup_data.py (roles=[{"role": "System Manager"}]).
+# Defining it once, here, means
 # introducing a narrower "Hikmat Facilitator" role later is a one-line change in one
 # place instead of a hunt through the file.
 #
@@ -847,15 +845,6 @@ def _track_json(t, with_content):
             dialogues.append({"who": d.who or "🙂", "line": d.line, "lineHi": d.line_hi,
                               "then": d.followup, "replies": replies})
 
-        capture = []
-        for p in frappe.get_all("Dialect Prompt", filters={"lesson": l.name},
-                                fields=["prompt_key", "prompt_text_hi", "prompt_text_en",
-                                        "category", "complexity_tier"],
-                                order_by="sort_order asc, creation asc"):
-            capture.append({"key": p.prompt_key, "hi": p.prompt_text_hi,
-                            "en": p.prompt_text_en or "", "category": p.category or "",
-                            "tier": _int(p.complexity_tier) or 1})
-
         code = []
         for c in frappe.get_all("Lesson Code", filters={"parent": l.name},
                                 fields=["prompt", "prompt_hi", "teach", "teach_hi", "code", "choices", "answer"],
@@ -932,7 +921,6 @@ def _track_json(t, with_content):
             "key": l.lesson_key, "title": l.title, "titleHi": l.title_hi,
             "words": words, "dialogues": dialogues, "code": code, "fix": fix,
             "email": email, "quiz": quiz, "read": read, "reply": reply,
-            "capture": capture,
         }
         # optional per-lesson explainer video (YouTube link or file URL) — keys absent when unset
         if (l.get("video") or "").strip():
@@ -1145,15 +1133,18 @@ def _active_milestones():
 
 def _total_gems(student):
     """A student's global gem total 💎 = SUM of coins over every lesson attempt
-    (score*5 + stars*10 each) PLUS every Boli XP Ledger award — mirrors the client's
-    state.coins, and unlike stars it keeps growing on replays and on corpus work, so
-    both practice and dialect contributions count toward the next belt."""
+    (score*5 + stars*10 each) — mirrors the client's state.coins, and unlike stars it keeps
+    growing on replays, so practice keeps counting toward the next belt.
+
+    Corpus XP used to be added here too. The Bhojpuri AI / Boli pipeline is gone and its
+    ledger table with it, so lesson attempts are now the whole story. A girl who had banked
+    corpus XP therefore sees her SERVER-side gem total drop by that much, which can un-cross
+    a belt she had reached — Evaluations already created are untouched, but the next one may
+    take longer. v12_remove_boli prints who was affected so a facilitator can clear them by
+    hand rather than the loss going unnoticed."""
     r = frappe.db.sql(
         "select coalesce(sum(coins), 0) from `tabLesson Attempt` where student=%s", student)
-    base = int(r[0][0]) if r else 0
-    b = frappe.db.sql(
-        "select coalesce(sum(points), 0) from `tabBoli XP Ledger` where student=%s", student)
-    return base + (int(b[0][0]) if b else 0)
+    return int(r[0][0]) if r else 0
 
 
 def _check_milestones(student, sinfo):
@@ -1262,696 +1253,6 @@ def report_doubt(student=None, token=None, track=None, lesson=None, activity=Non
     _notify_facilitators(_("🙋 Doubt from {0}: {1}").format(who, question[:80]),   # already plain text
                          "Lesson Doubt", doc.name)
     return {"ok": True, "name": doc.name}
-
-
-# ---------------------------------------------------------------------------
-# Boli (बोली) — the Champaran Bhojpuri corpus pipeline (Record → Transcribe →
-# Verify → Curate). Recording is stage 1; a clip only enters the corpus and
-# pays full XP once independent students verify its transcription. Every XP
-# value, threshold and lease timing lives in Hikmat Settings.boli so PAs tune
-# them without a redeploy — _boli_cfg() overlays that JSON on these defaults.
-# ---------------------------------------------------------------------------
-_BOLI_DEFAULTS = {
-    "xp_recorded": 5, "xp_operator_assist": 2, "xp_transcription_verified": 20,
-    "xp_speaker_credit": 10, "xp_verification_match": 5, "xp_gold_passed": 5,
-    "xp_curation_done": 5, "xp_gem_awarded": 25, "xp_elder_verified": 30,
-    "xp_classroom_present": 2,
-    "verifier_unlock": 15,               # own accepted transcriptions before Verify unlocks
-    "curator_unlock_verified": 10, "curator_unlock_verifications": 20,
-    "gold_check_pct": 10, "verifier_accuracy_floor": 0.6,
-    "accepts_to_verify": 2, "max_rework_rounds": 2,
-    "queue_batch": 8, "lease_ttl_secs": 6 * 3600,   # long lease: cloud + intermittent internet
-}
-
-
-def _boli_cfg():
-    """Boli tunables: the defaults above overlaid with the Hikmat Settings `boli` JSON
-    blob (PA-editable, no redeploy). A missing/invalid setting simply falls back."""
-    cfg = dict(_BOLI_DEFAULTS)
-    try:
-        raw = frappe.db.get_single_value("Hikmat Settings", "boli")
-        if raw:
-            cfg.update(json.loads(raw) if isinstance(raw, str) else dict(raw))
-    except Exception:
-        pass
-    return cfg
-
-
-def _award_xp(student, event, points, clip=None, dedup_key=None, student_name=None):
-    """Append one server-authored Boli XP row — the ledger is the single source of truth
-    for corpus XP, folded into gems by _total_gems(). Idempotent on dedup_key so replays
-    and retries never double-award (e.g. dedup_key='verified:<clip>')."""
-    if not student or not _int(points):
-        return
-    if dedup_key and frappe.db.get_value("Boli XP Ledger", {"dedup_key": dedup_key}, "name"):
-        return
-    if student_name is None:
-        student_name = frappe.db.get_value("Student", student, "student_name")
-    try:
-        frappe.get_doc({
-            "doctype": "Boli XP Ledger", "student": student, "student_name": student_name,
-            "event": event, "points": _int(points), "clip": clip,
-            "dedup_key": (dedup_key or "")[:140] or None, "awarded_on": frappe.utils.now(),
-        }).insert(ignore_permissions=True)
-    except frappe.DuplicateEntryError:                       # raced with the same dedup_key
-        frappe.db.rollback()
-
-
-_AGE_BANDS = [(13, 15, "13-15"), (16, 18, "16-18"), (19, 25, "19-25"),
-              (26, 40, "26-40"), (41, 60, "41-60")]
-
-
-def _age_to_band(age):
-    age = _int(age)
-    if not age:
-        return None
-    for lo, hi, band in _AGE_BANDS:
-        if lo <= age <= hi:
-            return band
-    return "60+" if age > 60 else None
-
-
-def _valid_village(v):
-    v = _docname(v)          # scalars only: a dict would reach frappe.db.exists as a FILTER
-    return v if (v and frappe.db.exists("Boli Village", v)) else None
-
-
-_SPK_RELATIONS = ("self", "family-elder", "neighbor", "other")
-
-
-def _resolve_boli_speaker(student, relation=None, age_band=None, gender=None,
-                          village=None, consent_status=None):
-    """Return a Boli Speaker for this clip. A 'self' clip reuses (or creates once) the
-    learner's own pseudonymous CHM-SPK id so all her recordings share one speaker; a
-    family/neighbour speaker is a fresh pseudonymous row carrying demographics only —
-    never a name (Boli Speaker.student is the sole real-name link, and elders get none)."""
-    relation = (_docname(relation, 40) or "self").lower()
-    if relation not in _SPK_RELATIONS:
-        relation = "other"
-    # age_band / gender are Select fields (frappe checks the VALUE); coerce to a scalar first so
-    # a dict can't be stored via the `age_band or …` fallback below.
-    age_band, gender = _docname(age_band, 20), _docname(gender, 20)
-    village = _valid_village(village)
-    if relation == "self":
-        existing = frappe.db.get_value("Boli Speaker", {"student": student, "relation": "self"}, "name")
-        if existing:
-            return existing
-        ag = frappe.db.get_value("Student", student, ["age", "gender"], as_dict=True) or {}
-        return frappe.get_doc({
-            "doctype": "Boli Speaker", "student": student, "relation": "self",
-            "age_band": age_band or _age_to_band(ag.get("age")),
-            "gender": gender or ag.get("gender"),
-            "village_or_block": village, "consent_status": consent_status or "self_consented",
-        }).insert(ignore_permissions=True).name
-    return frappe.get_doc({
-        "doctype": "Boli Speaker", "relation": relation,
-        "age_band": age_band or None, "gender": gender or None,
-        "village_or_block": village, "consent_status": consent_status or "verbal_elder_consent",
-    }).insert(ignore_permissions=True).name
-
-
-_PROMPT_TYPES = ("in_class", "elder_home", "image", "free")
-
-
-# ---------------------------------------------------------------------------
-# Boli stage 1 — Record ("बोल"). A learner records a prompt in someone's boli
-# (herself, or a family elder / neighbour) and the clip enters the pipeline at
-# status=recorded. Transcription is NO LONGER done here — a *different* student
-# transcribes it in stage 2. Audio is a PRIVATE File on the Dialect Capture row
-# (Desk-only, never served to guests). Untrusted input → same hardening as
-# submit_attempt: rate caps, active-student + token check, clamps, client_id
-# idempotency for the offline outbox.
-# ---------------------------------------------------------------------------
-_CAPTURE_AUDIO_MAX = 8 * 1024 * 1024   # 8MB ≈ a 3-minute 16kHz WAV, the client's hard limit
-
-# upload mimetype → stored file extension (anything unrecognised is kept as .bin)
-_CAPTURE_EXT = {"audio/wav": ".wav", "audio/webm": ".webm",
-                "audio/mp4": ".m4a", "audio/mpeg": ".mp3"}
-
-
-def _private_files_dir():
-    return frappe.utils.get_files_path(is_private=1)
-
-
-def _unshare_capture_bytes(file_doc, want, audio_bytes):
-    """ONE CLIP, ONE FILE ON DISK — a right-to-erasure control, not tidiness.
-
-    Frappe dedups uploads on {content_hash, is_private} with no parent scoping
-    (file.py save_file → `duplicate_file`): two byte-identical clips get ONE path, and
-    File.on_trash then refuses to unlink while any other File row shares the hash
-    (file.py _delete_file_on_disk). Erasing girl A therefore left her audio on disk,
-    still downloadable through girl B's clip. Identical buffers are not hypothetical:
-    a muted mic or a failed take produces the same fixed-size silence for every child.
-
-    So when Frappe handed this clip somebody else's path, write the clip its own copy and
-    repoint the File row at it. Erasure then unlinks exactly this clip's bytes (see
-    _erase_capture_bytes) and nobody else's. Bytes are written before the caller's commit,
-    exactly like Frappe's own upload, so a rollback can leave them orphaned with no row —
-    harmless (nothing serves them) and reclaimed by purge_orphan_capture_files()."""
-    if not file_doc.file_url or file_doc.file_url.rsplit("/", 1)[-1] == want:
-        return                          # not deduped: this clip already owns its path
-    stem, ext = os.path.splitext(want)
-    if os.path.exists(os.path.join(_private_files_dir(), want)):
-        want = "%s-%s%s" % (stem, frappe.generate_hash(length=6), ext)   # never clobber
-    with open(os.path.join(_private_files_dir(), want), "wb") as fh:
-        fh.write(audio_bytes)
-        os.fsync(fh.fileno())
-    # content_hash stays as-is (it describes the bytes): the twin's File row keeps its own
-    # path, so both recordings can be deleted independently.
-    file_doc.db_set({"file_url": "/private/files/" + want, "file_name": want},
-                    update_modified=False)
-
-
-@frappe.whitelist(allow_guest=True)
-def submit_dialect_capture(student=None, token=None, track=None, lesson=None,
-                           prompt_key=None, prompt_text_hi=None, transcription=None,
-                           duration_secs=0, client_id=None, operator=None, prompt_type=None,
-                           category=None, tier=None, speaker_relation=None, speaker_age_band=None,
-                           speaker_gender=None, village_or_block=None, consent_status=None,
-                           public_ok=0, sample_rate=0, device_id=None):
-    """Record one spoken dialect capture (multipart POST, file field 'audio').
-    Thin wrapper: reads the upload off the request, then hands everything to
-    _save_dialect_capture so tests can hit the real logic without a request."""
-    f = frappe.request.files.get("audio") if getattr(frappe, "request", None) else None
-    audio_bytes = f.read() if f else None
-    mimetype = f.mimetype if f else None
-    return _save_dialect_capture(audio_bytes, mimetype, student=student, token=token,
-                                 track=track, lesson=lesson, prompt_key=prompt_key,
-                                 prompt_text_hi=prompt_text_hi, transcription=transcription,
-                                 duration_secs=duration_secs, client_id=client_id,
-                                 operator=operator, prompt_type=prompt_type, category=category,
-                                 tier=tier, speaker_relation=speaker_relation,
-                                 speaker_age_band=speaker_age_band, speaker_gender=speaker_gender,
-                                 village_or_block=village_or_block, consent_status=consent_status,
-                                 public_ok=public_ok, sample_rate=sample_rate, device_id=device_id)
-
-
-def _save_dialect_capture(audio_bytes, mimetype, student=None, token=None, track=None,
-                          lesson=None, prompt_key=None, prompt_text_hi=None,
-                          transcription=None, duration_secs=0, client_id=None, operator=None,
-                          prompt_type=None, category=None, tier=None, speaker_relation=None,
-                          speaker_age_band=None, speaker_gender=None, village_or_block=None,
-                          consent_status=None, public_ok=0, sample_rate=0, device_id=None):
-    """Validate + store one capture. Requires a real logged-in student (audio of a
-    child is personal data — no anonymous/guest captures, unlike report_doubt).
-    client_id makes the write idempotent so the offline outbox can retry safely."""
-    # Captures are rarer than attempts, and each one writes audio bytes to disk — so this is
-    # one of the two paths that fail CLOSED when the limiter is unavailable (see _rate_ok).
-    # Nothing is lost: the client's outbox treats rate_limited as transient and retries.
-    if not _rate_ok("capture:" + _client_ip(), 600, 3600, fail_closed=True):
-        return {"ok": False, "error": "rate_limited"}
-    # scalars only (see _docname): `student` and `operator` are both fed to
-    # frappe.db.get_value / frappe.db.exists, where a dict would act as an ORM FILTER and
-    # resolve some arbitrary classmate — `operator` also credits XP to whoever it names.
-    student, operator = _docname(student), _docname(operator)
-    client_id = _docname(client_id, 64)          # ditto: it is a dedup FILTER value
-    if not student:
-        student = _session_student()                         # online client authed by session, may omit id
-    if not student:
-        return {"ok": False, "error": "unknown_student"}
-    sinfo = frappe.db.get_value("Student", student, ["student_name", "cohort", "active"], as_dict=True)
-    if not sinfo or not sinfo.active:
-        return {"ok": False, "error": "unknown_student"}
-    if not _authorized(student, token):                      # campus token OR online session
-        return {"ok": False, "error": "auth"}
-    if not _rate_ok("capture-stu:" + str(student), 60, 3600, fail_closed=True):
-        return {"ok": False, "error": "rate_limited"}
-    if client_id:                                            # already saved this exact clip? done.
-        if frappe.db.get_value("Dialect Capture", {"client_id": client_id}, "name"):
-            return {"ok": True, "dedup": True}
-    if not audio_bytes or len(audio_bytes) > _CAPTURE_AUDIO_MAX:
-        return {"ok": False, "error": "bad_audio"}
-
-    # Recording no longer carries a transcription (that's stage 2, done by a different
-    # student). A legacy client that still posts one keeps it in the legacy field.
-    transcription = _plain_text(transcription)
-
-    # _docname, not .strip(), on these three: a whitelisted argument can arrive as a dict and
-    # .strip() would raise (a 500 + an error-log entry from a public endpoint). The VALUE of
-    # each is checked below or by frappe's Select validation.
-    prompt_type = (_docname(prompt_type, 40) or "in_class").lower()
-    if prompt_type not in _PROMPT_TYPES:
-        prompt_type = "in_class"
-    relation = (_docname(speaker_relation, 40) or "self").lower()
-    third_party = relation != "self" or prompt_type == "elder_home"
-    consent_status = _docname(consent_status, 40) or ("self_consented" if not third_party else "")
-    # Someone else's voice (elder / neighbour) may not enter the corpus without a
-    # recorded consent attestation — the client collects it on the pre-submit checklist.
-    if third_party and consent_status in ("", "missing"):
-        return {"ok": False, "error": "consent_required"}
-
-    track = _content_key(track)                  # these three compose a Dialect Prompt name
-    lesson = _content_key(lesson)                # below, so they must be scalars too — and they
-    prompt_key = _content_key(prompt_key, 60)    # are stored + shown in the PA's queue
-    category = _content_key(category)            # normalise BEFORE the prompt fallback (see
-                                                 # below); a category is a SLUG the PA queue
-                                                 # renders, not her words → formula-lead too
-    # resolve the authored prompt if it still exists; a dangling key never fails the
-    # write — the denormalized prompt text keeps the row meaningful after a reseed
-    prompt = None
-    if track and lesson and prompt_key:
-        pname = f"{track}-{lesson}-{prompt_key}"             # Dialect Prompt autoname: {lesson doc}-{key}
-        if frappe.db.exists("Dialect Prompt", pname):
-            prompt = pname
-    if prompt:
-        # The authored prompt is the source of truth for ITS OWN metadata. prompt_text_hi and
-        # tier describe the authored prompt, not the recording, so when the link resolves they
-        # come from the row a PA wrote and the client's values are dropped: tier used to stay
-        # client-authored, which let a learner file corpus metadata that contradicts the prompt
-        # she recorded (tier=9 against a complexity_tier of 5), and an unset authored tier is
-        # honestly 0 (unknown) rather than her number. `category` still only FILLS IN (the game
-        # echoes the prompt's own category), but see the normalisation note below.
-        pinfo = frappe.db.get_value("Dialect Prompt", prompt,
-                                    ["prompt_text_hi", "category", "complexity_tier"],
-                                    as_dict=True) or {}
-        prompt_text_hi = pinfo.get("prompt_text_hi") or ""
-        # `category or …` has to run AFTER the normalisation above: junk that _plain_text
-        # reduces to "" is still truthy as sent, so the authored category used to be skipped
-        # and the row stored '' instead of e.g. 'market_money'.
-        category = category or _content_key(pinfo.get("category"))
-        tier = _int(pinfo.get("complexity_tier"))
-    else:
-        prompt_text_hi = _plain_text(prompt_text_hi)   # free/dangling prompt: keep her words, no markup
-        tier = max(0, min(9, _int(tier)))              # no authored prompt to trust: clamp hers
-
-    speaker = _resolve_boli_speaker(student, relation=relation, age_band=speaker_age_band,
-                                    gender=speaker_gender, village=village_or_block,
-                                    consent_status=consent_status)
-    spk = frappe.db.get_value("Boli Speaker", speaker,
-                              ["age_band", "gender", "village_or_block"], as_dict=True) or {}
-    try:
-        doc = frappe.get_doc({
-            "doctype": "Dialect Capture", "client_id": (client_id or "")[:64] or None,
-            "student": student, "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
-            "operator": operator if (operator and frappe.db.exists("Student", operator)) else None,
-            "speaker": speaker, "speaker_relation": relation,
-            "speaker_age_band": spk.get("age_band"), "speaker_gender": spk.get("gender"),
-            "village_or_block": spk.get("village_or_block"),
-            "track": track, "lesson": lesson,
-            "prompt_key": prompt_key, "prompt": prompt,
-            "prompt_text_hi": (prompt_text_hi or "")[:500],
-            "prompt_type": prompt_type, "category": category, "tier": tier,   # settled above
-            "dialect_transcription": transcription[:2000] or None,
-            "consent_status": consent_status or "self_consented",
-            "public_ok": 1 if _int(public_ok) else 0,
-            "status": "recorded",
-            "duration_secs": max(0, min(600, _int(duration_secs))),   # the client stops at 3 min
-            "sample_rate": max(0, _int(sample_rate)), "device_id": _plain_text(device_id)[:64],
-            "captured_on": frappe.utils.now(),
-        }).insert(ignore_permissions=True)
-    except frappe.DuplicateEntryError:                       # raced with a retry of the same client_id
-        frappe.db.rollback()
-        return {"ok": True, "dedup": True}
-    ext = _CAPTURE_EXT.get((mimetype or "").split(";")[0].strip().lower(), ".bin")
-    file_doc = frappe.get_doc({
-        "doctype": "File", "attached_to_doctype": "Dialect Capture",
-        "attached_to_name": doc.name, "is_private": 1,
-        "file_name": f"{doc.name}{ext}", "content": audio_bytes,
-    }).insert(ignore_permissions=True)
-    _unshare_capture_bytes(file_doc, f"{doc.name}{ext}", audio_bytes)   # erasability, see helper
-    doc.db_set("audio_file", file_doc.file_url, update_modified=False)
-    frappe.db.commit()
-    # Recording pays a little now; the big XP lands when the clip is verified.
-    cfg = _boli_cfg()
-    _award_xp(student, "recorded", cfg["xp_recorded"], clip=doc.name,
-              dedup_key="recorded:" + doc.name, student_name=sinfo.get("student_name"))
-    if operator and operator != student and frappe.db.exists("Student", operator):
-        _award_xp(operator, "operator_assist", cfg["xp_operator_assist"], clip=doc.name,
-                  dedup_key="operator:" + doc.name)
-    return {"ok": True, "id": doc.name}
-
-
-# ---------------------------------------------------------------------------
-# Boli stage 2 (Transcribe "लिख") + stage 3 (Verify "जांच"). These act on OTHER
-# students' clips — the app's first shared, mutable, cross-student work queue.
-# Connectivity is intermittent (cloud), so the client prefetches a batch and
-# works offline; transcription takes a short EXCLUSIVE lease (one transcriber per
-# clip, auto-released on expiry) while verification is deliberately lease-free (a
-# clip needs two INDEPENDENT accepts). Server-wins: a submission against an
-# already-resolved clip is kept as data but changes no outcome. All endpoints are
-# allow_guest (campus students are Frappe "Guest") — real auth is _authorized().
-# ---------------------------------------------------------------------------
-_BOLI_QUEUE_KINDS = ("transcribe", "verify")
-_VERDICTS = ("accept", "reject", "escalate")
-
-
-def _owner_participating(c):
-    """True when the clip's recorder still has a Student row AND that row is `active` — the
-    POSITIVE form of the ownership check, and the same guard every read and write path in the
-    pipeline uses (get_boli_queue's SQL `exists`, get_boli_audio, submit_transcription,
-    submit_verification).
-
-    (1) THE ROW MUST EXIST. Every other ownership test in the pipeline is
-    `c.student == student`, which FAILS OPEN on a dangling owner id: nobody equals a deleted
-    row, so an orphan clip looks like "somebody else's clip", i.e. like work. On the WRITE
-    paths that is worse than on the read paths. Proven: submit_transcription on an orphan
-    minted a transcription and flipped the clip to in_verification, then submit_verification's
-    second accept raised LinkValidationError while awarding XP — AFTER _boli_mark_verified had
-    already committed status='verified'. Durable result: an orphan counted in the PUBLIC corpus
-    meter, every XP award rolled back, and a 500 whose traceback disclosed the erased girl's
-    Student id to a learner.
-
-    (2) SHE MUST STILL BE ACTIVE. `active` is the facilitator's one lever for offboarding and
-    for withdrawn consent, and it already cuts off her own device (_token_ok). It did NOT stop
-    her VOICE circulating: the queue and the audio stream checked only that her row existed,
-    so a girl who had been deactivated — the exact case of "her guardian withdrew consent
-    yesterday" — kept having her recordings handed to and played by classmates. Deactivation
-    now behaves like a PAUSE on her data, in both directions.
-
-    Deliberately a gate at read/serve time and NOT a status rewrite: a clip of hers sitting in
-    `in_verification` is left exactly where it is, simply never offered or streamed while she
-    is inactive, and it resumes untouched if she is reactivated (a mis-click, a girl who
-    returns next term). Rewriting statuses on deactivation would throw away the pipeline
-    position, strand her peers' half-finished work, and would need a doc hook to be reliable —
-    all to achieve nothing the gate does not already achieve. PERMANENT withdrawal is a
-    different operation: delete_student erases the bytes (see _erase_boli_data).
-
-    So the pipeline is safe BY CONSTRUCTION and does not depend on an erasure having completed
-    or on a background job having run. `not_found` (not a new code) is the honest answer to
-    both cases: the clip is not work for anyone. Orphans are separately repaired by patch v9 /
-    _erase_boli_data."""
-    return bool(c.student and frappe.db.get_value("Student", c.student, "active"))
-
-
-def _boli_latest_transcription(clip):
-    """The most recent transcription for a clip (name/text/author/version), or None."""
-    clip = _docname(clip)                        # a dict here would widen the filter
-    if not clip:
-        return None
-    rows = frappe.get_all("Boli Transcription", filters={"clip": clip},
-                          fields=["name", "text", "author", "version"],
-                          order_by="version desc", limit=1)
-    return rows[0] if rows else None
-
-
-@frappe.whitelist(allow_guest=True)
-def get_boli_queue(student=None, token=None, kind=None, batch=None):
-    """Hand a student a batch of clips to work on for `kind` (transcribe|verify) — never
-    her own recording/transcription, never a clip she has already handled at this stage.
-    Transcribe items are leased to her (exclusive, TTL from config); verify items are
-    not (independent votes). The client caches these + their audio for offline work."""
-    kind = (kind or "").strip().lower()
-    if kind not in _BOLI_QUEUE_KINDS:
-        return {"ok": False, "error": "bad_kind"}
-    student = _docname(student)                  # never a dict: it is an SQL bind + a Link write
-    if not student:
-        student = _session_student()
-    if not student:
-        return {"ok": False, "error": "unknown_student"}
-    if not _authorized(student, token):
-        return {"ok": False, "error": "auth"}
-    cfg = _boli_cfg()
-    n = max(1, min(20, _int(batch) or cfg["queue_batch"]))
-    now = frappe.utils.now()
-    items = []
-    if kind == "transcribe":
-        rows = frappe.db.sql("""
-            select dc.name, dc.prompt_text_hi, dc.prompt_type, dc.duration_secs
-            from `tabDialect Capture` dc
-            where dc.status = 'recorded' and dc.student != %(me)s
-              -- The recorder must still be a PARTICIPATING student: her row must exist and
-              -- be `active`. `dc.student != me` passes for a dangling owner id, so without
-              -- the `exists` a clip left behind by a failed or partial erasure would go on
-              -- being handed to her classmates; and without `s.active` a girl who was
-              -- DEACTIVATED (offboarded, consent withdrawn) would keep having her voice
-              -- handed out. SQL twin of _owner_participating() — keep the two in step.
-              and exists (select 1 from `tabStudent` s
-                          where s.name = dc.student and s.active = 1)
-              and (dc.claim_expires is null or dc.claim_expires < %(now)s)
-              and dc.audio_file is not null and dc.audio_file != ''
-              and not exists (select 1 from `tabBoli Transcription` bt
-                              where bt.clip = dc.name and bt.author = %(me)s)
-            order by dc.captured_on asc limit %(n)s
-        """, {"me": student, "now": now, "n": n}, as_dict=True)
-        expires = frappe.utils.add_to_date(now, seconds=cfg["lease_ttl_secs"])
-        for r in rows:
-            frappe.db.set_value("Dialect Capture", r.name,
-                                {"claimed_by": student, "claim_expires": expires},
-                                update_modified=False)
-            items.append({"clip": r.name, "prompt_text_hi": r.prompt_text_hi,
-                          "prompt_type": r.prompt_type, "duration_secs": r.duration_secs,
-                          "lease_expires": str(expires)})
-        frappe.db.commit()
-    else:  # verify — no lease; a clip wants several independent judges
-        rows = frappe.db.sql("""
-            select dc.name, dc.prompt_text_hi, dc.prompt_type, dc.duration_secs
-            from `tabDialect Capture` dc
-            where dc.status = 'in_verification' and dc.student != %(me)s
-              and exists (select 1 from `tabStudent` s
-                          where s.name = dc.student and s.active = 1)   -- see above
-              and dc.audio_file is not null and dc.audio_file != ''
-              and not exists (select 1 from `tabBoli Transcription` bt
-                              where bt.clip = dc.name and bt.author = %(me)s)
-              and not exists (select 1 from `tabBoli Verification` bv
-                              where bv.clip = dc.name and bv.verifier = %(me)s)
-            order by dc.captured_on asc limit %(n)s
-        """, {"me": student, "n": n}, as_dict=True)
-        for r in rows:
-            tr = _boli_latest_transcription(r.name)
-            if not tr:
-                continue
-            items.append({"clip": r.name, "prompt_text_hi": r.prompt_text_hi,
-                          "prompt_type": r.prompt_type, "duration_secs": r.duration_secs,
-                          "transcription": {"id": tr["name"], "text": tr["text"]}})
-    return {"ok": True, "kind": kind, "items": items}
-
-
-@frappe.whitelist(allow_guest=True)
-def get_boli_audio(student=None, token=None, clip=None):
-    """Stream one clip's PRIVATE audio to an authorized student for transcribe/verify.
-    Campus students aren't Frappe users, so /private/files can't serve them — access is
-    gated on the bearer token + the work context (never her own clip; a recorded clip
-    must be leased to her). The client fetch()es this into an offline blob."""
-    student, clip = _docname(student), _docname(clip)   # a dict `clip` would be an ORM FILTER
-    if not clip:                                       # (see _docname) — reject, don't resolve
-        return {"ok": False, "error": "not_found"}
-    if not student:
-        student = _session_student()
-    if not student:
-        return {"ok": False, "error": "unknown_student"}
-    if not _authorized(student, token):
-        return {"ok": False, "error": "auth"}
-    c = frappe.db.get_value("Dialect Capture", clip,
-                            ["name", "student", "status", "claimed_by", "audio_file"], as_dict=True)
-    if not c or not c.audio_file:
-        return {"ok": False, "error": "not_found"}
-    # Never stream a clip whose owner is gone OR deactivated: `c.student == student` FAILS
-    # OPEN on a dangling owner id, so an orphan used to be served to peers, and a deactivated
-    # girl's voice kept playing on her classmates' laptops. ONE definition of the positive
-    # check, shared with the two write paths — see _owner_participating for the full why.
-    if not _owner_participating(c):
-        return {"ok": False, "error": "not_found"}
-    if c.student == student:
-        return {"ok": False, "error": "own_clip"}
-    allowed = (c.status == "in_verification") or (c.status == "recorded" and c.claimed_by == student)
-    if not allowed:
-        return {"ok": False, "error": "not_available"}
-    fname = frappe.db.get_value("File", {"file_url": c.audio_file, "attached_to_name": c.name}, "name")
-    if not fname:
-        return {"ok": False, "error": "not_found"}
-    fdoc = frappe.get_doc("File", fname)
-    frappe.local.response.filename = fdoc.file_name
-    frappe.local.response.filecontent = fdoc.get_content()
-    frappe.local.response.type = "download"
-
-
-@frappe.whitelist(allow_guest=True)
-def submit_transcription(student=None, token=None, clip=None, text=None,
-                         lint_warnings=None, client_id=None):
-    """Stage 2 — a student types the Devanagari transcription of someone else's clip.
-    Moves the clip to in_verification and releases the transcribe lease. No XP here; the
-    reward lands when two peers verify it (see submit_verification)."""
-    if not _rate_ok("boli-tx:" + _client_ip(), 1200, 3600):
-        return {"ok": False, "error": "rate_limited"}
-    student, clip = _docname(student), _docname(clip)   # scalars only (see _docname)
-    client_id = _docname(client_id, 64)                # a LIST here is an ORM operator spec
-    if not clip:                                       # ("like", "%") → someone else's row
-        return {"ok": False, "error": "not_found"}
-    if not student:
-        student = _session_student()
-    if not student:
-        return {"ok": False, "error": "unknown_student"}
-    if not _authorized(student, token):
-        return {"ok": False, "error": "auth"}
-    if client_id:
-        existing = frappe.db.get_value("Boli Transcription", {"client_id": client_id}, "name")
-        if existing:
-            return {"ok": True, "name": existing, "dedup": True}
-    text = _plain_text(text)          # her Devanagari survives; markup never reaches the PA queue
-    # lint_warnings is a CLIENT-authored diagnostic string, stored verbatim until now. It does
-    # not reach a grid today, but it sits one "add a column" away from the adjudication report,
-    # so it gets the same treatment as the transcription itself rather than being trusted.
-    lint_warnings = _plain_text(lint_warnings)[:500]
-    if not text:
-        return {"ok": False, "error": "bad_transcription"}
-    c = frappe.db.get_value("Dialect Capture", clip, ["name", "student", "status"], as_dict=True)
-    if not c:
-        return {"ok": False, "error": "not_found"}
-    if not _owner_participating(c):
-        return {"ok": False, "error": "not_found"}
-    if c.student == student:
-        return {"ok": False, "error": "own_clip"}            # can't transcribe your own recording
-    if c.status != "recorded":
-        return {"ok": False, "error": "not_available"}       # already transcribed / verified / resolved
-    ver = _int(frappe.db.sql(
-        "select coalesce(max(version), 0) from `tabBoli Transcription` where clip=%s", clip)[0][0]) + 1
-    try:
-        doc = frappe.get_doc({
-            "doctype": "Boli Transcription", "client_id": (client_id or "")[:64] or None,
-            "clip": clip, "author": student, "text": text[:2000], "version": ver,
-            "lint_warnings": lint_warnings, "is_final": 0,          # normalised above
-            "submitted_at": frappe.utils.now(),
-        }).insert(ignore_permissions=True)
-    except frappe.DuplicateEntryError:
-        frappe.db.rollback()
-        existing = frappe.db.get_value("Boli Transcription", {"client_id": client_id}, "name")
-        return {"ok": True, "name": existing, "dedup": True}
-    frappe.db.set_value("Dialect Capture", clip,
-                        {"status": "in_verification", "claimed_by": None, "claim_expires": None},
-                        update_modified=False)
-    frappe.db.commit()
-    return {"ok": True, "name": doc.name, "version": ver}
-
-
-@frappe.whitelist(allow_guest=True)
-def submit_verification(student=None, token=None, clip=None, transcription=None,
-                        verdict=None, reason=None, client_id=None):
-    """Stage 3 — a peer judges the latest transcription: accept / reject(+reason) /
-    escalate. accepts_to_verify independent accepts VERIFY the clip (transcriber, speaker
-    and matching verifiers paid); a reject sends it back to be re-transcribed (capped at
-    max_rework_rounds, then it parks for PA); an escalate parks it for PA. The outcome and
-    all XP are decided SERVER-side, never trusted from the client."""
-    if not _rate_ok("boli-vf:" + _client_ip(), 3000, 3600):
-        return {"ok": False, "error": "rate_limited"}
-    verdict = _docname(verdict, 20).lower()      # a dict/list is simply not a verdict
-    if verdict not in _VERDICTS:
-        return {"ok": False, "error": "bad_verdict"}
-    # `reason` is a Select, so frappe validates the VALUE on insert; this only guarantees a
-    # scalar string reaches it (a dict used to raise a TypeError on the slice → HTTP 500).
-    reason = _plain_text(reason)[:40]
-    # scalars only (see _docname). `transcription` is coerced even though the verdict is
-    # currently re-resolved server-side from the clip, so it can never become a filter if a
-    # later change starts honouring the client's id.
-    student, clip = _docname(student), _docname(clip)
-    transcription, client_id = _docname(transcription), _docname(client_id, 64)
-    if not clip:
-        return {"ok": False, "error": "not_found"}
-    if not student:
-        student = _session_student()
-    if not student:
-        return {"ok": False, "error": "unknown_student"}
-    if not _authorized(student, token):
-        return {"ok": False, "error": "auth"}
-    if client_id:
-        existing = frappe.db.get_value("Boli Verification", {"client_id": client_id}, "name")
-        if existing:
-            return {"ok": True, "name": existing, "dedup": True}
-    c = frappe.db.get_value("Dialect Capture", clip,
-                            ["name", "student", "status", "rework_rounds",
-                             "prompt_type", "speaker", "speaker_relation"], as_dict=True)
-    if not c:
-        return {"ok": False, "error": "not_found"}
-    if not _owner_participating(c):
-        return {"ok": False, "error": "not_found"}
-    if c.student == student:
-        return {"ok": False, "error": "own_clip"}
-    tr = _boli_latest_transcription(clip)
-    if not tr:
-        return {"ok": False, "error": "not_available"}
-    if tr["author"] == student:
-        return {"ok": False, "error": "own_transcription"}   # can't verify what you wrote
-    if frappe.db.exists("Boli Verification",
-                        {"clip": clip, "transcription": tr["name"], "verifier": student}):
-        return {"ok": True, "dedup": True}                   # one vote per transcription
-    # server-wins: if the clip already left verification, keep the vote as data (audit /
-    # future accuracy) but don't disturb the settled outcome
-    stale = c.status != "in_verification"
-    try:
-        vdoc = frappe.get_doc({
-            "doctype": "Boli Verification", "client_id": (client_id or "")[:64] or None,
-            "clip": clip, "transcription": tr["name"], "verifier": student,
-            "verdict": verdict, "reason": reason if verdict == "reject" else "",
-            "is_gold_check": 0, "created_at": frappe.utils.now(),
-        }).insert(ignore_permissions=True)
-    except frappe.DuplicateEntryError:
-        frappe.db.rollback()
-        existing = frappe.db.get_value("Boli Verification", {"client_id": client_id}, "name")
-        return {"ok": True, "name": existing, "dedup": True}
-    frappe.db.commit()
-    if stale:
-        return {"ok": True, "name": vdoc.name, "stale": True}
-
-    cfg = _boli_cfg()
-    result = {"ok": True, "name": vdoc.name}
-    if verdict == "accept":
-        accepts = _int(frappe.db.sql(
-            "select count(distinct verifier) from `tabBoli Verification` "
-            "where clip=%s and transcription=%s and verdict='accept'", (clip, tr["name"]))[0][0])
-        if accepts >= cfg["accepts_to_verify"]:
-            _boli_mark_verified(c, tr, cfg)
-            result["verified"] = True
-    elif verdict == "reject" and _int(c.rework_rounds) < cfg["max_rework_rounds"]:
-        # rework: re-open for transcription (a fresh transcriber redoes it; returning it
-        # to the SAME transcriber's personal inbox is a Phase-2 refinement)
-        frappe.db.set_value("Dialect Capture", clip,
-                            {"status": "recorded", "rework_rounds": _int(c.rework_rounds) + 1,
-                             "claimed_by": None, "claim_expires": None}, update_modified=False)
-        frappe.db.commit()
-        result["rework"] = True
-    else:  # escalate, or a reject once rework is exhausted → forced PA adjudication
-        frappe.db.set_value("Dialect Capture", clip, {"status": "escalated"}, update_modified=False)
-        frappe.db.commit()
-        result["escalated"] = True
-    return result
-
-
-def _boli_mark_verified(c, tr, cfg):
-    """Transition a clip to verified and pay the pipeline: the transcriber earns
-    xp_transcription_verified, each matching (accepting) verifier earns xp_verification_match,
-    the speaker earns a credit when she is a learner, and an elder recording pays the
-    recorder the elder bonus. Every award is idempotent via a per-clip dedup_key so a
-    double-trip never double-pays."""
-    frappe.db.set_value("Dialect Capture", c.name, {"status": "verified"}, update_modified=False)
-    frappe.db.set_value("Boli Transcription", tr["name"], {"is_final": 1}, update_modified=False)
-    frappe.db.commit()
-    _award_xp(tr["author"], "transcription_verified", cfg["xp_transcription_verified"],
-              clip=c.name, dedup_key="verified:" + c.name)
-    for v in frappe.get_all("Boli Verification",
-                            filters={"clip": c.name, "transcription": tr["name"], "verdict": "accept"},
-                            pluck="verifier"):
-        _award_xp(v, "verification_match", cfg["xp_verification_match"],
-                  clip=c.name, dedup_key="vmatch:%s:%s" % (c.name, v))
-    spk_student = frappe.db.get_value("Boli Speaker", c.speaker, "student") if c.speaker else None
-    if spk_student:
-        _award_xp(spk_student, "speaker_credit", cfg["xp_speaker_credit"],
-                  clip=c.name, dedup_key="speaker:" + c.name)
-    if (c.speaker_relation or "") == "family-elder" or (c.prompt_type or "") == "elder_home":
-        _award_xp(c.student, "elder_verified", cfg["xp_elder_verified"],
-                  clip=c.name, dedup_key="elder:" + c.name)
-
-
-@frappe.whitelist(allow_guest=True)
-def boli_home(student=None, token=None):
-    """Powers the भोजपुरी AI / Bhojpuri AI tab: the shared Corpus Meter (always) plus, when
-    authed, this student's own contribution counts + gems. The meter is the class's single
-    shared motivator — cooperation over competition."""
-    m = frappe.db.sql("""
-        select count(*) as clips, coalesce(sum(duration_secs), 0) as secs
-        from `tabDialect Capture` where status in ('verified', 'curated', 'exported')
-    """, as_dict=True)[0]
-    out = {"ok": True, "meter": {"verifiedClips": _int(m.clips),
-                                 "verifiedMinutes": round(_int(m.secs) / 60)}}
-    student = _docname(student)                  # scalars only (see _docname)
-    if not student:
-        student = _session_student()
-    if student and _authorized(student, token):
-        out["mine"] = {
-            "recorded": _int(frappe.db.count("Dialect Capture", {"student": student})),
-            "transcribed": _int(frappe.db.count("Boli Transcription", {"author": student})),
-            "verified": _int(frappe.db.count("Boli Verification", {"verifier": student})),
-            "gems": _total_gems(student),
-        }
-    return out
 
 
 @frappe.whitelist(allow_guest=True)
@@ -3121,30 +2422,23 @@ def get_progress(student=None, token=None):
 
 
 # ---------------------------------------------------------------------------
-# Right to erasure. A child's voice is the most sensitive thing this app holds,
-# so deletion has to reach the rows, the private audio File docs AND the bytes
-# on disk. Both entry points — delete_student (one child) and
+# Right to erasure. Deletion has to reach every row keyed on the child's id, the
+# Frappe User of an online learner, and the bookkeeping rows Frappe leaves behind
+# NAMING those docs. Both entry points — delete_student (one child) and
 # setup_data.wipe_demo_data (production cutover) — go through the helpers below:
-# when the two kept their own lists, the whole Boli pipeline was erased by
-# neither and other girls kept being served the erased child's recordings.
+# when the two kept their own lists, a table ended up erased by neither.
 #
-# THREE INVARIANTS a future maintainer must not "simplify" away:
-#  1. ROWS BEFORE BYTES, across a commit. Unlinking audio inside the transaction that
-#     deletes its rows leaves a rolled-back erasure serving clips whose audio is gone.
-#  2. SCOPED BYTES. An erasure may only unlink paths taken from the erased clips' own File
-#     rows. A directory sweep destroyed unrelated files, including uploads in flight.
-#  3. ERASING ONE CHILD MUST NOT COST ANOTHER ONE ANYTHING — not a recording she operated,
-#     not a lease, and not the gems she earned on the erased clip (_sever_peer_xp).
+# This used to also unlink private audio bytes off disk, with the invariants that go
+# with a delete that cannot be rolled back. The app no longer records anything (the
+# Bhojpuri AI / Boli pipeline was removed outright; v12_remove_boli erases what older
+# builds left behind), so what remains here is rows only. The one invariant that
+# outlives that removal: ERASING ONE CHILD MUST NOT COST ANOTHER ONE ANYTHING.
 # ---------------------------------------------------------------------------
 # Everything keyed on `student`, children before parents. Both erasure paths
 # walk this list so neither can forget a table again.
 _LEARNER_DOCTYPES = ("AI Conversation Turn", "AI Conversation", "Lesson Doubt",
                      "Lesson Attempt", "Test Attempt", "Learning Event",
                      "Attendance Ping", "Attendance Day", "Evaluation")
-# Boli residue, in safe delete order (used for the bulk cutover wipe).
-_BOLI_DOCTYPES = ("Boli Verification", "Boli Transcription", "Boli XP Ledger",
-                  "Dialect Capture", "Boli Speaker")
-
 # Bookkeeping tables that record a document's identity: {table: (doctype field, name field)}.
 # Frappe clears these from delete_dynamic_links, which delete_doc only ENQUEUES
 # (enqueue_after_commit=True) — on a site whose worker is down, or a campus box with no
@@ -3209,228 +2503,6 @@ def _like_literal(val):
     return (val or "").replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
 
 
-def _private_path(file_url):
-    """Absolute path of a private file, or None. Basename only, and only inside the
-    private-files directory: `file_url` is a DB column, and an erasure must not be
-    talked into unlinking something outside that directory by a `..` in it."""
-    base = (file_url or "").rsplit("/", 1)[-1]
-    if not base or base in (".", "..") or "/" in base or "\\" in base:
-        return None
-    root = os.path.abspath(_private_files_dir())
-    full = os.path.abspath(os.path.join(root, base))
-    return full if os.path.dirname(full) == root else None
-
-
-def _capture_audio_paths(clips):
-    """On-disk paths of these clips' private audio, read from their OWN File rows before
-    anything is deleted. `file_url` is the authoritative path (`file_name` can diverge from
-    what is on disk). This is the whole scope of the bytes an erasure may unlink — never a
-    directory listing (see _purge_orphan_capture_files for why that mattered)."""
-    if not clips:
-        return []
-    urls = frappe.get_all("File", filters={"attached_to_doctype": "Dialect Capture",
-                                           "attached_to_name": ["in", clips]}, pluck="file_url")
-    urls += frappe.get_all("Dialect Capture", filters={"name": ["in", clips]}, pluck="audio_file")
-    paths = []
-    for u in urls:
-        p = _private_path(u)
-        if p and p not in paths:
-            paths.append(p)
-    return paths
-
-
-def _pending_unlink(paths=None):
-    """Request-scoped list of audio paths whose ROWS are deleted but whose bytes no caller
-    has taken responsibility for yet — a safety net for a deletion path that drops
-    _erase_boli_data's return value (setup_data's cutover wipe and cohort erasure both hand
-    the byte work to the maintenance sweep). The sweep drains this list, so a child's voice
-    is never left on disk merely because a caller forgot, and it does NOT have to relax its
-    age guard to find those bytes.
-
-    Draining stays safe after a rollback: _erase_capture_bytes never removes a path that a
-    surviving File row still claims, and a rolled-back File row claims its path again."""
-    if not hasattr(frappe.local, "hikmat_pending_unlink"):
-        frappe.local.hikmat_pending_unlink = []
-    lst = frappe.local.hikmat_pending_unlink
-    for p in (paths or []):
-        if p not in lst:
-            lst.append(p)
-    return lst
-
-
-def _erase_capture_bytes(paths):
-    """Unlink audio bytes — ONLY AFTER the rows that pointed at them are committed.
-
-    Filesystem deletes are not transactional. While the unlink happened inside the erasure
-    transaction (delete_doc's File cascade), an error part-way through rolled the Dialect
-    Capture and File rows BACK while the bytes stayed gone: get_boli_queue then kept
-    offering the clip and get_boli_audio raised FileNotFoundError on it — a row whose audio
-    is missing. Bytes-after-commit fails the other way instead: a crash can leave bytes with
-    no row, which nothing serves and _purge_orphan_capture_files() later reclaims.
-
-    A path that a SURVIVING File row still claims is left alone: those bytes may be the
-    recording of a girl we are NOT erasing (rows uploaded before _unshare_capture_bytes can
-    still share one path)."""
-    removed = 0
-    pending = _pending_unlink()
-    for p in paths:
-        if p in pending:
-            pending.remove(p)            # handled here; the sweep need not chase it
-        base = os.path.basename(p)
-        if frappe.db.exists("File", {"file_url": "/private/files/" + base}):
-            continue                     # still claimed → not ours to remove
-        try:
-            os.remove(p)
-            removed += 1
-        except FileNotFoundError:
-            pass                         # already gone: erasure is idempotent
-        except OSError:                  # unreadable/racing file must not abort the erasure
-            frappe.log_error("Student erasure: could not remove " + base, frappe.get_traceback())
-    return removed
-
-
-def _sever_peer_xp(clips, student):
-    """PRODUCT DECISION: erasure never claws back another child's earnings.
-
-    The Boli XP Ledger is what _total_gems() sums, so DELETING a peer's row — she
-    transcribed, verified or operated the erased girl's clip and was paid for it — silently
-    drops that peer's gem total and can pull her back below a belt she already passed,
-    punishing her for a classmate's unrelated choice. So the row stays and only the
-    reference to the erased girl is severed: the `clip` link is nulled and `dedup_key`
-    (which embeds the clip id) is replaced with a unique but non-identifying value, so
-    nothing in the row can be traced back to the erased recording. `points`/`event` name
-    nobody and are hers to keep. Rows belonging to the ERASED girl are deleted, not severed."""
-    if not clips or not frappe.db.exists("DocType", "Boli XP Ledger"):
-        return 0
-    n = 0
-    for row in frappe.get_all("Boli XP Ledger", filters={"clip": ["in", clips]},
-                              fields=["name", "student"]):
-        if row.student == student:
-            continue                     # hers — the caller already deleted those rows
-        frappe.db.set_value("Boli XP Ledger", row.name,
-                            {"clip": None, "dedup_key": "severed:" + row.name},
-                            update_modified=False)
-        n += 1
-    return n
-
-
-# Pipeline states that CANNOT progress without a transcription: the verify queue needs one
-# to show a judge (get_boli_queue skips a clip with none) and PA adjudication needs one to
-# adjudicate. Only the transcribe queue can refill them, and it only looks at 'recorded'.
-_NEEDS_TRANSCRIPTION = ("transcribed", "in_verification", "escalated")
-
-
-def _reopen_stranded_clips(clip_names):
-    """INVARIANT 3, the half _sever_peer_xp does not cover: erasing a TRANSCRIBER must not
-    cost the RECORDER her clip.
-
-    Erasure deletes the transcriptions the erased girl wrote — including the ones she wrote of
-    OTHER children's audio, which is correct (that text is hers). But her transcription is
-    what moved that clip out of 'recorded'. Delete it and nothing resets the status, so the
-    clip sits in 'in_verification' with zero transcriptions: the verify queue skips it (no
-    transcription to show) and the transcribe queue skips it (status != 'recorded'). No
-    maintenance job resets it either, so it is stranded FOREVER — the recorder never earns her
-    speaker credit and her voice never reaches the corpus. Proven end-to-end 2026-07-28.
-
-    Fix: hand it back to the transcribe queue exactly as a rework does — status 'recorded',
-    lease cleared. `rework_rounds` is deliberately NOT bumped: nobody did poor work here, and
-    burning a rework round could push the clip straight to forced PA adjudication.
-
-    NOT reopened, on purpose: a clip already 'verified'/'curated'/'exported' keeps its settled
-    outcome. Reversing it would retract a number the public corpus meter has already published
-    AND could never pay a replacement transcriber — _boli_mark_verified's award is deduped on
-    "verified:<clip>", which is already spent. Such a clip is left with audio but no text; see
-    the note in SECURITY.md."""
-    if not clip_names or not frappe.db.exists("DocType", "Dialect Capture"):
-        return 0
-    n = 0
-    for clip in {c for c in clip_names if c}:
-        # Existence first: her OWN clips are deleted by now, and those must not be resurrected.
-        row = frappe.db.get_value("Dialect Capture", clip, ["name", "status"], as_dict=True)
-        if not row or row.status not in _NEEDS_TRANSCRIPTION:
-            continue
-        if frappe.db.count("Boli Transcription", {"clip": clip}):
-            continue                     # another girl's transcription survives → still work
-        frappe.db.set_value("Dialect Capture", clip,
-                            {"status": "recorded", "claimed_by": None, "claim_expires": None},
-                            update_modified=False)
-        n += 1
-    return n
-
-
-def _release_capture_refs(student):
-    """Clear the erased girl's fingerprints from OTHER children's clips: `operator` (she
-    held the phone for her grandmother) and `claimed_by`/`claim_expires` (an open
-    transcription lease — clearing it also releases the clip back to the queue).
-
-    Row-at-a-time BY PRIMARY KEY, deliberately: frappe.db.set_value with a FILTER
-    ({"operator": student}) is one table-wide UPDATE on an unindexed column, which took a
-    lock on every Dialect Capture row — with a single uncommitted capture insert open in
-    another request, erasure blocked ~12s and the request aborted. A plain SELECT followed
-    by per-name UPDATEs touches only the rows that actually reference her, and stays correct
-    whether or not those columns are indexed."""
-    if not frappe.db.exists("DocType", "Dialect Capture"):
-        return
-    for name in frappe.get_all("Dialect Capture", filters={"operator": student}, pluck="name"):
-        frappe.db.set_value("Dialect Capture", name, "operator", None, update_modified=False)
-    for name in frappe.get_all("Dialect Capture", filters={"claimed_by": student}, pluck="name"):
-        frappe.db.set_value("Dialect Capture", name, {"claimed_by": None, "claim_expires": None},
-                            update_modified=False)
-
-
-def _erase_boli_data(student, receipt=None):
-    """Erase one student's whole voice trail, children before parents. Idempotent, so a
-    half-finished erasure can simply be re-run.
-
-    RETURNS the on-disk audio paths of her clips, for the caller to unlink AFTER its commit
-    (_erase_capture_bytes). Rows first, bytes last: that ordering is what stops an
-    interrupted erasure from leaving a clip whose audio is missing. A caller that DROPS that
-    return value erases her rows but leaves her voice on disk until the age-guarded
-    maintenance sweep reclaims it — every deletion path must unlink what it is handed.
-
-    A clip where she is only `operator` (she held the phone for her grandmother) or
-    `claimed_by` (an open transcription lease) is ANOTHER child's recording: those
-    fields are cleared instead, which also releases the lease back to the queue."""
-    clips = _erasable("Dialect Capture", {"student": student})
-    paths = _capture_audio_paths(clips)          # while the File rows still exist
-    _erase("Boli Verification", _erasable("Boli Verification", {"verifier": student}), receipt)
-    if clips:   # other girls' votes on her audio
-        _erase("Boli Verification", _erasable("Boli Verification", {"clip": ("in", clips)}), receipt)
-    trans = _erasable("Boli Transcription", {"author": student})
-    if clips:   # other girls' transcriptions of her audio
-        trans += [t for t in _erasable("Boli Transcription", {"clip": ("in", clips)})
-                  if t not in trans]
-    # Which clips those transcriptions belonged to, read BEFORE the rows go — the survivors
-    # among them are other children's recordings that must not be left mid-pipeline
-    # (_reopen_stranded_clips, called once the deletions are done).
-    trans_clips = (frappe.get_all("Boli Transcription", filters={"name": ("in", trans)},
-                                  pluck="clip") if trans else [])
-    if trans:   # a vote still pointing at one of these would dangle, so it goes first
-        _erase("Boli Verification", _erasable("Boli Verification", {"transcription": ("in", trans)}),
-               receipt)
-        _erase("Boli Transcription", trans, receipt)
-    _erase("Boli XP Ledger", _erasable("Boli XP Ledger", {"student": student}), receipt)
-    _sever_peer_xp(clips, student)       # peers keep their gems, minus the reference to her
-    if clips:
-        # File ROWS only. delete_doc's attachment cascade would unlink the audio inside this
-        # transaction, which is exactly the interrupted-erasure hazard (_erase_capture_bytes);
-        # the raw delete also skips the "Attachment Removed" feed comment that would otherwise
-        # name her clip's file after the row itself is gone.
-        fnames = frappe.get_all("File", filters={"attached_to_doctype": "Dialect Capture",
-                                                 "attached_to_name": ["in", clips]}, pluck="name")
-        if fnames:
-            _db_delete_names("File", fnames)
-    _erase("Dialect Capture", clips, receipt)
-    _release_capture_refs(student)
-    # AFTER her own clips are gone, so the survivors in trans_clips are by definition other
-    # children's recordings (see invariant 3 above).
-    _reopen_stranded_clips(trans_clips)
-    # the real-name → voice bridge; also what makes Frappe refuse a Desk delete
-    _erase("Boli Speaker", _erasable("Boli Speaker", {"student": student}), receipt)
-    _pending_unlink(paths)               # safety net if the caller ignores the return value
-    return paths
-
-
 def _erase_student_user(user, receipt=None):
     """An online learner's identity also lives in a Frappe User (synthetic
     *.hikmat.invalid). Delete it; if something still links to it, at least disable
@@ -3461,8 +2533,8 @@ def _scrub_name_residue(receipt, student=None, user=None):
     "delete ALL her data" a full-table scan still found her id, name or user in:
       * Comment — Frappe's delete feed (model/delete_doc.py insert_feed) writes
         comment_type='Deleted', subject='<DocType> <name>' and NO reference_name, so the
-        reference-keyed cleanup can never match those rows: "Student <id>",
-        "Boli Speaker CHM-SPK-…" survive forever.
+        reference-keyed cleanup can never match those rows: "Student <id>" survives
+        forever.
       * Notification Log / DocShare / Version / ToDo / … — see _RESIDUE_TABLES: cleaned only
         by a QUEUED job, i.e. not at all on a site with no worker.
       * Deleted Document — a cascaded child deleted without delete_permanently (her
@@ -3510,87 +2582,17 @@ def _erasure_residue(student):
     """True when rows keyed on this student id outlive her Student row — a half-finished
     erasure (or one done by an older code path) that a re-run should FINISH rather than
     refuse with not_found."""
-    for dt in _LEARNER_DOCTYPES + ("Dialect Capture", "Boli Speaker", "Boli XP Ledger"):
+    for dt in _LEARNER_DOCTYPES:
         if _erasable(dt, {"student": student}):
             return True
-    for dt, field in (("Boli Transcription", "author"), ("Boli Verification", "verifier"),
-                      ("Dialect Capture", "operator"), ("Dialect Capture", "claimed_by")):
-        if _erasable(dt, {field: student}):
-            return True
     return False
-
-
-def _purge_orphan_capture_files(min_age_secs=900):
-    """MAINTENANCE SWEEP for leftover audio — explicitly invoked (the production-cutover
-    wipe), and deliberately NOT part of delete_student.
-
-    It used to be, and that was destructive: it walked the whole private-files directory and
-    removed every file no File doc claimed, with no scoping to the child being erased. A
-    verifier planted two probes there and lost BOTH to one delete_student call — an untracked
-    file, and a capture that was mid-upload. The second case is real, not theoretical:
-    _save_dialect_capture writes the audio through File.validate() BEFORE its commit, so a
-    sweep in another request cannot see the row yet but CAN see the bytes — erasing one girl
-    could destroy another girl's recording while she was still uploading it. Hence two
-    separate protections, both required:
-      * per-child erasure never sweeps: it unlinks only the paths of the clips it erased
-        (_erase_capture_bytes);
-      * this sweep skips anything modified in the last `min_age_secs`, so bytes still being
-        written — or written by a transaction that has not committed yet — are never eligible.
-        The age guard costs nothing in reach: bytes whose ROWS an erasure deleted are unlinked
-        by path regardless of age (_pending_unlink), so only truly unattributable files wait.
-
-    Pass 1 drops File rows whose Dialect Capture parent is gone, pass 2 removes CAPTURE AUDIO
-    that no File row claims at all. Basenames come from `file_url`, the authoritative path.
-    Never removes a path another File row still claims: those bytes may be the recording of a
-    girl we are NOT erasing.
-
-    Pass 2 is scoped by extension because it is the one BLIND pass — it judges by directory
-    listing, not by a row. Unscoped it deleted every unreferenced file in private/files
-    whatever it was; a verifier measured 54 unrelated private files destroyed by a single
-    `bench migrate` (patch v9 calls this). That is collateral damage this function has no
-    mandate for: it is the audio sweep. Scoping costs it nothing, because every capture is
-    written with an extension from _CAPTURE_EXT (_save_dialect_capture) and
-    _unshare_capture_bytes preserves it — so the reach over a child's voice is unchanged."""
-    stale, paths = [], []
-    for f in frappe.get_all("File", filters={"attached_to_doctype": "Dialect Capture"},
-                            fields=["name", "attached_to_name", "file_url"]):
-        if not (f.attached_to_name and frappe.db.exists("Dialect Capture", f.attached_to_name)):
-            stale.append(f.name)
-            paths.append(f.file_url)
-    if stale:
-        _db_delete_names("File", stale)      # rows now…
-        frappe.db.commit()
-    # …bytes after the commit: pass-1 paths plus anything an earlier erasure in this request
-    # deleted the rows of without unlinking (see _pending_unlink) — both are row-scoped, so
-    # they are removed regardless of age; only the blind directory pass below is age-guarded.
-    removed = _erase_capture_bytes(list(_pending_unlink())
-                                   + [p for p in (_private_path(u) for u in paths) if p])
-    root = _private_files_dir()
-    referenced = {u.rsplit("/", 1)[-1] for u in frappe.get_all("File", pluck="file_url") if u}
-    audio_ext = set(_CAPTURE_EXT.values())
-    cutoff = time.time() - max(0, _int(min_age_secs))
-    for fn in (os.listdir(root) if os.path.isdir(root) else []):
-        full = os.path.join(root, fn)
-        if fn.startswith(".") or fn in referenced or not os.path.isfile(full):
-            continue                     # conservative: only bytes NO File doc claims
-        if os.path.splitext(fn)[1].lower() not in audio_ext:
-            continue                     # not capture audio → not this sweep's business
-        try:
-            if os.path.getmtime(full) > cutoff:
-                continue                 # in flight / just written → never eligible
-            os.remove(full)
-            removed += 1
-        except OSError:                  # unreadable/racing file must not abort the sweep
-            frappe.log_error("Capture sweep: could not remove " + fn, frappe.get_traceback())
-    return len(stale), removed
 
 
 @frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
 def delete_student(student):
     """Erase a child's record and ALL her data (right-to-erasure for minors' data):
-    attempts, tests, doubts, events, attendance, evaluations, AI chats, her whole Boli
-    voice trail including the audio on disk, and the Frappe User of an online learner.
-    Staff only. Use from Desk or a trusted admin tool.
+    attempts, tests, doubts, events, attendance, evaluations, AI chats, and the Frappe
+    User of an online learner. Staff only. Use from Desk or a trusted admin tool.
 
     The _require_staff() call is the ONLY thing that makes that true — do not remove it
     and do not trust the decorator instead. This function used to carry the comment "NOT
@@ -3600,15 +2602,12 @@ def delete_student(student):
     unauthenticated-by-role POST away from irreversible, unrecoverable data loss for a
     child (delete_permanently=1 leaves no Deleted Document to restore from).
 
-    ROWS IN ONE TRANSACTION, THEN THE BYTES. Everything down to the commit is a single
-    transaction, so a failure part-way through erases nothing and leaves the Student row (and
-    her user link) intact — a re-run then simply redoes the whole job. The audio is unlinked
-    only afterwards, because filesystem deletes cannot be rolled back: with the old mid-way
-    commit an error left rows restored but bytes already gone (a clip whose audio 500s), and a
-    re-run could not even be attempted because the Student row was gone and this returned
-    not_found. Where an older run already left that state behind, _erasure_residue lets a
-    re-run finish it, and the same check after the commit is what stops this from reporting
-    a success it did not achieve. `incomplete` means "nothing was promised, run it again"."""
+    ROWS IN ONE TRANSACTION. Everything down to the commit is a single transaction, so a
+    failure part-way through erases nothing and leaves the Student row (and her user link)
+    intact — a re-run then simply redoes the whole job. Where an older run left a partial
+    erasure behind, _erasure_residue lets a re-run finish it, and the same check after the
+    commit is what stops this from reporting a success it did not achieve. `incomplete`
+    means "nothing was promised, run it again"."""
     _require_staff()
     student = _docname(student)   # scalars only (see _docname): a dict here is an ORM FILTER,
     if not student:               # so it would resolve to — and irreversibly erase — SOME
@@ -3619,7 +2618,6 @@ def delete_student(student):
     receipt = []
     for dt in _LEARNER_DOCTYPES:
         _erase(dt, _erasable(dt, {"student": student}), receipt)
-    paths = _erase_boli_data(student, receipt)
     if sinfo.get("user"):
         # drop the link BEFORE the User goes, so the Student row never points at a
         # deleted User even for the rest of this transaction
@@ -3635,7 +2633,6 @@ def delete_student(student):
     # facilitator told "erased" cannot un-tell a child. Re-running is safe and idempotent.
     if frappe.db.exists("Student", student) or _erasure_residue(student):
         return {"ok": False, "error": "incomplete"}
-    _erase_capture_bytes(paths)   # bytes LAST — only once the row deletions are durable
     # bookkeeping residue last of all, outside the erasure transaction (see the helper)
     _scrub_name_residue(receipt, student=student, user=sinfo.get("user"))
     frappe.db.commit()

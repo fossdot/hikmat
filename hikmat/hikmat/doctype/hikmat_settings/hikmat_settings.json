@@ -25,9 +25,7 @@
   "stt_endpoint",
   "tts_endpoint",
   "tts_voice",
-  "attendance_min_minutes",
-  "sec_boli",
-  "boli"
+  "attendance_min_minutes"
  ],
  "fields": [
   {
@@ -146,18 +144,6 @@
    "fieldname": "attendance_min_minutes",
    "fieldtype": "Int",
    "label": "Attendance minimum (minutes/day)"
-  },
-  {
-   "fieldname": "sec_boli",
-   "fieldtype": "Section Break",
-   "label": "Boli (Bhojpuri AI corpus)"
-  },
-  {
-   "description": "JSON of Boli tunables — XP values, unlock thresholds, lease TTL, marker set and the Devanagari style guide. Edit to tune the corpus project without a redeploy; blank falls back to built-in defaults.",
-   "fieldname": "boli",
-   "fieldtype": "Code",
-   "label": "Boli config (JSON)",
-   "options": "JSON"
   }
  ],
  "grid_page_length": 50,
