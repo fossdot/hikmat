@@ -3635,6 +3635,8 @@ const EVENT_QUEUE = "hikmat_event_queue";
 function _readEvents(){ try { return JSON.parse(localStorage.getItem(EVENT_QUEUE)) || []; } catch(e){ return []; } }
 function _saveEvents(q){ try { localStorage.setItem(EVENT_QUEUE, JSON.stringify(q.slice(-400))) ; } catch(e){} }  // cap: never blow localStorage
 function recordEvent(ev){
+  if(!currentStudent) return;   // guest / not signed in → never transmit: the parental-consent
+                                // checkbox lives on a signup screen a guest never reaches
   const q = _readEvents();
   q.push({ ...ev,
            student: currentStudent ? currentStudent.id : "",
@@ -3724,6 +3726,7 @@ root.addEventListener("click", e => {
 function _readDoubts(){ try { return JSON.parse(localStorage.getItem(DOUBT_QUEUE)) || []; } catch(e){ return []; } }
 function _saveDoubts(q){ try { localStorage.setItem(DOUBT_QUEUE, JSON.stringify(q)); } catch(e){} }
 function reportDoubt(d){
+  if(!currentStudent) return;   // guest / not signed in → never transmit (see recordEvent)
   const q = _readDoubts();
   q.push({ ...d,
            student: currentStudent ? currentStudent.id : "",
