@@ -11,3 +11,22 @@ node_modules/
 .vscode/
 *.log
 *.bak
+
+# ---- Never commit signing material or credentials --------------------------
+# This repo is PUBLIC. sync-game.sh copies index.html in from the sibling
+# "Hikmat Games" folder, which also holds the Play upload keystore, its
+# passwords, and the publisher's home address and phone. None of that belongs
+# here. These patterns are a backstop against an accidental copy.
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+keystore/
+keystore.properties*
+KEYSTORE-CREDENTIALS*.txt
+*.aab
+*.apk
+.env
+.env.*

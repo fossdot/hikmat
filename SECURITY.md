@@ -100,16 +100,11 @@ untrusted entry is the client. Otherwise the header is ignored and the socket pe
   lost or handed-down laptop.
 - **Unticking `active` on a Student now cuts off her device immediately**, on every
   endpoint — it is checked in the shared auth path, not per endpoint. (It used to gate
-  only new logins and dialect capture, so a deactivated girl's cached token kept working
+  only new logins and one write path, so a deactivated girl's cached token kept working
   for up to 90 days unless someone also called `revoke_student_token`.) Deactivate to
   offboard; `revoke_student_token` is for rotating a token on an account that stays live.
-- **Deactivation is also a pause on her DATA, in both directions.** Her Boli recordings stop
-  being offered to peers and stop streaming the moment she is inactive (the queue, the audio
-  endpoint and both write paths all require the owning Student to exist **and** be active).
-  A clip mid-pipeline keeps its place rather than being rewritten, so reactivating a girl who
-  was switched off by mistake restores it untouched. **Withdrawn consent:** deactivate for an
-  immediate stop, then `delete_student` to erase the bytes — deactivation alone leaves the
-  audio on disk.
+  **Withdrawn consent:** deactivate for an immediate stop, then `delete_student` to erase
+  what is already stored — deactivation alone deletes nothing.
 - Login is **by name + PIN** (`login_by_name`, indexed lookup) — the roster is never
   listed publicly and errors are generic (no "does this name exist?" enumeration).
 - Self-signups still require a guardian/teacher **consent** acknowledgement in the UI.
@@ -137,21 +132,18 @@ untrusted entry is the client. Otherwise the header is ignored and the socket pe
 - Lesson Attempt rows denormalise `student_name`/`cohort` for reporting and grow over
   time. To erase a child's data, use **`hikmat.api.delete_student(student)`**
   (facilitator/System-Manager only) — it cascades over her attempts, tests, doubts,
-  events, attendance, evaluations, AI chats, her whole Boli voice trail (captures,
-  speaker row, transcriptions, verifications, XP) **including the private audio bytes
-  on disk**, and the Frappe User of an online learner. Clips she only helped record
-  (`operator`) or had leased (`claimed_by`) belong to another child: those references
-  are cleared, not deleted. Deleting a Student from Desk instead is **not** equivalent
-  — Frappe refuses it while a Boli Speaker links to her.
-- **Erasing one girl never costs another one anything.** Her peers keep the gems they
-  earned on her clips (the ledger row is severed, not deleted), and a clip of ANOTHER
-  child that she had only transcribed is handed back to the transcribe queue rather
-  than left stuck mid-pipeline (`api._reopen_stranded_clips`). **Known gap:** if the
-  clip had already reached `verified`/`curated`/`exported`, that outcome stands and the
-  clip keeps its published corpus count but now has **no transcription text** — a PA
-  has to re-transcribe it by hand from the Boli Adjudication Queue. Reopening it
-  automatically would retract a published number and could not pay a replacement
-  transcriber (the XP award is deduped per clip).
+  events, attendance, evaluations, AI chats, and the Frappe User of an online learner.
+  It also scrubs the bookkeeping rows Frappe leaves behind naming her (delete-feed
+  Comments, Versions, Notification Logs, DocShares), which its own queued cleanup does
+  not reach on a site with no worker. A half-finished erasure is **resumed** rather than
+  refused, so a run interrupted part-way can simply be re-run.
+- **The app no longer records audio.** The Bhojpuri AI ("Boli") corpus feature — recording,
+  transcription, verification, the speaker registry and the XP ledger — was **removed
+  outright**, and the `v12_remove_boli` migration erases everything it had collected:
+  the rows, the doctypes and tables behind them, and the private audio bytes on disk.
+  Nothing in the app asks for microphone access any more.
+- **Erasing one girl never costs another one anything.** Erasure is scoped to rows keyed
+  on her id; a peer's rows are never touched.
 - **Decide and document a retention window** (e.g. purge inactive students' attempts
   after N years) before a full rollout. A scheduled job can be added to
   `scheduler_events` in `hooks.py`.

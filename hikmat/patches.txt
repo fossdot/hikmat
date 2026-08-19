@@ -11,8 +11,7 @@ hikmat.patches.v3_cohort_intake
 hikmat.patches.v4_two_cohorts
 hikmat.patches.v5_seed_radiant_content
 hikmat.patches.v6_default_sound_on
-hikmat.patches.v7_boli
 hikmat.patches.v8_seed_expanded_curriculum
-hikmat.patches.v9_erase_orphan_boli
 hikmat.patches.v10_guard_report_output
 hikmat.patches.v11_guard_more_reports
+hikmat.patches.v12_remove_boli
