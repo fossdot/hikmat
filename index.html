@@ -627,7 +627,9 @@
       padding-top: calc(12px + env(safe-area-inset-top, 0px));
     }
     .hero { padding: 10px 10px 14px; }
-    .hero h1 { font-size: clamp(20px, 6.2vw, 26px); letter-spacing: -.2px; }
+    /* 6.2vw left "Choose your class group" filling the line and stranded the trailing ✨ on a
+       line of its own, which reads as a mistake. 5.6vw fits the sparkle back on the line. */
+    .hero h1 { font-size: clamp(19px, 5.6vw, 24px); letter-spacing: -.2px; }
     .hero p { font-size: 14px; }
 
     /* The question bubble was losing 110px of a 393dp screen to the mascot and the gap, so
@@ -641,6 +643,29 @@
     .bubble2 .q { font-size: 18px; }
     /* the speech tail tracks the top of the bubble now that the row is top-aligned */
     .bubble2::before { top: 26px; }
+
+    /* Tap targets. Measured on the phone viewport: the theme, language and listen controls
+       were 26–28px tall and the back button 39px — under the 44px WCAG 2.5.5 floor, and well
+       under Android's 48dp guidance. The pre-existing max-width:430px rule made it worse by
+       shrinking the padding further. This is not a nitpick for this app: the users are
+       children on cheap phones, and a child who cannot yet read the label she just missed
+       has no way to recover from a mis-tap except by guessing again. Short side >= 44px;
+       the labels and font sizes are untouched, only the box grows. */
+    .pill, .toggle, .backbtn, .profilebtn, .speakbtn {
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+    }
+    .toggle, .backbtn, .profilebtn, .speakbtn { display: inline-flex; }
+    /* width too, not just height — the theme and language segments measured 32x44 and 37x44 */
+    .toggle { min-width: 44px; }
+    .toggle { padding: 6px 14px; }
+    .pill { padding: 6px 14px; }
+
+    /* The listen button now sits inside the same segmented pill as theme and language
+       (Vishal, 2026-08-21) — three loose controls read as clutter on a narrow bar. The row
+       wraps under the brand on a phone, so centre it rather than leaving it ragged right. */
+    .stats { width: 100%; justify-content: center; }
   }
   /* Long trail labels wrap rather than clip */
   .step .label { white-space:normal; overflow-wrap:break-word; }
@@ -683,6 +708,26 @@
   .esig input { font:inherit; border:0; border-bottom:2px dashed var(--line); background:transparent;
                 color:var(--ink); padding:2px 4px; min-width:150px; }
   .esig input:focus { outline:none; border-bottom:2px solid var(--grape,#006972); }
+
+  /* ---- Phone: compact category cards, two per row ---- */
+  /* Reported from the Android build 2026-08-21: each class-group card was a full-width block
+     with a 56px icon and a lot of dead space to its right, so three of them plus Life Skills
+     filled the screen and pushed everything below the fold.
+     The grid was `repeat(auto-fit, minmax(190px, 1fr))`: at ~365px of usable width two 190px
+     columns need 394px, so auto-fit could only ever place ONE column on a phone. Naming two
+     columns explicitly and shrinking the card's own metrics roughly halves the height.
+     This block lives at the END of the stylesheet on purpose — `.theme .big .iconsvg svg`
+     above sets a 46px icon at the same specificity, so an earlier media query would lose on
+     source order. Keep it last. */
+  @media (max-width: 560px){
+    .themes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .theme { padding: 14px 12px; }
+    .theme .big { width: 44px; height: 44px; border-radius: 12px; font-size: 22px; }
+    .theme .big .iconsvg svg { width: 30px; height: 30px; }
+    .theme h3 { margin: 9px 0 2px; font-size: 16px; }
+    .theme small { font-size: 12.5px; }
+    .theme .lock { top: 10px; right: 12px; font-size: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -694,8 +739,8 @@
       <div class="stats">
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
-        <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
         <div class="utilcluster">
+          <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
           <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
           <button class="toggle" id="langToggle" title="Language / भाषा">EN</button>
         </div>
