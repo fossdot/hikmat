@@ -118,6 +118,7 @@
   #topnav:empty { display:none; }
   .backbtn { align-self:flex-start; background:#fff; border:2px solid var(--line); border-radius:12px;
              padding:9px 16px; cursor:pointer; font-weight:800; color:var(--ink); font-size:14px;
+             font-family:var(--font-head);   /* .brand carries the display face; a Hindi back label must not be faux-bolded Rozha One */
              box-shadow:var(--shadow-sm); transition:transform .06s, box-shadow .06s; }
   .backbtn:active { transform:translateY(2px); box-shadow:var(--shadow-sm); }
   #app {
@@ -130,7 +131,7 @@
     min-height: 600px;
   }
   .topbar {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: flex-start;
     gap: 12px; padding: 14px 20px;
     background: linear-gradient(90deg,#ffffff,#fdf6ea);
     border-bottom: 1px solid var(--line);
@@ -140,9 +141,11 @@
   .brand #topBack { margin:0; padding:8px 15px; font-size:15px; }
   .brand .logo { font-size: 24px; display:inline-flex; align-items:center; }
   .brand .logo .logoimg { height:28px; width:auto; max-width:120px; object-fit:contain; vertical-align:middle; border-radius:6px; }
-  .stats { display: flex; gap: 8px; align-items:center; }
+  .stats { display: flex; gap: 8px; align-items:center; margin-left:auto; }
+  .utils { display: flex; gap: 8px; align-items:center; }
   .pill {
     padding: 6px 13px; border-radius: var(--r-pill); background:#fff; border:2px solid var(--line);
+    font-variant-numeric: tabular-nums;   /* equal-width digits: 19 to 20 gems must not re-wrap the bar */
     font-weight: 800; font-size: 14px; display:flex; align-items:center; gap:6px; color:var(--ink);
   }
   .pill.star { border-color:#ffe2a8; color:#994700; }
@@ -212,6 +215,7 @@
   @keyframes fadeIn { from{ opacity:0; } to{ opacity:1; } }
   .sheet { width:100%; max-width:560px; background:var(--card); color:var(--ink);
     border-radius:24px 24px 0 0; padding:22px 22px calc(22px + env(safe-area-inset-bottom));
+    max-height:92vh; overflow-y:auto; -webkit-overflow-scrolling:touch;   /* a long answer must scroll, not push the sheet buttons above the viewport */
     box-shadow:0 -10px 40px rgba(20,14,33,.3); animation:sheetUp .26s cubic-bezier(.2,.9,.3,1); }
   @keyframes sheetUp { from{ transform:translateY(100%); } to{ transform:translateY(0); } }
   @media (prefers-reduced-motion:reduce){ .sheetwrap,.sheet{ animation:none; } }
@@ -230,7 +234,7 @@
   .btn.wide { width:100%; }
 
   /* Floating Roshni voice assistant */
-  .roshnifab { position:fixed; right:16px; bottom:16px; z-index:9000; width:64px; height:64px;
+  .roshnifab { position:fixed; right:16px; bottom:16px; z-index:55; width:64px; height:64px;   /* below .sheetwrap(60): must never cover a sheet exit button */
     border-radius:50%; border:none; background:var(--grape); box-shadow:0 8px 22px rgba(0,0,0,.32);
     cursor:pointer; padding:6px; display:grid; place-items:center; }
   .roshnifab .rfabm, .roshnifab .rfabm svg { width:100%; height:100%; }
@@ -598,7 +602,7 @@
   }
   /* Top bar wraps instead of clipping its controls on narrow phones */
   .topbar { flex-wrap:wrap; }
-  .stats { flex-wrap:wrap; row-gap:6px; justify-content:flex-end; }
+  .stats, .utils { flex-wrap:wrap; row-gap:6px; }
   @media (max-width:430px){
     .topbar { padding:10px 12px; }
     .pill, .toggle { padding:5px 9px; font-size:12px; }
@@ -662,19 +666,30 @@
     .toggle { padding: 6px 14px; }
     .pill { padding: 6px 14px; }
 
-    /* The listen button now sits inside the same segmented pill as theme and language
-       (Vishal, 2026-08-21) — three loose controls read as clutter on a narrow bar.
-       `width:100%` here was a mistake: it FORCED the stats onto their own row always, so on an
-       inner screen row one held nothing but a short back button and the rest was empty
-       whitespace (reported on device). `flex:1 1 auto` instead lets the two share one row
-       whenever they fit — wider phones, landscape — and only wrap when they genuinely cannot,
-       centring itself when it does. */
-    .stats { flex: 1 1 auto; justify-content: center; }
-    /* A long back label (Hindi runs longer than English here) must not wrap to a second line
-       and make the whole bar taller; clip it instead. setBack() puts the full text in the
-       button's aria-label, so nothing is lost to a screen reader. */
-    #backLabel { display: inline-block; max-width: 46vw; overflow: hidden;
-                 text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+    /* Bar layout on a phone, third attempt — the audit measured the previous two failing:
+       `width:100%` forced an always-empty first row, and `flex:1 1 auto` still measured
+       133-183px of sticky bar (a fifth of the screen) because back + counters + cluster +
+       Help can never share 393px at 44px targets. The markup now groups counters (.stats)
+       separately from the buttons (.utils), so the wrap is deliberate: row one is the back
+       button with the counters beside it, row two is the utility cluster — two stable rows,
+       no blank row, and fmtCount()/tabular-nums stop the bar re-wrapping as she earns. */
+    .stats { margin-left: auto; }
+    .utils { flex: 1 1 auto; justify-content: center; }
+    /* A long back label (Hindi runs longer than English) truncates inside the row's real
+       free space instead of a fixed 46vw; the full text stays in the aria-label. */
+    .brand { flex: 1 1 auto; min-width: 0; }
+    #topBack { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
+    #backLabel { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* The 44px boxes held 12px artwork (~1.9mm on a 440dpi phone) — the speaker icon a
+       non-reader hunts for was nearly invisible. */
+    .toggle .iconsvg svg { width: 22px; height: 22px; }
+    .utilcluster { padding: 2px; border-width: 1.5px; }
+    /* The primary "Next" wrapped BELOW the two secondary buttons on the result screen; give
+       it the full first row instead so the way forward is the first thing she sees. */
+    .actionrow .btn.primary { order: -1; flex: 1 1 100%; }
+    /* Read & Answer: a long passage pushed every answer option off-screen with no footer to
+       hint more existed. Cap the passage; it scrolls, the answers stay on screen. */
+    .readbox { max-height: 45vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   }
   /* Long trail labels wrap rather than clip */
   .step .label { white-space:normal; overflow-wrap:break-word; }
@@ -748,6 +763,8 @@
       <div class="stats">
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
+      </div>
+      <div class="utils">
         <div class="utilcluster">
           <button class="toggle hearbtn" id="hearBtn" title="Listen to this screen / यह स्क्रीन सुनो">🔊</button>
           <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
@@ -1465,6 +1482,20 @@ function pickVoice(lang){
   }
   return pool.find(v => v.localService) || pool[0];   // prefer an offline voice for consistency + offline use
 }
+// Every bottom-fixed toast (#audiohint, #hkToast, #updToast) must clear the gameplay
+// footer's action zone: during an activity the primary button lives at the bottom of the
+// viewport and is often the only way forward. `.gamefooter:empty` is display:none, so its
+// offsetHeight is 0 outside gameplay and toasts sit at the normal 18px.
+function overlayBottom(){
+  const f = document.querySelector(".gamefooter");
+  if(!f || !f.offsetHeight) return "18px";
+  // Measure the footer's LIVE top edge, not offsetHeight — .gamefooter's negative margins
+  // (margin:20px -28px -30px) make its box height understate where it actually paints, which
+  // left a measured 28px of the primary button still covered. 8px above the visible edge,
+  // clamped so a mid-page footer can never push a toast up over the top bar.
+  const above = innerHeight - f.getBoundingClientRect().top + 8;
+  return Math.round(Math.min(Math.max(18, above), innerHeight * 0.5)) + "px";
+}
 let audioHintShown = false;
 let speechEverStarted = false;   // becomes true the first time audio actually plays
 // True in the packaged Android/iOS build (Capacitor serves the bundle from localhost and
@@ -1492,18 +1523,14 @@ function showAudioHint(){
          "यहाँ आवाज़ नहीं? शब्द सुनने के लिए इस फ़ाइल को Safari या Chrome में खोलो।");
   // block layout, button on its own line: the old flex row collapsed into an unreadable
   // one-word-per-line column on a 360dp phone, which is the screen this app is FOR.
-  const bar = el(`<div id="audiohint" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;max-width:92%;width:max-content;text-align:center;">🔇 ${esc(msg)}<div style="margin-top:10px"><button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:8px 22px;border-radius:8px;cursor:pointer;font-size:14px;">${tx("OK","ठीक")}</button></div></div>`);
+  const bar = el(`<div id="audiohint" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;max-width:92%;width:max-content;text-align:center;">🔇 ${esc(msg)}<div style="margin-top:10px"><button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:10px 26px;min-height:44px;min-width:88px;border-radius:10px;cursor:pointer;font-size:15px;">${tx("OK","ठीक")}</button></div></div>`);
+  bar.style.bottom = overlayBottom();   // never on top of the footer's primary action
   document.body.appendChild(bar);
-  // It is fixed to the bottom of the VIEWPORT, and during gameplay the bottom of the viewport
-  // is where .gamefooter puts the primary action ("Got it \u2192") \u2014 which is often the only way
-  // forward. Reported on device 2026-08-21 sitting right on top of that button. So reserve as
-  // much space at the foot of the page as the hint occupies, letting the button scroll clear
-  // of it, and auto-dismiss: a child who cannot read "OK" must not be able to strand herself
-  // behind a notice about a setting only an adult can change.
-  const clearHint = () => { document.body.style.paddingBottom = ""; bar.remove(); };
-  requestAnimationFrame(() => {
-    if(bar.isConnected) document.body.style.paddingBottom = (bar.offsetHeight + 24) + "px";
-  });
+  // Auto-dismiss: a child who cannot read "OK" must not be able to strand herself behind a
+  // notice about a setting only an adult can change. (An earlier body padding-bottom "reserve"
+  // was measured useless — body is a fixed 100%-height border-box, so its padding creates no
+  // scrollable space; see overlayBottom() above for the placement fix that replaced it.)
+  const clearHint = () => bar.remove();
   bar.querySelector("button").onclick = clearHint;
   setTimeout(clearHint, 12000);
   srSay(msg);
@@ -1556,7 +1583,7 @@ function speak(text, lang="en", opts){
     playTimer = setTimeout(() => { playTimer = null; playNext(); }, 130);
   } catch(e){ showAudioHint(); }
 }
-function sayHi(text){ if(state.hindi) speak(text, "hi", { queue:true }); }
+function sayHi(text){ speak(text, "hi", { queue:true }); }   // always: spoken Hindi help must not depend on the removed Guide toggle
 
 // ---------- Audio-first shell: tap-to-hear narration of the current screen ----------
 // A non-reader (or non-reading parent) navigates by tapping the 🔊 button to hear the screen.
@@ -1860,13 +1887,53 @@ function armBack(){
 }
 window.addEventListener("popstate", () => {
   _navArmed = false;
-  // A dialog is open (doubt sheet, gate wall, PIN overlay): back closes it, it does not
-  // navigate the screen underneath — matching what the sheet's own close button does.
+  // A running module test owns the back button. setBack(null) leaves _backFn empty there, so
+  // without this branch the first press was swallowed SILENTLY and the second closed the app —
+  // which voids the test via pagehide with no warning a non-reader could perceive. Speak, and
+  // re-arm so every further press lands here too; the ✋ Stop button is the only exit.
+  if(typeof TEST !== "undefined" && TEST && !TEST.done){
+    const m = tx("The test is running. Tap ✋ Stop the test to leave.","परीक्षा चल रही है। बाहर जाने के लिए ✋ परीक्षा रोको दबाओ।");
+    srSay(m); speak(m, state.lang === "hi" ? "hi" : "en");
+    try { history.pushState({ hk:"back" }, ""); _navArmed = true; } catch(e){}
+    return;
+  }
+  // A dialog is open (doubt sheet, Roshni panel, gate wall): back closes it, it does not
+  // navigate the screen underneath. Prefer the sheet's own close button — Roshni's runs
+  // stopRec(), so a bare .remove() would leave the recorder without a UI.
   const sheet = document.querySelector(".sheetwrap");
-  if(sheet){ sheet.remove(); armBack(); return; }
+  if(sheet){
+    const cb = sheet.querySelector("#rClose, #dClose");
+    if(cb) cb.click(); else sheet.remove();
+    armBack(); return;
+  }
   if(_backFn){ sfx.back(); _backFn(); armBack(); }
 });
 
+// The sticky top bar hides a focused field Chromium believes is "in view": on signup the name
+// input sat 100% behind the bar, so the caret was invisible. Worse, the validation-error paths
+// call focus() on a field that is ALREADY focused — no focusin fires, so a plain listener never
+// runs exactly when the child mistypes and is sent back to the field. Patch focus() itself on
+// form controls: revealing is unconditional, every current and future call site included.
+function revealUnderBar(el){
+  try {
+    const tb = document.querySelector(".topbar");
+    if(!tb || !el || !el.getBoundingClientRect) return;
+    const h = tb.getBoundingClientRect().height;
+    const r = el.getBoundingClientRect();
+    if(r.top < h + 8) window.scrollBy({ top: r.top - (h + 8), behavior: "smooth" });
+  } catch(e){}
+}
+for(const C of [HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement]){
+  const orig = C.prototype.focus;
+  C.prototype.focus = function(opts){ orig.call(this, opts); revealUnderBar(this); };
+}
+document.addEventListener("focusin", e => {   // pointer/keyboard focus that skips .focus()
+  if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) revealUnderBar(e.target);
+});
+
+// 1234 → "1.2k": the top-bar pills must not widen as she earns (measured: the bar re-wrapped
+// mid-lesson when a pill crossed a digit boundary, shifting every tile under her finger).
+function fmtCount(n){ n = Math.max(0, n|0); return n < 1000 ? String(n) : ((n/1000).toFixed(n < 9950 ? 1 : 0).replace(/\.0$/,"") + "k"); }
 function refreshTop(){
   document.documentElement.lang = state.lang || "en";   // keep <html lang> in sync for screen readers
   const dark = state.theme === "dark";
@@ -1885,8 +1952,8 @@ function refreshTop(){
       lg.appendChild(img);
     } else { lg.innerHTML = iconFor("brand","🪔"); }
   }
-  $("#totalStars").textContent = totalStars();
-  $("#coins").textContent = state.coins;
+  $("#totalStars").textContent = fmtCount(totalStars());
+  $("#coins").textContent = fmtCount(state.coins);
   const hn = $("#helpNeedBtn");
   if(hn){ hn.innerHTML = iconFor("help","🙋") + " " + esc(tx("Help","मदद")); hn.title = tx("Help Needed","मदद चाहिए"); hn.setAttribute("aria-label", tx("Help Needed","मदद चाहिए")); }
   const lt = $("#langToggle");
@@ -2799,6 +2866,11 @@ function startLevel(course, lesson, lv, back){
             speak(r.then, "en", { queue:true, gap:500 });   // play after the reply finishes, don't cut it
             setFooter(`<button class="btn primary" id="next">${tx("Continue →","आगे बढ़ो →")}</button>`);
             $("#next").onclick = () => { sfx.next(); next(true); };
+            // Everything else on screen was just disabled, and on a phone this footer renders
+            // below the fold — she would be stranded on a dead screen with no cue that the way
+            // forward exists. Bring it into view.
+            const gf = document.querySelector(".gamefooter");
+            if(gf) try { gf.scrollIntoView({ block: "end", behavior: "smooth" }); } catch(e){}
           }, 1000);
         } else {
           // wrong: gentle nudge, let them try again — no rushing ahead
@@ -3172,6 +3244,7 @@ function startLevel(course, lesson, lv, back){
                       "शाबाश! तुम "+(belt.titleHi||belt.title)+" तक पहुँच गई! जल्द ही टीचर तुम्हारी जाँच करेंगी।"), state.lang==="hi"?"hi":"en");
     else speak(stars>=2?"Shabash! Well done":"Good try");
     srSay(tx("You got "+score+" of "+rounds.length+", "+stars+" stars", rounds.length+" में से "+score+" सही, "+stars+" सितारे"));
+    if(canGoOn) speak(tx("Tap Next to keep going.","आगे बढ़ने के लिए 'आगे' दबाओ।"), state.lang==="hi"?"hi":"en", { queue:true });
     const rh=root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try{ rh.focus({preventScroll:true}); }catch(e){} }
     $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv, back); };
     $("#map").onclick=()=>{ sfx.back(); backToLesson(); };
@@ -3990,6 +4063,7 @@ function helpNeeded(){
 function flashToast(msg){
   const ex = document.getElementById("hkToast"); if(ex) ex.remove();
   const t = el(`<div id="hkToast" role="status">${esc(msg)}</div>`);
+  t.style.bottom = overlayBottom();   // never on top of the footer's primary action
   document.body.appendChild(t);
   setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 400); }, 2600);
 }
@@ -5246,7 +5320,8 @@ function applySettingsDefaults(s){
 function applyServerDefaults(){
   if(state.prefsTouched) return;                  // respect the user's own toggles
   if(SETTINGS.defaultLanguage) state.lang = SETTINGS.defaultLanguage;
-  state.hindi = !!SETTINGS.helpDefaultOn;
+  /* state.hindi is no longer written here: the Guide toggle that could undo it is gone,
+     so a server default of ON would strand every learner with glosses forever. */
   if(SETTINGS.defaultTheme) state.theme = SETTINGS.defaultTheme;
   state.sound = SETTINGS.defaultSound !== false;
   save();
@@ -5296,8 +5371,17 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   });
   function showUpdateToast(worker){
     if(document.getElementById("updToast")) return;             // a refresh is offered, NOT forced — never yank a child mid-activity
-    const t = el(`<div id="updToast" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#2c2440;color:#fff;border-radius:999px;padding:10px 16px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer;font-size:14px">${tx("New version — tap to refresh","नया वर्शन — रिफ्रेश करें")}</div>`);
-    t.onclick = () => { t.textContent = tx("Updating…","अपडेट हो रहा है…"); worker.postMessage("SKIP_WAITING"); };
+    // Audited 2026-08-21: the old pill had no dismiss and no timeout, sat on the email
+    // activity's Send button, and its ONLY action was a reload that threw away whatever the
+    // child had typed. Now: reload only via the labelled text, an ✕ that just closes it, and
+    // footer-safe placement.
+    const t = el(`<div id="updToast" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#2c2440;color:#fff;border-radius:999px;padding:4px 4px 4px 16px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:14px;display:flex;align-items:center;gap:8px;max-width:92%;">
+      <span id="updGo" style="cursor:pointer;padding:8px 0;min-height:44px;display:inline-flex;align-items:center;">${tx("New version — tap to refresh","नया वर्शन — रिफ्रेश करें")}</span>
+      <button id="updClose" aria-label="${escAttr(tx("Not now","अभी नहीं"))}" style="background:transparent;border:0;color:#fff;font-size:18px;font-weight:800;min-width:44px;min-height:44px;cursor:pointer;border-radius:999px;">✕</button>
+    </div>`);
+    t.style.bottom = overlayBottom();
+    t.querySelector("#updGo").onclick = () => { t.textContent = tx("Updating…","अपडेट हो रहा है…"); worker.postMessage("SKIP_WAITING"); };
+    t.querySelector("#updClose").onclick = () => t.remove();
     document.body.appendChild(t);
   }
   window.addEventListener("load", () => {
