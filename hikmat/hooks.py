@@ -166,6 +166,10 @@ doc_events = {
 scheduler_events = {
 	"daily": [
 		"hikmat.api.prune_attendance_pings",
+		# Spent/expired phone-verification challenges. They hold neither a number nor a usable
+		# code, but "this number was verified on this date" is data with no further purpose.
+		# Consent records are deliberately NOT pruned — they are the proof of permission.
+		"hikmat.api.prune_otp_records",
 	],
 }
 

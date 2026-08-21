@@ -19,7 +19,12 @@
   "band",
   "mode",
   "campus",
-  "user"
+  "user",
+  "sec_guardian",
+  "guardian_mobile_hash",
+  "guardian_mobile_last4",
+  "guardian_verified",
+  "guardian_consent_on"
  ],
  "fields": [
   {
@@ -114,6 +119,41 @@
    "options": "User",
    "read_only": 1,
    "unique": 1
+  },
+  {
+   "fieldname": "sec_guardian",
+   "fieldtype": "Section Break",
+   "label": "Guardian / parental consent"
+  },
+  {
+   "fieldname": "guardian_mobile_hash",
+   "fieldtype": "Data",
+   "length": 64,
+   "label": "Guardian number (hashed)",
+   "read_only": 1,
+   "search_index": 1,
+   "description": "HMAC-SHA256 of the guardian's E.164 number, keyed on the site encryption key (site_config.json, never in the database). The number itself is NEVER stored: recovery works because the person asking types the number again, and we compare hashes. So a database dump leaks no guardians' phone numbers."
+  },
+  {
+   "fieldname": "guardian_mobile_last4",
+   "fieldtype": "Data",
+   "length": 4,
+   "label": "Guardian number ends in",
+   "read_only": 1,
+   "description": "Last 4 digits, so a facilitator can confirm which number is on file without the app holding it."
+  },
+  {
+   "fieldname": "guardian_verified",
+   "fieldtype": "Check",
+   "label": "Guardian number verified",
+   "read_only": 1,
+   "description": "A code was sent to that number and entered correctly. This is the verifiable-parental-consent basis DPDP asks for; the old signup tickbox was not."
+  },
+  {
+   "fieldname": "guardian_consent_on",
+   "fieldtype": "Datetime",
+   "label": "Consent verified on",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,

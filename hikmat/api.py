@@ -18,6 +18,7 @@ import hmac
 import ipaddress
 import json
 import re
+import secrets
 import time
 import unicodedata
 
@@ -976,6 +977,16 @@ def _build_settings():
         # never in this cached payload that any guest can fetch.
         "aiEnabled": bool(s.get("ai_enabled")),
         "voiceEnabled": bool(s.get("voice_enabled")),
+        # Guardian phone verification. Only the flag and the WORDING are public — never the
+        # phone number id or the token. The wording travels server→client on purpose: the
+        # consent record snapshots this same constant, so the text a guardian saw and the text
+        # we filed as agreed-to are provably the same string. A stale cached client showing
+        # older wording is the one case they can differ, which is why the version rides along
+        # and is stored beside the snapshot.
+        "otpEnabled": bool(s.get("otp_enabled")),
+        "consentVersion": _CONSENT_VERSION,
+        "consentText": _CONSENT_TEXT_EN,
+        "consentTextHi": _CONSENT_TEXT_HI,
         # Belt thresholds ship with settings so gate DETECTION works fully offline;
         # CLEARING stays server-side (Evaluation status, synced via get_progress).
         "milestones": [{"key": m.milestone_key, "title": m.title, "titleHi": m.title_hi or "",
@@ -2123,6 +2134,82 @@ def login_student(student, pin=None):
     return {"ok": True, "id": student, "name": s.student_name, "avatar": s.avatar or "🙂", "token": token}
 
 
+def _validated_profile_fields(name, avatar, pin, age, band):
+    """Normalise and check every field a new learner profile needs. Returns
+    (fields_for_insert, None) or (None, error_code). Touches the database only to confirm the
+    band exists, and creates nothing.
+
+    VALIDATION IS SEPARATE FROM INSERTION on purpose, and the split is what lets
+    signup_with_consent check the form BEFORE it burns the guardian's one-time ticket. With
+    the two fused, a girl who typed a 3-digit PIN got her payload rejected AND her ticket
+    spent, so a guardian standing next to her had to request a whole new code over WhatsApp
+    to fix a typo. The frontend disables the button until the fields are valid, so this was
+    reachable mainly by a crafted call or a mid-submit hiccup — but "fumbling the PIN box
+    costs you another SMS" is exactly the kind of cruelty a low-literacy audience should not
+    have to discover.
+
+    Extracted so the two self-signup doors — signup_student (tickbox consent) and
+    signup_with_consent (a guardian's number proven by a code) — cannot drift apart on what a
+    legal name, PIN, avatar, age or band is. They had every reason to drift: the rules here are
+    the accumulated answer to several proven bugs, and duplicating them would mean the newer
+    door quietly missing one. Every check below is verbatim from the original, in the same
+    order, and the error codes are unchanged because the game switches on them.
+
+    A name can't carry markup OR open a spreadsheet formula: it is denormalised onto every row
+    a facilitator sees in Desk and exported to XLSX from the attendance report (see
+    _display_name). Only the formula lead is dropped — her actual name is stored as typed.
+
+    _docname on pin/band: scalars only (see _docname). A JSON body can send the PIN as a
+    NUMBER, and .strip() on an int used to be a 500; a dict band would reach
+    frappe.db.exists as a FILTER and "pass" the existence check as some other row.
+
+    The PIN is hashed here rather than at insert time so that no caller of this function ever
+    holds a plaintext PIN in a structure it might log. That means an unauthorised caller can
+    spend one pbkdf2 per attempt, which the per-IP signup ceiling (60/hour) already bounds to
+    the point of irrelevance."""
+    name = _display_name(name)
+    if not (2 <= len(name) <= 40):
+        return None, "bad_name"
+    pin = _docname(pin, 16)
+    if not (pin.isdigit() and 4 <= len(pin) <= 8):   # PIN REQUIRED (4–8 digits) — no PIN-less profiles
+        return None, "bad_pin"
+    avatar = _plain_text(avatar)[:20] or "🙂"        # an emoji, but nothing stops a crafted call;
+    a = _int(age, None)                              # ZWJ-compound emoji survive (see _KEEP_FORMAT)
+    band = _docname(band)
+    return {
+        "doctype": "Student", "student_name": name, "avatar": avatar,   # both normalised above
+        "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
+        "age": a if (a is not None and 3 <= a <= 25) else None,
+        "band": band if (band and frappe.db.exists("Grade Band", band)) else None,
+    }, None
+
+
+def _insert_self_signup_student(fields, cohort=None):
+    """Insert an already-validated profile into the self-signup cohort. Returns the doc.
+
+    Kept apart from validation so the only thing between a redeemed ticket and a created row
+    is the insert itself — nothing that can fail on user input, and so nothing that can leave
+    a guardian's spent ticket with no profile to show for it."""
+    cohort = _docname(cohort)
+    if not cohort:
+        cohort = "Online"                                  # self-signups are the online cohort
+        if not frappe.db.exists("Cohort", cohort):
+            try:
+                frappe.get_doc({"doctype": "Cohort", "cohort_name": cohort, "mode": "Online",
+                                "center": "Self sign-up"}).insert(ignore_permissions=True)
+            except frappe.DuplicateEntryError:             # concurrent first signups — fine
+                pass
+    return frappe.get_doc(dict(fields, cohort=cohort)).insert(ignore_permissions=True)
+
+
+def _create_self_signup_student(name, avatar, pin, age, band, cohort=None):
+    """Validate then insert, for callers with nothing to do in between."""
+    fields, err = _validated_profile_fields(name, avatar, pin, age, band)
+    if err:
+        return None, err
+    return _insert_self_signup_student(fields, cohort), None
+
+
 @frappe.whitelist(allow_guest=True)
 def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band=None):
     """Self-service signup: a learner creates their own profile and is logged straight in.
@@ -2133,37 +2220,9 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band
         # if the limiter is unavailable, refuse new profiles rather than run without a ceiling.
         # Existing learners are unaffected: every lesson path stays fail-open.
         return {"ok": False, "error": "rate_limited"}
-    # A name can't carry markup OR open a spreadsheet formula: it is denormalised onto every
-    # row a facilitator sees in Desk and exported to XLSX from the attendance report (see
-    # _display_name). Only the formula lead is dropped — her actual name is stored as typed.
-    name = _display_name(name)
-    if not (2 <= len(name) <= 40):
-        return {"ok": False, "error": "bad_name"}
-    # _docname on pin/band/cohort: scalars only (see _docname). A JSON body can send the PIN as
-    # a NUMBER, and .strip() on an int used to be a 500; a dict band/cohort would reach
-    # frappe.db.exists as a FILTER and "pass" the existence check as some other row.
-    pin = _docname(pin, 16)
-    if not (pin.isdigit() and 4 <= len(pin) <= 8):   # PIN now REQUIRED (4–8 digits) — no PIN-less profiles
-        return {"ok": False, "error": "bad_pin"}
-    avatar = _plain_text(avatar)[:20] or "🙂"        # an emoji, but nothing stops a crafted call;
-    a = _int(age, None)                              # ZWJ-compound emoji survive (see _KEEP_FORMAT)
-    age_val = a if (a is not None and 3 <= a <= 25) else None
-    band, cohort = _docname(band), _docname(cohort)
-    band = band if (band and frappe.db.exists("Grade Band", band)) else None
-
-    if not cohort:
-        cohort = "Online"                                  # self-signups are the online cohort
-        if not frappe.db.exists("Cohort", cohort):
-            try:
-                frappe.get_doc({"doctype": "Cohort", "cohort_name": cohort, "mode": "Online",
-                                "center": "Self sign-up"}).insert(ignore_permissions=True)
-            except frappe.DuplicateEntryError:             # concurrent first signups — fine
-                pass
-    doc = frappe.get_doc({
-        "doctype": "Student", "student_name": name, "avatar": avatar,   # both normalised above
-        "cohort": cohort, "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
-        "age": age_val, "band": band,
-    }).insert(ignore_permissions=True)
+    doc, err = _create_self_signup_student(name, avatar, pin, age, band, cohort)
+    if err:
+        return {"ok": False, "error": err}
     token = _token_for(doc.name)
     frappe.db.commit()
     return {"ok": True, "id": doc.name, "name": doc.student_name,
@@ -2353,6 +2412,596 @@ def get_campuses():
     _require_staff()
     return frappe.get_all("Campus", filters={"active": 1}, fields=["name", "location"],
                           order_by="campus_name asc")
+
+
+# ---------------------------------------------------------------------------
+# GUARDIAN PHONE VERIFICATION (a code over WhatsApp)
+#
+# WHOSE NUMBER, AND WHY IT IS NOT THE LEARNER'S. This app is a Designed-for-Families,
+# child-directed app (see playstore/05-families-policy.md), and under India's DPDP Act 2023
+# a "child" is anyone under 18 — which is essentially every learner here. So the number
+# collected is the PARENT'S / GUARDIAN'S, never the girl's, for three reasons that all point
+# the same way:
+#   1. lawfulness. To collect a minor's phone number you first need verifiable parental
+#      consent, so you need the guardian in the loop anyway; making the child's number the
+#      identifier is circular, and it would put "phone number, collected from children" on
+#      the Play Data Safety form of a Families app.
+#   2. it is the consent mechanism we already owe. A code entered on the guardian's own
+#      handset IS a recognised way to verify parental consent. The signup screen's old
+#      tickbox ("a parent said it's okay") is an assertion by the child, not consent by the
+#      parent. This closes that gap rather than adding a new obligation.
+#   3. reality in Champaran. Most girls do not own the phone — it is a father's or a
+#      brother's. Making the girl's number her login would lock her out the moment the
+#      handset moves, and rural prepaid SIM churn would strand her permanently.
+#
+# WHY THIS IS NOT THE DAILY LOGIN. A code is required only to ENROL and to RECOVER a
+# forgotten PIN. Day-to-day login stays name+PIN — verified ON-DEVICE against the cached
+# roster hash on a campus laptop (see get_campus_roster / pbkdf2Verify in the game). That is
+# not a convenience choice, it is the whole offline-first premise: an OTP-gated login would
+# brick the app on every stretch without a signal. It also keeps the message volume at
+# roughly one or two per learner per YEAR, so the paid channel costs paise, and it means a
+# shared family handset is needed twice, not twice a day.
+#
+# WHAT IS STORED: NOTHING REVERSIBLE. No phone number is ever written to the database, not
+# even encrypted. We keep an HMAC of it (see _mobile_hash) plus the last 4 digits so a
+# facilitator can say "the number ending 3210?". Recovery still works because the person
+# asking types the number again and we compare hashes — the plaintext exists only for the
+# life of that one request. A database dump therefore yields no list of guardians' phone
+# numbers, which is the DPDP data-minimisation answer and also the honest answer to "what
+# happens if the server is breached". The code itself is stored as a pbkdf2 hash and is
+# never logged, never put in an error message, and never written to an SMS/comm log — which
+# is exactly why the WhatsApp send below does NOT go through frappe.core...sms_settings
+# .send_sms: that helper writes the message BODY into an SMS Log row.
+#
+# ENUMERATION, AND THE TRADE-OFF TAKEN DELIBERATELY. For a Recovery request we send only if
+# some verified guardian number matches, so a caller who probes numbers can learn "this
+# number belongs to a family in the programme" by watching for a delivered message. The
+# alternative — always claim to have sent — leaves a rural guardian staring at a phone that
+# will never buzz, with no way to tell a wrong number from a slow one. Given the leak yields
+# no account access and the audience cannot debug silence, the usable behaviour wins; it is
+# priced down by the per-number and per-IP ceilings below. The response text is still
+# uniform ("if that number is on file, a code is on its way"), so the ORACLE IS THE MESSAGE,
+# NOT THE API — a remote attacker without the handset learns nothing from the reply.
+# ---------------------------------------------------------------------------
+_OTP_DIGITS = 6
+_OTP_MAX_ATTEMPTS = 5             # wrong codes before the challenge voids
+_OTP_RESEND_COOLDOWN = 60         # seconds between sends to one number
+_OTP_PER_NUMBER_DAY = 5           # sends per number per 24h
+_OTP_PER_IP_HOUR = 20             # sends per source per hour
+_OTP_VERIFY_PER_IP_HOUR = 60      # code guesses per source per hour
+_TICKET_TTL_SECONDS = 900         # 15 min to finish the signup / reset after verifying
+_OTP_KEEP_DAYS = 30               # then the challenge rows are pruned (storage limitation)
+
+# The canonical consent wording lives HERE, server-side, and is what the game renders (it
+# rides along in get_settings as consentText/consentTextHi). That direction matters for the
+# audit trail: storing text the CLIENT sent would let a crafted call file whatever wording it
+# liked as "what the guardian agreed to". Bump the version whenever the wording changes —
+# consent to superseded wording is not consent to the new wording, which is why each
+# Hikmat Consent row snapshots the text it was given rather than pointing at this constant.
+_CONSENT_VERSION = "2026-08-20-v1"
+_CONSENT_TEXT_EN = (
+    "I am the parent or guardian of this child. I agree that she may use Bodhya Learn, and "
+    "that her first name or nickname, her lesson answers and her stars are saved so her "
+    "teacher can help her learn. I know this phone number is kept only to prove this "
+    "permission and to reset her PIN if she forgets it, and that I can ask for her account "
+    "and data to be deleted at any time."
+)
+_CONSENT_TEXT_HI = (
+    "मैं इस बच्ची का माता-पिता या अभिभावक हूँ। मैं सहमति देता/देती हूँ कि वह बोध्या लर्न का उपयोग कर सकती है, और "
+    "उसका पहला नाम या उपनाम, उसके पाठ के उत्तर और उसके सितारे सुरक्षित रखे जाएँ ताकि उसकी शिक्षिका उसकी मदद कर सके। "
+    "मुझे पता है कि यह मोबाइल नंबर केवल इस अनुमति को प्रमाणित करने और पिन भूल जाने पर उसे बदलने के लिए रखा जाता है, "
+    "और मैं कभी भी उसका खाता और डेटा हटाने के लिए कह सकता/सकती हूँ।"
+)
+
+_MOBILE_RE = re.compile(r"^[6-9]\d{9}$")      # Indian mobile: 10 digits, leading 6-9
+
+
+def _norm_mobile(val):
+    """A guardian's number as E.164 (+91XXXXXXXXXX), or "" if it is not a valid Indian
+    mobile number.
+
+    ONE canonical form is a security property, not tidiness: the number is the key for the
+    per-number resend cooldown and daily ceiling, and it is what the stored HMAC is computed
+    over. If "98765 43210", "+919876543210" and "09876543210" hashed differently, the same
+    guardian would get a fresh send budget per spelling (the same class of bypass that
+    _login_name_key exists to close) and a girl who recovered her PIN with one spelling
+    could not recover it with another.
+
+    People type numbers with spaces, dashes, brackets and a country code or a trunk 0, so
+    all of those are accepted and folded. The length guards matter: `91` is stripped only
+    from a 12-digit string, because 9123456789 is itself a perfectly good 10-digit number,
+    and a leading `0` only from an 11-digit one.
+
+    India-only, deliberately and narrowly: WhatsApp will happily accept a foreign number and
+    charge a different rate for it, and every family in this programme is in India. A number
+    we cannot reason about is refused rather than half-supported."""
+    s = _docname(val, 24)                     # scalars only — a dict here reaches an ORM filter
+    s = re.sub(r"[^\d]", "", s)               # drop +, spaces, dashes, brackets alike
+    if len(s) == 14 and s.startswith("0091"):
+        s = s[4:]
+    if len(s) == 12 and s.startswith("91"):
+        s = s[2:]
+    if len(s) == 11 and s.startswith("0"):
+        s = s[1:]
+    return "+91" + s if _MOBILE_RE.match(s) else ""
+
+
+def _mobile_hash(e164):
+    """Keyed HMAC of a normalised number — the only form of it that touches the database.
+
+    HMAC, not a bare digest: an Indian mobile number has about 9 billion possibilities, so a
+    plain sha256(number) column is a rainbow table someone can build on a laptop over lunch.
+    The key is the SITE ENCRYPTION KEY, which lives in site_config.json and not in the
+    database, so the hashes in a stolen dump cannot be reversed without also taking the
+    filesystem.
+
+    Consequence to know about: rotating the site encryption key orphans every hash here, and
+    guardians would have to verify their number again (a PIN reset would stop matching until
+    they do). That is the same blast radius rotation already has for every Password field in
+    Frappe, so it is a property of the platform rather than a new trap — but it is the reason
+    this is not silently re-derivable from something else."""
+    from frappe.utils.password import get_encryption_key
+    key = str(get_encryption_key() or "")
+    return hmac.new(key.encode("utf-8"), e164.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _otp_code():
+    """A 6-digit code from the CSPRNG, leading zeros kept (it is a string, not a number).
+
+    secrets, not random: `random` is a Mersenne Twister seeded from the clock, and a handful
+    of observed codes let an attacker predict the next one — which for a code that authorises
+    a PIN reset is the whole ballgame."""
+    return "{:0{}d}".format(secrets.randbelow(10 ** _OTP_DIGITS), _OTP_DIGITS)
+
+
+def _otp_config():
+    """The OTP channel configuration, or None when the feature is switched off.
+
+    Off is the DEFAULT and it is a real, supported state: a site with no WhatsApp credentials
+    returns None here, every endpoint below answers `otp_off`, and the game falls back to the
+    plain consent tickbox exactly as it behaved before this existed. Nothing half-configured
+    can send."""
+    s = frappe.get_cached_doc("Hikmat Settings")
+    if not s.get("otp_enabled"):
+        return None
+    channel = (s.get("otp_channel") or "WhatsApp").strip()
+    cfg = {
+        "channel": "Console" if channel.startswith("Console") else "WhatsApp",
+        "ttl": max(2, min(_int(s.get("otp_ttl_minutes"), 10) or 10, 60)),
+        "template": (s.get("wa_template") or "hikmat_otp").strip(),
+        "lang": (s.get("wa_lang") or "en").strip(),
+        "phone_number_id": (s.get("wa_phone_number_id") or "").strip(),
+        "api_version": (s.get("wa_api_version") or "v21.0").strip(),
+        "send_button": bool(s.get("wa_send_button")),
+        "button_subtype": (s.get("wa_button_subtype") or "url").strip(),
+    }
+    if cfg["channel"] == "WhatsApp" and not cfg["phone_number_id"]:
+        return None                            # configured to send, but cannot: treat as off
+    return cfg
+
+
+def _wa_token():
+    from frappe.utils.password import get_decrypted_password
+    return get_decrypted_password("Hikmat Settings", "Hikmat Settings", "wa_token",
+                                  raise_exception=False) or ""
+
+
+def _send_otp_whatsapp(e164, code, cfg):
+    """Hand one authentication-template message to Meta's Cloud API. Returns (ok, error).
+
+    Called DIRECTLY (no BSP), which is why there is no platform fee to pay: Meta hosts the
+    Cloud API and bills only per delivered message.
+
+    Meta requires an authentication template to carry a copy-code or one-tap button, and when
+    it does, the code has to be repeated in a BUTTON component as well as the body — sending
+    only the body is rejected with a components mismatch. Both the presence of that button
+    and its sub_type are Desk settings rather than constants, because the one thing that
+    reliably differs between accounts is exactly how the approved template is shaped, and a
+    mismatch should be a five-second edit rather than a deploy.
+
+    Note what is NOT here: no expiry-minutes parameter. An authentication template's body
+    takes a single variable (the code); its "expires in N minutes" line is configured on the
+    template at approval time, not per send. Our own TTL is enforced server-side regardless.
+
+    A timeout is mandatory, not defensive dressing: this runs inside the request that the
+    guardian is waiting on, and a hung graph call would pin a gunicorn worker until the
+    frontend gave up. The error text is truncated and, being Meta's own, never contains the
+    code — the one thing that must not reach a log."""
+    import requests
+    token = _wa_token()
+    if not token:
+        return False, "no access token configured"
+    url = "https://graph.facebook.com/{}/{}/messages".format(cfg["api_version"], cfg["phone_number_id"])
+    components = [{"type": "body", "parameters": [{"type": "text", "text": code}]}]
+    if cfg["send_button"]:
+        components.append({"type": "button", "sub_type": cfg["button_subtype"], "index": "0",
+                           "parameters": [{"type": "text", "text": code}]})
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": e164.lstrip("+"),                # Meta wants digits, country code included
+        "type": "template",
+        "template": {"name": cfg["template"], "language": {"code": cfg["lang"]},
+                     "components": components},
+    }
+    try:
+        r = requests.post(url, json=payload, timeout=10,
+                          headers={"Authorization": "Bearer " + token,
+                                   "Content-Type": "application/json"})
+    except Exception as e:
+        return False, "network: {}".format(type(e).__name__)
+    if 200 <= r.status_code < 300:
+        return True, ""
+    detail = ""
+    try:
+        detail = ((r.json().get("error") or {}).get("message") or "")[:400]
+    except Exception:
+        detail = (r.text or "")[:400]
+    return False, "HTTP {}: {}".format(r.status_code, detail)
+
+
+def _deliver_otp(e164, code, cfg):
+    """Send the code on the configured channel. Returns (channel, ok, error).
+
+    Console sends nothing at all. It exists so the whole flow can be exercised on a laptop
+    and in the test suite without a Meta account, and it is fenced twice: the channel has to
+    be selected in Desk AND the site has to be in developer_mode (or running tests) before
+    the code is ever handed back to the caller — see send_guardian_otp. A production site
+    that mis-selects Console therefore fails closed and tells nobody the code, rather than
+    quietly turning its consent gate into a formality."""
+    if cfg["channel"] == "Console":
+        return "Console", True, ""
+    ok, err = _send_otp_whatsapp(e164, code, cfg)
+    return "WhatsApp", ok, err
+
+
+def _console_ok():
+    """True when a Console-channel code may be returned to the caller: a developer bench or
+    the test runner, never a real site."""
+    return bool(frappe.conf.get("developer_mode")) or bool(frappe.flags.in_test)
+
+
+def _students_for_guardian(mhash):
+    """Active learners whose VERIFIED guardian number hashes to `mhash`.
+
+    guardian_verified is part of the filter, not a later check: a row carrying a hash that
+    was never proven (a facilitator typing a number into Desk, say) must not be recoverable
+    by whoever happens to control that number today.
+
+    More than one is normal and supported — sisters share a guardian's handset — which is why
+    the recovery flow names the girl AFTER the number is proven instead of asking for both up
+    front."""
+    return frappe.get_all("Student",
+                          filters={"active": 1, "guardian_mobile_hash": mhash, "guardian_verified": 1},
+                          fields=["name", "student_name", "avatar", "band"],
+                          order_by="student_name asc")
+
+
+@frappe.whitelist(allow_guest=True)
+def send_guardian_otp(mobile=None, purpose="consent"):
+    """Send a one-time code to a guardian's own phone.
+
+    `purpose` is bound into the challenge and checked again on every later step, so a code
+    obtained to CONSENT to a new profile cannot be redeemed to reset an existing girl's PIN.
+    They are genuinely different powers: consent creates a profile, recovery takes one over.
+
+    Every ceiling here is fail_closed, matching signup_student's reasoning and going further:
+    an uncapped faucet on this endpoint does not just mint rows, it spends money on delivered
+    messages and, worse, lets someone use our WhatsApp sender to spam a stranger's phone. If
+    the limiter is unavailable we refuse to send. Lessons keep working regardless — nothing on
+    the learning path touches this.
+
+    The ceilings are checked cheapest-and-most-specific first so that a guardian tapping
+    "resend" twice is stopped by the 60-second cooldown WITHOUT burning one of that number's
+    five daily sends."""
+    cfg = _otp_config()
+    if not cfg:
+        return {"ok": False, "error": "otp_off"}
+    e164 = _norm_mobile(mobile)
+    if not e164:
+        return {"ok": False, "error": "bad_mobile"}
+    purpose = "recovery" if _docname(purpose, 20).lower() == "recovery" else "consent"
+    mhash = _mobile_hash(e164)
+
+    ip = _client_ip()
+    if not _rate_ok("otpip:" + ip, _OTP_PER_IP_HOUR, 3600, fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+    if not _rate_ok("otpcool:" + mhash, 1, _OTP_RESEND_COOLDOWN, fail_closed=True):
+        return {"ok": False, "error": "too_soon"}
+    if not _rate_ok("otpday:" + mhash, _OTP_PER_NUMBER_DAY, 86400, fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+
+    student = None
+    if purpose == "recovery":
+        matches = _students_for_guardian(mhash)
+        if not matches:
+            # Nothing to recover. Answered as success on purpose — see the ENUMERATION note
+            # above: the reply is uniform, and only the handset learns the truth.
+            return {"ok": True, "sent": True, "last4": e164[-4:], "expires_in": cfg["ttl"] * 60}
+        student = matches[0].name if len(matches) == 1 else None
+
+    code = _otp_code()
+    doc = frappe.get_doc({
+        "doctype": "Hikmat OTP", "purpose": purpose.capitalize(),
+        "mobile_hash": mhash, "mobile_last4": e164[-4:], "student": student,
+        "code_hash": _hash_pin(code),                  # pbkdf2, same primitive as a PIN
+        "expires_on": frappe.utils.add_to_date(frappe.utils.now(), minutes=cfg["ttl"]),
+        "attempts": 0,
+    }).insert(ignore_permissions=True)
+
+    channel, ok, err = _deliver_otp(e164, code, cfg)
+    doc.db_set({"channel": channel, "sent_ok": 1 if ok else 0, "send_error": err or None},
+               update_modified=False)
+    frappe.db.commit()
+    if not ok:
+        # Surfaced honestly rather than swallowed: a guardian who is told "sent" and gets
+        # nothing has no next move, whereas the game can offer "ask your teacher" on this.
+        return {"ok": False, "error": "send_failed"}
+    out = {"ok": True, "sent": True, "last4": e164[-4:], "expires_in": cfg["ttl"] * 60}
+    if channel == "Console" and _console_ok():
+        out["code"] = code                             # dev bench / test runner only
+    return out
+
+
+@frappe.whitelist(allow_guest=True)
+def verify_guardian_otp(mobile=None, code=None, purpose="consent"):
+    """Check a code and, if it is right, hand back a SINGLE-USE TICKET for the follow-up call.
+
+    Why a ticket instead of just answering "yes, correct": the act being authorised (create a
+    profile / reset a PIN) needs several more fields than a verify call should carry, and
+    without a ticket the client would have to re-present the code — which means the code lives
+    longer, in more places, and a replay of that one request repeats the action. The ticket is
+    bound to this challenge, this number and this purpose, expires in 15 minutes, and is
+    burned on use.
+
+    The challenge is consumed under SELECT ... FOR UPDATE. That is not ceremony: two verify
+    calls racing on the same code would otherwise both observe consumed_on empty and both
+    mint a valid ticket, turning a single-use code into a double-use one.
+
+    Wrong guesses are counted on the challenge itself (5, then it is dead) AND per source per
+    hour. The per-challenge ceiling is the real control — a 6-digit code is 1 in a million, so
+    5 tries is nowhere near guessable, while a source ceiling alone would fall to anyone who
+    can vary their IP (precisely the hole that made the old PIN lockout worthless; see the PIN
+    LOCKOUT note)."""
+    cfg = _otp_config()
+    if not cfg:
+        return {"ok": False, "error": "otp_off"}
+    e164 = _norm_mobile(mobile)
+    if not e164:
+        return {"ok": False, "error": "bad_mobile"}
+    if not _rate_ok("otpver:" + _client_ip(), _OTP_VERIFY_PER_IP_HOUR, 3600, fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+    purpose = "Recovery" if _docname(purpose, 20).lower() == "recovery" else "Consent"
+    code = _docname(code, 12)
+    mhash = _mobile_hash(e164)
+
+    rows = frappe.get_all("Hikmat OTP",
+                          filters={"mobile_hash": mhash, "purpose": purpose,
+                                   "consumed_on": ["is", "not set"],
+                                   "expires_on": [">", frappe.utils.now()]},
+                          fields=["name"], order_by="creation desc", limit=1)
+    if not rows:
+        return {"ok": False, "error": "bad_code"}
+    name = rows[0].name
+    row = frappe.db.get_value("Hikmat OTP", name,
+                              ["code_hash", "attempts", "consumed_on", "expires_on"],
+                              as_dict=True, for_update=True)
+    if not row or row.consumed_on or _int(row.attempts) >= _OTP_MAX_ATTEMPTS:
+        return {"ok": False, "error": "bad_code"}
+    if not _pin_ok(row.code_hash, code):               # constant-time; fail-closed on empties
+        frappe.db.set_value("Hikmat OTP", name, "attempts", _int(row.attempts) + 1,
+                            update_modified=False)
+        frappe.db.commit()
+        left = _OTP_MAX_ATTEMPTS - (_int(row.attempts) + 1)
+        return {"ok": False, "error": "bad_code", "tries_left": max(0, left)}
+
+    ticket = frappe.generate_hash(length=40)
+    frappe.db.set_value("Hikmat OTP", name, {
+        "consumed_on": frappe.utils.now(),
+        "ticket_hash": hashlib.sha256(ticket.encode("utf-8")).hexdigest(),
+        "ticket_expires_on": frappe.utils.add_to_date(frappe.utils.now(),
+                                                      seconds=_TICKET_TTL_SECONDS),
+    }, update_modified=False)
+    frappe.db.commit()
+    out = {"ok": True, "ticket": ticket, "last4": e164[-4:],
+           "expires_in": _TICKET_TTL_SECONDS}
+    if purpose == "Recovery":
+        # Safe to name them only now: whoever holds this ticket has demonstrated control of
+        # the guardian's handset, so listing that guardian's OWN daughters reveals nothing
+        # they do not already know — and it spares a low-literacy user from having to type a
+        # name that must match what a facilitator once spelled.
+        out["students"] = [{"id": s.name, "name": s.student_name, "avatar": s.avatar or "🙂"}
+                           for s in _students_for_guardian(mhash)]
+    return out
+
+
+def _redeem_ticket(mhash, purpose, ticket):
+    """Burn a one-time ticket and return its challenge name, or None.
+
+    Both halves are required: the ticket AND the number it was issued for. The client
+    re-sends the number, we re-hash it, and only a challenge matching both is redeemable — so
+    a leaked ticket on its own (a shared screen, a URL in a log) authorises nothing.
+
+    Compared in Python with compare_digest against a FOR UPDATE row rather than looked up by
+    ticket hash, for the same reason the challenge is: the row has to be locked before its
+    used-flag is read, or two concurrent redemptions both see it unused."""
+    ticket = _docname(ticket, 80)
+    if not ticket:
+        return None
+    rows = frappe.get_all("Hikmat OTP",
+                          filters={"mobile_hash": mhash, "purpose": purpose,
+                                   "ticket_used_on": ["is", "not set"],
+                                   "ticket_expires_on": [">", frappe.utils.now()]},
+                          fields=["name"], order_by="creation desc", limit=1)
+    if not rows:
+        return None
+    name = rows[0].name
+    row = frappe.db.get_value("Hikmat OTP", name, ["ticket_hash", "ticket_used_on"],
+                              as_dict=True, for_update=True)
+    if not row or row.ticket_used_on or not row.ticket_hash:
+        return None
+    want = hashlib.sha256(ticket.encode("utf-8")).hexdigest()
+    if not hmac.compare_digest(str(row.ticket_hash), want):
+        return None
+    frappe.db.set_value("Hikmat OTP", name, "ticket_used_on", frappe.utils.now(),
+                        update_modified=False)
+    return name
+
+
+def _file_consent(student, student_name, mhash, last4, channel, otp=None):
+    """Write the consent record and stamp the Student. One place, so the campus route (a
+    facilitator recording an in-person permission) and the WhatsApp route cannot end up
+    meaning subtly different things.
+
+    The wording is snapshotted from the server constant — see _CONSENT_VERSION."""
+    frappe.get_doc({
+        "doctype": "Hikmat Consent", "student": student, "student_name": student_name,
+        "verified_on": frappe.utils.now(), "channel": channel,
+        "guardian_mobile_hash": mhash, "guardian_mobile_last4": last4, "otp": otp,
+        "consent_text_version": _CONSENT_VERSION,
+        "consent_text": _CONSENT_TEXT_EN + "\n\n" + _CONSENT_TEXT_HI,
+    }).insert(ignore_permissions=True)
+    frappe.db.set_value("Student", student, {
+        "guardian_mobile_hash": mhash, "guardian_mobile_last4": last4,
+        "guardian_verified": 1, "guardian_consent_on": frappe.utils.now(),
+    }, update_modified=False)
+
+
+@frappe.whitelist(allow_guest=True)
+def signup_with_consent(mobile=None, ticket=None, name=None, avatar=None, pin=None,
+                        age=None, band=None):
+    """Create a learner's profile against a guardian's PROVEN number.
+
+    This is signup_student with a verified adult behind it: same validation, same rate limit,
+    same shape of answer, so the game's finishLogin path is unchanged. The difference is that
+    the profile carries a real consent record instead of a tickbox.
+
+    Order of operations: the form is validated, THEN the ticket is redeemed, THEN the row is
+    inserted. Validating first means a typo does not spend the guardian's code (see
+    _validated_profile_fields); redeeming before the insert means a replayed or expired ticket
+    creates nothing."""
+    cfg = _otp_config()
+    if not cfg:
+        return {"ok": False, "error": "otp_off"}
+    if not _rate_ok("signup:" + _client_ip(), 60, 3600, fail_closed=True):   # see signup_student
+        return {"ok": False, "error": "rate_limited"}
+    e164 = _norm_mobile(mobile)
+    if not e164:
+        return {"ok": False, "error": "bad_mobile"}
+    mhash = _mobile_hash(e164)
+    # Form first, ticket second: a rejected name or PIN must not cost the guardian their code.
+    fields, err = _validated_profile_fields(name, avatar, pin, age, band)
+    if err:
+        return {"ok": False, "error": err}
+    otp = _redeem_ticket(mhash, "Consent", ticket)
+    if not otp:
+        return {"ok": False, "error": "bad_ticket"}
+    doc = _insert_self_signup_student(fields)
+    _file_consent(doc.name, doc.student_name, mhash, e164[-4:], cfg["channel"], otp)
+    token = _token_for(doc.name)
+    frappe.db.commit()
+    return {"ok": True, "id": doc.name, "name": doc.student_name, "avatar": doc.avatar or "🙂",
+            "hasPin": True, "token": token, "band": doc.band or "",
+            "guardianLast4": e164[-4:]}
+
+
+@frappe.whitelist(allow_guest=True)
+def reset_pin(mobile=None, ticket=None, student=None, new_pin=None):
+    """Set a new PIN for a girl whose guardian has just proven their number.
+
+    THE GAP THIS FILLS: until now a forgotten PIN was terminal. There was no reset endpoint at
+    all — not even a staff one — so the only cure was a facilitator editing login_pin in Desk,
+    and a home learner with no facilitator simply lost her stars.
+
+    `student` must be one of THIS guardian's learners, re-checked here against the number's
+    hash rather than trusted from the client: the list handed out by verify_guardian_otp is a
+    convenience, not an authorisation, and a crafted call must not be able to name someone
+    else's daughter.
+
+    The bearer token is deliberately NOT rotated. A campus laptop authenticates her offline
+    against a cached roster entry, so rotating would silently break every provisioned device
+    she uses to punish a guardian for using the recovery flow. The reset already required
+    control of the guardian's handset, and the lockout counters are cleared so she can get
+    straight back in.
+
+    Facilitators are notified. A PIN reset is exactly the event a supervising adult should see
+    after the fact, and it is cheap to send."""
+    cfg = _otp_config()
+    if not cfg:
+        return {"ok": False, "error": "otp_off"}
+    e164 = _norm_mobile(mobile)
+    if not e164:
+        return {"ok": False, "error": "bad_mobile"}
+    new_pin = _docname(new_pin, 16)                    # may arrive as a JSON number
+    if not (new_pin.isdigit() and 4 <= len(new_pin) <= 8):
+        return {"ok": False, "error": "bad_pin"}
+    mhash = _mobile_hash(e164)
+    student = _docname(student)
+    mine = {s.name: s for s in _students_for_guardian(mhash)}
+    if student not in mine:
+        return {"ok": False, "error": "not_found"}
+    if not _redeem_ticket(mhash, "Recovery", ticket):
+        return {"ok": False, "error": "bad_ticket"}
+
+    frappe.db.set_value("Student", student, "login_pin", _hash_pin(new_pin),
+                        update_modified=False)
+    row = mine[student]
+    # Both lockout buckets she could be held in — by docname, and by the name she types.
+    _login_succeeded(_login_id_account(student, student))
+    _login_succeeded(_login_account_key("nm", _login_name_key(row.student_name)))
+    token = _token_for(student)
+    frappe.db.commit()
+    _notify_facilitators("PIN reset by guardian: {}".format(row.student_name),
+                         "Student", student)
+    return {"ok": True, "id": student, "name": row.student_name,
+            "avatar": row.avatar or "🙂", "token": token, "band": row.band or ""}
+
+
+@frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
+def record_guardian_consent(student=None, mobile=None, note=None):
+    """Record a guardian's permission that was given IN PERSON, on paper or by phone call.
+
+    This is not a convenience door around the OTP — it is the only route that exists for the
+    families the chosen channel cannot reach. WhatsApp needs a smartphone and data; a guardian
+    with a feature phone or no data can never receive a code, and those are disproportionately
+    the poorest households in the programme. Refusing them a verified profile would make the
+    consent gate a wealth filter, so a facilitator who has met the guardian can attest to it
+    and the record says so honestly: channel "Facilitator", `verified_on` now, and the
+    facilitator's own user on the row's owner. An auditor can therefore tell an attested
+    consent from a device-proven one, which is the point — they are not the same evidence.
+
+    The number is optional and, when given, is stored the same way as any other: hash plus
+    last 4, never the number. `guardian_verified` is set because a human verified it; what
+    differs is HOW, and that is on the record."""
+    _require_staff()
+    student = _docname(student)
+    if not student or not frappe.db.exists("Student", student):
+        return {"ok": False, "error": "not_found"}
+    e164 = _norm_mobile(mobile) if mobile else ""
+    if mobile and not e164:
+        return {"ok": False, "error": "bad_mobile"}
+    mhash = _mobile_hash(e164) if e164 else None
+    sname = frappe.db.get_value("Student", student, "student_name")
+    _file_consent(student, sname, mhash, e164[-4:] if e164 else None, "Facilitator")
+    if note:
+        frappe.db.set_value("Hikmat Consent",
+                            frappe.db.get_value("Hikmat Consent", {"student": student},
+                                                "name", order_by="creation desc"),
+                            "withdrawn_note", _plain_text(note)[:500], update_modified=False)
+    frappe.db.commit()
+    return {"ok": True, "student": student, "last4": e164[-4:] if e164 else ""}
+
+
+def prune_otp_records():
+    """Daily hygiene: drop challenges older than _OTP_KEEP_DAYS.
+
+    Storage limitation, and it costs nothing to honour: a spent or expired challenge has no
+    further use, and even though the rows hold neither a number nor a usable code, a pile of
+    "this number was verified on this date" is data we have no reason to keep. Wired in
+    hooks.py next to prune_attendance_pings. Consent records are NOT pruned — they are the
+    proof of permission and must outlive the challenge that produced them."""
+    cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -_OTP_KEEP_DAYS)
+    frappe.db.delete("Hikmat OTP", {"creation": ["<", cutoff]})
+    frappe.db.commit()
 
 
 # ---------------------------------------------------------------------------

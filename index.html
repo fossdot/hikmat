@@ -764,6 +764,14 @@ const SETTINGS = {
   aiEnabled: false,                           // Roshni AI tutor — on only when the backend says so
   voiceEnabled: false,                        // mic + neural Hindi voice — on only when the backend says so
   milestones: [],                             // belt gates [{key,title,titleHi,icon,threshold}] from the backend; empty = no gates (standalone/offline-fresh)
+  // Guardian phone verification (a code over WhatsApp). Off unless the backend says on, so a
+  // standalone/offline copy behaves exactly as it did before this existed.
+  otpEnabled: false,
+  // The consent wording is served BY the backend rather than written here, because the
+  // consent record stores a snapshot of the same server constant — so what a guardian read
+  // and what we filed as agreed-to are provably one string. Empty until first contact; the
+  // gate only ever appears when otpEnabled, which implies we have reached the server.
+  consentVersion: "", consentText: "", consentTextHi: "",
   // Admin-set defaults for a NEW/untouched user (applied in applyServerDefaults; a user's own
   // toggle wins thereafter via state.prefsTouched).
   defaultLanguage: "en", helpDefaultOn: false, defaultTheme: "light", defaultSound: true,
@@ -3972,10 +3980,18 @@ async function mergeServerProgress(){
 
 // SIGN UP — a learner creates their own profile (name + avatar + optional PIN), then plays.
 const AVATARS = ["🙂","👧","🧒","👩","😀","🦋","🌸","🌟","🐱","🦊","🐥","🚀"];
-function renderSignup(){
-  stopSpeech(); rerender = renderSignup; root.innerHTML = "";
+function renderSignup(draft){
+  stopSpeech(); rerender = () => renderSignup(draft); root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderLogin);
-  let avatar = AVATARS[0], band = "";
+  let avatar = (draft && draft.avatar) || AVATARS[0], band = (draft && draft.band) || "";
+  // When the backend asks for verified parental consent, THIS screen no longer collects it:
+  // the tickbox is replaced by a second step where a grown-up enters a code sent to their own
+  // phone (renderGuardianGate). Asking twice would be worse than asking once — and a tickbox
+  // ticked by the child was never consent by the parent anyway. `backendLive` is part of the
+  // condition because the gate cannot work without a server: offline, the old local-only path
+  // is still the right one (nothing is transmitted until she is online, see the note above
+  // renderGuardianGate).
+  const needGuardian = !!(SETTINGS.otpEnabled && backendLive);
   // Only offer a class picker when grade-band content actually exists (backend / curriculum.json
   // loaded). Standalone or offline the bundled fallback is Life-Skills only (no band-tagged tracks),
   // so bandTracks() is empty for every band → skip the picker entirely rather than showing an empty,
@@ -3997,10 +4013,11 @@ function renderSignup(){
       <label class="fieldlabel">${tx("Choose a PIN","एक पिन चुनो")}</label>
       <input id="suPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
              placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
-      <label class="consent"><input type="checkbox" id="suConsent">
-        <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+      ${needGuardian ? `<div class="hint2">${tx("Next, a parent or teacher confirms on their own phone.","आगे, माता-पिता या शिक्षक अपने फ़ोन पर पुष्टि करेंगे।")}</div>`
+        : `<label class="consent"><input type="checkbox" id="suConsent">
+        <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>`}
       <div class="feedback bad" id="suErr" style="min-height:18px"></div>
-      <div class="center"><button class="btn primary" id="suGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
+      <div class="center"><button class="btn primary" id="suGo" disabled>${needGuardian ? tx("Next: ask a grown-up →","आगे: किसी बड़े से पूछो →") : tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
         <button class="btn ghost" id="suLogin">${tx("Already have a name? Log in","पहले से नाम है? लॉग इन")}</button>
         <button class="btn ghost" id="suOnline">${tx("🌐 Invite code? Sign up online","🌐 इनवाइट कोड? ऑनलाइन साइन अप")}</button>
@@ -4014,21 +4031,26 @@ function renderSignup(){
   setNarration(suNarr, suNarr);
   const avwrap = $("#avpick");
   AVATARS.forEach((a,i) => {
-    const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
+    const b = el(`<button class="av ${a===avatar?'sel':''}">${a}</button>`);
     b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
     avwrap.appendChild(b);
   });
   const name = $("#suName"), pin = $("#suPin"), go = $("#suGo"), err = $("#suErr"), consent = $("#suConsent");
   const pinOK = () => /^\d{4,8}$/.test(pin.value.trim());   // PIN is now required (4–8 digits)
-  const refreshGo = () => { go.disabled = !(name.value.trim() && consent.checked && pinOK() && (!haveBands || band)); };
+  // `consent` is absent when the guardian gate will collect it on the next screen.
+  const refreshGo = () => { go.disabled = !(name.value.trim() && (needGuardian || (consent && consent.checked)) && pinOK() && (!haveBands || band)); };
   name.oninput = () => { refreshGo(); err.textContent = ""; };
   pin.oninput = () => { refreshGo(); err.textContent = ""; };
-  consent.onchange = refreshGo;
+  if(consent) consent.onchange = refreshGo;
+  // Coming BACK from the guardian gate must not wipe what she typed.
+  if(draft){ if(draft.name) name.value = draft.name; if(draft.pin) pin.value = draft.pin; }
+  refreshGo();
   if(haveBands){
     const bandwrap = $("#bandpick");
     bandList.forEach(b => {
       const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
       btn.onclick = () => { band = b.key; sfx.tap(); bandwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
+      if(b.key === band) btn.classList.add("sel");        // restored from a draft
       bandwrap.appendChild(btn);
     });
   }
@@ -4040,9 +4062,16 @@ function renderSignup(){
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
     if(haveBands && !band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
-    if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
+    if(!needGuardian && !(consent && consent.checked)){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     const p = pin.value.trim();
     if(!/^\d{4,8}$/.test(p)){ err.textContent = tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।"); return; }
+    if(needGuardian){
+      // Hand everything she typed to the gate, so stepping back loses nothing. Her profile is
+      // created there, once a grown-up's number is proven (signup_with_consent).
+      sfx.tap();
+      renderGuardianGate({ name:nm, avatar, pin:p, band, mobile:(draft && draft.mobile) || "" });
+      return;
+    }
     go.disabled = true; err.textContent = "";
     const r = await api("signup_student", { name:nm, avatar, pin:p, band }, true);
     if(r && r.ok){ finishLogin(r); return; }
@@ -4085,6 +4114,7 @@ function renderLogin(){
         <button class="btn ghost" id="toSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
         <button class="btn ghost" id="toOnline">${tx("🌐 Online? Use your username","🌐 ऑनलाइन? यूज़रनेम से")}</button>
         <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+        ${(SETTINGS.otpEnabled && backendLive) ? `<button class="btn ghost" id="forgotPin">${tx("🔑 Forgot your PIN?","🔑 पिन भूल गई?")}</button>` : ``}
         <button class="btn ghost" id="toSetup">${tx("⚙️ Set up this laptop","⚙️ यह लैपटॉप सेट करो")}</button>
       </div>
     </div>
@@ -4096,6 +4126,9 @@ function renderLogin(){
   $("#toOnline").onclick = () => { sfx.tap(); renderOnlineLogin(); };
   $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
   $("#toSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
+  // Only present when the backend offers guardian verification — without it there is no way to
+  // prove who is asking, and a self-serve PIN reset would be an account-takeover button.
+  const fp = $("#forgotPin"); if(fp) fp.onclick = () => { sfx.tap(); renderForgotPin(); };
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); name.focus(); return; }
@@ -4110,6 +4143,317 @@ function renderLogin(){
   pin.onkeydown  = (e) => { if(e.key === "Enter") submit(); };
   refreshTop();
 }
+// ============================================================
+//  GUARDIAN PHONE VERIFICATION — enrolment consent, and PIN recovery.
+//
+//  WHOSE PHONE. The number asked for here is a PARENT'S or GUARDIAN'S, never the learner's.
+//  This is a child-directed app (Play Families / Designed for Families) and under India's
+//  DPDP Act everyone under 18 is a child, so collecting girls' phone numbers is both the
+//  wrong thing to declare and the wrong thing to rely on — most girls in Champaran do not
+//  own the handset. See the GUARDIAN PHONE VERIFICATION note in api.py for the whole
+//  reasoning; the copy on these screens is written to make that obvious to a guardian too.
+//
+//  WHEN IT APPEARS. Only when the backend says otpEnabled AND we have actually reached it.
+//  A standalone copy, a file:// open, an offline laptop or a site with no WhatsApp
+//  credentials configured all skip it entirely and keep the old tickbox path — which is
+//  correct rather than a compromise: an offline signup already stays local to the device and
+//  transmits nothing (a profile created offline is `local: true`), so there is no personal
+//  data leaving the device for a guardian to consent to until she next comes online.
+//
+//  WHAT IT IS NOT. This never becomes the daily login. She logs in with her name and PIN, on
+//  a campus laptop entirely offline. A code is needed twice in a girl's life: once to enrol,
+//  and again only if she forgets her PIN.
+// ============================================================
+
+// One place for every failure this pair of screens can hit, so the gate and the recovery
+// screen never describe the same backend refusal in two different ways. Each message says
+// what to DO next — "ask your teacher" is a real escape hatch here, not filler, because a
+// guardian whose phone has no WhatsApp genuinely cannot proceed alone (a facilitator records
+// that consent in person instead; see record_guardian_consent).
+function otpErrText(r){
+  const e = (r && r.error) || "";
+  if(e === "too_soon")     return tx("Please wait a minute, then ask for a new code.","एक मिनट रुको, फिर नया कोड मांगो।");
+  if(e === "rate_limited") return tx("Too many tries. Please try later, or ask your teacher.","बहुत बार कोशिश हुई। बाद में कोशिश करो, या शिक्षिका से पूछो।");
+  if(e === "bad_mobile")   return tx("Please type the 10-digit mobile number.","कृपया 10 अंकों का मोबाइल नंबर लिखो।");
+  if(e === "send_failed")  return tx("We could not send the code. Check that this number has WhatsApp, or ask your teacher.","कोड नहीं भेज पाए। देखो कि इस नंबर पर WhatsApp है, या शिक्षिका से पूछो।");
+  if(e === "bad_ticket")   return tx("That took too long. Please ask for a new code.","बहुत समय हो गया। कृपया नया कोड मांगो।");
+  if(e === "bad_pin")      return tx("Please choose a PIN of 4 to 8 digits.","कृपया 4 से 8 अंकों का पिन चुनो।");
+  if(e === "bad_name")     return tx("Please type a name of at least 2 letters.","कम से कम 2 अक्षर का नाम लिखो।");
+  if(e === "not_found")    return tx("We could not find that learner on this number.","इस नंबर पर वह नाम नहीं मिला।");
+  if(e === "otp_off")      return tx("This is not available right now — ask your teacher.","यह अभी उपलब्ध नहीं है — शिक्षिका से पूछो।");
+  if(e === "bad_code"){
+    const left = (r && typeof r.tries_left === "number") ? r.tries_left : null;
+    if(left === null) return tx("Wrong code — please try again.","ग़लत कोड — फिर कोशिश करो।");
+    if(left > 0) return tx("Wrong code — " + left + " tries left.","ग़लत कोड — " + left + " कोशिश बची।");
+    return tx("Too many wrong tries. Please ask for a new code.","बहुत ग़लत कोशिशें। कृपया नया कोड मांगो।");
+  }
+  return tx("Something went wrong — please try again.","कुछ ग़लत हुआ — फिर कोशिश करो।");
+}
+
+// A 10-digit box with a fixed +91 in front. Deliberately NOT a free-text field that accepts a
+// country code: _norm_mobile on the server is India-only, so letting someone type +44 here
+// would produce a "bad number" refusal they could not understand.
+function mobileFieldHTML(id, value){
+  // maxlength is 18, not 10, and that is not slack: a guardian writes "98765 43210" or pastes
+  // "+91 98765 43210", and a 10-character cap silently truncates either one to nine digits in
+  // a box that LOOKS full — then answers "please type the 10-digit number". Proven in a
+  // browser before this was raised. bindMobileField below normalises whatever lands here.
+  return `<div style="display:flex; gap:8px; align-items:center">
+      <span aria-hidden="true" style="font-weight:700; opacity:.7">+91</span>
+      <input id="${id}" class="searchbox" type="tel" inputmode="numeric" maxlength="18"
+             autocomplete="tel-national" value="${escAttr(value || "")}"
+             aria-label="${escAttr(tx("Guardian's 10-digit mobile number","अभिभावक का 10 अंकों का मोबाइल नंबर"))}"
+             placeholder="${escAttr(tx("10-digit number","10 अंकों का नंबर"))}">
+    </div>`;
+}
+
+// Keep a mobile box to 10 digits no matter what is typed or pasted: strip everything that is
+// not a digit, and if a country code came along, keep the LAST ten (so "+91 98765 43210",
+// "098765 43210" and "98765-43210" all settle on the same ten digits the server will accept).
+// Normalising as they type, rather than only on submit, means the field always shows exactly
+// what will be sent.
+function bindMobileField(input, onEdit){
+  input.oninput = () => {
+    const d = (input.value || "").replace(/\D/g, "");
+    const norm = d.length > 10 ? d.slice(-10) : d;
+    if(input.value !== norm) input.value = norm;
+    if(onEdit) onEdit();
+  };
+}
+
+// autocomplete="one-time-code" is the whole of the auto-fill story here, on purpose. Reading
+// the code out of the message automatically would mean the SMS Retriever or WhatsApp one-tap
+// APIs — native code plus Play Services, i.e. a new SDK inside a Designed-for-Families app —
+// to save six keystrokes. Not worth the review risk.
+function codeFieldHTML(id){
+  return `<input id="${id}" class="searchbox" type="text" inputmode="numeric" maxlength="6"
+             autocomplete="one-time-code"
+             aria-label="${escAttr(tx("6-digit code","6 अंकों का कोड"))}"
+             placeholder="––––––"
+             style="text-align:center; letter-spacing:.45em; font-size:1.35rem; font-weight:700">`;
+}
+
+// STEP 2 of signing up: the girl has already chosen her name, avatar and PIN (that is `draft`,
+// and it is carried through so nothing she typed is lost if she steps back). Now a grown-up
+// confirms on their own phone.
+function renderGuardianGate(draft){
+  stopSpeech(); rerender = () => renderGuardianGate(draft); root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), () => renderSignup(draft));
+  draft.step = draft.step || "number";
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Ask a grown-up 🙋","किसी बड़े से पूछो 🙋")}</h1>
+      <p>${tx("A parent, guardian or teacher confirms on their own phone. Just once.","माता-पिता, अभिभावक या शिक्षक अपने फ़ोन पर पुष्टि करते हैं। बस एक बार।")}</p></div>
+    <div class="authform" id="gwrap"></div>
+  </div>`));
+  const wrap = $("#gwrap");
+
+  const paintNumber = () => {
+    const consent = tx(SETTINGS.consentText || "", SETTINGS.consentTextHi || SETTINGS.consentText || "");
+    wrap.innerHTML = `
+      ${consent ? `<div class="hint2" style="text-align:left; line-height:1.6; margin-bottom:14px">${esc(consent)}</div>` : ``}
+      <label class="fieldlabel">${tx("Parent's or guardian's mobile number","माता-पिता या अभिभावक का मोबाइल नंबर")}</label>
+      ${mobileFieldHTML("gMobile", draft.mobile)}
+      <div class="hint2">${tx("We send a 6-digit code on WhatsApp. We keep only the last 4 digits of this number — never the whole number.","हम WhatsApp पर 6 अंकों का कोड भेजते हैं। हम इस नंबर के केवल अंतिम 4 अंक रखते हैं — पूरा नंबर कभी नहीं।")}</div>
+      <div class="feedback bad" id="gErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="gSend">${tx("Send the code →","कोड भेजो →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="gGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+      </div>`;
+    const num = $("#gMobile"), err = $("#gErr"), go = $("#gSend");
+    setTimeout(() => num.focus(), 60);
+    bindMobileField(num, () => { err.textContent = ""; });
+    $("#gGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+    const send = async () => {
+      const m = (num.value || "").replace(/\D/g, "");
+      if(m.length !== 10){ err.textContent = tx("Please type the 10-digit mobile number.","कृपया 10 अंकों का मोबाइल नंबर लिखो।"); srSay(err.textContent); num.focus(); return; }
+      go.disabled = true; err.textContent = tx("Sending…","भेज रहे हैं…");
+      const r = await api("send_guardian_otp", { mobile: m, purpose: "consent" }, true);
+      go.disabled = false;
+      if(r && r.ok){ draft.mobile = m; draft.last4 = r.last4 || m.slice(-4); draft.step = "code"; sfx.enter(); paint(); return; }
+      err.textContent = otpErrText(r); srSay(err.textContent);
+    };
+    go.onclick = send;
+    num.onkeydown = (e) => { if(e.key === "Enter") send(); };
+    const n = tx("Ask a grown-up. Type a parent's mobile number to get a code on WhatsApp.","किसी बड़े से पूछो। WhatsApp पर कोड पाने के लिए माता-पिता का मोबाइल नंबर लिखो।");
+    setNarration(n, n);
+  };
+
+  const paintCode = () => {
+    wrap.innerHTML = `
+      <p style="text-align:center">${tx("We sent a 6-digit code on WhatsApp to the number ending","हमने WhatsApp पर 6 अंकों का कोड उस नंबर पर भेजा है जो इन अंकों पर ख़त्म होता है")}
+        <b>••${esc(draft.last4 || "")}</b>.</p>
+      <label class="fieldlabel">${tx("Enter the 6-digit code","6 अंकों का कोड डालो")}</label>
+      ${codeFieldHTML("gCode")}
+      <div class="feedback bad" id="gErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="gGo">${tx("Finish and start →","पूरा करो और शुरू करो →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="gResend">${tx("Send it again","फिर भेजो")}</button>
+        <button class="btn ghost" id="gChange">${tx("Use another number","दूसरा नंबर")}</button>
+      </div>`;
+    const code = $("#gCode"), err = $("#gErr"), go = $("#gGo");
+    setTimeout(() => code.focus(), 60);
+    code.oninput = () => { err.textContent = ""; };
+    $("#gChange").onclick = () => { sfx.back(); draft.step = "number"; paint(); };
+    $("#gResend").onclick = async () => {
+      err.textContent = tx("Sending…","भेज रहे हैं…");
+      const r = await api("send_guardian_otp", { mobile: draft.mobile, purpose: "consent" }, true);
+      err.textContent = (r && r.ok) ? tx("Sent again. Check WhatsApp.","फिर भेज दिया। WhatsApp देखो।") : otpErrText(r);
+      srSay(err.textContent);
+    };
+    const submit = async () => {
+      const c = (code.value || "").replace(/\D/g, "");
+      if(c.length !== 6){ err.textContent = tx("Please enter all 6 digits.","कृपया पूरे 6 अंक डालो।"); code.focus(); return; }
+      go.disabled = true; err.textContent = tx("Checking…","जाँच रहे हैं…");
+      const v = await api("verify_guardian_otp", { mobile: draft.mobile, code: c, purpose: "consent" }, true);
+      if(!(v && v.ok)){ go.disabled = false; code.value = ""; err.textContent = otpErrText(v); srSay(err.textContent); code.focus(); return; }
+      // The number is proven. Create her profile against it — the same validation as an
+      // ordinary signup, so a rejected field here leaves the ticket usable and she can fix it.
+      const r = await api("signup_with_consent", {
+        mobile: draft.mobile, ticket: v.ticket, name: draft.name,
+        avatar: draft.avatar, pin: draft.pin, band: draft.band,
+      }, true);
+      if(r && r.ok){ finishLogin(r); return; }
+      go.disabled = false; err.textContent = otpErrText(r); srSay(err.textContent);
+    };
+    go.onclick = submit;
+    code.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+    const n = tx("Enter the 6-digit code sent on WhatsApp.","WhatsApp पर भेजा गया 6 अंकों का कोड डालो।");
+    setNarration(n, n);
+  };
+
+  const paint = () => { (draft.step === "code" ? paintCode : paintNumber)(); };
+  paint();
+  refreshTop();
+}
+
+// FORGOT PIN. Before this existed a forgotten PIN was the end of a girl's account: there was
+// no reset path anywhere, not even for staff, so her stars were simply gone. Three steps —
+// prove the guardian's number, pick which girl (sisters share a handset), choose a new PIN.
+function renderForgotPin(st){
+  const s = st || {};
+  stopSpeech(); rerender = () => renderForgotPin(s); root.innerHTML = "";
+  setBack(tx("← Log in","← लॉग इन"), renderLogin);
+  s.step = s.step || "number";
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Forgot your PIN? 🔑","पिन भूल गई? 🔑")}</h1>
+      <p>${tx("A grown-up's phone can set a new one. Your stars are safe.","किसी बड़े के फ़ोन से नया पिन बन सकता है। तुम्हारे सितारे सुरक्षित हैं।")}</p></div>
+    <div class="authform" id="fwrap"></div>
+  </div>`));
+  const wrap = $("#fwrap");
+
+  const paintNumber = () => {
+    wrap.innerHTML = `
+      <label class="fieldlabel">${tx("The mobile number a grown-up used when you signed up","साइन अप के समय किसी बड़े ने जो मोबाइल नंबर दिया था")}</label>
+      ${mobileFieldHTML("fMobile", s.mobile)}
+      <div class="hint2">${tx("We send a 6-digit code to that number on WhatsApp.","हम उस नंबर पर WhatsApp से 6 अंकों का कोड भेजते हैं।")}</div>
+      <div class="feedback bad" id="fErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="fSend">${tx("Send the code →","कोड भेजो →")}</button></div>
+      <div class="center" style="margin-top:14px"><button class="btn ghost" id="fAsk">${tx("No WhatsApp? Ask your teacher","WhatsApp नहीं है? शिक्षिका से पूछो")}</button></div>`;
+    const num = $("#fMobile"), err = $("#fErr"), go = $("#fSend");
+    setTimeout(() => num.focus(), 60);
+    bindMobileField(num, () => { err.textContent = ""; });
+    $("#fAsk").onclick = () => {
+      // Honest dead end rather than a broken promise: a facilitator resets it from Desk.
+      err.textContent = tx("Your teacher can set a new PIN for you.","तुम्हारी शिक्षिका तुम्हारे लिए नया पिन बना सकती हैं।");
+      srSay(err.textContent); sfx.tap();
+    };
+    const send = async () => {
+      const m = (num.value || "").replace(/\D/g, "");
+      if(m.length !== 10){ err.textContent = tx("Please type the 10-digit mobile number.","कृपया 10 अंकों का मोबाइल नंबर लिखो।"); num.focus(); return; }
+      go.disabled = true; err.textContent = tx("Sending…","भेज रहे हैं…");
+      const r = await api("send_guardian_otp", { mobile: m, purpose: "recovery" }, true);
+      go.disabled = false;
+      if(r && r.ok){ s.mobile = m; s.last4 = r.last4 || m.slice(-4); s.step = "code"; sfx.enter(); paint(); return; }
+      err.textContent = otpErrText(r); srSay(err.textContent);
+    };
+    go.onclick = send;
+    num.onkeydown = (e) => { if(e.key === "Enter") send(); };
+    const n = tx("Forgot your PIN. Type the grown-up's mobile number to get a code.","पिन भूल गई। कोड पाने के लिए किसी बड़े का मोबाइल नंबर लिखो।");
+    setNarration(n, n);
+  };
+
+  const paintCode = () => {
+    wrap.innerHTML = `
+      <p style="text-align:center">${tx("Code sent on WhatsApp to the number ending","WhatsApp पर उस नंबर को कोड भेजा गया जो इन अंकों पर ख़त्म होता है")} <b>••${esc(s.last4 || "")}</b>.
+        ${tx("If that number is not on file, no code was sent.","अगर वह नंबर दर्ज नहीं है, तो कोई कोड नहीं भेजा गया।")}</p>
+      <label class="fieldlabel">${tx("Enter the 6-digit code","6 अंकों का कोड डालो")}</label>
+      ${codeFieldHTML("fCode")}
+      <div class="feedback bad" id="fErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="fGo">${tx("Next →","आगे →")}</button></div>
+      <div class="center" style="margin-top:14px"><button class="btn ghost" id="fChange">${tx("Use another number","दूसरा नंबर")}</button></div>`;
+    const code = $("#fCode"), err = $("#fErr"), go = $("#fGo");
+    setTimeout(() => code.focus(), 60);
+    code.oninput = () => { err.textContent = ""; };
+    $("#fChange").onclick = () => { sfx.back(); s.step = "number"; paint(); };
+    const submit = async () => {
+      const c = (code.value || "").replace(/\D/g, "");
+      if(c.length !== 6){ err.textContent = tx("Please enter all 6 digits.","कृपया पूरे 6 अंक डालो।"); code.focus(); return; }
+      go.disabled = true; err.textContent = tx("Checking…","जाँच रहे हैं…");
+      const v = await api("verify_guardian_otp", { mobile: s.mobile, code: c, purpose: "recovery" }, true);
+      go.disabled = false;
+      if(!(v && v.ok)){ code.value = ""; err.textContent = otpErrText(v); srSay(err.textContent); code.focus(); return; }
+      s.ticket = v.ticket;
+      s.students = Array.isArray(v.students) ? v.students : [];
+      if(!s.students.length){
+        // The number verified but carries no learner — an unknown number answered uniformly
+        // by design (see the ENUMERATION note in api.py), so say so plainly here.
+        err.textContent = tx("No learner is registered on this number. Please ask your teacher.","इस नंबर पर कोई विद्यार्थी दर्ज नहीं है। कृपया शिक्षिका से पूछो।");
+        srSay(err.textContent); return;
+      }
+      s.step = "pin"; s.who = s.students.length === 1 ? s.students[0].id : ""; sfx.enter(); paint();
+    };
+    go.onclick = submit;
+    code.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+    const n = tx("Enter the 6-digit code sent on WhatsApp.","WhatsApp पर भेजा गया 6 अंकों का कोड डालो।");
+    setNarration(n, n);
+  };
+
+  const paintPin = () => {
+    const many = s.students.length > 1;
+    wrap.innerHTML = `
+      ${many ? `<label class="fieldlabel">${tx("Who is setting a new PIN?","किसका नया पिन बनाना है?")}</label>
+      <div class="avpick" id="fWho"></div>` : ``}
+      <label class="fieldlabel">${tx("Choose a new PIN","नया पिन चुनो")}</label>
+      <input id="fPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
+             autocomplete="new-password" placeholder="${escAttr(tx("4–8 digits","4–8 अंक"))}">
+      <label class="fieldlabel">${tx("Type it again","फिर से लिखो")}</label>
+      <input id="fPin2" class="searchbox" type="password" inputmode="numeric" maxlength="8"
+             autocomplete="new-password" placeholder="${escAttr(tx("4–8 digits","4–8 अंक"))}">
+      <div class="feedback bad" id="fErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="fSet">${tx("Save the new PIN →","नया पिन सुरक्षित करो →")}</button></div>`;
+    const pin = $("#fPin"), pin2 = $("#fPin2"), err = $("#fErr"), go = $("#fSet");
+    if(many){
+      const box = $("#fWho");
+      s.students.forEach(stu => {
+        const b = el(`<button class="av ${stu.id === s.who ? "sel" : ""}" style="width:auto; padding:6px 12px">${esc(stu.avatar || "🙂")} ${esc(stu.name)}</button>`);
+        b.onclick = () => { s.who = stu.id; sfx.tap(); box.querySelectorAll(".av").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); err.textContent = ""; };
+        box.appendChild(b);
+      });
+    }
+    setTimeout(() => pin.focus(), 60);
+    const submit = async () => {
+      if(!s.who){ err.textContent = tx("Please choose who this is for.","कृपया चुनो कि यह किसके लिए है।"); return; }
+      const p = (pin.value || "").trim();
+      if(!/^\d{4,8}$/.test(p)){ err.textContent = tx("Please choose a PIN of 4 to 8 digits.","कृपया 4 से 8 अंकों का पिन चुनो।"); pin.focus(); return; }
+      if(p !== (pin2.value || "").trim()){ err.textContent = tx("The two PINs are not the same.","दोनों पिन एक जैसे नहीं हैं।"); pin2.value = ""; pin2.focus(); return; }
+      go.disabled = true; err.textContent = tx("Saving…","सुरक्षित कर रहे हैं…");
+      const r = await api("reset_pin", { mobile: s.mobile, ticket: s.ticket, student: s.who, new_pin: p }, true);
+      if(r && r.ok){ finishLogin(r); return; }
+      go.disabled = false; err.textContent = otpErrText(r); srSay(err.textContent);
+      // A spent or expired ticket means starting over — say so by going back to the number.
+      if(r && r.error === "bad_ticket"){ s.step = "number"; setTimeout(paint, 1200); }
+    };
+    go.onclick = submit;
+    pin2.onkeydown = (e) => { if(e.key === "Enter") submit(); };
+    const n = tx("Choose a new PIN, then type it again.","नया पिन चुनो, फिर उसे दोबारा लिखो।");
+    setNarration(n, n);
+  };
+
+  const paint = () => { ({ number: paintNumber, code: paintCode, pin: paintPin }[s.step] || paintNumber)(); };
+  paint();
+  refreshTop();
+}
+
 // ONLINE auth — remote learners are real Frappe Website Users (username + PIN, no email).
 // Login goes through Frappe's own /api/method/login (sets the session cookie), then we load
 // the linked Student via get_my_student. Signup goes through hikmat.signup_online (invite code).
@@ -4615,6 +4959,13 @@ function applySettingsDefaults(s){
   if(typeof s.helpDefaultOn === "boolean") SETTINGS.helpDefaultOn = s.helpDefaultOn;
   if(s.defaultTheme) SETTINGS.defaultTheme = s.defaultTheme;
   if(typeof s.defaultSound === "boolean") SETTINGS.defaultSound = s.defaultSound;
+  // Guardian phone verification. Handled here, not at the two call sites, because BOTH the
+  // localStorage-cached settings and the live get_settings response funnel through this
+  // function — so a device that has been online once keeps the right wording while offline.
+  if(typeof s.otpEnabled === "boolean") SETTINGS.otpEnabled = s.otpEnabled;
+  if(s.consentVersion) SETTINGS.consentVersion = s.consentVersion;
+  if(s.consentText) SETTINGS.consentText = s.consentText;
+  if(s.consentTextHi) SETTINGS.consentTextHi = s.consentTextHi;
 }
 function applyServerDefaults(){
   if(state.prefsTouched) return;                  // respect the user's own toggles

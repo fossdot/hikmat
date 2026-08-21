@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-08-20 10:00:00.000000",
+ "description": "Proof that a parent or guardian consented to this child's profile, verified by a code sent to their own phone. This is the record India's DPDP Act 2023 asks for: it stores WHAT was agreed to (the exact bilingual text, snapshotted, not a pointer to text that can later be edited), WHEN, and HOW the number was proven — and it stores no phone number, only its HMAC and last 4 digits.",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "verified_on",
+  "channel",
+  "guardian_mobile_hash",
+  "guardian_mobile_last4",
+  "otp",
+  "sec_text",
+  "consent_text_version",
+  "consent_text",
+  "sec_withdraw",
+  "withdrawn_on",
+  "withdrawn_note"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "description": "Denormalised so the record still reads if the profile is later deleted on request.",
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Student name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "verified_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Consent verified on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "channel",
+   "fieldtype": "Select",
+   "label": "Verified via",
+   "options": "\nWhatsApp\nSMS\nConsole\nFacilitator",
+   "read_only": 1
+  },
+  {
+   "fieldname": "guardian_mobile_hash",
+   "fieldtype": "Data",
+   "label": "Guardian number (hashed)",
+   "length": 64,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "guardian_mobile_last4",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ends in",
+   "length": 4,
+   "read_only": 1
+  },
+  {
+   "description": "The challenge that proved the number. Kept as the audit chain; it holds no number and no code.",
+   "fieldname": "otp",
+   "fieldtype": "Link",
+   "label": "Verified by challenge",
+   "options": "Hikmat OTP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_text",
+   "fieldtype": "Section Break",
+   "label": "What was agreed to"
+  },
+  {
+   "fieldname": "consent_text_version",
+   "fieldtype": "Data",
+   "label": "Consent text version",
+   "length": 40,
+   "read_only": 1
+  },
+  {
+   "description": "Snapshot of the exact wording shown at the time, in both languages. Snapshotted deliberately: consent to wording that has since been rewritten is not consent to the new wording.",
+   "fieldname": "consent_text",
+   "fieldtype": "Small Text",
+   "label": "Consent text (as shown)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_withdraw",
+   "fieldtype": "Section Break",
+   "label": "Withdrawal"
+  },
+  {
+   "description": "Set when a guardian withdraws consent. DPDP gives them that right, and withdrawal must be as easy as giving it.",
+   "fieldname": "withdrawn_on",
+   "fieldtype": "Datetime",
+   "label": "Withdrawn on"
+  },
+  {
+   "fieldname": "withdrawn_note",
+   "fieldtype": "Small Text",
+   "label": "Withdrawal note"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-20 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Hikmat Consent",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "student_name",
+ "track_changes": 1
+}

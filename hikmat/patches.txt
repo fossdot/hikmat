@@ -15,3 +15,4 @@ hikmat.patches.v8_seed_expanded_curriculum
 hikmat.patches.v10_guard_report_output
 hikmat.patches.v11_guard_more_reports
 hikmat.patches.v12_remove_boli
+hikmat.patches.v13_guardian_otp
