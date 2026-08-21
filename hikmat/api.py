@@ -983,7 +983,10 @@ def _build_settings():
         # we filed as agreed-to are provably the same string. A stale cached client showing
         # older wording is the one case they can differ, which is why the version rides along
         # and is stored beside the snapshot.
-        "otpEnabled": bool(s.get("otp_enabled")),
+        # bool(_otp_config()), NOT the raw tickbox: the client uses this to decide whether to
+        # SHOW the guardian gate INSTEAD OF the consent tickbox, so publishing "enabled but
+        # unable to send" hides the only working door behind one that cannot open.
+        "otpEnabled": bool(_otp_config()),
         "consentVersion": _CONSENT_VERSION,
         "consentText": _CONSENT_TEXT_EN,
         "consentTextHi": _CONSENT_TEXT_HI,
@@ -2034,7 +2037,7 @@ def _login_succeeded(account):
 
 
 @frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
-def clear_login_lockout(student=None, name=None, ip=None):
+def clear_login_lockout(student=None, name=None, ip=None, mobile=None):
     """Let a locked-out girl back in NOW. This is the release valve that makes a per-account
     lockout acceptable: without it, an attacker burning another child's wrong-PIN budget would
     keep her out for up to 24h with nobody able to help.
@@ -2052,6 +2055,27 @@ def clear_login_lockout(student=None, name=None, ip=None):
     be no valve at all — it is what makes a per-account lockout tolerable."""
     _require_staff()
     student, name, ip = _docname(student), _docname(name), _norm_ip(ip)
+    out_otp = {}
+    if mobile:
+        # The OTP arm, and it is the same release valve for the same reason. The send ceilings
+        # are keyed on the guardian's NUMBER, which is not a secret, so anyone who knows it can
+        # spend a family's daily sends and leave a girl unable to recover her PIN for 24 hours.
+        # A per-number ceiling is only tolerable if somebody can lift it on the spot — exactly
+        # the argument made for the PIN buckets above.
+        e164 = _norm_mobile(mobile)
+        if not e164:
+            return {"ok": False, "error": "bad_mobile"}
+        mh = _mobile_hash(e164)
+        for b in ("otpdayall:" + mh, "otpreset:" + mh) + tuple(
+                pre + p + ":" + mh for pre in ("otpday:", "otpcool:") for p in ("consent", "recovery")):
+            out_otp[b] = {"count": _fail_count(b)}
+            try:
+                _rate_reset(b)
+            except Exception as e:
+                _rl_warn(b, e, False)
+        # Challenges already burned to their attempt ceiling stay dead — they were guessed at,
+        # and reviving one would hand the guesser more tries. She simply asks for a new code,
+        # which the cleared budget now allows.
     targets = []
     if student:
         row = frappe.db.get_value("Student", student, ["name", "student_name"], as_dict=True)
@@ -2063,7 +2087,7 @@ def clear_login_lockout(student=None, name=None, ip=None):
         if key:                                  # a name of nothing but markup/format chars
             targets.append(_login_account_key("nm", key))
     targets = list(dict.fromkeys(targets))       # she may be reachable by both routes
-    if not (targets or ip):
+    if not (targets or ip or out_otp):
         return {"ok": False, "error": "no_target"}
     out = {}
     for acct in targets:
@@ -2081,6 +2105,7 @@ def clear_login_lockout(student=None, name=None, ip=None):
             _rate_reset(b)
         except Exception as e:
             _rl_warn(b, e, False)
+    out.update(out_otp)
     return {"ok": True, "cleared": out}
 
 
@@ -2213,7 +2238,19 @@ def _create_self_signup_student(name, avatar, pin, age, band, cohort=None):
 @frappe.whitelist(allow_guest=True)
 def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band=None):
     """Self-service signup: a learner creates their own profile and is logged straight in.
-    No email/password — just a name (+ optional avatar, PIN, grade band). Rate-limited per IP."""
+    No email/password — just a name (+ optional avatar, PIN, grade band). Rate-limited per IP.
+
+    REFUSED OUTRIGHT while guardian verification is switched on, because otherwise this is a
+    way around it. The game decides which screen to show from `SETTINGS.otpEnabled &&
+    backendLive`, and `backendLive` is a boot-time latch: a device that booted with no signal
+    (or whose first API call lost a race) keeps cached settings but a false latch, so it shows
+    the OLD child-ticked box — and then reaches a server that IS up and creates a real, fully
+    synced Student with no parental consent behind it. Which is precisely the thing the gate
+    exists to prevent, so the ceiling cannot live in the client. A profile made with no server
+    at all is unaffected and still allowed: it stays on the device (`local: true`), transmits
+    nothing, and so processes no personal data for anyone to consent to."""
+    if _otp_config():
+        return {"ok": False, "error": "otp_required"}
     if not _rate_ok("signup:" + _client_ip(), 60, 3600, fail_closed=True):
         # generous for a classroom; stops spam faucets. fail_closed: signup is PRE-AUTH and
         # mints a Student row + a 90-day token, so an uncapped faucet is the destructive case —
@@ -2466,9 +2503,12 @@ def get_campuses():
 _OTP_DIGITS = 6
 _OTP_MAX_ATTEMPTS = 5             # wrong codes before the challenge voids
 _OTP_RESEND_COOLDOWN = 60         # seconds between sends to one number
-_OTP_PER_NUMBER_DAY = 5           # sends per number per 24h
+_OTP_PER_NUMBER_DAY = 5           # sends per number per 24h, PER PURPOSE
+_OTP_PER_NUMBER_DAY_TOTAL = 8     # ...and across both purposes together
 _OTP_PER_IP_HOUR = 20             # sends per source per hour
 _OTP_VERIFY_PER_IP_HOUR = 60      # code guesses per source per hour
+_OTP_RESET_PER_NUMBER_HOUR = 10   # PIN-reset attempts per guardian number per hour
+_OTP_RESET_PER_IP_HOUR = 30       # ...and per source per hour
 _TICKET_TTL_SECONDS = 900         # 15 min to finish the signup / reset after verifying
 _OTP_KEEP_DAYS = 30               # then the challenge rows are pruned (storage limitation)
 
@@ -2493,11 +2533,31 @@ _CONSENT_TEXT_HI = (
     "और मैं कभी भी उसका खाता और डेटा हटाने के लिए कह सकता/सकती हूँ।"
 )
 
-_MOBILE_RE = re.compile(r"^[6-9]\d{9}$")      # Indian mobile: 10 digits, leading 6-9
+# ASCII digits ONLY, spelled [0-9] rather than \d. In Python \d is UNICODE: it matches
+# Devanagari ०-९, Arabic-Indic, Bengali and a dozen other decimal scripts, so `\d{9}` happily
+# accepted "98765४3210" (a Devanagari 4 in the middle) as a valid number — see _norm_mobile
+# for why that was the whole ceiling gone.
+_MOBILE_RE = re.compile(r"^[6-9][0-9]{9}$")   # Indian mobile: 10 ASCII digits, leading 6-9
+
+
+def _rate_room(bucket, limit):
+    """True if `bucket` is under `limit`, WITHOUT consuming any of it. Fails CLOSED.
+
+    Exists so a send budget can be checked BEFORE the message is attempted and charged only
+    AFTER it is actually handed to the gateway. Charging up front (which is what _rate_ok
+    does, since it INCRs to test) meant a misconfigured or throttling gateway burned a
+    family's whole day of sends without delivering anything — and "the access token expired"
+    is the single likeliest state of a real deployment months in, so that turned one bad
+    credential into a 24-hour lockout for every family who tried."""
+    try:
+        return _rate_state(bucket)[0] < limit
+    except Exception as e:
+        _rl_warn(bucket, e, True)
+        return False
 
 
 def _norm_mobile(val):
-    """A guardian's number as E.164 (+91XXXXXXXXXX), or "" if it is not a valid Indian
+    r"""A guardian's number as E.164 (+91XXXXXXXXXX), or "" if it is not a valid Indian
     mobile number.
 
     ONE canonical form is a security property, not tidiness: the number is the key for the
@@ -2514,9 +2574,27 @@ def _norm_mobile(val):
 
     India-only, deliberately and narrowly: WhatsApp will happily accept a foreign number and
     charge a different rate for it, and every family in this programme is in India. A number
-    we cannot reason about is refused rather than half-supported."""
+    we cannot reason about is refused rather than half-supported.
+
+    NON-ASCII DIGITS ARE FOLDED, NOT DROPPED, and that is the same security property again.
+    This used to strip with `[^\d]`, and Python's `\d` is UNICODE — it KEEPS Devanagari
+    ०१२३४५६७८९ and every other decimal script — while `_MOBILE_RE` was `[6-9]\d{9}`, which
+    ACCEPTED them. Measured: "98765४3210" (one Devanagari 4) passed both, so it normalised to a
+    string different from "9876543210", hashed differently, and therefore
+      * minted a FRESH resend cooldown and a fresh 5-a-day budget per spelling — with ~10
+        interchangeable spellings per digit position that is the per-number ceiling gone,
+        leaving only the per-IP one, which is exactly the "attacker varies something the
+        victim cannot" bug this file has been broken by twice (see the PIN LOCKOUT note); and
+      * silently broke recovery: a guardian who enrolled from a Devanagari keypad stored a
+        hash that the ASCII spelling of her own number can never match, and the uniform
+        "if that number is on file, a code is on its way" reply means she would never be
+        told why no message ever came.
+    Folding rather than rejecting is deliberate: a Hindi keyboard really can produce these,
+    and unicodedata.digit maps each to the same ASCII value, so both spellings now reach ONE
+    canonical form and ONE hash."""
     s = _docname(val, 24)                     # scalars only — a dict here reaches an ORM filter
-    s = re.sub(r"[^\d]", "", s)               # drop +, spaces, dashes, brackets alike
+    s = "".join(str(unicodedata.digit(ch)) for ch in s if ch.isdigit()
+                and unicodedata.decimal(ch, None) is not None)
     if len(s) == 14 and s.startswith("0091"):
         s = s[4:]
     if len(s) == 12 and s.startswith("91"):
@@ -2560,7 +2638,16 @@ def _otp_config():
     Off is the DEFAULT and it is a real, supported state: a site with no WhatsApp credentials
     returns None here, every endpoint below answers `otp_off`, and the game falls back to the
     plain consent tickbox exactly as it behaved before this existed. Nothing half-configured
-    can send."""
+    can send.
+
+    "Can it actually send?" is the whole question this answers, which is why it checks the
+    TOKEN as well as the phone number id, and why Console counts as ready only where a Console
+    code is actually handed back (_console_ok). The alternative — reporting the raw `otp_enabled`
+    tickbox — put a consent gate in front of every new learner on a site that could not send:
+    the gate appears, "Send the code" fails, and because the gate REPLACES the old tickbox
+    there is no other way to enrol. A ticked box plus an expired token is the likeliest state
+    of a real deployment six months in, so it has to degrade to the pre-existing path rather
+    than to a dead end. get_settings publishes bool(_otp_config()) for the same reason."""
     s = frappe.get_cached_doc("Hikmat Settings")
     if not s.get("otp_enabled"):
         return None
@@ -2575,8 +2662,10 @@ def _otp_config():
         "send_button": bool(s.get("wa_send_button")),
         "button_subtype": (s.get("wa_button_subtype") or "url").strip(),
     }
-    if cfg["channel"] == "WhatsApp" and not cfg["phone_number_id"]:
+    if cfg["channel"] == "WhatsApp" and not (cfg["phone_number_id"] and _wa_token()):
         return None                            # configured to send, but cannot: treat as off
+    if cfg["channel"] == "Console" and not _console_ok():
+        return None                            # Console on a real site would never reveal a code
     return cfg
 
 
@@ -2692,7 +2781,16 @@ def send_guardian_otp(mobile=None, purpose="consent"):
 
     The ceilings are checked cheapest-and-most-specific first so that a guardian tapping
     "resend" twice is stopped by the 60-second cooldown WITHOUT burning one of that number's
-    five daily sends."""
+    five daily sends.
+
+    THE DAY BUDGET IS PER PURPOSE, with a smaller total on top. Keyed on the number alone, an
+    enrolment flood spent the SAME five sends a girl needs to recover her forgotten PIN: five
+    guest POSTs (60s apart, purely to clear the cooldown) and that household could neither
+    enrol nor reset a PIN for 24 hours, repeatable daily. Separating them reserves recovery
+    from consent traffic; the total then stops the two budgets from simply doubling how many
+    unexpected messages a stranger's handset can be made to receive.
+
+    And a budget is charged only once the gateway has ACCEPTED the message — see _rate_room."""
     cfg = _otp_config()
     if not cfg:
         return {"ok": False, "error": "otp_off"}
@@ -2703,11 +2801,15 @@ def send_guardian_otp(mobile=None, purpose="consent"):
     mhash = _mobile_hash(e164)
 
     ip = _client_ip()
+    day_b = "otpday:" + purpose + ":" + mhash       # per purpose: recovery keeps its own room
+    tot_b = "otpdayall:" + mhash                    # ...bounded overall, so it cannot double
     if not _rate_ok("otpip:" + ip, _OTP_PER_IP_HOUR, 3600, fail_closed=True):
         return {"ok": False, "error": "rate_limited"}
-    if not _rate_ok("otpcool:" + mhash, 1, _OTP_RESEND_COOLDOWN, fail_closed=True):
+    # The cooldown IS charged up front — that is exactly its job, to stop a rapid re-tap, and a
+    # failed send legitimately costs the caller a 60-second wait before trying again.
+    if not _rate_ok("otpcool:" + purpose + ":" + mhash, 1, _OTP_RESEND_COOLDOWN, fail_closed=True):
         return {"ok": False, "error": "too_soon"}
-    if not _rate_ok("otpday:" + mhash, _OTP_PER_NUMBER_DAY, 86400, fail_closed=True):
+    if not (_rate_room(day_b, _OTP_PER_NUMBER_DAY) and _rate_room(tot_b, _OTP_PER_NUMBER_DAY_TOTAL)):
         return {"ok": False, "error": "rate_limited"}
 
     student = None
@@ -2716,6 +2818,17 @@ def send_guardian_otp(mobile=None, purpose="consent"):
         if not matches:
             # Nothing to recover. Answered as success on purpose — see the ENUMERATION note
             # above: the reply is uniform, and only the handset learns the truth.
+            #
+            # The budget IS charged even though nothing is sent, and that is the point. Skipping
+            # it made the CEILING itself the oracle the uniform reply was there to prevent: six
+            # requests against an enrolled number eventually answered rate_limited, while the
+            # same six against an unknown number never did — so a caller learned which
+            # households are in the programme by watching for the refusal instead of watching
+            # for a message. Charging both paths identically costs nothing real (nobody is
+            # recovering on a number with no learner, and the window is 24h) and keeps every
+            # observable difference on the handset, where it belongs.
+            for b, lim in ((day_b, _OTP_PER_NUMBER_DAY), (tot_b, _OTP_PER_NUMBER_DAY_TOTAL)):
+                _rate_ok(b, lim, 86400, fail_closed=True)
             return {"ok": True, "sent": True, "last4": e164[-4:], "expires_in": cfg["ttl"] * 60}
         student = matches[0].name if len(matches) == 1 else None
 
@@ -2735,7 +2848,17 @@ def send_guardian_otp(mobile=None, purpose="consent"):
     if not ok:
         # Surfaced honestly rather than swallowed: a guardian who is told "sent" and gets
         # nothing has no next move, whereas the game can offer "ask your teacher" on this.
+        #
+        # The row DELIBERATELY STAYS, with sent_ok=0 and the gateway's own error, because a
+        # facilitator debugging "no codes are arriving" needs to see that sends were attempted
+        # and why they failed. What must never happen is this row COMPETING to be the code the
+        # guardian types — verify only considers challenges with sent_ok=1. It could before,
+        # and did: a resend whose graph call failed made the guardian's real, still-in-TTL
+        # code answer "wrong code" until it expired. No day budget is charged either, so a
+        # broken gateway costs her a 60-second cooldown rather than her whole day of sends.
         return {"ok": False, "error": "send_failed"}
+    for b, lim in ((day_b, _OTP_PER_NUMBER_DAY), (tot_b, _OTP_PER_NUMBER_DAY_TOTAL)):
+        _rate_ok(b, lim, 86400, fail_closed=True)      # charged now that it really went
     out = {"ok": True, "sent": True, "last4": e164[-4:], "expires_in": cfg["ttl"] * 60}
     if channel == "Console" and _console_ok():
         out["code"] = code                             # dev bench / test runner only
@@ -2761,7 +2884,29 @@ def verify_guardian_otp(mobile=None, code=None, purpose="consent"):
     hour. The per-challenge ceiling is the real control — a 6-digit code is 1 in a million, so
     5 tries is nowhere near guessable, while a source ceiling alone would fall to anyone who
     can vary their IP (precisely the hole that made the old PIN lockout worthless; see the PIN
-    LOCKOUT note)."""
+    LOCKOUT note).
+
+    EVERY LIVE CHALLENGE IS TRIED, not just the newest. This used to take
+    `order_by creation desc limit 1`, which broke the two commonest real situations at once:
+      * a guardian on 2G taps "Send it again" because nothing has arrived, then the FIRST
+        message lands — and typing its perfectly valid code answered "wrong code", because
+        only the newer row was ever consulted;
+      * two sisters on one handset (which _students_for_guardian exists to support) enrolling
+        minutes apart — the second send silently killed the first girl's code.
+    In both cases her repeated, correct attempts then burned the newer challenge's budget
+    until BOTH were dead.
+    A WRONG guess is charged to every live challenge for that number, so widening this does
+    NOT widen the guessing budget: five wrong codes still end the number's attempts, whether
+    there is one outstanding challenge or three. That is the honest reading of "5 tries" —
+    per number, not per row — and it is what stops a resend from being a way to buy more
+    guesses.
+
+    `tries_left` is deliberately NOT reported. It looked like a kindness, and it was an
+    unauthenticated oracle: the field was present only when a live challenge existed for that
+    number, so one send plus one deliberately-wrong verify told a caller whether a phone
+    number belongs to a family in this programme — without ever touching the handset, which is
+    precisely the leak the ENUMERATION note above promises the API does not have. The screen
+    says "wrong code, try again" instead; the ceiling is enforced, not advertised."""
     cfg = _otp_config()
     if not cfg:
         return {"ok": False, "error": "otp_off"}
@@ -2774,25 +2919,32 @@ def verify_guardian_otp(mobile=None, code=None, purpose="consent"):
     code = _docname(code, 12)
     mhash = _mobile_hash(e164)
 
+    # sent_ok=1: a challenge the gateway REFUSED was never in anyone's hand, so it must not be
+    # able to answer for one that was. attempts: a spent challenge drops out of the running
+    # rather than shadowing a live one. The cap is a sanity bound — the day ceilings mean there
+    # can only be a handful.
     rows = frappe.get_all("Hikmat OTP",
-                          filters={"mobile_hash": mhash, "purpose": purpose,
+                          filters={"mobile_hash": mhash, "purpose": purpose, "sent_ok": 1,
                                    "consumed_on": ["is", "not set"],
+                                   "attempts": ["<", _OTP_MAX_ATTEMPTS],
                                    "expires_on": [">", frappe.utils.now()]},
-                          fields=["name"], order_by="creation desc", limit=1)
-    if not rows:
-        return {"ok": False, "error": "bad_code"}
-    name = rows[0].name
-    row = frappe.db.get_value("Hikmat OTP", name,
-                              ["code_hash", "attempts", "consumed_on", "expires_on"],
-                              as_dict=True, for_update=True)
-    if not row or row.consumed_on or _int(row.attempts) >= _OTP_MAX_ATTEMPTS:
-        return {"ok": False, "error": "bad_code"}
-    if not _pin_ok(row.code_hash, code):               # constant-time; fail-closed on empties
-        frappe.db.set_value("Hikmat OTP", name, "attempts", _int(row.attempts) + 1,
-                            update_modified=False)
+                          fields=["name", "code_hash", "attempts"],
+                          order_by="creation desc", limit=20)
+    match = next((r for r in rows if _pin_ok(r.code_hash, code)), None)   # constant-time compare
+    if not match:
+        for r in rows:      # one shared budget: a resend does not buy extra guesses
+            frappe.db.set_value("Hikmat OTP", r.name, "attempts", _int(r.attempts) + 1,
+                                update_modified=False)
         frappe.db.commit()
-        left = _OTP_MAX_ATTEMPTS - (_int(row.attempts) + 1)
-        return {"ok": False, "error": "bad_code", "tries_left": max(0, left)}
+        return {"ok": False, "error": "bad_code"}
+
+    name = match.name
+    # Re-read the winner under a row lock before consuming it: two verify calls racing on the
+    # same code would otherwise both see consumed_on empty and both mint a valid ticket.
+    locked = frappe.db.get_value("Hikmat OTP", name, ["consumed_on"], as_dict=True,
+                                 for_update=True)
+    if not locked or locked.consumed_on:
+        return {"ok": False, "error": "bad_code"}
 
     ticket = frappe.generate_hash(length=40)
     frappe.db.set_value("Hikmat OTP", name, {
@@ -2814,12 +2966,22 @@ def verify_guardian_otp(mobile=None, code=None, purpose="consent"):
     return out
 
 
-def _redeem_ticket(mhash, purpose, ticket):
-    """Burn a one-time ticket and return its challenge name, or None.
+def _find_ticket(mhash, purpose, ticket):
+    """Locate a live, unused ticket and LOCK its row, without burning it. Returns the challenge
+    name, or None.
 
     Both halves are required: the ticket AND the number it was issued for. The client
     re-sends the number, we re-hash it, and only a challenge matching both is redeemable — so
     a leaked ticket on its own (a shared screen, a URL in a log) authorises nothing.
+
+    Finding is SEPARATE from burning so a caller can establish "this request is authorised"
+    before it does anything that might refuse for an unrelated reason. reset_pin needs exactly
+    that: it used to answer whether a girl belonged to a number BEFORE it looked at the ticket,
+    which made an unmetered membership oracle out of an endpoint that authorises a PIN change
+    (see reset_pin).
+
+    Every live ticket for the number is considered, not just the newest: two sisters on one
+    handset can each be holding one, and `limit 1` silently invalidated the elder's.
 
     Compared in Python with compare_digest against a FOR UPDATE row rather than looked up by
     ticket hash, for the same reason the challenge is: the row has to be locked before its
@@ -2827,43 +2989,66 @@ def _redeem_ticket(mhash, purpose, ticket):
     ticket = _docname(ticket, 80)
     if not ticket:
         return None
+    want = hashlib.sha256(ticket.encode("utf-8")).hexdigest()
     rows = frappe.get_all("Hikmat OTP",
-                          filters={"mobile_hash": mhash, "purpose": purpose,
+                          filters={"mobile_hash": mhash, "purpose": purpose, "sent_ok": 1,
                                    "ticket_used_on": ["is", "not set"],
                                    "ticket_expires_on": [">", frappe.utils.now()]},
-                          fields=["name"], order_by="creation desc", limit=1)
-    if not rows:
-        return None
-    name = rows[0].name
-    row = frappe.db.get_value("Hikmat OTP", name, ["ticket_hash", "ticket_used_on"],
-                              as_dict=True, for_update=True)
-    if not row or row.ticket_used_on or not row.ticket_hash:
-        return None
-    want = hashlib.sha256(ticket.encode("utf-8")).hexdigest()
-    if not hmac.compare_digest(str(row.ticket_hash), want):
-        return None
+                          fields=["name"], order_by="creation desc", limit=20)
+    for r in rows:
+        row = frappe.db.get_value("Hikmat OTP", r.name, ["ticket_hash", "ticket_used_on"],
+                                  as_dict=True, for_update=True)
+        if not row or row.ticket_used_on or not row.ticket_hash:
+            continue
+        if hmac.compare_digest(str(row.ticket_hash), want):
+            return r.name
+    return None
+
+
+def _burn_ticket(name):
+    """Spend a ticket found by _find_ticket. Its row is already locked by that call."""
     frappe.db.set_value("Hikmat OTP", name, "ticket_used_on", frappe.utils.now(),
                         update_modified=False)
+
+
+def _redeem_ticket(mhash, purpose, ticket):
+    """Find and burn in one step, for callers with nothing to check in between."""
+    name = _find_ticket(mhash, purpose, ticket)
+    if name:
+        _burn_ticket(name)
     return name
 
 
-def _file_consent(student, student_name, mhash, last4, channel, otp=None):
+def _file_consent(student, student_name, mhash, last4, channel, otp=None, note=None):
     """Write the consent record and stamp the Student. One place, so the campus route (a
     facilitator recording an in-person permission) and the WhatsApp route cannot end up
     meaning subtly different things.
 
-    The wording is snapshotted from the server constant — see _CONSENT_VERSION."""
+    The wording is snapshotted from the server constant — see _CONSENT_VERSION.
+
+    THE STUDENT UPDATE IS BUILT CONDITIONALLY, and that is a correctness fix, not tidiness.
+    It used to write the hash and last-4 unconditionally, so recording an attested consent
+    with no number — which record_guardian_consent explicitly allows, and which a facilitator
+    filing a paper form months later would naturally do — issued
+    `UPDATE tabStudent SET guardian_mobile_hash = NULL, guardian_mobile_last4 = NULL`
+    over a number a guardian had already PROVEN. That silently destroyed her only route to a
+    PIN reset: recovery matches on the hash, so her guardian's real number then matched
+    nothing, and because an unknown number is answered uniformly ("if that number is on file,
+    a code is on its way") she would have waited for a message that could never come, with
+    nothing anywhere saying why. Adding a consent record must never subtract evidence."""
     frappe.get_doc({
         "doctype": "Hikmat Consent", "student": student, "student_name": student_name,
         "verified_on": frappe.utils.now(), "channel": channel,
         "guardian_mobile_hash": mhash, "guardian_mobile_last4": last4, "otp": otp,
+        "attested_note": _plain_text(note)[:500] if note else None,
         "consent_text_version": _CONSENT_VERSION,
         "consent_text": _CONSENT_TEXT_EN + "\n\n" + _CONSENT_TEXT_HI,
     }).insert(ignore_permissions=True)
-    frappe.db.set_value("Student", student, {
-        "guardian_mobile_hash": mhash, "guardian_mobile_last4": last4,
-        "guardian_verified": 1, "guardian_consent_on": frappe.utils.now(),
-    }, update_modified=False)
+    stamp = {"guardian_verified": 1, "guardian_consent_on": frappe.utils.now()}
+    if mhash:                      # never overwrite a proven number with nothing
+        stamp["guardian_mobile_hash"] = mhash
+        stamp["guardian_mobile_last4"] = last4
+    frappe.db.set_value("Student", student, stamp, update_modified=False)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -2924,7 +3109,20 @@ def reset_pin(mobile=None, ticket=None, student=None, new_pin=None):
     straight back in.
 
     Facilitators are notified. A PIN reset is exactly the event a supervising adult should see
-    after the fact, and it is cheap to send."""
+    after the fact, and it is cheap to send.
+
+    ORDER AND METERING ARE THE SECURITY HERE, and both were wrong. This endpoint used to
+    answer the membership question — "is this number the verified guardian of this exact
+    girl?" — BEFORE it looked at the ticket, and with no rate limit of any kind. So a guest
+    holding a Student docname could probe with a junk ticket and read the answer off the error
+    code: `bad_ticket` meant yes, `not_found` meant no. Nothing was spent, written or logged,
+    and docnames are not secret — a provisioned campus laptop caches the whole roster, and any
+    girl's own id sits in her localStorage. That mapped an arbitrary phone number to one
+    specific named minor in at most one request per name.
+    Now: fail-closed ceilings first, then the TICKET (found but not yet burned), then
+    membership, and BOTH failures answer `bad_ticket` — so neither reveals the other. The
+    ticket is burned only once the whole request is known to be good, so a legitimate guardian
+    who fumbles does not lose it."""
     cfg = _otp_config()
     if not cfg:
         return {"ok": False, "error": "otp_off"}
@@ -2936,11 +3134,18 @@ def reset_pin(mobile=None, ticket=None, student=None, new_pin=None):
         return {"ok": False, "error": "bad_pin"}
     mhash = _mobile_hash(e164)
     student = _docname(student)
+    # Fail closed, like every other pre-auth door here: this one changes a credential, so an
+    # uncapped faucet is both a probing tool and a way to grind pbkdf2.
+    if not _rate_ok("otpreset:" + mhash, _OTP_RESET_PER_NUMBER_HOUR, 3600, fail_closed=True) \
+            or not _rate_ok("otpresetip:" + _client_ip(), _OTP_RESET_PER_IP_HOUR, 3600,
+                            fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+    # Ticket BEFORE membership, and one shared refusal for both — see the docstring.
+    otp = _find_ticket(mhash, "Recovery", ticket)
     mine = {s.name: s for s in _students_for_guardian(mhash)}
-    if student not in mine:
-        return {"ok": False, "error": "not_found"}
-    if not _redeem_ticket(mhash, "Recovery", ticket):
+    if not otp or student not in mine:
         return {"ok": False, "error": "bad_ticket"}
+    _burn_ticket(otp)
 
     frappe.db.set_value("Student", student, "login_pin", _hash_pin(new_pin),
                         update_modified=False)
@@ -2981,12 +3186,12 @@ def record_guardian_consent(student=None, mobile=None, note=None):
         return {"ok": False, "error": "bad_mobile"}
     mhash = _mobile_hash(e164) if e164 else None
     sname = frappe.db.get_value("Student", student, "student_name")
-    _file_consent(student, sname, mhash, e164[-4:] if e164 else None, "Facilitator")
-    if note:
-        frappe.db.set_value("Hikmat Consent",
-                            frappe.db.get_value("Hikmat Consent", {"student": student},
-                                                "name", order_by="creation desc"),
-                            "withdrawn_note", _plain_text(note)[:500], update_modified=False)
+    # The note goes in ON INSERT, into its own field. It used to be written afterwards into
+    # `withdrawn_note` on whichever row a re-query said was newest — wrong field (an auditor
+    # would see a withdrawal note on a consent that was never withdrawn) and wrong row waiting
+    # to happen (a concurrent insert, or a girl with an earlier device-proven consent, and the
+    # note lands on somebody else's evidence).
+    _file_consent(student, sname, mhash, e164[-4:] if e164 else None, "Facilitator", note=note)
     frappe.db.commit()
     return {"ok": True, "student": student, "last4": e164[-4:] if e164 else ""}
 
@@ -3000,7 +3205,27 @@ def prune_otp_records():
     hooks.py next to prune_attendance_pings. Consent records are NOT pruned — they are the
     proof of permission and must outlive the challenge that produced them."""
     cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -_OTP_KEEP_DAYS)
-    frappe.db.delete("Hikmat OTP", {"creation": ["<", cutoff]})
+    stale = frappe.get_all("Hikmat OTP", filters={"creation": ["<", cutoff]}, pluck="name")
+    if not stale:
+        return
+    # Clear the Consent -> challenge link FIRST. frappe.db.delete is a raw DELETE that neither
+    # nulls nor checks referring links, so pruning left every consent record older than 30 days
+    # pointing at a row that no longer exists — and Frappe validates links on SAVE, so the next
+    # time anyone opened that record to set `withdrawn_on` (the DPDP withdrawal the doctype's
+    # own description promises) the save was refused with "Could not find Verified by
+    # challenge". The field is read_only, so Desk offered no way to clear it, and this app is
+    # deployed with no shell: the only fix would have been another patch release. The link is
+    # an audit breadcrumb, not a live relation, so dropping it when the challenge ages out is
+    # correct — the consent record keeps everything that matters on its own row.
+    for i in range(0, len(stale), 500):
+        chunk = stale[i:i + 500]
+        # A filter dict here IS a bulk UPDATE — normally the bug this file warns about loudest
+        # (see _token_for). It is deliberate and safe in this one place: `chunk` is a list of
+        # docnames this function just selected itself, never a caller's argument, and clearing
+        # every consent row that points at a pruned challenge is exactly the intent.
+        frappe.db.set_value("Hikmat Consent", {"otp": ["in", chunk]}, "otp", None,
+                            update_modified=False)
+        frappe.db.delete("Hikmat OTP", {"name": ["in", chunk]})
     frappe.db.commit()
 
 
@@ -3085,9 +3310,25 @@ def get_progress(student=None, token=None):
 # ---------------------------------------------------------------------------
 # Everything keyed on `student`, children before parents. Both erasure paths
 # walk this list so neither can forget a table again.
-_LEARNER_DOCTYPES = ("AI Conversation Turn", "AI Conversation", "Lesson Doubt",
+_LEARNER_DOCTYPES = ("Hikmat Consent", "Hikmat OTP",
+                     "AI Conversation Turn", "AI Conversation", "Lesson Doubt",
                      "Lesson Attempt", "Test Attempt", "Learning Event",
                      "Attendance Ping", "Attendance Day", "Evaluation")
+# Hikmat Consent is listed FIRST, and it is not optional. It denormalises student_name, so
+# leaving it out meant an "erase ALL her data" that left the child's NAME behind — the exact
+# residue the rest of this section exists to remove — plus her guardian's number hash. There
+# is a tempting argument for keeping consent records after erasure ("proof we were allowed
+# to process her data"), and it is self-defeating: once her data is gone there is nothing
+# left to justify, and holding her name in order to prove we were permitted to hold her name
+# is not a retention basis. It goes. (Before Consent, so the row that LINKS to a challenge
+# is gone before the challenge — tidiness only, since _erase passes force=1 and so skips
+# Frappe's link check.)
+# Hikmat OTP is erased BY THE `student` LINK, which covers her Recovery challenges. The
+# enrolment (purpose="Consent") challenge has no student — it predates her profile by a few
+# seconds — and is deliberately left to prune_otp_records: it holds no name and no number,
+# only a keyed hash of a guardian's number, and once the Consent row above is gone nothing
+# ties it to her. Deleting it by mobile_hash instead would reach across to a SISTER on the
+# same handset, whose challenges are her own business.
 # Bookkeeping tables that record a document's identity: {table: (doctype field, name field)}.
 # Frappe clears these from delete_dynamic_links, which delete_doc only ENQUEUES
 # (enqueue_after_commit=True) — on a site whose worker is down, or a campus box with no
@@ -3240,8 +3481,9 @@ def _erasure_residue(student):
 @frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
 def delete_student(student):
     """Erase a child's record and ALL her data (right-to-erasure for minors' data):
-    attempts, tests, doubts, events, attendance, evaluations, AI chats, and the Frappe
-    User of an online learner. Staff only. Use from Desk or a trusted admin tool.
+    attempts, tests, doubts, events, attendance, evaluations, AI chats, her parental-consent
+    record and phone-verification challenges, and the Frappe User of an online learner. Staff
+    only. Use from Desk or a trusted admin tool.
 
     The _require_staff() call is the ONLY thing that makes that true — do not remove it
     and do not trust the decorator instead. This function used to carry the comment "NOT

@@ -3031,10 +3031,15 @@ class TestGuardianOTP(FrappeTestCase):
 		frappe.db.commit()
 		frappe.clear_document_cache("Hikmat Settings", "Hikmat Settings")
 
-	def _reset_buckets(self, mobile):
+	def _buckets(self, mobile):
 		h = api._mobile_hash(api._norm_mobile(mobile))
 		ip = api._client_ip()
-		for b in ("otpcool:" + h, "otpday:" + h, "otpip:" + ip, "otpver:" + ip, "signup:" + ip):
+		return (["otpdayall:" + h, "otpreset:" + h, "otpip:" + ip, "otpver:" + ip,
+		         "otpresetip:" + ip, "signup:" + ip]
+		        + ["otp%s:%s:%s" % (k, p, h) for k in ("cool", "day") for p in ("consent", "recovery")])
+
+	def _reset_buckets(self, mobile):
+		for b in self._buckets(mobile):
 			api._rate_reset(b)
 			self.addCleanup(api._rate_reset, b)
 
@@ -3056,7 +3061,7 @@ class TestGuardianOTP(FrappeTestCase):
 
 		Cleared explicitly rather than slept through: the cooldown is real and tested
 		separately, and a suite that waited it out would take minutes."""
-		api._rate_reset("otpcool:" + api._mobile_hash(api._norm_mobile(mobile)))
+		api._rate_reset("otpcool:%s:%s" % (purpose, api._mobile_hash(api._norm_mobile(mobile))))
 		self._cleanup_number(mobile)
 		return api.send_guardian_otp(mobile=mobile, purpose=purpose)
 
@@ -3246,10 +3251,14 @@ class TestGuardianOTP(FrappeTestCase):
 		self._cleanup_number(self.G1)
 		r = self._send(self.G1)
 		wrong = "000000" if r["code"] != "000000" else "111111"
-		for i in range(api._OTP_MAX_ATTEMPTS):
+		for _ in range(api._OTP_MAX_ATTEMPTS):
 			bad = api.verify_guardian_otp(mobile=self.G1, code=wrong)
 			self.assertEqual(bad.get("error"), "bad_code")
-			self.assertEqual(bad.get("tries_left"), api._OTP_MAX_ATTEMPTS - (i + 1))
+			# tries_left is deliberately absent: its PRESENCE told an unauthenticated caller
+			# that a live challenge existed for that number, i.e. that the number belongs to a
+			# family in the programme, which is the leak the api.py block comment promises is
+			# not there. Every failure now answers identically.
+			self.assertNotIn("tries_left", bad)
 		# the RIGHT code is now dead too — the challenge is spent, not merely rate-limited
 		self.assertEqual(api.verify_guardian_otp(mobile=self.G1, code=r["code"]).get("error"),
 		                 "bad_code")
@@ -3322,7 +3331,11 @@ class TestGuardianOTP(FrappeTestCase):
 		v = self._ticket(self.G1, "recovery")
 		r = api.reset_pin(mobile=self.G1, ticket=v["ticket"], student=theirs["id"],
 		                  new_pin="9999")
-		self.assertEqual(r.get("error"), "not_found")
+		# One indistinguishable refusal for "not your child" and "bad ticket": answering
+		# not_found vs bad_ticket turned this into an unmetered oracle mapping a phone number
+		# to one specific named minor (docnames are not secret — a campus laptop caches the
+		# whole roster).
+		self.assertEqual(r.get("error"), "bad_ticket")
 		self.assertTrue(api._pin_ok(
 			frappe.db.get_value("Student", theirs["id"], "login_pin"), "1234"))
 		self.assertTrue(frappe.db.exists("Student", mine["id"]))
@@ -3335,6 +3348,21 @@ class TestGuardianOTP(FrappeTestCase):
 		b = self._enrol(self.G1, "Sister Two")
 		v = self._ticket(self.G1, "recovery")
 		self.assertEqual({s["id"] for s in v["students"]}, {a["id"], b["id"]})
+
+	def test_an_unknown_number_is_charged_the_same_budget_as_a_known_one(self):
+		"""Otherwise the CEILING is the oracle the uniform reply exists to prevent: an enrolled
+		number eventually answers rate_limited, an unknown one never would."""
+		self._reset_buckets(self.G2)
+		self._cleanup_number(self.G2)
+		h = api._mobile_hash(api._norm_mobile(self.G2))
+		self.assertTrue(api.send_guardian_otp(mobile=self.G2, purpose="recovery").get("ok"))
+		self.assertEqual(api._rate_state("otpday:recovery:" + h)[0], 1)
+		for _ in range(api._OTP_PER_NUMBER_DAY - 1):
+			api._rate_reset("otpcool:recovery:" + h)
+			api.send_guardian_otp(mobile=self.G2, purpose="recovery")
+		api._rate_reset("otpcool:recovery:" + h)
+		self.assertEqual(api.send_guardian_otp(mobile=self.G2, purpose="recovery").get("error"),
+		                 "rate_limited")
 
 	def test_recovery_for_an_unknown_number_answers_uniformly(self):
 		"""No API-level oracle: the reply is the same shape whether or not a family matched.
@@ -3399,15 +3427,54 @@ class TestGuardianOTP(FrappeTestCase):
 		self._reset_buckets(self.G1)
 		self._cleanup_number(self.G1)
 		h = api._mobile_hash(api._norm_mobile(self.G1))
+		cool, day = "otpcool:consent:" + h, "otpday:consent:" + h
 		self.assertTrue(api.send_guardian_otp(mobile=self.G1).get("ok"))
 		for _ in range(3):
 			self.assertEqual(api.send_guardian_otp(mobile=self.G1).get("error"), "too_soon")
-		self.assertEqual(api._rate_state("otpday:" + h)[0], 1)     # still just the one send
+		self.assertEqual(api._rate_state(day)[0], 1)               # still just the one send
 		for _ in range(api._OTP_PER_NUMBER_DAY - 1):
-			api._rate_reset("otpcool:" + h)
+			api._rate_reset(cool)
 			self.assertTrue(api.send_guardian_otp(mobile=self.G1).get("ok"))
-		api._rate_reset("otpcool:" + h)
+		api._rate_reset(cool)
 		self.assertEqual(api.send_guardian_otp(mobile=self.G1).get("error"), "rate_limited")
+
+	def test_an_enrolment_flood_cannot_spend_a_girls_recovery_allowance(self):
+		"""The day budget used to be keyed on the number ALONE, so five guest POSTs asking to
+		enrol spent the exact five sends a girl needs to recover her forgotten PIN — for 24
+		hours, repeatable daily, against any number an attacker happens to know."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Reserved Recovery Girl")
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		for _ in range(api._OTP_PER_NUMBER_DAY):                   # burn consent entirely
+			api._rate_reset("otpcool:consent:" + h)
+			api.send_guardian_otp(mobile=self.G1, purpose="consent")
+		api._rate_reset("otpcool:consent:" + h)
+		self.assertEqual(api.send_guardian_otp(mobile=self.G1, purpose="consent").get("error"),
+		                 "rate_limited")
+		# ...and she can still get her PIN back
+		r = self._send(self.G1, "recovery")
+		self.assertTrue(r.get("ok"), r)
+		self.assertIn("code", r)
+		self.assertTrue(girl["id"])
+
+	def test_a_facilitator_can_release_a_familys_send_ceilings(self):
+		"""A per-number ceiling is only tolerable if somebody can lift it on the spot — the
+		number is not a secret, so anyone who knows it can spend a family's day of sends."""
+		self._reset_buckets(self.G1)
+		self._cleanup_number(self.G1)
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		for _ in range(api._OTP_PER_NUMBER_DAY):
+			api._rate_reset("otpcool:recovery:" + h)
+			api.send_guardian_otp(mobile=self.G1, purpose="recovery")
+		api._rate_reset("otpcool:recovery:" + h)
+		self.assertEqual(api.send_guardian_otp(mobile=self.G1, purpose="recovery").get("error"),
+		                 "rate_limited")
+		out = api.clear_login_lockout(mobile=self.G1)
+		self.assertTrue(out.get("ok"), out)
+		self.assertTrue(api.send_guardian_otp(mobile=self.G1, purpose="recovery").get("ok"))
+
+	def test_releasing_ceilings_rejects_a_junk_number(self):
+		self.assertEqual(api.clear_login_lockout(mobile="12345").get("error"), "bad_mobile")
 
 	def test_console_codes_are_fenced_to_a_dev_bench(self):
 		"""The Console channel must never hand a real site its codes. in_test is true here,
@@ -3433,11 +3500,20 @@ class TestGuardianOTP(FrappeTestCase):
 		stu = frappe.get_doc({"doctype": "Student", "student_name": "Feature Phone Girl",
 		                      "active": 1, "gender": "Other"}).insert(ignore_permissions=True)
 		self.addCleanup(lambda: frappe.db.delete("Hikmat Consent", {"student": stu.name}))
-		r = api.record_guardian_consent(student=stu.name, mobile=self.G1)
+		r = api.record_guardian_consent(student=stu.name, mobile=self.G1,
+		                                note="Met her mother at the centre; she agreed.")
 		self.assertTrue(r.get("ok"), r)
 		con = frappe.get_all("Hikmat Consent", filters={"student": stu.name},
-		                     fields=["channel", "guardian_mobile_last4", "otp"])[0]
+		                     fields=["channel", "guardian_mobile_last4", "otp",
+		                             "attested_note", "withdrawn_note", "withdrawn_on"])[0]
 		self.assertEqual(con.channel, "Facilitator")
+		# The note is the ATTESTATION, on its own field. It used to be written into
+		# withdrawn_note, which showed an auditor a withdrawal note on a consent nobody had
+		# withdrawn — and, being a post-insert re-query for "the newest row", could land on a
+		# different row than the one just filed.
+		self.assertIn("Met her mother", con.attested_note or "")
+		self.assertFalse(con.withdrawn_note)
+		self.assertFalse(con.withdrawn_on)
 		self.assertEqual(con.guardian_mobile_last4, self.G1[-4:])
 		self.assertFalse(con.otp)                       # no challenge — that is the point
 		self.assertTrue(frappe.db.get_value("Student", stu.name, "guardian_verified"))
@@ -3454,6 +3530,213 @@ class TestGuardianOTP(FrappeTestCase):
 		self.assertRaises(frappe.PermissionError, api.record_guardian_consent, stu.name)
 		frappe.set_user("Administrator")
 		self.assertFalse(frappe.db.get_value("Student", stu.name, "guardian_verified"))
+
+	def test_erasing_a_learner_erases_her_consent_record_and_her_name_with_it(self):
+		"""Right-to-erasure, and a Play requirement: "delete my data" must actually remove the
+		associated data. The consent row denormalises student_name, so omitting it from
+		_LEARNER_DOCTYPES left a child's NAME behind after an erasure that reported success —
+		the precise residue the rest of that machinery exists to remove."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Erase Consent Girl")
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		self.assertTrue(frappe.get_all("Hikmat Consent", filters={"student": girl["id"]}))
+		r = api.delete_student(girl["id"])
+		self.assertTrue(r.get("ok"), r)
+		self.assertFalse(frappe.db.exists("Student", girl["id"]))
+		self.assertFalse(frappe.get_all("Hikmat Consent", filters={"student": girl["id"]}))
+		# her name must not survive anywhere in the consent table, by any route
+		self.assertFalse(frappe.get_all("Hikmat Consent",
+		                                filters={"student_name": "Erase Consent Girl"}))
+		# challenges tied to her by link are gone; the enrolment one (student is unset, and it
+		# holds no name and no number) is left to the pruner — see _LEARNER_DOCTYPES.
+		self.assertFalse(frappe.get_all("Hikmat OTP", filters={"student": girl["id"]}))
+		for row in frappe.get_all("Hikmat OTP", filters={"mobile_hash": h},
+		                          fields=["purpose", "student"]):
+			self.assertEqual(row.purpose, "Consent")
+			self.assertFalse(row.student)
+
+	def test_erasure_resumes_when_only_a_consent_row_is_left_behind(self):
+		"""_erasure_residue drives the "finish a half-done erasure" path, and it iterates the
+		same list — so a consent row left by an older code path must make a re-run FINISH
+		rather than answer not_found."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Residue Consent Girl")
+		frappe.delete_doc("Student", girl["id"], force=1, ignore_permissions=True,
+		                  delete_permanently=True)      # the pre-fix erasure: profile only
+		frappe.db.commit()
+		self.assertTrue(api._erasure_residue(girl["id"]))
+		r = api.delete_student(girl["id"])
+		self.assertTrue(r.get("ok"), r)
+		self.assertTrue(r.get("resumed"))
+		self.assertFalse(frappe.get_all("Hikmat Consent", filters={"student": girl["id"]}))
+
+	# -- 7. regressions found by review, each pinned ---------------------------------
+	def test_a_devanagari_digit_folds_to_the_same_number(self):
+		r"""The bug family this file has been broken by twice: something the attacker can vary
+		while attacking the same victim. `re.sub(r"[^\d]", ...)` is UNICODE in Python, so it
+		KEPT Devanagari digits, and _MOBILE_RE was `[6-9]\d{9}`, which ACCEPTED them — giving
+		one real phone number thousands of spellings, each with its own send budget and its own
+		stored hash. A guardian who enrolled from a Hindi keypad could then never be matched by
+		the ASCII spelling of her own number, and would never be told why no code arrived."""
+		ascii_form = "9876543210"
+		deva = "９８７६५४३२१०"                     # fullwidth + Devanagari digits, same number
+		mixed = "98765४3210"                       # one Devanagari 4 in the middle
+		for spelling in (deva, mixed, "98765 ४3210", "+91 98765४3210"):
+			self.assertEqual(api._norm_mobile(spelling), "+91" + ascii_form, spelling)
+			self.assertEqual(api._mobile_hash(api._norm_mobile(spelling)),
+			                 api._mobile_hash("+91" + ascii_form), spelling)
+		# and a non-decimal "digit-like" character is still not a digit
+		self.assertEqual(api._norm_mobile("98765④3210"), "")
+
+	def test_a_send_that_failed_cannot_shadow_a_delivered_code(self):
+		"""verify used to take the NEWEST live challenge and never looked at sent_ok, so a
+		resend whose WhatsApp call failed made the guardian's real, still-valid code answer
+		"wrong code" until it expired — while burning its attempts."""
+		self._reset_buckets(self.G1)
+		self._cleanup_number(self.G1)
+		good = self._send(self.G1)
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		# simulate the next send failing at the gateway: a row exists, sent_ok=0
+		frappe.get_doc({"doctype": "Hikmat OTP", "purpose": "Consent", "mobile_hash": h,
+		                "mobile_last4": self.G1[-4:], "code_hash": api._hash_pin("999999"),
+		                "expires_on": frappe.utils.add_to_date(frappe.utils.now(), minutes=10),
+		                "attempts": 0, "sent_ok": 0, "channel": "WhatsApp",
+		                "send_error": "HTTP 401: token expired"}).insert(ignore_permissions=True)
+		frappe.db.commit()
+		# her delivered code still works...
+		v = api.verify_guardian_otp(mobile=self.G1, code=good["code"])
+		self.assertTrue(v.get("ok"), v)
+		# ...and the undelivered one is not usable by anyone
+		self.assertEqual(api.verify_guardian_otp(mobile=self.G1, code="999999").get("error"),
+		                 "bad_code")
+
+	def test_a_resend_does_not_kill_the_code_already_in_her_hand(self):
+		"""Two live codes, both delivered: on 2G she taps "Send it again" and then the FIRST
+		message lands. Typing it must work."""
+		self._reset_buckets(self.G1)
+		self._cleanup_number(self.G1)
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		first = api.send_guardian_otp(mobile=self.G1)
+		api._rate_reset("otpcool:consent:" + h)
+		second = api.send_guardian_otp(mobile=self.G1)
+		self.assertTrue(first.get("ok") and second.get("ok"))
+		self.assertNotEqual(first["code"], second["code"])
+		v = api.verify_guardian_otp(mobile=self.G1, code=first["code"])   # the older one
+		self.assertTrue(v.get("ok"), v)
+
+	def test_a_resend_does_not_buy_extra_guesses(self):
+		"""Widening verify to every live challenge must not widen the guessing budget: five
+		wrong codes end the number's attempts however many challenges are outstanding."""
+		self._reset_buckets(self.G1)
+		self._cleanup_number(self.G1)
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		a = api.send_guardian_otp(mobile=self.G1)
+		api._rate_reset("otpcool:consent:" + h)
+		b = api.send_guardian_otp(mobile=self.G1)
+		wrong = "000000" if "000000" not in (a["code"], b["code"]) else "111111"
+		for _ in range(api._OTP_MAX_ATTEMPTS):
+			self.assertEqual(api.verify_guardian_otp(mobile=self.G1, code=wrong).get("error"),
+			                 "bad_code")
+		for real in (a["code"], b["code"]):
+			self.assertEqual(api.verify_guardian_otp(mobile=self.G1, code=real).get("error"),
+			                 "bad_code")
+
+	def test_recording_consent_without_a_number_does_not_erase_a_proven_one(self):
+		"""_file_consent used to write the hash unconditionally, so filing a paper consent form
+		months later ran UPDATE ... SET guardian_mobile_hash = NULL over a number the guardian
+		had already proven — silently destroying her only route to a PIN reset, with the uniform
+		"if that number is on file..." reply guaranteeing nobody ever found out why."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Keep My Number Girl")
+		before = frappe.db.get_value("Student", girl["id"],
+		                             ["guardian_mobile_hash", "guardian_mobile_last4"], as_dict=True)
+		self.assertTrue(before.guardian_mobile_hash)
+		r = api.record_guardian_consent(student=girl["id"], note="Paper form filed.")
+		self.assertTrue(r.get("ok"), r)
+		after = frappe.db.get_value("Student", girl["id"],
+		                            ["guardian_mobile_hash", "guardian_mobile_last4",
+		                             "guardian_verified"], as_dict=True)
+		self.assertEqual(after.guardian_mobile_hash, before.guardian_mobile_hash)
+		self.assertEqual(after.guardian_mobile_last4, before.guardian_mobile_last4)
+		self.assertTrue(after.guardian_verified)
+		# ...so recovery still finds her
+		self.assertIn(girl["id"], [s.name for s in api._students_for_guardian(
+			api._mobile_hash(api._norm_mobile(self.G1)))])
+
+	def test_signup_student_is_closed_while_the_gate_is_on(self):
+		"""The gate cannot live in the client. `backendLive` is a boot-time latch, so a device
+		that booted with no signal shows the OLD tickbox and then reaches a server that IS up —
+		creating a real, fully synced Student with no parental consent behind it."""
+		self.assertEqual(api.signup_student(name="Ungated Girl", pin="1234").get("error"),
+		                 "otp_required")
+		self.assertFalse(frappe.db.exists("Student", {"student_name": "Ungated Girl"}))
+
+	def test_signup_student_still_works_when_the_gate_is_off(self):
+		"""The refusal must be conditional — with the feature off, the old door is the only one."""
+		self._enable_otp(enabled=0)
+		self.addCleanup(lambda: frappe.db.delete("Student", {"student_name": "Ungated Off Girl"}))
+		r = api.signup_student(name="Ungated Off Girl", pin="1234")
+		self.assertTrue(r.get("ok"), r)
+
+	def test_a_half_configured_site_reports_the_gate_as_off(self):
+		"""get_settings published the raw tickbox, so "enabled but cannot send" hid the only
+		working enrolment path behind a gate that could not open. An expired token is the
+		likeliest state of a real deployment months in."""
+		self._enable_otp(channel="WhatsApp")            # no phone number id / token on this site
+		self.assertIsNone(api._otp_config())
+		frappe.cache().delete_value(api.SETTINGS_CACHE_KEY)
+		self.addCleanup(frappe.cache().delete_value, api.SETTINGS_CACHE_KEY)
+		self.assertFalse(api.get_settings().get("otpEnabled"))
+		# ...and with it genuinely usable, it reports on
+		self._enable_otp()
+		frappe.cache().delete_value(api.SETTINGS_CACHE_KEY)
+		self.assertTrue(api.get_settings().get("otpEnabled"))
+
+	def test_reset_pin_is_rate_limited(self):
+		"""It changes a credential and was completely unmetered, which is what made the
+		membership oracle cheap enough to sweep a roster with."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Metered Reset Girl")
+		for _ in range(api._OTP_RESET_PER_NUMBER_HOUR):
+			api.reset_pin(mobile=self.G1, ticket="junk", student=girl["id"], new_pin="4321")
+		self.assertEqual(api.reset_pin(mobile=self.G1, ticket="junk", student=girl["id"],
+		                               new_pin="4321").get("error"), "rate_limited")
+
+	def test_a_failed_reset_does_not_burn_the_ticket(self):
+		"""The ticket is found, then checked, then burned only once the request is known good —
+		so a guardian whose new PIN was rejected can simply try again."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Retry Reset Girl")
+		v = self._ticket(self.G1, "recovery")
+		self.assertEqual(api.reset_pin(mobile=self.G1, ticket=v["ticket"], student=girl["id"],
+		                               new_pin="12").get("error"), "bad_pin")
+		r = api.reset_pin(mobile=self.G1, ticket=v["ticket"], student=girl["id"], new_pin="4321")
+		self.assertTrue(r.get("ok"), r)
+		self.assertTrue(api.login_by_name(name="Retry Reset Girl", pin="4321").get("ok"))
+
+	def test_pruning_does_not_leave_a_consent_record_unsaveable(self):
+		"""prune deletes challenges with a raw DELETE, so it used to leave every consent record
+		older than 30 days pointing at a row that no longer existed — and Frappe validates links
+		on SAVE, so the next attempt to record a DPDP withdrawal was refused outright, on a
+		deployment with no shell to fix it from."""
+		self._reset_buckets(self.G1)
+		girl = self._enrol(self.G1, "Withdrawable Girl")
+		h = api._mobile_hash(api._norm_mobile(self.G1))
+		con = frappe.get_all("Hikmat Consent", filters={"student": girl["id"]},
+		                     fields=["name", "otp"])[0]
+		self.assertTrue(con.otp)
+		frappe.db.sql("update `tabHikmat OTP` set creation = %s where mobile_hash = %s",
+		              (frappe.utils.add_days(frappe.utils.nowdate(), -(api._OTP_KEEP_DAYS + 5)), h))
+		frappe.db.commit()
+		api.prune_otp_records()
+		self.assertIsNone(frappe.db.get_value("Hikmat Consent", con.name, "otp"))
+		# the guardian can now actually withdraw
+		doc = frappe.get_doc("Hikmat Consent", con.name)
+		doc.withdrawn_on = frappe.utils.now()
+		doc.withdrawn_note = "Guardian asked us to stop."
+		doc.save(ignore_permissions=True)          # would raise LinkValidationError before
+		frappe.db.commit()
+		self.assertTrue(frappe.db.get_value("Hikmat Consent", con.name, "withdrawn_on"))
 
 	def test_pruning_drops_old_challenges_but_never_consent(self):
 		self._reset_buckets(self.G1)

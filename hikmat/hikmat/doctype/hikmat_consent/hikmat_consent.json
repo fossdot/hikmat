@@ -15,6 +15,7 @@
   "guardian_mobile_hash",
   "guardian_mobile_last4",
   "otp",
+  "attested_note",
   "sec_text",
   "consent_text_version",
   "consent_text",
@@ -33,7 +34,7 @@
    "reqd": 1
   },
   {
-   "description": "Denormalised so the record still reads if the profile is later deleted on request.",
+   "description": "Denormalised so the record reads without a join while it lives. It does NOT outlive the learner: delete_student erases this whole row, because keeping a child's name in order to prove we were permitted to keep her name is not a retention basis.",
    "fieldname": "student_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -76,6 +77,14 @@
    "fieldtype": "Link",
    "label": "Verified by challenge",
    "options": "Hikmat OTP",
+   "read_only": 1
+  },
+  {
+   "description": "How the facilitator obtained this permission — met the guardian, phone call, signed paper form. Only meaningful when channel is Facilitator; a device-proven consent needs no explanation beyond the challenge it links to.",
+   "depends_on": "eval:doc.channel=='Facilitator'",
+   "fieldname": "attested_note",
+   "fieldtype": "Small Text",
+   "label": "How consent was given (facilitator)",
    "read_only": 1
   },
   {

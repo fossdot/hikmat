@@ -604,6 +604,44 @@
     .pill, .toggle { padding:5px 9px; font-size:12px; }
     .step .labelblock { right:8px; }
   }
+
+  /* ---- Phone layout: edge-to-edge, and a top bar that stays put ---- */
+  /* All three fixed from on-device feedback, 2026-08-21 (Android, ~412dp):
+     1. The card sat inside body's 22px gutter on BOTH sides — ~11% of the screen spent on
+        background — so the app "did not cover the width of the phone".
+     2. The top bar scrolled away, taking the stars, gems, theme and language controls (and
+        the back button, which lives in the same bar) off screen mid-lesson.
+     3. `.hero h1` was a fixed 30px, so "Choose your class group" wrapped to two lines and
+        pushed the class-group cards below the fold.
+     Note `overflow:hidden` on #app has to go for the sticky bar to stick at all: hidden makes
+     #app a scroll container, so a sticky child sticks to a box that never scrolls, i.e. never.
+     At this width border-radius is 0, so there is no longer anything to clip. VERIFY LAYOUT
+     CHANGES HERE IN THE PACKAGED APP — a browser does not reproduce this shell's overflow. */
+  @media (max-width: 560px){
+    body { padding: 0; }
+    #shell { gap: 0; }
+    #app { border-radius: 0; overflow: visible; box-shadow: none; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      /* honoured on notched devices; resolves to 0 in a normal Capacitor WebView */
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    }
+    .hero { padding: 10px 10px 14px; }
+    .hero h1 { font-size: clamp(20px, 6.2vw, 26px); letter-spacing: -.2px; }
+    .hero p { font-size: 14px; }
+
+    /* The question bubble was losing 110px of a 393dp screen to the mascot and the gap, so
+       "What is the degree of 3x² + 5x + 1?" wrapped to five lines of two or three words
+       (reported with a screenshot, 2026-08-21). Roshni stays — she is who asks the question —
+       but at 56px instead of 96px, which buys the text ~24% more width. Top-aligned so a
+       long question grows downward past her rather than dragging her down the screen. */
+    .mascotrow { gap: 10px; align-items: flex-start; margin-bottom: 18px; }
+    .mascot { width: 56px; }
+    .bubble2 { padding: 12px 14px; }
+    .bubble2 .q { font-size: 18px; }
+    /* the speech tail tracks the top of the bubble now that the row is top-aligned */
+    .bubble2::before { top: 26px; }
+  }
   /* Long trail labels wrap rather than clip */
   .step .label { white-space:normal; overflow-wrap:break-word; }
   /* Darken decorative greys that failed contrast */
@@ -660,7 +698,6 @@
         <div class="utilcluster">
           <button class="toggle" id="themeToggle" title="Light / dark">🌙</button>
           <button class="toggle" id="langToggle" title="Language / भाषा">EN</button>
-          <button class="toggle" id="hiToggle" title="Show the Hindi guide / हिंदी गाइड दिखाओ">Guide</button>
         </div>
         <button class="toggle helpneed" id="helpNeedBtn" title="Help Needed / मदद चाहिए">Help</button>
       </div>
@@ -1189,8 +1226,15 @@ try { currentStudent = JSON.parse(localStorage.getItem("hikmat_current")) || nul
 function stateKey(){ return "hikmat_state_" + (currentStudent ? currentStudent.id : "guest"); }
 function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true, testSeen:{}, testPassed:{}, videosSeen:{} }; }
 function loadState(){
-  try { return JSON.parse(localStorage.getItem(stateKey())) || fresh(); }
-  catch(e){ return fresh(); }
+  let st;
+  try { st = JSON.parse(localStorage.getItem(stateKey())) || fresh(); }
+  catch(e){ st = fresh(); }
+  // The Hindi-gloss toggle is gone from the UI (see the note by the old #hiToggle binding), so
+  // a learner who had switched it ON could never switch it off again. Normalise it to the
+  // default instead of stranding her in a mode with no exit. The `state.hindi` reads scattered
+  // through the activity renderers stay valid; they simply never fire now.
+  st.hindi = false;
+  return st;
 }
 function save(){ localStorage.setItem(stateKey(), JSON.stringify(state)); }
 let state = loadState();
@@ -1638,7 +1682,11 @@ function renderPath(items){
   });
 }
 // the back button lives above the card; pass null to hide it (home screen)
+let _backFn = null;      // the current screen's back handler, set by setBack()
+let _navArmed = false;   // is a spare history entry currently pushed?
 function setBack(label, fn){
+  _backFn = (label && fn) ? fn : null;   // hardware back mirrors the on-screen back button
+  armBack();
   var bw = document.getElementById("brandWrap");
   var bb = document.getElementById("topBack");
   var bl = document.getElementById("backLabel");
@@ -1650,6 +1698,31 @@ function setBack(label, fn){
   bb.setAttribute("aria-label", tx("Back","वापस") + ": " + clean);
   bb.onclick = function(){ sfx.back(); fn(); };
 }
+
+// ---------- Android hardware back / browser back ----------
+// Reported on device 2026-08-21: the phone's back button CLOSED THE APP from any screen.
+// Cause: this is a single page that never touches the History API, so the WebView had no
+// history to go back through and Android fell through to finishing the activity.
+// Fix without adding a Capacitor plugin (the project ships no runtime deps): keep exactly
+// ONE spare history entry armed whenever a screen has a back handler. Hardware back pops
+// that entry, we run the same handler the on-screen back button runs, then re-arm. At home
+// there is no handler, nothing is armed, and back exits the app — which is what a
+// launcher-level back should do. Works identically for a browser's back button.
+// Known wrinkle: reaching home via the ON-SCREEN back button leaves one spent trap entry,
+// so the first hardware back at home is swallowed and the second exits. Harmless, and the
+// alternative (forcing an exit from JS) is not reliable in a WebView without a plugin.
+function armBack(){
+  if(_navArmed || !_backFn) return;
+  try { history.pushState({ hk:"back" }, ""); _navArmed = true; } catch(e){}
+}
+window.addEventListener("popstate", () => {
+  _navArmed = false;
+  // A dialog is open (doubt sheet, gate wall, PIN overlay): back closes it, it does not
+  // navigate the screen underneath — matching what the sheet's own close button does.
+  const sheet = document.querySelector(".sheetwrap");
+  if(sheet){ sheet.remove(); armBack(); return; }
+  if(_backFn){ sfx.back(); _backFn(); armBack(); }
+});
 
 function refreshTop(){
   document.documentElement.lang = state.lang || "en";   // keep <html lang> in sync for screen readers
@@ -1671,24 +1744,17 @@ function refreshTop(){
   }
   $("#totalStars").textContent = totalStars();
   $("#coins").textContent = state.coins;
-  const ht = $("#hiToggle");
-  if(ht){ ht.classList.toggle("on", state.hindi); ht.textContent = tx("Guide","गाइड") + (state.hindi ? " ✓" : ""); ht.title = tx("Show the Hindi guide","हिंदी गाइड दिखाओ"); }
   const hn = $("#helpNeedBtn");
   if(hn){ hn.innerHTML = iconFor("help","🙋") + " " + esc(tx("Help","मदद")); hn.title = tx("Help Needed","मदद चाहिए"); hn.setAttribute("aria-label", tx("Help Needed","मदद चाहिए")); }
   const lt = $("#langToggle");
   if(lt){ lt.classList.toggle("on", state.lang==="hi"); lt.textContent = (state.lang==="hi" ? "हिं" : "EN"); }
   mountRoshniFab();   // floating Roshni voice assistant — appears once AI is on + a student is logged in
 }
-$("#hiToggle").onclick = () => {
-  state.hindi=!state.hindi; state.prefsTouched=true; save(); refreshTop(); updateHiLine();
-  sfx.tap(); logTool("hindi_guide");
-  // Outside gameplay there's no hint bubble to change, so confirm the switch explicitly —
-  // otherwise the tap looks like it did nothing.
-  const msg = state.hindi ? tx("Guide ON — words will also show their Hindi meaning.","गाइड चालू — शब्दों का हिंदी मतलब भी दिखेगा।")
-                          : tx("Guide OFF.","गाइड बंद।");
-  flashToast(msg); srSay(msg);
-  if(state.hindi) sayHi("हिंदी गाइड चालू");
-};
+/* The "Guide" toggle (the Hindi-gloss switch) was removed from the top bar on Vishal's
+   instruction after on-device testing (2026-08-21) — the label told a child nothing and it
+   crowded the bar. Its markup, its refreshTop() relabel and this unguarded click binding all
+   had to go together: the binding was NOT null-guarded, so dropping only the markup would
+   have thrown a TypeError during boot and taken the whole app down. */
 // A language switch re-renders the current screen, which would otherwise wipe anything typed but
 // not yet submitted (signup name/PIN, a compose/transcribe textarea, a ticked consent box).
 // Snapshot the on-screen fields, re-render in the new language, then restore what was entered.
@@ -2941,6 +3007,17 @@ function startLevel(course, lesson, lv, back){
                     stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5,
                     duration_secs: secs });
     if(stars>=1) sfx.complete(); else sfx.wrong();
+    // Reported on device 2026-08-21: bouncing back to the map after every activity is a lot of
+    // taps for a child. Offer the next step directly. Only when she earned at least one star,
+    // because the map unlocks step i+1 on `getStars(i) > 0` — offering "Next" after a 0-star
+    // round would contradict the lock she is about to see. A 0-star round makes "Play again"
+    // the primary action instead, which is the thing that actually moves her forward.
+    const _LV = levelsFor(lesson);
+    const _li = _LV.findIndex(l => l.id === lv.id);
+    const nextLv = (_li >= 0 && _li + 1 < _LV.length) ? _LV[_li + 1] : null;
+    const _ls = course.lessons.findIndex(l => l.key === lesson.key);
+    const nextLesson = (!nextLv && _ls >= 0 && _ls + 1 < course.lessons.length) ? course.lessons[_ls + 1] : null;
+    const canGoOn = stars >= 1 && !!(nextLv || nextLesson);
     root.innerHTML="";
     root.appendChild(el(`<div class="screen result">
       <div class="mascot big ${stars>=2?"m-cheer":(stars>=1?"m-happy":"m-sad")}">${mascotSVG()}</div>
@@ -2951,8 +3028,9 @@ function startLevel(course, lesson, lv, back){
       ${belt ? `<div class="savechip" style="font-size:1.05em">${esc(belt.icon||"🏅")} ${esc(tx("You reached the "+belt.title+"!","तुम "+(belt.titleHi||belt.title)+" तक पहुँच गई!"))} 🎉</div>` : ""}
       ${currentStudent ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
       <div class="actionrow">
-        <button class="btn ghost" id="again">${tx("Play again","फिर से खेलो")}</button>
-        <button class="btn primary" id="map">${tx("Back to map →","नक्शे पर वापस →")}</button>
+        <button class="btn ${canGoOn ? "ghost" : "primary"}" id="again">${tx("Play again","फिर से खेलो")}</button>
+        <button class="btn ghost" id="map">${canGoOn ? tx("Map","नक्शा") : tx("Back to map →","नक्शे पर वापस →")}</button>
+        ${canGoOn ? `<button class="btn primary" id="next">${nextLv ? tx("Next →","आगे →") : tx("Next lesson →","अगला पाठ →")}</button>` : ""}
       </div>
     </div>`));
     if(belt) speak(tx("Shabash! You reached the "+belt.title+"! Your teacher will evaluate you soon.",
@@ -2962,6 +3040,19 @@ function startLevel(course, lesson, lv, back){
     const rh=root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try{ rh.focus({preventScroll:true}); }catch(e){} }
     $("#again").onclick=()=>{ sfx.restart(); startLevel(course, lesson, lv, back); };
     $("#map").onclick=()=>{ sfx.back(); backToLesson(); };
+    const nb = $("#next");
+    if(nb) nb.onclick = () => {
+      sfx.enter(); actEnd(false);                       // no-op if finish() already closed the clock
+      if(nextLv){ startLevel(course, lesson, nextLv, back); return; }
+      // Rolling on to the NEXT LESSON must pass exactly the gates the lesson map applies on
+      // tap (the guest two-lesson wall, a pending milestone belt, a due module test). Landing
+      // on the next lesson's map rather than straight into its first activity keeps that
+      // check, and lets her see the new path before committing.
+      if(!guestGate(course, nextLesson, back)) return;
+      if(!gateGate(course, nextLesson, back)) return;
+      if(!testGate(course, nextLesson, back)) return;
+      renderLessonMap(course, nextLesson, back);
+    };
   }
 }
 
@@ -4061,6 +4152,10 @@ function renderSignup(draft){
   const submit = async () => {
     const nm = name.value.trim();
     if(!nm){ err.textContent = tx("Please type your name.","कृपया अपना नाम लिखो।"); return; }
+    // The server needs 2+ characters (_validated_profile_fields). Checked here too, because on
+    // the guardian path the name box is two screens behind by the time the server sees it, and
+    // "please type a longer name" is useless on a screen with no name box.
+    if(nm.length < 2){ err.textContent = tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।"); return; }
     if(haveBands && !band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
     if(!needGuardian && !(consent && consent.checked)){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     const p = pin.value.trim();
@@ -4075,6 +4170,14 @@ function renderSignup(draft){
     go.disabled = true; err.textContent = "";
     const r = await api("signup_student", { name:nm, avatar, pin:p, band }, true);
     if(r && r.ok){ finishLogin(r); return; }
+    if(r && r.error === "otp_required"){
+      // The server insists on a grown-up, and this client believed otherwise — the boot-time
+      // `backendLive` latch was false (booted with no signal) while the server is in fact up.
+      // Believe the server, not the latch.
+      backendLive = true;
+      renderGuardianGate({ name:nm, avatar, pin:p, band, mobile:(draft && draft.mobile) || "" });
+      return;
+    }
     if(r == null && !backendLive){
       // No server was ever reached (file:// / standalone / offline). Create a local-only profile so
       // the learner can start playing right now; progress is saved per-id in localStorage. If a
@@ -4114,7 +4217,7 @@ function renderLogin(){
         <button class="btn ghost" id="toSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
         <button class="btn ghost" id="toOnline">${tx("🌐 Online? Use your username","🌐 ऑनलाइन? यूज़रनेम से")}</button>
         <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
-        ${(SETTINGS.otpEnabled && backendLive) ? `<button class="btn ghost" id="forgotPin">${tx("🔑 Forgot your PIN?","🔑 पिन भूल गई?")}</button>` : ``}
+        ${(SETTINGS.otpEnabled && backendLive && !campusRoster()) ? `<button class="btn ghost" id="forgotPin">${tx("🔑 Forgot your PIN?","🔑 पिन भूल गई?")}</button>` : ``}
         <button class="btn ghost" id="toSetup">${tx("⚙️ Set up this laptop","⚙️ यह लैपटॉप सेट करो")}</button>
       </div>
     </div>
@@ -4128,6 +4231,13 @@ function renderLogin(){
   $("#toSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
   // Only present when the backend offers guardian verification — without it there is no way to
   // prove who is asking, and a self-serve PIN reset would be an account-takeover button.
+  //
+  // And NOT on a provisioned campus laptop. That device authenticates her offline against the
+  // pinHash cached from get_campus_roster, which a server-side reset does not update — so the
+  // reset would appear to succeed, the new PIN would still be refused on that laptop, and the
+  // forgotten old one would go on working there. Offering it would be a promise the device
+  // cannot keep; a campus girl has a facilitator, who can reset her PIN in Desk. (Making the
+  // cached roster follow a reset is the real fix, and is not attempted here.)
   const fp = $("#forgotPin"); if(fp) fp.onclick = () => { sfx.tap(); renderForgotPin(); };
   const submit = async () => {
     const nm = name.value.trim();
@@ -4181,6 +4291,11 @@ function otpErrText(r){
   if(e === "bad_name")     return tx("Please type a name of at least 2 letters.","कम से कम 2 अक्षर का नाम लिखो।");
   if(e === "not_found")    return tx("We could not find that learner on this number.","इस नंबर पर वह नाम नहीं मिला।");
   if(e === "otp_off")      return tx("This is not available right now — ask your teacher.","यह अभी उपलब्ध नहीं है — शिक्षिका से पूछो।");
+  // otp_required means the server insists on a grown-up's confirmation and this client thought
+  // otherwise (a stale boot latch — see renderSignup). The caller routes into the gate rather
+  // than showing this, so it should never be read; it exists so a future caller cannot leave
+  // the learner staring at "something went wrong".
+  if(e === "otp_required") return tx("A parent or teacher needs to confirm on their phone.","माता-पिता या शिक्षक को अपने फ़ोन पर पुष्टि करनी होगी।");
   if(e === "bad_code"){
     const left = (r && typeof r.tries_left === "number") ? r.tries_left : null;
     if(left === null) return tx("Wrong code — please try again.","ग़लत कोड — फिर कोशिश करो।");
@@ -4270,6 +4385,7 @@ function renderGuardianGate(draft){
       const r = await api("send_guardian_otp", { mobile: m, purpose: "consent" }, true);
       go.disabled = false;
       if(r && r.ok){ draft.mobile = m; draft.last4 = r.last4 || m.slice(-4); draft.step = "code"; sfx.enter(); paint(); return; }
+      if(r === null && !backendLive){ goOffline(); return; }   // signal gone: fall back, don't trap
       err.textContent = otpErrText(r); srSay(err.textContent);
     };
     go.onclick = send;
@@ -4304,21 +4420,46 @@ function renderGuardianGate(draft){
       const c = (code.value || "").replace(/\D/g, "");
       if(c.length !== 6){ err.textContent = tx("Please enter all 6 digits.","कृपया पूरे 6 अंक डालो।"); code.focus(); return; }
       go.disabled = true; err.textContent = tx("Checking…","जाँच रहे हैं…");
-      const v = await api("verify_guardian_otp", { mobile: draft.mobile, code: c, purpose: "consent" }, true);
-      if(!(v && v.ok)){ go.disabled = false; code.value = ""; err.textContent = otpErrText(v); srSay(err.textContent); code.focus(); return; }
+      // A ticket already in hand is REUSED rather than re-earned. Without this, any failure
+      // after a correct code — a dropped connection on the signup call, a field the server
+      // rejects — sent her back to type the same code again, which the server had already
+      // consumed, so the app called her correct code "wrong" and then ran her out of tries.
+      // The code is single-use; the ticket is what is still spendable, and it lives 15 minutes.
+      if(!draft.ticket){
+        const v = await api("verify_guardian_otp", { mobile: draft.mobile, code: c, purpose: "consent" }, true);
+        if(v === null && !backendLive){ goOffline(); return; }
+        if(!(v && v.ok)){ go.disabled = false; code.value = ""; err.textContent = otpErrText(v); srSay(err.textContent); code.focus(); return; }
+        draft.ticket = v.ticket;
+      }
       // The number is proven. Create her profile against it — the same validation as an
       // ordinary signup, so a rejected field here leaves the ticket usable and she can fix it.
       const r = await api("signup_with_consent", {
-        mobile: draft.mobile, ticket: v.ticket, name: draft.name,
+        mobile: draft.mobile, ticket: draft.ticket, name: draft.name,
         avatar: draft.avatar, pin: draft.pin, band: draft.band,
       }, true);
       if(r && r.ok){ finishLogin(r); return; }
+      if(r === null && !backendLive){ goOffline(); return; }
+      if(r && r.error === "bad_ticket"){ draft.ticket = ""; }   // spent or expired: earn a new one
       go.disabled = false; err.textContent = otpErrText(r); srSay(err.textContent);
     };
     go.onclick = submit;
     code.onkeydown = (e) => { if(e.key === "Enter") submit(); };
     const n = tx("Enter the 6-digit code sent on WhatsApp.","WhatsApp पर भेजा गया 6 अंकों का कोड डालो।");
     setNarration(n, n);
+  };
+
+  // Losing the network mid-flow must not trap her. `backendLive` is set at boot and never
+  // cleared, so a signal that drops after launch left the gate as the ONLY way to make a
+  // profile — and the gate cannot work without a server. Every "we got nothing back" path
+  // lands here, which clears the latch and re-renders signup: that screen then shows the
+  // tickbox again and its existing local-only-profile fallback, with everything she typed
+  // still in the draft. A device with no server transmits nothing, so a local profile needs
+  // no guardian's consent to be lawful — see the note above this section.
+  const goOffline = () => {
+    backendLive = false;
+    draft.ticket = "";
+    draft.step = "number";
+    renderSignup(draft);
   };
 
   const paint = () => { (draft.step === "code" ? paintCode : paintNumber)(); };
