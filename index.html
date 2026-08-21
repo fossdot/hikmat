@@ -405,6 +405,9 @@
   .profilerow { display:flex; gap:2px; justify-content:center; align-items:center; flex-wrap:wrap; }
   /* Tap-to-hear button — primary-tinted so it reads as "play", distinct from the mute toggle */
   .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
+  .toggle.hearbtn.muted { background:#fff; border-color:var(--line); }
+  .toggle.hearbtn.muted .iconsvg svg, .toggle.hearbtn.muted svg { filter:none; }
+  [data-theme="dark"] .toggle.hearbtn.muted { background:#2a2240; border-color:var(--line); }
   .toggle.hearbtn .iconsvg svg, .toggle.hearbtn svg { filter:brightness(0) invert(1); }
   [data-theme="dark"] .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
   /* "Saved on this device" reassurance chip on the result screen */
@@ -1576,6 +1579,7 @@ function announce(fn){ clearAnnounce(); _announceTimer = setTimeout(() => { _ann
 // speak now (interrupts current speech). Pass {queue:true} to play AFTER what's already queued.
 function speak(text, lang="en", opts){
   try {
+    if(state.sound === false) return;   // muted — sfx are already gated in audioCtx(); this gates speech
     if(!window.speechSynthesis){ showAudioHint(); return; }
     if(!(opts && opts.queue)) stopSpeech();
     speechQ.push({ text, lang, gap: (opts && opts.gap) || 0, rate: (opts && opts.rate) || 0 });
@@ -1941,7 +1945,15 @@ function refreshTop(){
   const tt = $("#themeToggle"); if(tt){ tt.innerHTML = dark ? iconFor("theme-light","☀️") : iconFor("theme-dark","🌙"); tt.classList.toggle("on", dark); }
   const si = $("#starIcon"); if(si) si.innerHTML = iconFor("star","★");
   const ci = $("#coinIcon"); if(ci) ci.innerHTML = iconFor("gem","💎");
-  const hb = $("#hearBtn"); if(hb) hb.innerHTML = iconFor("sound-on","🔊");
+  const hb = $("#hearBtn");
+  if(hb){
+    const on = state.sound !== false;
+    hb.innerHTML = on ? iconFor("sound-on","🔊") : iconFor("sound-off","🔇");
+    hb.classList.toggle("muted", !on);
+    const lbl = on ? tx("Sound is on — tap to turn off","आवाज़ चालू है — बंद करने के लिए दबाओ")
+                   : tx("Sound is off — tap to turn on","आवाज़ बंद है — चालू करने के लिए दबाओ");
+    hb.title = lbl; hb.setAttribute("aria-label", lbl); hb.setAttribute("aria-pressed", String(on));
+  }
   const an = $("#appName"); if(an) an.textContent = SETTINGS.appName;
   const lg = $("#brandLogo");
   if(lg){                                   // build via DOM + scheme-check so a hostile logo URL can't break out / run javascript:
@@ -1996,7 +2008,20 @@ $("#langToggle").onclick = () => {
   logTool("lang_switch");
 };
 $("#themeToggle").onclick = () => { state.theme = state.theme==="dark" ? "light" : "dark"; state.prefsTouched=true; save(); refreshTop(); sfx.tap(); logTool("theme"); };
-$("#hearBtn").onclick = () => { sfx.tap(); hearNarration(); logTool("hear_screen"); };
+$("#hearBtn").onclick = () => {
+  if(state.sound !== false){
+    sfx.tap();                       // audible acknowledgement BEFORE the app goes quiet
+    state.sound = false; state.prefsTouched = true; save(); stopSpeech(); refreshTop();
+    const m = tx("Sound off","आवाज़ बंद");
+    flashToast("🔇 " + m); srSay(m);
+  } else {
+    state.sound = true; state.prefsTouched = true; save(); refreshTop();
+    sfx.tap();
+    speak(tx("Sound on.","आवाज़ चालू।"), state.lang==="hi"?"hi":"en");
+    hearNarration();                 // the old "listen to this screen" affordance, kept
+  }
+  logTool("sound_toggle");
+};
 $("#helpNeedBtn").onclick = () => helpNeeded();
 
 // ============================================================
@@ -5142,7 +5167,7 @@ function ttsCachePut(key, blob){
 // Speak a Hindi line the natural way (Piper) when voice is on; else the built-in voice.
 // Always resolves (never throws) so a caller can await it safely.
 async function ttsPlay(text){
-  if(!text) return;
+  if(!text || state.sound === false) return;   // honour the mute toggle (web-only Roshni audio path)
   if(!(SETTINGS.voiceEnabled && currentStudent)){ speak(text, "hi"); return; }
   const key = "v1:" + text;
   let blob = await ttsCacheGet(key);
