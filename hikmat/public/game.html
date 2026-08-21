@@ -1952,49 +1952,41 @@ function renderHome(){
       <div class="roshni">${mascotSVG()}</div>
       <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
     </div>
-    <div class="center" id="profileRow" style="margin:8px 0 20px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
     <div id="homeSections"></div>
+    <div class="center" id="profileRow" style="margin:6px 0 18px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
   </div>`);
   root.appendChild(s);
   setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
   profileChip($("#profileRow"));
   const host = $("#homeSections");
   const seeBtn = (label, fn) => { const b = el(`<button class="btn ghost seeother">${label}</button>`); b.onclick = () => { sfx.tap(); fn(); }; const c = el(`<div class="center" style="margin:2px 0 4px"></div>`); c.appendChild(b); host.appendChild(c); };
-  // By Class — a logged-in student sees ONLY their class group (+ a way to peek at the others)
-  if(haveBands){
-    if(hasMy && !showAllClasses){
-      host.appendChild(el(`<div class="sectionhead">${tx("📚 Your class","📚 तुम्हारी कक्षा")}</div>`));
-      const grid = el(`<div class="themes"></div>`);
-      bandList.filter(b => b.key === myBand).forEach(b => grid.appendChild(bandCard(b)));
-      host.appendChild(grid);
-      seeBtn(tx("See other classes →","दूसरी कक्षाएँ देखो →"), () => { showAllClasses = true; renderHome(); });
-    } else {
-      host.appendChild(el(`<div class="sectionhead">${tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
-      const grid = el(`<div class="themes"></div>`);
-      bandList.forEach(b => grid.appendChild(bandCard(b)));
-      host.appendChild(grid);
-      if(hasMy && showAllClasses) seeBtn(tx("← Show only my class","← सिर्फ़ मेरी कक्षा"), () => { showAllClasses = false; renderHome(); });
-    }
-  }
-  // Life Skills (the original thematic tracks)
+  // Life Skills used to get its own heading and grid underneath the class groups. It now rides
+  // in the SAME grid as the bands (Vishal, 2026-08-21): three bands leave an empty fourth cell
+  // in the two-column phone layout, so dropping Life Skills into it removes a section heading
+  // and a screenful of scrolling. The standalone path — no class bands published at all, where
+  // the thematic tracks ARE the content — is unchanged.
   const life = lifeSkillsTracks();
-  if(life.length){
+  if(haveBands){
+    // A logged-in student sees ONLY her own class group, plus a way to peek at the others.
+    const onlyMine = hasMy && !showAllClasses;
+    host.appendChild(el(`<div class="sectionhead">${onlyMine ? tx("📚 Your class","📚 तुम्हारी कक्षा")
+                                                             : tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
     const grid = el(`<div class="themes"></div>`);
-    if(haveBands){
-      // class bands present → collapse the 4 thematic tracks into ONE "Life Skills" card to keep Home tidy
-      host.appendChild(el(`<div class="sectionhead">${tx("🌼 Life Skills","🌼 जीवन कौशल")}</div>`));
-      grid.appendChild(lifeSkillsCard());
-    } else {
-      // standalone / no class bands → show the tracks directly (nothing to declutter)
-      life.forEach(c => grid.appendChild(trackCard(c)));
-    }
+    (onlyMine ? bandList.filter(b => b.key === myBand) : bandList).forEach(b => grid.appendChild(bandCard(b)));
+    if(life.length) grid.appendChild(lifeSkillsCard());
+    host.appendChild(grid);
+    if(onlyMine) seeBtn(tx("See other classes →","दूसरी कक्षाएँ देखो →"), () => { showAllClasses = true; renderHome(); });
+    else if(hasMy) seeBtn(tx("← Show only my class","← सिर्फ़ मेरी कक्षा"), () => { showAllClasses = false; renderHome(); });
+  } else if(life.length){
+    const grid = el(`<div class="themes"></div>`);
+    life.forEach(c => grid.appendChild(trackCard(c)));
     host.appendChild(grid);
   }
   // Legal footer. Google Play requires a reachable privacy policy AND an in-app route to
   // account/data deletion, so these two links must stay on Home. target=_blank keeps the
   // packaged Capacitor app from navigating its own WebView away to the website; both pages
   // need the internet, which is why nothing else on this screen does.
-  host.appendChild(el(`<div class="legalfoot">
+  s.appendChild(el(`<div class="legalfoot">
     <a href="https://bodhya.net/bodhya-learn-privacy" target="_blank" rel="noopener">${tx("Privacy Policy","गोपनीयता नीति")}</a>
     <span aria-hidden="true"> · </span>
     <a href="https://bodhya.net/data-deletion" target="_blank" rel="noopener">${tx("Delete my data","मेरा डेटा हटाओ")}</a>
