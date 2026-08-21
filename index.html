@@ -663,9 +663,18 @@
     .pill { padding: 6px 14px; }
 
     /* The listen button now sits inside the same segmented pill as theme and language
-       (Vishal, 2026-08-21) — three loose controls read as clutter on a narrow bar. The row
-       wraps under the brand on a phone, so centre it rather than leaving it ragged right. */
-    .stats { width: 100%; justify-content: center; }
+       (Vishal, 2026-08-21) — three loose controls read as clutter on a narrow bar.
+       `width:100%` here was a mistake: it FORCED the stats onto their own row always, so on an
+       inner screen row one held nothing but a short back button and the rest was empty
+       whitespace (reported on device). `flex:1 1 auto` instead lets the two share one row
+       whenever they fit — wider phones, landscape — and only wrap when they genuinely cannot,
+       centring itself when it does. */
+    .stats { flex: 1 1 auto; justify-content: center; }
+    /* A long back label (Hindi runs longer than English here) must not wrap to a second line
+       and make the whole bar taller; clip it instead. setBack() puts the full text in the
+       button's aria-label, so nothing is lost to a screen reader. */
+    #backLabel { display: inline-block; max-width: 46vw; overflow: hidden;
+                 text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   }
   /* Long trail labels wrap rather than clip */
   .step .label { white-space:normal; overflow-wrap:break-word; }
@@ -1353,6 +1362,84 @@ function buildPaper(course){
   return { clientId: uid(), qs, reused: unseen.length < n };
 }
 
+// ---------- Native-TTS bridge for the packaged Android app ----------
+// Android System WebView has NEVER shipped the Web Speech API — it is a Chrome-browser
+// feature — so window.speechSynthesis is undefined inside the app and every speak() fell
+// straight into the "no sound" hint, on every phone, regardless of any setting. (Verified
+// on the emulator 2026-08-21 with an instrumented build: speechSynthesis ABSENT with and
+// without a user gesture, while WebAudio played fine. The hint's advice to "turn on
+// Text-to-speech in Settings" could never fix it.) The Capacitor TextToSpeech plugin talks
+// to Android's native engine instead; this shim teaches the game's existing speech queue to
+// use it by recreating the exact surface the code below touches: SpeechSynthesisUtterance
+// with onstart/onend/onerror, and speechSynthesis.speak/cancel/resume/getVoices/
+// onvoiceschanged. In a real browser (web build, file:// preview) speechSynthesis exists
+// and this whole block steps aside; in an old APK without the plugin it also steps aside,
+// which lands in the same hint behaviour as before.
+(function(){
+  if (window.speechSynthesis) return;
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech;
+  if (!P || typeof P.speak !== "function") return;
+
+  function U(text){
+    this.text = String(text == null ? "" : text);
+    this.lang = "en-US"; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null;
+    this.onstart = null; this.onend = null; this.onerror = null;
+  }
+  window.SpeechSynthesisUtterance = U;
+
+  let cache = [];       // plugin voices in the shape pickVoice() reads
+  let current = null;   // in-flight utterance, so cancel() can silence its callbacks
+
+  const S = {
+    speaking: false, pending: false, paused: false,
+    onvoiceschanged: null,
+    getVoices(){ return cache; },
+    pause(){}, resume(){},
+    cancel(){
+      if (current) current._dead = true;   // a cancelled utterance must not fire into the queue
+      current = null; S.speaking = false;
+      try { P.stop(); } catch(e){}
+    },
+    speak(u){
+      if (!u || !u.text) return;
+      S.cancel();
+      current = u; S.speaking = true;
+      // Fire onstart on a short delay rather than immediately: a missing language/voice makes
+      // the plugin reject almost at once, and onstart sets speechEverStarted — which would
+      // suppress the very hint that tells someone to install voice data. 250ms lets a fast
+      // failure land first; a real utterance is always longer than that.
+      let started = false;
+      const startT = setTimeout(() => {
+        if (!u._dead){ started = true; if (u.onstart) try { u.onstart(); } catch(e){} }
+      }, 250);
+      P.speak({ text: u.text, lang: u.lang || "en-US", rate: u.rate || 1.0, category: "playback" })
+        .then(() => {
+          if (u._dead) return;
+          if (!started){ started = true; clearTimeout(startT); if (u.onstart) try { u.onstart(); } catch(e){} }
+          S.speaking = false; current = null;
+          if (u.onend) try { u.onend(); } catch(e){}
+        })
+        .catch(() => {
+          clearTimeout(startT);
+          if (u._dead) return;
+          S.speaking = false; current = null;
+          if (u.onerror) try { u.onerror({ error: "synthesis-failed" }); } catch(e){}
+        });
+    }
+  };
+  window.speechSynthesis = S;
+
+  try {
+    P.getSupportedVoices().then(r => {
+      cache = ((r && r.voices) || []).map(v => ({
+        name: v.name || "", lang: v.lang || "", voiceURI: v.voiceURI || v.name || "",
+        localService: true, default: !!v.default
+      }));
+      if (S.onvoiceschanged) try { S.onvoiceschanged(); } catch(e){}
+    }).catch(() => {});
+  } catch(e){}
+})();
+
 // ---------- Speech (offline, macOS voices) ----------
 let voices = [];
 function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
@@ -1407,7 +1494,18 @@ function showAudioHint(){
   // one-word-per-line column on a 360dp phone, which is the screen this app is FOR.
   const bar = el(`<div id="audiohint" role="status" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2c2440;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999;max-width:92%;width:max-content;text-align:center;">🔇 ${esc(msg)}<div style="margin-top:10px"><button style="background:#ff7a45;border:0;color:#fff;font-weight:800;padding:8px 22px;border-radius:8px;cursor:pointer;font-size:14px;">${tx("OK","ठीक")}</button></div></div>`);
   document.body.appendChild(bar);
-  bar.querySelector("button").onclick = () => bar.remove();
+  // It is fixed to the bottom of the VIEWPORT, and during gameplay the bottom of the viewport
+  // is where .gamefooter puts the primary action ("Got it \u2192") \u2014 which is often the only way
+  // forward. Reported on device 2026-08-21 sitting right on top of that button. So reserve as
+  // much space at the foot of the page as the hint occupies, letting the button scroll clear
+  // of it, and auto-dismiss: a child who cannot read "OK" must not be able to strand herself
+  // behind a notice about a setting only an adult can change.
+  const clearHint = () => { document.body.style.paddingBottom = ""; bar.remove(); };
+  requestAnimationFrame(() => {
+    if(bar.isConnected) document.body.style.paddingBottom = (bar.offsetHeight + 24) + "px";
+  });
+  bar.querySelector("button").onclick = clearHint;
+  setTimeout(clearHint, 12000);
   srSay(msg);
 }
 // --- speech queue: plays utterances one after another so nothing cancels
