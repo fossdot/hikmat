@@ -3080,6 +3080,45 @@ class TestGuardianOTP(FrappeTestCase):
 		self.assertTrue(r.get("ok"), r)
 		return r
 
+	def test_consent_signup_carries_gender_and_guide(self):
+		"""The guardian door must store the learner's own two presentation choices too.
+
+		It is the ONLY door with a second screen between the form and the insert (a grown-up
+		enters a code on their own phone), so it is the one where a field added to the form can
+		most easily be dropped on the floor — the game has to carry gender and mascot forward
+		through renderGuardianGate as part of the draft. Exercised for real rather than by
+		reading the source, because "the parameter exists" is not the same as "the value
+		reaches the row".
+		"""
+		name = "Consent Guide Girl"
+		frappe.db.delete("Student", {"student_name": name})
+		self.addCleanup(frappe.db.delete, "Student", {"student_name": name})
+		self._reset_buckets(self.G1)
+		t = self._ticket(self.G1, "consent")
+		r = api.signup_with_consent(mobile=self.G1, ticket=t["ticket"], name=name, pin="1234",
+		                            gender="Male", mascot="bhalu")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(r["gender"], "Male")
+		self.assertEqual(r["mascot"], "bhalu")
+		row = frappe.db.get_value("Student", r["id"], ["gender", "mascot"], as_dict=True)
+		self.assertEqual(row.gender, "Male")
+		self.assertEqual(row.mascot, "bhalu")
+
+	def test_consent_signup_normalises_a_crafted_guide(self):
+		"""A crafted call must not be able to burn the guardian's one-time ticket AND store junk:
+		the field normalises, so the enrolment still succeeds for the learner standing there."""
+		name = "Consent Junk Girl"
+		frappe.db.delete("Student", {"student_name": name})
+		self.addCleanup(frappe.db.delete, "Student", {"student_name": name})
+		self._reset_buckets(self.G1)
+		t = self._ticket(self.G1, "consent")
+		r = api.signup_with_consent(mobile=self.G1, ticket=t["ticket"], name=name, pin="1234",
+		                            gender="Squirrel", mascot="<img onerror=1>")
+		self.assertTrue(r.get("ok"), r)
+		row = frappe.db.get_value("Student", r["id"], ["gender", "mascot"], as_dict=True)
+		self.assertEqual(row.gender, "Other")
+		self.assertEqual(row.mascot, "roshni")
+
 	# -- 1. the privacy guarantee ----------------------------------------------
 	def test_no_phone_number_is_ever_stored_in_recoverable_form(self):
 		"""The load-bearing claim: a database dump yields no guardians' phone numbers.
@@ -3751,6 +3790,7 @@ class TestGuardianOTP(FrappeTestCase):
 		# the proof of permission outlives the challenge that produced it
 		self.assertTrue(frappe.get_all("Hikmat Consent", filters={"student": girl["id"]}))
 
+
 class TestSelfSignupIsOnlineMode(FrappeTestCase):
 	"""Student.mode must agree with the door the learner came through.
 
@@ -3786,3 +3826,109 @@ class TestSelfSignupIsOnlineMode(FrappeTestCase):
 		rows = frappe.get_all("Student", filters={"active": 1, "mode": "Campus"},
 		                      fields=["name"])
 		self.assertNotIn(r["id"], [x.name for x in rows])
+
+
+class TestGenderAndMascot(FrappeTestCase):
+	"""Gender and the chosen guide must survive the round trip through every door.
+
+	Gender is not decoration here: Hindi verbs and adjectives agree with their subject, so the
+	app cannot address a boy correctly without it (gform() in the game resolves
+	{feminine|masculine} markers off this field). It used to be HARDCODED to "Other" in
+	_validated_profile_fields, so the Select on the doctype was never actually reachable.
+
+	The guide (mascot) matters for the same practical reason gender does: the roster runs on
+	~30 SHARED campus laptops, so anything kept only in localStorage is forgotten the next time
+	she sits at a different machine.
+	"""
+
+	NAME = "Gender Test Girl"
+	BOY = "Gender Test Boy"
+
+	def setUp(self):
+		for n in (self.NAME, self.BOY):
+			frappe.db.delete("Student", {"student_name": n})
+			self.addCleanup(frappe.db.delete, "Student", {"student_name": n})
+
+	def test_signup_stores_and_returns_gender_and_mascot(self):
+		r = api.signup_student(name=self.BOY, pin="1234", gender="Male", mascot="sheru")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(r["gender"], "Male")
+		self.assertEqual(r["mascot"], "sheru")
+		row = frappe.db.get_value("Student", r["id"], ["gender", "mascot"], as_dict=True)
+		self.assertEqual(row.gender, "Male")
+		self.assertEqual(row.mascot, "sheru")
+
+	def test_unknown_gender_or_mascot_falls_back_never_errors(self):
+		"""A crafted call must not be able to store junk in a field the UI switches on — but it
+		also must not break signup for a learner, so these normalise rather than reject."""
+		r = api.signup_student(name=self.NAME, pin="1234",
+		                       gender="<script>", mascot="../../etc/passwd")
+		self.assertTrue(r.get("ok"), r)
+		row = frappe.db.get_value("Student", r["id"], ["gender", "mascot"], as_dict=True)
+		self.assertEqual(row.gender, "Other")      # the app resolves Other to the feminine forms
+		self.assertEqual(row.mascot, "roshni")     # and to the default guide
+
+	def test_omitting_them_keeps_the_old_defaults(self):
+		"""Older app builds do not send these fields at all; their signups must still work."""
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		row = frappe.db.get_value("Student", r["id"], ["gender", "mascot"], as_dict=True)
+		self.assertEqual(row.gender, "Other")
+		self.assertEqual(row.mascot, "roshni")
+
+	def test_login_carries_them_to_a_fresh_device(self):
+		"""The whole point: she signs up on one laptop and logs in on another."""
+		r = api.signup_student(name=self.BOY, pin="4321", gender="Male", mascot="bhalu")
+		self.assertTrue(r.get("ok"), r)
+		lg = api.login_by_name(name=self.BOY, pin="4321")
+		self.assertTrue(lg.get("ok"), lg)
+		self.assertEqual(lg["gender"], "Male")
+		self.assertEqual(lg["mascot"], "bhalu")
+
+	def test_set_profile_updates_only_its_own_two_fields(self):
+		r = api.signup_student(name=self.NAME, pin="1234", gender="Female", mascot="roshni")
+		self.assertTrue(r.get("ok"), r)
+		before = frappe.db.get_value("Student", r["id"],
+		                             ["student_name", "login_pin", "band", "active"], as_dict=True)
+		ok = api.set_profile(student=r["id"], token=r["token"], mascot="tara", gender="Male")
+		self.assertTrue(ok.get("ok"), ok)
+		after = frappe.db.get_value("Student", r["id"],
+		                            ["student_name", "login_pin", "band", "active",
+		                             "gender", "mascot"], as_dict=True)
+		self.assertEqual(after.mascot, "tara")
+		self.assertEqual(after.gender, "Male")
+		# nothing else may move — a stolen token must not be able to rename or unlock anyone
+		self.assertEqual(after.student_name, before.student_name)
+		self.assertEqual(after.login_pin, before.login_pin)
+		self.assertEqual(after.band, before.band)
+		self.assertEqual(after.active, before.active)
+
+	def test_set_profile_needs_a_valid_token(self):
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(api.set_profile(student=r["id"], token="nope", mascot="tara").get("error"),
+		                 "not_authorized")
+		self.assertEqual(frappe.db.get_value("Student", r["id"], "mascot"), "roshni")
+
+	def test_set_profile_rejects_an_unknown_guide(self):
+		"""Unlike signup, an explicit CHANGE to junk is an error rather than a silent fallback:
+		the client only ever sends an id from its own list, so junk here means a bad caller and
+		answering ok:True would tell it the write happened."""
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(api.set_profile(student=r["id"], token=r["token"],
+		                                 mascot="godzilla").get("error"), "bad_mascot")
+		self.assertEqual(api.set_profile(student=r["id"], token=r["token"],
+		                                 gender="Alien").get("error"), "bad_gender")
+		self.assertEqual(api.set_profile(student=r["id"], token=r["token"]).get("error"),
+		                 "nothing_to_set")
+
+	def test_every_offered_guide_is_accepted(self):
+		"""The game's MASCOTS list and this whitelist must not drift: a guide the app offers but
+		the server rejects would silently stop saving her choice."""
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		for mid in api.MASCOT_IDS:
+			self.assertTrue(api.set_profile(student=r["id"], token=r["token"],
+			                                mascot=mid).get("ok"), mid)
+			self.assertEqual(frappe.db.get_value("Student", r["id"], "mascot"), mid)

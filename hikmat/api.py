@@ -2159,7 +2159,17 @@ def login_student(student, pin=None):
     return {"ok": True, "id": student, "name": s.student_name, "avatar": s.avatar or "🙂", "token": token}
 
 
-def _validated_profile_fields(name, avatar, pin, age, band):
+# The seven named guides the app offers (see MASCOTS in index.html). Whitelisted rather than
+# stored free-form: this string is read back by the game and used to pick an SVG, and an
+# unknown value there would silently fall back to Roshni anyway — better to reject it here so
+# Desk and the app agree on what a guide is. Blank means Roshni.
+MASCOT_IDS = ("roshni", "tara", "chanda", "zoya", "chotu", "kabir", "imran", "sheru", "bhalu")
+
+# Student.gender is a Select with exactly these options.
+GENDERS = ("Female", "Male", "Other")
+
+
+def _validated_profile_fields(name, avatar, pin, age, band, gender=None, mascot=None):
     """Normalise and check every field a new learner profile needs. Returns
     (fields_for_insert, None) or (None, error_code). Touches the database only to confirm the
     band exists, and creates nothing.
@@ -2188,6 +2198,12 @@ def _validated_profile_fields(name, avatar, pin, age, band):
     NUMBER, and .strip() on an int used to be a 500; a dict band would reach
     frappe.db.exists as a FILTER and "pass" the existence check as some other row.
 
+    gender is NOT demographics-for-its-own-sake and is not optional theatre: Hindi verbs and
+    adjectives agree with their subject, so the app literally cannot address a boy correctly
+    without it (see gform() in the game). Anything that is not Female/Male — including the
+    learner declining to say — lands on "Other", which the game resolves to the feminine forms
+    this programme was written in. That is why the field was already hardcoded to "Other" here.
+
     The PIN is hashed here rather than at insert time so that no caller of this function ever
     holds a plaintext PIN in a structure it might log. That means an unauthorised caller can
     spend one pbkdf2 per attempt, which the per-IP signup ceiling (60/hour) already bounds to
@@ -2201,9 +2217,13 @@ def _validated_profile_fields(name, avatar, pin, age, band):
     avatar = _plain_text(avatar)[:20] or "🙂"        # an emoji, but nothing stops a crafted call;
     a = _int(age, None)                              # ZWJ-compound emoji survive (see _KEEP_FORMAT)
     band = _docname(band)
+    g = _plain_text(gender)
+    mas = _plain_text(mascot).lower()
     return {
         "doctype": "Student", "student_name": name, "avatar": avatar,   # both normalised above
-        "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
+        "login_pin": _hash_pin(pin), "active": 1,
+        "gender": g if g in GENDERS else "Other",
+        "mascot": mas if mas in MASCOT_IDS else "roshni",
         "age": a if (a is not None and 3 <= a <= 25) else None,
         "band": band if (band and frappe.db.exists("Grade Band", band)) else None,
     }, None
@@ -2230,16 +2250,18 @@ def _insert_self_signup_student(fields, cohort=None):
     return frappe.get_doc(dict(fields, cohort=cohort, mode="Online")).insert(ignore_permissions=True)
 
 
-def _create_self_signup_student(name, avatar, pin, age, band, cohort=None):
+def _create_self_signup_student(name, avatar, pin, age, band, cohort=None,
+                                gender=None, mascot=None):
     """Validate then insert, for callers with nothing to do in between."""
-    fields, err = _validated_profile_fields(name, avatar, pin, age, band)
+    fields, err = _validated_profile_fields(name, avatar, pin, age, band, gender, mascot)
     if err:
         return None, err
     return _insert_self_signup_student(fields, cohort), None
 
 
 @frappe.whitelist(allow_guest=True)
-def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band=None):
+def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band=None,
+                   gender=None, mascot=None):
     """Self-service signup: a learner creates their own profile and is logged straight in.
     No email/password — just a name (+ optional avatar, PIN, grade band). Rate-limited per IP.
 
@@ -2260,13 +2282,14 @@ def signup_student(name=None, avatar=None, pin=None, age=None, cohort=None, band
         # if the limiter is unavailable, refuse new profiles rather than run without a ceiling.
         # Existing learners are unaffected: every lesson path stays fail-open.
         return {"ok": False, "error": "rate_limited"}
-    doc, err = _create_self_signup_student(name, avatar, pin, age, band, cohort)
+    doc, err = _create_self_signup_student(name, avatar, pin, age, band, cohort, gender, mascot)
     if err:
         return {"ok": False, "error": err}
     token = _token_for(doc.name)
     frappe.db.commit()
     return {"ok": True, "id": doc.name, "name": doc.student_name,
-            "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token, "band": band or ""}
+            "avatar": doc.avatar or "🙂", "hasPin": bool(pin), "token": token, "band": band or "",
+            "gender": doc.gender or "", "mascot": doc.mascot or "roshni"}
 
 
 def _login_name_candidates(key):
@@ -2295,13 +2318,13 @@ def _login_name_candidates(key):
          budget bounds how often that can happen.
     The PIN is checked by the caller, so pbkdf2 is spent only on rows whose NAME really
     matches — a name the DB over-matches to fifty rows no longer costs fifty hashes."""
-    fields = ["name", "student_name", "login_pin", "avatar", "band"]
+    fields = ["name", "student_name", "login_pin", "avatar", "band", "gender", "mascot"]
     seen = set()
     for r in frappe.get_all("Student", filters={"active": 1, "student_name": key}, fields=fields):
         if _login_name_key(r.student_name) == key:
             seen.add(r.name)
             yield r
-    for r in frappe.db.sql("select `name`, student_name, login_pin, avatar, band "
+    for r in frappe.db.sql("select `name`, student_name, login_pin, avatar, band, gender, mascot "
                            "from `tabStudent` where active = 1 "
                            "and replace(student_name, ' ', '') = %s",
                            (key.replace(" ", ""),), as_dict=True):
@@ -2342,7 +2365,8 @@ def login_by_name(name, pin=None):
     token = _token_for(match.name)
     frappe.db.commit()
     return {"ok": True, "id": match.name, "name": match.student_name, "avatar": match.avatar or "🙂",
-            "token": token, "band": match.band or ""}
+            "token": token, "band": match.band or "",
+            "gender": match.gender or "", "mascot": match.mascot or "roshni"}
 
 
 # ---------------------------------------------------------------------------
@@ -2372,7 +2396,8 @@ def _create_online_user(username, pin, full_name):
 
 
 @frappe.whitelist(allow_guest=True)
-def signup_online(username=None, pin=None, invite_code=None, name=None, avatar=None, band=None):
+def signup_online(username=None, pin=None, invite_code=None, name=None, avatar=None, band=None,
+                  gender=None, mascot=None):
     """Self-service ONLINE signup gated by a cohort invite code. Creates a Website User +
     linked Student (mode=Online). Rate-limited per IP. Generic errors (no enumeration)."""
     if not _rate_ok("signup:" + _client_ip(), 60, 3600, fail_closed=True):   # see signup_student
@@ -2396,17 +2421,24 @@ def signup_online(username=None, pin=None, invite_code=None, name=None, avatar=N
     avatar = _plain_text(avatar)[:20] or "🙂"
     band = _docname(band)
     band = band if (band and frappe.db.exists("Grade Band", band)) else None
+    # Same whitelists as _validated_profile_fields — this door builds its Student row by hand
+    # (it also has to mint the User), so the two must not drift on what a gender or a guide is.
+    g = _plain_text(gender)
+    g = g if g in GENDERS else "Other"
+    mas = _plain_text(mascot).lower()
+    mas = mas if mas in MASCOT_IDS else "roshni"
 
     user = _create_online_user(username, pin, name)
     stu = frappe.get_doc({
         "doctype": "Student", "student_name": name, "avatar": avatar,   # both normalised above
-        "cohort": cohort, "login_pin": _hash_pin(pin), "active": 1, "gender": "Other",
+        "cohort": cohort, "login_pin": _hash_pin(pin), "active": 1, "gender": g, "mascot": mas,
         "band": band, "mode": "Online", "user": user.name,
     }).insert(ignore_permissions=True)
     token = _token_for(stu.name)
     frappe.db.commit()
     return {"ok": True, "id": stu.name, "name": name, "avatar": stu.avatar or "🙂",
-            "token": token, "band": band or "", "username": username}
+            "token": token, "band": band or "", "gender": g, "mascot": mas,
+            "username": username}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -2417,9 +2449,11 @@ def get_my_student():
     sid = _session_student()
     if not sid:
         return {"ok": False}
-    s = frappe.db.get_value("Student", sid, ["student_name", "avatar", "band"], as_dict=True)
+    s = frappe.db.get_value("Student", sid,
+                            ["student_name", "avatar", "band", "gender", "mascot"], as_dict=True)
     return {"ok": True, "id": sid, "name": s.student_name, "avatar": s.avatar or "🙂",
-            "band": s.band or "", "token": _token_for(sid)}   # request-level commit persists the token
+            "band": s.band or "", "gender": s.gender or "", "mascot": s.mascot or "roshni",
+            "token": _token_for(sid)}   # request-level commit persists the token
 
 
 @frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
@@ -2432,10 +2466,12 @@ def get_campus_roster(campus=None):
     if not campus:
         return []
     rows = frappe.get_all("Student", filters={"active": 1, "mode": "Campus", "campus": campus},
-                          fields=["name", "student_name", "avatar", "login_pin", "band"],
+                          fields=["name", "student_name", "avatar", "login_pin", "band",
+                                  "gender", "mascot"],
                           order_by="student_name asc")
     out = [{"id": r.name, "name": r.student_name, "avatar": r.avatar or "🙂",
-            "pinHash": r.login_pin or "", "token": _token_for(r.name), "band": r.band or ""} for r in rows]
+            "pinHash": r.login_pin or "", "token": _token_for(r.name), "band": r.band or "",
+            "gender": r.gender or "", "mascot": r.mascot or "roshni"} for r in rows]
     frappe.db.commit()   # _token_for may have minted tokens
     return out
 
@@ -3056,7 +3092,7 @@ def _file_consent(student, student_name, mhash, last4, channel, otp=None, note=N
 
 @frappe.whitelist(allow_guest=True)
 def signup_with_consent(mobile=None, ticket=None, name=None, avatar=None, pin=None,
-                        age=None, band=None):
+                        age=None, band=None, gender=None, mascot=None):
     """Create a learner's profile against a guardian's PROVEN number.
 
     This is signup_student with a verified adult behind it: same validation, same rate limit,
@@ -3077,7 +3113,7 @@ def signup_with_consent(mobile=None, ticket=None, name=None, avatar=None, pin=No
         return {"ok": False, "error": "bad_mobile"}
     mhash = _mobile_hash(e164)
     # Form first, ticket second: a rejected name or PIN must not cost the guardian their code.
-    fields, err = _validated_profile_fields(name, avatar, pin, age, band)
+    fields, err = _validated_profile_fields(name, avatar, pin, age, band, gender, mascot)
     if err:
         return {"ok": False, "error": err}
     otp = _redeem_ticket(mhash, "Consent", ticket)
@@ -3089,6 +3125,7 @@ def signup_with_consent(mobile=None, ticket=None, name=None, avatar=None, pin=No
     frappe.db.commit()
     return {"ok": True, "id": doc.name, "name": doc.student_name, "avatar": doc.avatar or "🙂",
             "hasPin": True, "token": token, "band": doc.band or "",
+            "gender": doc.gender or "", "mascot": doc.mascot or "roshni",
             "guardianLast4": e164[-4:]}
 
 
@@ -3252,6 +3289,50 @@ def average_stars():
     _require_staff()
     r = frappe.db.sql("select avg(stars) from `tabLesson Attempt`")
     return round(r[0][0], 2) if r and r[0][0] is not None else 0
+
+
+@frappe.whitelist(allow_guest=True)
+def set_profile(student=None, token=None, mascot=None, gender=None):
+    """Save a learner's own presentation choices — which named guide asks her the questions,
+    and the gender the Hindi has to agree with.
+
+    Why this exists at all: both are chosen at signup, but they are also changeable from the
+    in-app menu, and the roster runs on ~30 SHARED campus laptops. Keeping the choice only in
+    localStorage means a girl who picks Sheru on Monday is greeted by Roshni on Tuesday's
+    laptop, and — worse — a boy who set himself as a boy is addressed as a girl in Hindi by
+    every machine except the one he happened to sign up on.
+
+    Deliberately narrow: it can write nothing but these two whitelisted enums, on the caller's
+    OWN row, proven by the same bearer token (or online session) every other per-student
+    endpoint uses. It cannot touch a name, a PIN, a band, a cohort or the active flag, so the
+    worst a stolen token can do here is change whose face says hello.
+
+    Fail-open by design on the client side: the game writes the choice to localStorage FIRST
+    and calls this fire-and-forget, because picking a friend must work with no network at all.
+    A failure here costs the cross-device sync, never the choice."""
+    if not student:
+        student = _session_student()
+    if not student or not _authorized(student, token):
+        return {"ok": False, "error": "not_authorized"}
+    vals = {}
+    mas = _plain_text(mascot).lower()
+    if mas:
+        if mas not in MASCOT_IDS:
+            return {"ok": False, "error": "bad_mascot"}
+        vals["mascot"] = mas
+    g = _plain_text(gender)
+    if g:
+        if g not in GENDERS:
+            return {"ok": False, "error": "bad_gender"}
+        vals["gender"] = g
+    if not vals:
+        return {"ok": False, "error": "nothing_to_set"}
+    # update_modified=False: this is a preference, not a content edit, and letting it bump
+    # `modified` would reorder every Desk list that sorts on it (Student.sort_field) every
+    # time a child tries on a different guide.
+    frappe.db.set_value("Student", student, vals, update_modified=False)
+    frappe.db.commit()
+    return {"ok": True, "mascot": vals.get("mascot", ""), "gender": vals.get("gender", "")}
 
 
 @frappe.whitelist(allow_guest=True)
