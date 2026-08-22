@@ -13,6 +13,7 @@
   "cohort",
   "login_pin",
   "avatar",
+  "mascot",
   "active",
   "auth_token",
   "token_issued_on",
@@ -63,6 +64,13 @@
    "fieldname": "avatar",
    "fieldtype": "Data",
    "label": "Avatar (emoji)"
+  },
+  {
+   "fieldname": "mascot",
+   "fieldtype": "Data",
+   "label": "Guide (mascot)",
+   "length": 20,
+   "description": "Which named guide the learner picked in the app (roshni, tara, chanda, zoya, chotu, kabir, imran, sheru, bhalu). Blank = Roshni."
   },
   {
    "default": "1",
