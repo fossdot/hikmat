@@ -96,7 +96,7 @@
    "options": "Grade Band"
   },
   {
-   "default": "Campus",
+   "default": "Online",
    "fieldname": "mode",
    "fieldtype": "Select",
    "in_list_view": 1,
