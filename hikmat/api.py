@@ -2224,7 +2224,10 @@ def _insert_self_signup_student(fields, cohort=None):
                                 "center": "Self sign-up"}).insert(ignore_permissions=True)
             except frappe.DuplicateEntryError:             # concurrent first signups — fine
                 pass
-    return frappe.get_doc(dict(fields, cohort=cohort)).insert(ignore_permissions=True)
+    # mode is set EXPLICITLY rather than left to the Student doctype's default: this door
+    # is, by definition, the online one. Relying on the field default is what put
+    # every Play Store tester in the "Campus" bucket while their cohort said Online.
+    return frappe.get_doc(dict(fields, cohort=cohort, mode="Online")).insert(ignore_permissions=True)
 
 
 def _create_self_signup_student(name, avatar, pin, age, band, cohort=None):

@@ -16,3 +16,5 @@ hikmat.patches.v10_guard_report_output
 hikmat.patches.v11_guard_more_reports
 hikmat.patches.v12_remove_boli
 hikmat.patches.v13_guardian_otp
+hikmat.patches.v14_self_signup_is_online
+hikmat.patches.v15_allow_capacitor_origin

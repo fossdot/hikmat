@@ -3750,3 +3750,39 @@ class TestGuardianOTP(FrappeTestCase):
 		self.assertFalse(frappe.get_all("Hikmat OTP", filters={"mobile_hash": h}))
 		# the proof of permission outlives the challenge that produced it
 		self.assertTrue(frappe.get_all("Hikmat Consent", filters={"student": girl["id"]}))
+
+class TestSelfSignupIsOnlineMode(FrappeTestCase):
+	"""Student.mode must agree with the door the learner came through.
+
+	The field's default was "Campus" and the self-signup path set only the cohort, so every
+	learner who signed herself up through the app was stored as cohort=Online + mode=Campus —
+	the same fact recorded two ways, disagreeing. It surfaced as soon as the Play Store testers
+	arrived: nine rows reading "Online" under Cohort and "Campus" under Mode.
+
+	Campus is the twenty-six girls a facilitator enters by hand and attaches to a Campus.
+	Everyone who arrives through the app is Online.
+	"""
+
+	NAME = "Mode Default Girl"
+
+	def setUp(self):
+		frappe.db.delete("Student", {"student_name": self.NAME})
+		self.addCleanup(frappe.db.delete, "Student", {"student_name": self.NAME})
+
+	def test_self_signup_is_stored_as_online(self):
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		stu = frappe.db.get_value("Student", r["id"], ["mode", "cohort", "campus"], as_dict=True)
+		self.assertEqual(stu.mode, "Online")
+		self.assertEqual(stu.cohort, "Online")      # the two must not disagree again
+		self.assertFalse(stu.campus)                # no physical campus behind an app signup
+
+	def test_an_online_learner_is_not_in_a_campus_roster(self):
+		"""campus_roster hands out every girl's PIN hash + bearer token for offline login, so an
+		internet stranger must never land in one. She was already excluded by the empty `campus`
+		filter; assert it against mode too, so the exclusion is not resting on one field."""
+		r = api.signup_student(name=self.NAME, pin="1234")
+		self.assertTrue(r.get("ok"), r)
+		rows = frappe.get_all("Student", filters={"active": 1, "mode": "Campus"},
+		                      fields=["name"])
+		self.assertNotIn(r["id"], [x.name for x in rows])
