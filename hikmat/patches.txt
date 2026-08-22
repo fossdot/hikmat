@@ -18,3 +18,4 @@ hikmat.patches.v12_remove_boli
 hikmat.patches.v13_guardian_otp
 hikmat.patches.v14_self_signup_is_online
 hikmat.patches.v15_allow_capacitor_origin
+hikmat.patches.v16_hindi_repair_and_gender
