@@ -445,9 +445,6 @@
   [data-theme="dark"] .rostercard { background:#2a2240; border-color:var(--line); box-shadow:var(--shadow-sm); }
   /* Legal footer on Home — Play requires a privacy-policy link and an in-app deletion route.
      Muted but AA-contrast on the page background; 44px tap targets for small fingers. */
-  .legalfoot{margin:30px 0 10px; text-align:center; font-size:13px; color:var(--muted); line-height:1.6}
-  .legalfoot a{color:var(--muted); text-decoration:underline; display:inline-block; padding:11px 6px}
-  .legalfoot a:hover,.legalfoot a:focus-visible{color:var(--text)}
 
   /* "🙋 Help Needed" top-bar button + its confirmation toast */
   .toggle.helpneed { background:var(--grape); color:#fff; border-color:var(--grape); font-weight:900; white-space:nowrap; }
@@ -1711,12 +1708,7 @@ function speak(text, lang="en", opts){
   } catch(e){ showAudioHint(); }
 }
 // Always spoken: Hindi help must not depend on the removed Guide toggle.
-// `gap` is the silence held AFTER whatever is already speaking and BEFORE this line starts.
-// Pass one whenever an English word or sentence comes immediately before, so the two do not
-// run together into one robotic string ("Potato ye hai aalu") — a child needs a beat to hear
-// the English, try it in her own mouth, and only then be told what it means.
-function sayHi(text, gap){ speak(text, "hi", { queue:true, gap: gap || 0 }); }
-const HI_GLOSS_GAP = 900;   // one word, then a breath, then its Hindi meaning
+function sayHi(text){ speak(text, "hi", { queue:true }); }
 
 // ---------- Audio-first shell: tap-to-hear narration of the current screen ----------
 // A non-reader (or non-reading parent) navigates by tapping the 🔊 button to hear the screen.
@@ -2567,9 +2559,11 @@ function openMenu(){
   sheet.querySelector("#mTheme").onclick = () => { close(); document.getElementById("themeToggle").click(); };
   sheet.querySelector("#mLang").onclick  = () => { close(); document.getElementById("langToggle").click(); };
   sheet.querySelector("#mWa").onclick    = () => { sfx.tap(); logTool("whatsapp_group"); };
-  const narr = tx("Menu. Choose your friend, how Hindi talks to you, sound, light or dark, language, or the WhatsApp group for grown-ups.",
-                  "मेन्यू। अपनी सहेली, हिंदी की भाषा, आवाज़, उजाला या अंधेरा, भाषा, या बड़ों के लिए व्हाट्सएप ग्रुप चुनो।");
-  srSay(narr); speak(narr, state.lang === "hi" ? "hi" : "en");
+  // No spoken narration here (Vishal, 2026-08-22): auto-speech belongs on a lesson screen,
+  // where a non-reader must know what she is being asked, not on a settings sheet she opened
+  // on purpose and can see. srSay writes only to the aria-live region — silent for everyone
+  // except a screen-reader user, who would otherwise get nothing at all.
+  srSay(tx("Menu","मेन्यू"));
   try { sheet.querySelector("#mFriend").focus({ preventScroll:true }); } catch(e){}
   logTool("menu");
 }
@@ -2619,8 +2613,7 @@ function openMascotPicker(){
     grid.appendChild(b);
   });
   sheet.querySelector("#dClose").onclick = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
-  const narr = tx("Choose your friend. Tap a face to hear who they are.","अपनी सहेली चुनो। किसी चेहरे पर छूकर सुनो कि वह कौन है।");
-  srSay(narr); speak(narr, state.lang === "hi" ? "hi" : "en");
+  srSay(tx("Choose your friend","अपनी सहेली चुनो"));   // silent; see the note in openMenu
 }
 // One writer for the choice, so the local state and the server never disagree about who her
 // friend is. The server call is fire-and-forget: the pick must work offline (that is the whole
@@ -2688,7 +2681,7 @@ function openGenderPicker(){
   });
   ex.textContent = sample();
   sheet.querySelector("#dClose").onclick = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
-  srSay(title + " " + body); speak(title + " " + body, state.lang === "hi" ? "hi" : "en");
+  srSay(title + " " + body);   // silent; the spoken sample below is the useful part
 }
 
 
@@ -2840,15 +2833,12 @@ function renderHome(){
     life.forEach(c => grid.appendChild(trackCard(c)));
     host.appendChild(grid);
   }
-  // Legal footer. Google Play requires a reachable privacy policy AND an in-app route to
-  // account/data deletion, so these two links must stay on Home. target=_blank keeps the
-  // packaged Capacitor app from navigating its own WebView away to the website; both pages
-  // need the internet, which is why nothing else on this screen does.
-  s.appendChild(el(`<div class="legalfoot">
-    <a href="https://bodhya.net/bodhya-learn-privacy" target="_blank" rel="noopener">${tx("Privacy Policy","गोपनीयता नीति")}</a>
-    <span aria-hidden="true"> · </span>
-    <a href="https://bodhya.net/data-deletion" target="_blank" rel="noopener">${tx("Delete my data","मेरा डेटा हटाओ")}</a>
-  </div>`));
+  // The privacy-policy and data-deletion links used to sit here, because Google Play requires
+  // both to be REACHABLE IN THE APP. They still are — they moved into the ☰ menu (openMenu),
+  // whose button is in the top bar of every single screen, so the requirement is met from
+  // anywhere rather than only from Home. Taken off this screen on Vishal's instruction
+  // 2026-08-22: it is the first thing a six-year-old sees and it was two lines of legal text
+  // aimed at an adult. If the menu ever loses them, they have to come back here.
   refreshTop();
 }
 
@@ -3450,7 +3440,11 @@ function startLevel(course, lesson, lv, back){
     $("#say").onclick = () => speak(it.en);
     $("#emojiBtn").onclick = () => speak(it.en);
     $("#next").onclick = () => { sfx.next(); next(true); };
-    announce(() => { speak(it.en); sayHi("ये है " + it.hi, HI_GLOSS_GAP); });
+    // The English word ONLY. "Banana" used to be followed by "ये है केला"; Vishal removed the
+    // spoken gloss on 2026-08-22 — the Hindi meaning is already on screen under the word, and
+    // hearing it every single card gets in the way of the English she is here to learn. (An
+    // earlier attempt just put a pause between the two; the answer was to drop the second one.)
+    announce(() => speak(it.en));
   }
 
   // --- LISTEN: hear English, choose the right picture
