@@ -77,7 +77,7 @@
        }
       ],
       "line": "Welcome! What do you want to buy?",
-      "lineHi": "स्वागत है! आप क्या खरीदना चाहती हैं?"
+      "lineHi": "स्वागत है! आप क्या खरीदना चाहत{ी|े} हैं?"
      },
      {
       "who": "🧑‍🦱",
@@ -204,21 +204,21 @@
        {
         "text": "I want bananas, please.",
         "ok": true,
-        "textHi": "मुझे केले चाहिए, कृपया।"
+        "textHi": "कृपया मुझे केले दे दीजिए।"
        },
        {
         "text": "I want a chair, please.",
         "ok": false,
-        "textHi": "मुझे एक कुर्सी चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक कुर्सी दे दीजिए।"
        },
        {
         "text": "I want a fan, please.",
         "ok": false,
-        "textHi": "मुझे एक पंखा चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक पंखा दे दीजिए।"
        }
       ],
       "line": "Which fruit do you want?",
-      "lineHi": "आप कौन सा फल चाहती हैं?"
+      "lineHi": "आप कौन-सा फल चाहत{ी|े} हैं?"
      }
     ],
     "fix": [
@@ -299,17 +299,17 @@
        {
         "text": "I need some rice, please.",
         "ok": true,
-        "textHi": "मुझे कुछ चावल चाहिए, कृपया।"
+        "textHi": "कृपया मुझे कुछ चावल दे दीजिए।"
        },
        {
         "text": "I need a new sari, please.",
         "ok": false,
-        "textHi": "मुझे एक नई साड़ी चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक नई साड़ी दे दीजिए।"
        },
        {
         "text": "I need a bicycle, please.",
         "ok": false,
-        "textHi": "मुझे एक साइकिल चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक साइकिल दे दीजिए।"
        }
       ],
       "line": "Do you need rice or wheat today?",
@@ -418,21 +418,21 @@
        {
         "text": "I want one kilo, please.",
         "ok": true,
-        "textHi": "मुझे एक किलो चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक किलो दे दीजिए।"
        },
        {
         "text": "I want one window, please.",
         "ok": false,
-        "textHi": "मुझे एक खिड़की चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक खिड़की दे दीजिए।"
        },
        {
         "text": "I want one song, please.",
         "ok": false,
-        "textHi": "मुझे एक गाना चाहिए, कृपया।"
+        "textHi": "कृपया मुझे एक गाना दे दीजिए।"
        }
       ],
       "line": "How many potatoes do you want?",
-      "lineHi": "आप कितने आलू चाहती हैं?"
+      "lineHi": "आप कितने आलू चाहत{ी|े} हैं?"
      },
      {
       "who": "🧑‍🦱",
@@ -455,7 +455,7 @@
        }
       ],
       "line": "Do you want a full kilo or half?",
-      "lineHi": "आप पूरा किलो चाहती हैं या आधा?"
+      "lineHi": "आप पूरा किलो चाहत{ी|े} हैं या आधा?"
      }
     ],
     "fix": [
@@ -536,17 +536,17 @@
        {
         "text": "Okay, I will take one kilo.",
         "ok": true,
-        "textHi": "ठीक है, मैं एक किलो ले लूँगी।"
+        "textHi": "ठीक है, मैं एक किलो ले लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will take one moon.",
         "ok": false,
-        "textHi": "ठीक है, मैं एक चाँद ले लूँगी।"
+        "textHi": "ठीक है, मैं एक चाँद ले लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will take one door.",
         "ok": false,
-        "textHi": "ठीक है, मैं एक दरवाज़ा ले लूँगी।"
+        "textHi": "ठीक है, मैं एक दरवाज़ा ले लूँग{ी|ा}।"
        }
       ],
       "line": "These tomatoes are twenty rupees a kilo.",
@@ -666,7 +666,7 @@
        }
       ],
       "line": "Do you want to know the price?",
-      "lineHi": "क्या आप कीमत जानना चाहती हैं?"
+      "lineHi": "क्या आप कीमत जानना चाहत{ी|े} हैं?"
      },
      {
       "who": "🧑‍🦱",
@@ -1043,7 +1043,7 @@
        }
       ],
       "line": "Do you want a receipt for this?",
-      "lineHi": "क्या आप इसकी रसीद चाहती हैं?"
+      "lineHi": "क्या आप इसकी रसीद चाहत{ी|े} हैं?"
      }
     ],
     "fix": [
@@ -1160,7 +1160,7 @@
        }
       ],
       "line": "Do you want home delivery for the heavy bags?",
-      "lineHi": "क्या आप भारी थैलों के लिए घर पर डिलीवरी चाहती हैं?"
+      "lineHi": "क्या आप भारी थैलों के लिए घर पर डिलीवरी चाहत{ी|े} हैं?"
      }
     ],
     "fix": [
@@ -1258,7 +1258,7 @@
        {
         "text": "I will eat the door.",
         "ok": false,
-        "textHi": "मैं दरवाज़ा खा जाऊँगी।"
+        "textHi": "मैं दरवाज़ा खा जाऊँग{ी|ा}।"
        },
        {
         "text": "Your house is a bus.",
@@ -1276,7 +1276,7 @@
        {
         "text": "Okay, I will open the window.",
         "ok": true,
-        "textHi": "ठीक है, मैं खिड़की खोल दूँगी।"
+        "textHi": "ठीक है, मैं खिड़की खोल दूँग{ी|ा}।"
        },
        {
         "text": "The window is my mother.",
@@ -1286,7 +1286,7 @@
        {
         "text": "I can drink the window.",
         "ok": false,
-        "textHi": "मैं खिड़की पी सकती हूँ।"
+        "textHi": "मैं खिड़की पी सकत{ी|ा} हूँ।"
        }
       ],
       "line": "Please open the window.",
@@ -1371,7 +1371,7 @@
        {
         "text": "Yes, I will bring a plate.",
         "ok": true,
-        "textHi": "हाँ, मैं एक थाली लाऊँगी।"
+        "textHi": "हाँ, मैं एक थाली लाऊँग{ी|ा}।"
        },
        {
         "text": "The plate is sleeping.",
@@ -1381,11 +1381,11 @@
        {
         "text": "I will wear the plate.",
         "ok": false,
-        "textHi": "मैं थाली पहनूँगी।"
+        "textHi": "मैं थाली पहनूँग{ी|ा}।"
        }
       ],
       "line": "Can you bring a plate?",
-      "lineHi": "क्या तुम एक थाली ला सकती हो?"
+      "lineHi": "क्या तुम एक थाली ला सकत{ी|े} हो?"
      },
      {
       "who": "👩",
@@ -1489,7 +1489,7 @@
        {
         "text": "Okay, I will put it on the table.",
         "ok": true,
-        "textHi": "ठीक है, मैं इसे मेज़ पर रख दूँगी।"
+        "textHi": "ठीक है, मैं इसे मेज़ पर रख दूँग{ी|ा}।"
        },
        {
         "text": "The table can run fast.",
@@ -1499,7 +1499,7 @@
        {
         "text": "I will cook the table.",
         "ok": false,
-        "textHi": "मैं मेज़ पकाऊँगी।"
+        "textHi": "मैं मेज़ पकाऊँग{ी|ा}।"
        }
       ],
       "line": "Please put the cup on the table.",
@@ -1715,21 +1715,21 @@
        {
         "text": "I wake up and wash my face.",
         "ok": true,
-        "textHi": "मैं उठती हूँ और अपना मुँह धोती हूँ।"
+        "textHi": "मैं उठत{ी|ा} हूँ और अपना मुँह धोत{ी|ा} हूँ।"
        },
        {
         "text": "I sleep on the clock.",
         "ok": false,
-        "textHi": "मैं घड़ी पर सोती हूँ।"
+        "textHi": "मैं घड़ी पर सोत{ी|ा} हूँ।"
        },
        {
         "text": "I eat the door slowly.",
         "ok": false,
-        "textHi": "मैं दरवाज़ा धीरे-धीरे खाती हूँ।"
+        "textHi": "मैं दरवाज़ा धीरे-धीरे खात{ी|ा} हूँ।"
        }
       ],
       "line": "What do you do in the morning?",
-      "lineHi": "तुम सुबह क्या करती हो?"
+      "lineHi": "तुम सुबह क्या करत{ी|े} हो?"
      },
      {
       "who": "👩",
@@ -1738,12 +1738,12 @@
        {
         "text": "I study after I eat dinner.",
         "ok": true,
-        "textHi": "मैं रात का खाना खाने के बाद पढ़ती हूँ।"
+        "textHi": "मैं रात का खाना खाने के बाद पढ़त{ी|ा} हूँ।"
        },
        {
         "text": "I study inside the cup.",
         "ok": false,
-        "textHi": "मैं कप के अंदर पढ़ती हूँ।"
+        "textHi": "मैं कप के अंदर पढ़त{ी|ा} हूँ।"
        },
        {
         "text": "My book eats my brother.",
@@ -1752,7 +1752,7 @@
        }
       ],
       "line": "When do you study?",
-      "lineHi": "तुम कब पढ़ती हो?"
+      "lineHi": "तुम कब पढ़त{ी|े} हो?"
      }
     ],
     "fix": [
@@ -1828,7 +1828,7 @@
        {
         "text": "Good morning! Yes, I slept well.",
         "ok": true,
-        "textHi": "सुप्रभात! हाँ, मैं अच्छी तरह सोई।"
+        "textHi": "सुप्रभात! हाँ, मैं अच्छी तरह सो{ई|या}।"
        },
        {
         "text": "Good morning! I am a table.",
@@ -1838,11 +1838,11 @@
        {
         "text": "Good night! I will eat the sun.",
         "ok": false,
-        "textHi": "शुभ रात्रि! मैं सूरज को खा जाऊँगी।"
+        "textHi": "शुभ रात्रि! मैं सूरज को खा जाऊँग{ी|ा}।"
        }
       ],
       "line": "Good morning! Did you sleep well?",
-      "lineHi": "सुप्रभात! क्या तुम अच्छे से सोई?"
+      "lineHi": "सुप्रभात! क्या तुम अच्छे से सो{ई|ए}?"
      },
      {
       "who": "👩",
@@ -1851,12 +1851,12 @@
        {
         "text": "This evening I will help my mother.",
         "ok": true,
-        "textHi": "आज शाम मैं अपनी माँ की मदद करूँगी।"
+        "textHi": "आज शाम मैं अपनी माँ की मदद करूँग{ी|ा}।"
        },
        {
         "text": "This evening I will drink the night.",
         "ok": false,
-        "textHi": "आज शाम मैं रात को पी जाऊँगी।"
+        "textHi": "आज शाम मैं रात को पी जाऊँग{ी|ा}।"
        },
        {
         "text": "The evening is in my pocket.",
@@ -1865,7 +1865,7 @@
        }
       ],
       "line": "What will you do this evening?",
-      "lineHi": "तुम आज शाम को क्या करोगी?"
+      "lineHi": "तुम आज शाम को क्या करोग{ी|े}?"
      }
     ],
     "fix": [
@@ -1944,7 +1944,7 @@
        {
         "text": "Yes, I will bring the broom.",
         "ok": true,
-        "textHi": "हाँ, मैं झाड़ू ले आऊँगी।"
+        "textHi": "हाँ, मैं झाड़ू ले आऊँग{ी|ा}।"
        },
        {
         "text": "No, the broom is my father.",
@@ -1954,11 +1954,11 @@
        {
         "text": "I will sleep in the bucket.",
         "ok": false,
-        "textHi": "मैं बाल्टी में सोऊँगी।"
+        "textHi": "मैं बाल्टी में सोऊँग{ी|ा}।"
        }
       ],
       "line": "Can you help me clean the room?",
-      "lineHi": "क्या तुम कमरा साफ़ करने में मेरी मदद कर सकती हो?"
+      "lineHi": "क्या तुम कमरा साफ़ करने में मेरी मदद कर सकत{ी|े} हो?"
      },
      {
       "who": "👩",
@@ -1967,12 +1967,12 @@
        {
         "text": "Okay, I will fill the bucket now.",
         "ok": true,
-        "textHi": "ठीक है, मैं अभी बाल्टी भर दूँगी।"
+        "textHi": "ठीक है, मैं अभी बाल्टी भर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will cook the bucket.",
         "ok": false,
-        "textHi": "ठीक है, मैं बाल्टी पकाऊँगी।"
+        "textHi": "ठीक है, मैं बाल्टी पकाऊँग{ी|ा}।"
        },
        {
         "text": "The bucket is reading a book.",
@@ -2067,7 +2067,7 @@
        {
         "text": "I will give you the night.",
         "ok": false,
-        "textHi": "मैं तुम्हें रात दे दूँगी।"
+        "textHi": "मैं तुम्हें रात दे दूँग{ी|ा}।"
        }
       ],
       "line": "Please give me the spoon.",
@@ -2080,12 +2080,12 @@
        {
         "text": "Yes, of course. I will wait.",
         "ok": true,
-        "textHi": "हाँ, ज़रूर। मैं इंतज़ार करूँगी।"
+        "textHi": "हाँ, ज़रूर। मैं इंतज़ार करूँग{ी|ा}।"
        },
        {
         "text": "Sorry, I will eat two minutes.",
         "ok": false,
-        "textHi": "माफ़ करना, मैं दो मिनट खाऊँगी।"
+        "textHi": "माफ़ करना, मैं दो मिनट खाऊँग{ी|ा}।"
        },
        {
         "text": "No, I am a clock now.",
@@ -2094,7 +2094,7 @@
        }
       ],
       "line": "Can you wait for two minutes?",
-      "lineHi": "क्या तुम दो मिनट इंतज़ार कर सकती हो?"
+      "lineHi": "क्या तुम दो मिनट इंतज़ार कर सकत{ी|े} हो?"
      }
     ],
     "fix": [
@@ -2179,7 +2179,7 @@
        {
         "text": "Yes, I will eat the dinner table only.",
         "ok": false,
-        "textHi": "हाँ, मैं सिर्फ़ खाने की मेज़ खाऊँगी।"
+        "textHi": "हाँ, मैं सिर्फ़ खाने की मेज़ खाऊँग{ी|ा}।"
        },
        {
         "text": "No, I am a plate of rice.",
@@ -2197,7 +2197,7 @@
        {
         "text": "Yes, please. A little more rice.",
         "ok": true,
-        "textHi": "हाँ, कृपया। थोड़ा और चावल।"
+        "textHi": "हाँ, थोड़ा और चावल दे दीजिए।"
        },
        {
         "text": "No, I had breakfast in the bucket.",
@@ -2211,7 +2211,7 @@
        }
       ],
       "line": "Would you like more rice?",
-      "lineHi": "क्या तुम और चावल लोगी?"
+      "lineHi": "क्या तुम और चावल लोग{ी|े}?"
      }
     ],
     "fix": [
@@ -2287,21 +2287,21 @@
        {
         "text": "Thank you. I will rest and help you later.",
         "ok": true,
-        "textHi": "धन्यवाद। मैं आराम करूँगी और बाद में आपकी मदद करूँगी।"
+        "textHi": "धन्यवाद। मैं आराम करूँग{ी|ा} और बाद में आपकी मदद करूँग{ी|ा}।"
        },
        {
         "text": "No, I will sleep on the dinner.",
         "ok": false,
-        "textHi": "नहीं, मैं खाने पर सो जाऊँगी।"
+        "textHi": "नहीं, मैं खाने पर सो जाऊँग{ी|ा}।"
        },
        {
         "text": "I am tired, so I am a chair.",
         "ok": false,
-        "textHi": "मैं थकी हूँ, इसलिए मैं एक कुर्सी हूँ।"
+        "textHi": "मैं थक{ी|ा} हूँ, इसलिए मैं एक कुर्सी हूँ।"
        }
       ],
       "line": "You look tired. Please take some rest.",
-      "lineHi": "तुम थकी हुई लग रही हो। कृपया थोड़ा आराम कर लो।"
+      "lineHi": "तुम थक{ी|े} लग रह{ी|े} हो। कृपया थोड़ा आराम कर लो।"
      },
      {
       "who": "👩",
@@ -2422,7 +2422,7 @@
        {
         "text": "Yes, I drink a pen.",
         "ok": false,
-        "textHi": "हाँ, मैं कलम पीती हूँ।"
+        "textHi": "हाँ, मैं कलम पीत{ी|ा} हूँ।"
        },
        {
         "text": "The pen is sleeping.",
@@ -2440,12 +2440,12 @@
        {
         "text": "Yes, I will open my book.",
         "ok": true,
-        "textHi": "हाँ, मैं अपनी किताब खोलूँगी।"
+        "textHi": "हाँ, मैं अपनी किताब खोलूँग{ी|ा}।"
        },
        {
         "text": "I eat my book now.",
         "ok": false,
-        "textHi": "मैं अभी अपनी किताब खाती हूँ।"
+        "textHi": "मैं अभी अपनी किताब खात{ी|ा} हूँ।"
        },
        {
         "text": "My book is a pen.",
@@ -2463,21 +2463,21 @@
       "wrongWord": "have",
       "fix": "has",
       "teach": "With he, she, or it, use has, not have.",
-      "teachHi": "He, she ya it ke saath has lagta hai, have nahi."
+      "teachHi": "He, she या it के साथ has लगता है, have नहीं।"
      },
      {
       "sentence": "I bought two book today.",
       "wrongWord": "book",
       "fix": "books",
       "teach": "After a number more than one, add s to the noun.",
-      "teachHi": "Ek se zyada sankhya ke baad noun mein s lagao."
+      "teachHi": "एक से ज़्यादा की संख्या के बाद संज्ञा (noun) में s लगाओ।"
      },
      {
       "sentence": "Yesterday I forget my pencil.",
       "wrongWord": "forget",
       "fix": "forgot",
       "teach": "For past time like yesterday, use the past form of the verb.",
-      "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
+      "teachHi": "Yesterday जैसे बीते समय के लिए क्रिया (verb) का past रूप लगाओ।"
      }
     ]
    },
@@ -2549,7 +2549,7 @@
        }
       ],
       "line": "Can I borrow your ruler?",
-      "lineHi": "क्या मैं तुम्हारा रूलर ले सकती हूँ?"
+      "lineHi": "क्या मैं तुम्हारा रूलर ले सकत{ी|ा} हूँ?"
      },
      {
       "who": "👩‍🏫",
@@ -2581,21 +2581,21 @@
       "wrongWord": "need",
       "fix": "needs",
       "teach": "With he, she, or it, add s to the verb.",
-      "teachHi": "He, she ya it ke saath verb mein s lagta hai."
+      "teachHi": "He, she या it के साथ क्रिया (verb) में s लगता है।"
      },
      {
       "sentence": "I have a eraser in my box.",
       "wrongWord": "a",
       "fix": "an",
       "teach": "Before a vowel sound, use an, not a.",
-      "teachHi": "Swar dhwani se pehle a nahi, an lagta hai."
+      "teachHi": "स्वर की आवाज़ से पहले a नहीं, an लगता है।"
      },
      {
       "sentence": "She keeps three bottle in her bag.",
       "wrongWord": "bottle",
       "fix": "bottles",
       "teach": "After a number more than one, add s to the noun.",
-      "teachHi": "Ek se zyada sankhya ke baad noun mein s lagao."
+      "teachHi": "एक से ज़्यादा की संख्या के बाद संज्ञा (noun) में s लगाओ।"
      }
     ]
    },
@@ -2694,21 +2694,21 @@
       "wrongWord": "have",
       "fix": "has",
       "teach": "With a single person, use has, not have.",
-      "teachHi": "Ek vyakti ke saath has lagta hai, have nahi."
+      "teachHi": "एक व्यक्ति के साथ has लगता है, have नहीं।"
      },
      {
       "sentence": "The girl read a book daily.",
       "wrongWord": "read",
       "fix": "reads",
       "teach": "With he, she, or one person, add s to the verb.",
-      "teachHi": "Ek vyakti ya she ke saath verb mein s lagta hai."
+      "teachHi": "He, she या एक व्यक्ति के साथ क्रिया (verb) में s लगता है।"
      },
      {
       "sentence": "She is a honest principal.",
       "wrongWord": "a",
       "fix": "an",
       "teach": "Before a vowel sound like honest, use an.",
-      "teachHi": "Honest jaisi swar dhwani se pehle an lagta hai."
+      "teachHi": "Honest जैसी स्वर की आवाज़ से पहले an लगता है।"
      }
     ]
    },
@@ -2766,12 +2766,12 @@
        {
         "text": "Yes, I am looking at the board.",
         "ok": true,
-        "textHi": "हाँ, मैं बोर्ड की ओर देख रही हूँ।"
+        "textHi": "हाँ, मैं बोर्ड की ओर देख रह{ी|ा} हूँ।"
        },
        {
         "text": "Yes, I am eating the board.",
         "ok": false,
-        "textHi": "हाँ, मैं बोर्ड खा रही हूँ।"
+        "textHi": "हाँ, मैं बोर्ड खा रह{ी|ा} हूँ।"
        },
        {
         "text": "The board is my friend.",
@@ -2789,12 +2789,12 @@
        {
         "text": "Yes, I will close the door.",
         "ok": true,
-        "textHi": "हाँ, मैं दरवाज़ा बंद करूँगी।"
+        "textHi": "हाँ, मैं दरवाज़ा बंद करूँग{ी|ा}।"
        },
        {
         "text": "Yes, I will drink the door.",
         "ok": false,
-        "textHi": "हाँ, मैं दरवाज़ा पीऊँगी।"
+        "textHi": "हाँ, मैं दरवाज़ा पीऊँग{ी|ा}।"
        },
        {
         "text": "The door is hungry.",
@@ -2812,21 +2812,21 @@
       "wrongWord": "open",
       "fix": "opens",
       "teach": "With he or she, add 's' to the verb.",
-      "teachHi": "He या She के साथ verb में 's' लगता है।"
+      "teachHi": "He या she के साथ क्रिया (verb) में 's' लगता है।"
      },
      {
       "sentence": "We sit on two desk in class.",
       "wrongWord": "desk",
       "fix": "desks",
       "teach": "After a number more than one, add s to the noun.",
-      "teachHi": "Ek se zyada sankhya ke baad noun mein s lagao."
+      "teachHi": "एक से ज़्यादा की संख्या के बाद संज्ञा (noun) में s लगाओ।"
      },
      {
       "sentence": "Please close the window at class.",
       "wrongWord": "at",
       "fix": "in",
       "teach": "Use in class, not at class.",
-      "teachHi": "Class ke andar ke liye in class bolte hain, at nahi."
+      "teachHi": "कक्षा के अंदर के लिए in class बोलते हैं, at नहीं।"
      }
     ]
    },
@@ -2889,7 +2889,7 @@
        {
         "text": "I eat science every day.",
         "ok": false,
-        "textHi": "मैं रोज़ विज्ञान खाती हूँ।"
+        "textHi": "मैं रोज़ विज्ञान खात{ी|ा} हूँ।"
        },
        {
         "text": "Science wears my shoes.",
@@ -2912,7 +2912,7 @@
        {
         "text": "Yes, maths is sleeping today.",
         "ok": false,
-        "textHi": "हाँ, आज गणित सो रही है।"
+        "textHi": "हाँ, आज गणित सो रहा है।"
        },
        {
         "text": "Maths is a green door.",
@@ -2930,21 +2930,21 @@
       "wrongWord": "like",
       "fix": "likes",
       "teach": "With he or she, add s to the verb.",
-      "teachHi": "He ya she ke saath verb mein s lagta hai."
+      "teachHi": "He या she के साथ क्रिया (verb) में s लगता है।"
      },
      {
       "sentence": "We study English at the morning.",
       "wrongWord": "at",
       "fix": "in",
       "teach": "Use in the morning, not at the morning.",
-      "teachHi": "Subah ke liye in the morning bolte hain, at nahi."
+      "teachHi": "सुबह के लिए in the morning बोलते हैं, at नहीं।"
      },
      {
       "sentence": "Yesterday we learn science in class.",
       "wrongWord": "learn",
       "fix": "learned",
       "teach": "For past time like yesterday, use the past form.",
-      "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
+      "teachHi": "Yesterday जैसे बीते समय के लिए क्रिया (verb) का past रूप लगाओ।"
      }
     ]
    },
@@ -2997,12 +2997,12 @@
        {
         "text": "Yes, I will read it now.",
         "ok": true,
-        "textHi": "हाँ, मैं इसे अभी पढ़ूँगी।"
+        "textHi": "हाँ, मैं इसे अभी पढ़ूँग{ी|ा}।"
        },
        {
         "text": "Yes, I will sleep it now.",
         "ok": false,
-        "textHi": "हाँ, मैं इसे अभी सो जाऊँगी।"
+        "textHi": "हाँ, मैं इसे अभी सो जाऊँग{ी|ा}।"
        },
        {
         "text": "The line will read me.",
@@ -3034,7 +3034,7 @@
        }
       ],
       "line": "Can you answer this question?",
-      "lineHi": "क्या तुम इस सवाल का जवाब दे सकती हो?"
+      "lineHi": "क्या तुम इस सवाल का जवाब दे सकत{ी|े} हो?"
      }
     ],
     "fix": [
@@ -3043,21 +3043,21 @@
       "wrongWord": "write",
       "fix": "writes",
       "teach": "With he, she, or it, add s to the verb.",
-      "teachHi": "He, she ya it ke saath verb mein s lagta hai."
+      "teachHi": "He, she या it के साथ क्रिया (verb) में s लगता है।"
      },
      {
       "sentence": "We listen to the teacher in attention.",
       "wrongWord": "in",
       "fix": "with",
       "teach": "Use with attention, not in attention.",
-      "teachHi": "Dhyan se ke liye with attention bolte hain, in nahi."
+      "teachHi": "ध्यान से कहने के लिए with attention बोलते हैं, in नहीं।"
      },
      {
       "sentence": "Yesterday she answer every question.",
       "wrongWord": "answer",
       "fix": "answered",
       "teach": "For past time like yesterday, use the past form.",
-      "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
+      "teachHi": "Yesterday जैसे बीते समय के लिए क्रिया (verb) का past रूप लगाओ।"
      }
     ]
    },
@@ -3156,21 +3156,21 @@
       "wrongWord": "at",
       "fix": "in",
       "teach": "Use in the morning, not at the morning.",
-      "teachHi": "Subah ke liye in the morning bolte hain, at nahi."
+      "teachHi": "सुबह के लिए in the morning बोलते हैं, at नहीं।"
      },
      {
       "sentence": "She come to school on Monday.",
       "wrongWord": "come",
       "fix": "comes",
       "teach": "With he or she, add s to the verb.",
-      "teachHi": "He ya she ke saath verb mein s lagta hai."
+      "teachHi": "He या she के साथ क्रिया (verb) में s लगता है।"
      },
      {
       "sentence": "We will go to school in Monday.",
       "wrongWord": "in",
       "fix": "on",
       "teach": "With days of the week, use on, not in.",
-      "teachHi": "Din ke saath on lagta hai, in nahi."
+      "teachHi": "हफ़्ते के दिनों के साथ on लगता है, in नहीं।"
      }
     ]
    },
@@ -3224,12 +3224,12 @@
        {
         "text": "May I drink some water, please?",
         "ok": true,
-        "textHi": "क्या मैं थोड़ा पानी पी सकती हूँ?"
+        "textHi": "क्या मैं थोड़ा पानी पी सकत{ी|ा} हूँ?"
        },
        {
         "text": "May I eat the door, please?",
         "ok": false,
-        "textHi": "क्या मैं दरवाज़ा खा सकती हूँ?"
+        "textHi": "क्या मैं दरवाज़ा खा सकत{ी|ा} हूँ?"
        },
        {
         "text": "May the water drink me, please?",
@@ -3238,7 +3238,7 @@
        }
       ],
       "line": "Do you want to ask something?",
-      "lineHi": "क्या तुम कुछ पूछना चाहती हो?"
+      "lineHi": "क्या तुम कुछ पूछना चाहत{ी|े} हो?"
      },
      {
       "who": "👩‍🏫",
@@ -3247,12 +3247,12 @@
        {
         "text": "May I sit down, please?",
         "ok": true,
-        "textHi": "क्या मैं बैठ सकती हूँ?"
+        "textHi": "क्या मैं बैठ सकत{ी|ा} हूँ?"
        },
        {
         "text": "May I fly away, please?",
         "ok": false,
-        "textHi": "क्या मैं उड़ कर जा सकती हूँ?"
+        "textHi": "क्या मैं उड़ कर जा सकत{ी|ा} हूँ?"
        },
        {
         "text": "May the chair sit on me?",
@@ -3261,7 +3261,7 @@
        }
       ],
       "line": "Why are you standing?",
-      "lineHi": "तुम खड़ी क्यों हो?"
+      "lineHi": "तुम खड़{ी|े} क्यों हो?"
      }
     ],
     "fix": [
@@ -3270,21 +3270,21 @@
       "wrongWord": "drinks",
       "fix": "drink",
       "teach": "After may, use the plain verb without s.",
-      "teachHi": "May ke baad verb bina s ke aata hai."
+      "teachHi": "May के बाद क्रिया (verb) बिना s के आती है।"
      },
      {
       "sentence": "Please can I sits here?",
       "wrongWord": "sits",
       "fix": "sit",
       "teach": "After can, use the plain verb without s.",
-      "teachHi": "Can ke baad verb bina s ke aata hai."
+      "teachHi": "Can के बाद क्रिया (verb) बिना s के आती है।"
      },
      {
       "sentence": "The students stands when the teacher comes.",
       "wrongWord": "stands",
       "fix": "stand",
       "teach": "With a plural like students, do not add s to the verb.",
-      "teachHi": "Students jaise bahuvachan ke saath verb mein s nahi lagta."
+      "teachHi": "Students जैसे बहुवचन (plural) के साथ क्रिया (verb) में s नहीं लगता।"
      }
     ]
    },
@@ -3349,11 +3349,11 @@
        {
         "text": "I understand the green sky.",
         "ok": false,
-        "textHi": "मैं हरे आसमान को समझती हूँ।"
+        "textHi": "मैं हरे आसमान को समझत{ी|ा} हूँ।"
        }
       ],
       "line": "Did you understand the lesson?",
-      "lineHi": "क्या तुम पाठ समझ गयीं?"
+      "lineHi": "क्या तुम पाठ समझ ग{ई|ए} हो?"
      },
      {
       "who": "👩‍🏫",
@@ -3385,21 +3385,21 @@
       "wrongWord": "understands",
       "fix": "understand",
       "teach": "After do not, use the plain verb without s.",
-      "teachHi": "Do not ke baad verb bina s ke aata hai."
+      "teachHi": "Do not के बाद क्रिया (verb) बिना s के आती है।"
      },
      {
       "sentence": "Please say it slow again.",
       "wrongWord": "slow",
       "fix": "slowly",
       "teach": "To describe how to do an action, use slowly, not slow.",
-      "teachHi": "Kaam kaise karna hai batane ke liye slowly bolo, slow nahi."
+      "teachHi": "काम कैसे करना है, यह बताने के लिए slowly बोलो, slow नहीं।"
      },
      {
       "sentence": "She ask many questions in class.",
       "wrongWord": "ask",
       "fix": "asks",
       "teach": "With he or she, add s to the verb.",
-      "teachHi": "He ya she ke saath verb mein s lagta hai."
+      "teachHi": "He या she के साथ क्रिया (verb) में s लगता है।"
      }
     ]
    },
@@ -3488,11 +3488,11 @@
        {
         "text": "I am late because I am a door.",
         "ok": false,
-        "textHi": "मैं देर से आई क्योंकि मैं एक दरवाज़ा हूँ।"
+        "textHi": "मैं देर से आ{ई|या} क्योंकि मैं एक दरवाज़ा हूँ।"
        }
       ],
       "line": "Why were you late today?",
-      "lineHi": "तुम आज देर से क्यों आयीं?"
+      "lineHi": "तुम आज देर से क्यों आ{ईं|ए}?"
      }
     ],
     "fix": [
@@ -3501,21 +3501,21 @@
       "wrongWord": "have",
       "fix": "has",
       "teach": "With he or she, use has, not have.",
-      "teachHi": "He ya she ke saath has lagta hai, have nahi."
+      "teachHi": "He या she के साथ has लगता है, have नहीं।"
      },
      {
       "sentence": "Yesterday he come late to class.",
       "wrongWord": "come",
       "fix": "came",
       "teach": "For past time like yesterday, use the past form.",
-      "teachHi": "Yesterday jaise beete samay ke liye verb ka past roop lagao."
+      "teachHi": "Yesterday जैसे बीते समय के लिए क्रिया (verb) का past रूप लगाओ।"
      },
      {
       "sentence": "Two students was absent today.",
       "wrongWord": "was",
       "fix": "were",
       "teach": "With a plural like two students, use were, not was.",
-      "teachHi": "Bahuvachan ke saath were lagta hai, was nahi."
+      "teachHi": "Two students जैसे बहुवचन (plural) के साथ were लगता है, was नहीं।"
      }
     ]
    }
@@ -3585,17 +3585,17 @@
        {
         "text": "Okay, I will press the power button to start it.",
         "ok": true,
-        "textHi": "ठीक है, मैं इसे चालू करने के लिए पावर बटन दबाऊँगी।"
+        "textHi": "ठीक है, मैं इसे चालू करने के लिए पावर बटन दबाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will eat the power button.",
         "ok": false,
-        "textHi": "ठीक है, मैं पावर बटन को खा जाऊँगी।"
+        "textHi": "ठीक है, मैं पावर बटन को खा जाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will wash the computer screen with water.",
         "ok": false,
-        "textHi": "ठीक है, मैं कंप्यूटर की स्क्रीन को पानी से धो दूँगी।"
+        "textHi": "ठीक है, मैं कंप्यूटर की स्क्रीन को पानी से धो दूँग{ी|ा}।"
        }
       ],
       "line": "Welcome! This is your computer. Please press the power button.",
@@ -3618,7 +3618,7 @@
        {
         "text": "Yes, I will throw the computer outside.",
         "ok": false,
-        "textHi": "हाँ, मैं कंप्यूटर को बाहर फेंक दूँगी।"
+        "textHi": "हाँ, मैं कंप्यूटर को बाहर फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "A computer is a machine that helps us do work. Can you see the screen?",
@@ -3680,17 +3680,17 @@
        {
         "text": "Okay, I will connect the cable to the monitor.",
         "ok": true,
-        "textHi": "ठीक है, मैं केबल को मॉनिटर से जोड़ूँगी।"
+        "textHi": "ठीक है, मैं केबल को मॉनिटर से जोड़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will cut the cable into pieces.",
         "ok": false,
-        "textHi": "ठीक है, मैं केबल को टुकड़े-टुकड़े काट दूँगी।"
+        "textHi": "ठीक है, मैं केबल को टुकड़े-टुकड़े काट दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will give the keyboard some food.",
         "ok": false,
-        "textHi": "ठीक है, मैं कीबोर्ड को कुछ खाना खिलाऊँगी।"
+        "textHi": "ठीक है, मैं कीबोर्ड को कुछ खाना खिलाऊँग{ी|ा}।"
        }
       ],
       "line": "This is the monitor and this is the keyboard. Please connect the cable.",
@@ -3708,16 +3708,16 @@
        {
         "text": "Yes, I will feed the mouse some cheese.",
         "ok": false,
-        "textHi": "हाँ, मैं चूहे को थोड़ा पनीर खिलाऊँगी।"
+        "textHi": "हाँ, मैं चूहे को थोड़ा पनीर खिलाऊँग{ी|ा}।"
        },
        {
         "text": "Yes, I will pour water into the speaker.",
         "ok": false,
-        "textHi": "हाँ, मैं स्पीकर में पानी डाल दूँगी।"
+        "textHi": "हाँ, मैं स्पीकर में पानी डाल दूँग{ी|ा}।"
        }
       ],
       "line": "We use the mouse to point and the speaker to hear sound. Can you find the mouse?",
-      "lineHi": "हम माउस से इशारा करते हैं और स्पीकर से आवाज़ सुनते हैं। क्या आप माउस ढूँढ सकती हैं?"
+      "lineHi": "हम माउस से इशारा करते हैं और स्पीकर से आवाज़ सुनते हैं। क्या आप माउस ढूँढ सकत{ी|े} हैं?"
      }
     ]
    },
@@ -3771,17 +3771,17 @@
        {
         "text": "Okay, I will click on the picture now.",
         "ok": true,
-        "textHi": "ठीक है, मैं अब तस्वीर पर क्लिक करूँगी।"
+        "textHi": "ठीक है, मैं अब तस्वीर पर क्लिक करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hit the monitor with the mouse.",
         "ok": false,
-        "textHi": "ठीक है, मैं माउस से मॉनिटर पर मारूँगी।"
+        "textHi": "ठीक है, मैं माउस से मॉनिटर पर मारूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the pointer on the floor.",
         "ok": false,
-        "textHi": "ठीक है, मैं पॉइंटर को फ़र्श पर फेंक दूँगी।"
+        "textHi": "ठीक है, मैं पॉइंटर को फ़र्श पर फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "Move the pointer to the picture and click on it.",
@@ -3794,21 +3794,21 @@
        {
         "text": "Okay, I will scroll down to read more.",
         "ok": true,
-        "textHi": "ठीक है, मैं और पढ़ने के लिए नीचे स्क्रॉल करूँगी।"
+        "textHi": "ठीक है, मैं और पढ़ने के लिए नीचे स्क्रॉल करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will scroll the chair across the room.",
         "ok": false,
-        "textHi": "ठीक है, मैं कुर्सी को कमरे के उस पार खिसका दूँगी।"
+        "textHi": "ठीक है, मैं कुर्सी को कमरे के उस पार खिसका दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will drag the teacher to the door.",
         "ok": false,
-        "textHi": "ठीक है, मैं टीचर को खींचकर दरवाज़े तक ले जाऊँगी।"
+        "textHi": "ठीक है, मैं टीचर को खींचकर दरवाज़े तक ले जाऊँग{ी|ा}।"
        }
       ],
       "line": "To read more, scroll down. To move a file, drag and select it.",
-      "lineHi": "और पढ़ने के लिए नीचे स्क्रॉल कीजिए। फ़ाइल हटाने के लिए उसे खींचिए और चुनिए।"
+      "lineHi": "और पढ़ने के लिए नीचे स्क्रॉल कीजिए। फ़ाइल को दूसरी जगह ले जाने के लिए उसे चुनिए और खींचिए।"
      }
     ]
    },
@@ -3864,17 +3864,17 @@
        {
         "text": "Okay, I will type my name using the keys.",
         "ok": true,
-        "textHi": "ठीक है, मैं कीज़ से अपना नाम टाइप करूँगी।"
+        "textHi": "ठीक है, मैं कीज़ से अपना नाम टाइप करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will eat the keys one by one.",
         "ok": false,
-        "textHi": "ठीक है, मैं एक-एक करके सारी कीज़ खा जाऊँगी।"
+        "textHi": "ठीक है, मैं एक-एक करके सारी कीज़ खा जाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will type my name on the wall.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना नाम दीवार पर टाइप करूँगी।"
+        "textHi": "ठीक है, मैं अपना नाम दीवार पर टाइप करूँग{ी|ा}।"
        }
       ],
       "line": "Use the keyboard to type your name. Press a letter key.",
@@ -3887,17 +3887,17 @@
        {
         "text": "Okay, I will press Enter to start a new line.",
         "ok": true,
-        "textHi": "ठीक है, मैं नई लाइन शुरू करने के लिए एंटर दबाऊँगी।"
+        "textHi": "ठीक है, मैं नई लाइन शुरू करने के लिए एंटर दबाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will press Enter to make tea.",
         "ok": false,
-        "textHi": "ठीक है, मैं चाय बनाने के लिए एंटर दबाऊँगी।"
+        "textHi": "ठीक है, मैं चाय बनाने के लिए एंटर दबाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will remove every key from the keyboard.",
         "ok": false,
-        "textHi": "ठीक है, मैं कीबोर्ड से हर एक कुंजी निकाल दूँगी।"
+        "textHi": "ठीक है, मैं कीबोर्ड से हर एक कुंजी निकाल दूँग{ी|ा}।"
        }
       ],
       "line": "When you finish a line, press Enter to go to the next line.",
@@ -3957,17 +3957,17 @@
        {
         "text": "Okay, I will double click the icon to open it.",
         "ok": true,
-        "textHi": "ठीक है, मैं इसे खोलने के लिए आइकन पर डबल क्लिक करूँगी।"
+        "textHi": "ठीक है, मैं इसे खोलने के लिए आइकन पर डबल क्लिक करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will paint over all the icons.",
         "ok": false,
-        "textHi": "ठीक है, मैं सारे आइकन पर रंग पोत दूँगी।"
+        "textHi": "ठीक है, मैं सारे आइकन पर रंग पोत दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will open the desktop with a key.",
         "ok": false,
-        "textHi": "ठीक है, मैं चाबी से डेस्कटॉप खोलूँगी।"
+        "textHi": "ठीक है, मैं चाबी से डेस्कटॉप खोलूँग{ी|ा}।"
        }
       ],
       "line": "On the desktop you see small icons. Double click an icon to open it.",
@@ -3980,17 +3980,17 @@
        {
         "text": "Okay, I will open the menu and then close the window.",
         "ok": true,
-        "textHi": "ठीक है, मैं मेन्यू खोलूँगी और फिर विंडो बंद कर दूँगी।"
+        "textHi": "ठीक है, मैं मेन्यू खोलूँग{ी|ा} और फिर विंडो बंद कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will order food from the menu.",
         "ok": false,
-        "textHi": "ठीक है, मैं मेन्यू से खाना ऑर्डर करूँगी।"
+        "textHi": "ठीक है, मैं मेन्यू से खाना ऑर्डर करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will close the door of the room first.",
         "ok": false,
-        "textHi": "ठीक है, मैं पहले कमरे का दरवाज़ा बंद करूँगी।"
+        "textHi": "ठीक है, मैं पहले कमरे का दरवाज़ा बंद करूँग{ी|ा}।"
        }
       ],
       "line": "Click the menu to see a list of choices, then close the window.",
@@ -4050,17 +4050,17 @@
        {
         "text": "Okay, I will name the folder and save the file inside it.",
         "ok": true,
-        "textHi": "ठीक है, मैं फ़ोल्डर को नाम दूँगी और फ़ाइल उसके अंदर सेव करूँगी।"
+        "textHi": "ठीक है, मैं फ़ोल्डर को नाम दूँग{ी|ा} और फ़ाइल उसके अंदर सेव करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tear the file into small pieces.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ाइल को छोटे-छोटे टुकड़ों में फाड़ दूँगी।"
+        "textHi": "ठीक है, मैं फ़ाइल को छोटे-छोटे टुकड़ों में फाड़ दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will keep the folder inside my bag.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ोल्डर को अपने बैग में रख लूँगी।"
+        "textHi": "ठीक है, मैं फ़ोल्डर को अपने बैग में रख लूँग{ी|ा}।"
        }
       ],
       "line": "Put this file in a folder and give the folder a clear name.",
@@ -4073,17 +4073,17 @@
        {
         "text": "Okay, I will save the file before I leave.",
         "ok": true,
-        "textHi": "ठीक है, मैं जाने से पहले फ़ाइल सेव कर दूँगी।"
+        "textHi": "ठीक है, मैं जाने से पहले फ़ाइल सेव कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the file in the bin.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ाइल को कूड़ेदान में फेंक दूँगी।"
+        "textHi": "ठीक है, मैं फ़ाइल को कूड़ेदान में फेंक दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hide the folder under the table.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ोल्डर को मेज़ के नीचे छिपा दूँगी।"
+        "textHi": "ठीक है, मैं फ़ोल्डर को मेज़ के नीचे छिपा दूँग{ी|ा}।"
        }
       ],
       "line": "Before you go, please save your work so we do not lose the file.",
@@ -4140,17 +4140,17 @@
        {
         "text": "Okay, I will copy the text and paste it in the new file.",
         "ok": true,
-        "textHi": "ठीक है, मैं टेक्स्ट कॉपी करके नई फ़ाइल में पेस्ट करूँगी।"
+        "textHi": "ठीक है, मैं टेक्स्ट कॉपी करके नई फ़ाइल में पेस्ट करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will paste glue on the screen.",
         "ok": false,
-        "textHi": "ठीक है, मैं स्क्रीन पर गोंद लगा दूँगी।"
+        "textHi": "ठीक है, मैं स्क्रीन पर गोंद लगा दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will copy my friend's lunch.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपनी सहेली का खाना कॉपी कर लूँगी।"
+        "textHi": "ठीक है, मैं अपने दोस्त का खाना कॉपी कर लूँग{ी|ा}।"
        }
       ],
       "line": "Copy this text and paste it into the new file.",
@@ -4163,17 +4163,17 @@
        {
         "text": "Okay, I will delete the wrong file and rename the correct one.",
         "ok": true,
-        "textHi": "ठीक है, मैं गलत फ़ाइल हटाऊँगी और सही वाली का नाम बदलूँगी।"
+        "textHi": "ठीक है, मैं गलत फ़ाइल हटाऊँग{ी|ा} और सही वाली का नाम बदलूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will delete the whole computer.",
         "ok": false,
-        "textHi": "ठीक है, मैं पूरा कंप्यूटर ही डिलीट कर दूँगी।"
+        "textHi": "ठीक है, मैं पूरा कंप्यूटर ही डिलीट कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will cut the monitor with scissors.",
         "ok": false,
-        "textHi": "ठीक है, मैं मॉनिटर को कैंची से काट दूँगी।"
+        "textHi": "ठीक है, मैं मॉनिटर को कैंची से काट दूँग{ी|ा}।"
        }
       ],
       "line": "This old file is wrong. Please delete it and rename the correct one.",
@@ -4234,17 +4234,17 @@
        {
         "text": "Okay, I will open the browser and search for the website.",
         "ok": true,
-        "textHi": "ठीक है, मैं ब्राउज़र खोलूँगी और वेबसाइट खोजूँगी।"
+        "textHi": "ठीक है, मैं ब्राउज़र खोलूँग{ी|ा} और वेबसाइट खोजूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will search the room for a browser.",
         "ok": false,
-        "textHi": "ठीक है, मैं पूरे कमरे में ब्राउज़र ढूँढ़ूँगी।"
+        "textHi": "ठीक है, मैं पूरे कमरे में ब्राउज़र ढूँढ़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the website out of the window.",
         "ok": false,
-        "textHi": "ठीक है, मैं वेबसाइट को खिड़की से बाहर फेंक दूँगी।"
+        "textHi": "ठीक है, मैं वेबसाइट को खिड़की से बाहर फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "Open the browser and search for a website about computers.",
@@ -4257,17 +4257,17 @@
        {
         "text": "Okay, I will click the link to open the page.",
         "ok": true,
-        "textHi": "ठीक है, मैं पेज खोलने के लिए लिंक पर क्लिक करूँगी।"
+        "textHi": "ठीक है, मैं पेज खोलने के लिए लिंक पर क्लिक करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tie the link with a rope.",
         "ok": false,
-        "textHi": "ठीक है, मैं लिंक को रस्सी से बाँध दूँगी।"
+        "textHi": "ठीक है, मैं लिंक को रस्सी से बाँध दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will turn off the internet for everyone.",
         "ok": false,
-        "textHi": "ठीक है, मैं सबके लिए इंटरनेट बंद कर दूँगी।"
+        "textHi": "ठीक है, मैं सबके लिए इंटरनेट बंद कर दूँग{ी|ा}।"
        }
       ],
       "line": "Click the blue link to open the next page.",
@@ -4280,21 +4280,21 @@
       "wrongWord": "search",
       "fix": "searching",
       "teach": "After 'am', use the -ing form: searching.",
-      "teachHi": "'am' के बाद -ing रूप: searching।"
+      "teachHi": "'am' के बाद क्रिया का -ing रूप आता है — searching।"
      },
      {
       "sentence": "She click the link",
       "wrongWord": "click",
       "fix": "clicks",
       "teach": "With she/he, add -s: clicks.",
-      "teachHi": "she/he के साथ -s: clicks।"
+      "teachHi": "she/he के साथ क्रिया में -s लगता है — clicks।"
      },
      {
       "sentence": "The website are slow today",
       "wrongWord": "are",
       "fix": "is",
       "teach": "One website needs 'is', not 'are'.",
-      "teachHi": "एक website → 'is', 'are' नहीं।"
+      "teachHi": "एक website के साथ 'is' आता है, 'are' नहीं।"
      }
     ]
    },
@@ -4349,17 +4349,17 @@
        {
         "text": "Okay, I will write the email and attach the file.",
         "ok": true,
-        "textHi": "ठीक है, मैं ईमेल लिखूँगी और फ़ाइल अटैच करूँगी।"
+        "textHi": "ठीक है, मैं ईमेल लिखूँग{ी|ा} और फ़ाइल अटैच करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will mail a letter by bus.",
         "ok": false,
-        "textHi": "ठीक है, मैं बस से एक चिट्ठी भेजूँगी।"
+        "textHi": "ठीक है, मैं बस से एक चिट्ठी भेजूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will attach the manager to the wall.",
         "ok": false,
-        "textHi": "ठीक है, मैं मैनेजर को दीवार से चिपका दूँगी।"
+        "textHi": "ठीक है, मैं मैनेजर को दीवार से चिपका दूँग{ी|ा}।"
        }
       ],
       "line": "Please write an email to the manager and attach this file.",
@@ -4372,17 +4372,17 @@
        {
         "text": "Okay, I will open my inbox and reply to the message.",
         "ok": true,
-        "textHi": "ठीक है, मैं अपना इनबॉक्स खोलूँगी और मैसेज का जवाब दूँगी।"
+        "textHi": "ठीक है, मैं अपना इनबॉक्स खोलूँग{ी|ा} और मैसेज का जवाब दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will cook the message for lunch.",
         "ok": false,
-        "textHi": "ठीक है, मैं मैसेज को दोपहर के खाने के लिए पका लूँगी।"
+        "textHi": "ठीक है, मैं मैसेज को दोपहर के खाने के लिए पका लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will reply by shouting at the screen.",
         "ok": false,
-        "textHi": "ठीक है, मैं स्क्रीन पर चिल्लाकर जवाब दूँगी।"
+        "textHi": "ठीक है, मैं स्क्रीन पर चिल्लाकर जवाब दूँग{ी|ा}।"
        }
       ],
       "line": "There is a new message in your inbox. Please reply to it.",
@@ -4402,20 +4402,20 @@
       "wrongWord": "reply",
       "fix": "replies",
       "teach": "With she/he, use 'replies'.",
-      "teachHi": "she/he के साथ 'replies'।"
+      "teachHi": "she/he के साथ 'replies' आता है।"
      },
      {
       "sentence": "He have sent the file",
       "wrongWord": "have",
       "fix": "has",
       "teach": "With he/she, use 'has', not 'have'.",
-      "teachHi": "he/she → 'has', 'have' नहीं।"
+      "teachHi": "he/she के साथ 'has' आता है, 'have' नहीं।"
      }
     ],
     "email": [
      {
       "scenario": "Write to your boss to ask for one day leave.",
-      "scenarioHi": "अपने बॉस को एक दिन की छुट्टी के लिए ईमेल लिखें।",
+      "scenarioHi": "अपने बॉस को एक दिन की छुट्टी के लिए ईमेल लिखो।",
       "to": "sir@office.com",
       "from": "Asha",
       "slots": [
@@ -4499,7 +4499,7 @@
      },
      {
       "scenario": "Write to your colleague Priya to send the report file.",
-      "scenarioHi": "अपनी सहकर्मी प्रिया को रिपोर्ट फ़ाइल भेजने के लिए ईमेल लिखें।",
+      "scenarioHi": "अपनी सहकर्मी प्रिया को रिपोर्ट फ़ाइल भेजने के लिए ईमेल लिखो।",
       "to": "priya@office.com",
       "from": "Asha",
       "slots": [
@@ -4635,17 +4635,17 @@
        {
         "text": "Okay, I will type the letter and choose a clear font.",
         "ok": true,
-        "textHi": "ठीक है, मैं चिट्ठी टाइप करूँगी और एक साफ़ फ़ॉन्ट चुनूँगी।"
+        "textHi": "ठीक है, मैं चिट्ठी टाइप करूँग{ी|ा} और एक साफ़ फ़ॉन्ट चुनूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will draw on every page with a pen.",
         "ok": false,
-        "textHi": "ठीक है, मैं हर पन्ने पर पेन से चित्र बनाऊँगी।"
+        "textHi": "ठीक है, मैं हर पन्ने पर पेन से चित्र बनाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will eat the document for breakfast.",
         "ok": false,
-        "textHi": "ठीक है, मैं नाश्ते में दस्तावेज़ खा जाऊँगी।"
+        "textHi": "ठीक है, मैं नाश्ते में दस्तावेज़ खा जाऊँग{ी|ा}।"
        }
       ],
       "line": "Type this letter in a new document and choose a clear font.",
@@ -4658,17 +4658,17 @@
        {
         "text": "Okay, I will edit the spelling and print one page.",
         "ok": true,
-        "textHi": "ठीक है, मैं वर्तनी ठीक करूँगी और एक पन्ना प्रिंट करूँगी।"
+        "textHi": "ठीक है, मैं वर्तनी ठीक करूँग{ी|ा} और एक पन्ना प्रिंट करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will print the page on my hand.",
         "ok": false,
-        "textHi": "ठीक है, मैं पन्ना अपने हाथ पर प्रिंट करूँगी।"
+        "textHi": "ठीक है, मैं पन्ना अपने हाथ पर प्रिंट करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will edit the printer with a hammer.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रिंटर को हथौड़े से ठीक करूँगी।"
+        "textHi": "ठीक है, मैं प्रिंटर को हथौड़े से ठीक करूँग{ी|ा}।"
        }
       ],
       "line": "Please edit the spelling, then print one page for the file.",
@@ -4678,7 +4678,7 @@
     "email": [
      {
       "scenario": "Write a formal email to your manager, sending the monthly report for review.",
-      "scenarioHi": "अपने मैनेजर को मासिक रिपोर्ट समीक्षा के लिए एक औपचारिक ईमेल लिखें।",
+      "scenarioHi": "अपने मैनेजर को औपचारिक ईमेल लिखो और मासिक रिपोर्ट जाँच के लिए भेजो।",
       "to": "manager@office.com",
       "from": "Asha Kumari",
       "slots": [
@@ -4835,17 +4835,17 @@
        {
         "text": "Okay, I will type each name in a new row.",
         "ok": true,
-        "textHi": "ठीक है, मैं हर नाम को एक नई पंक्ति में टाइप करूँगी।"
+        "textHi": "ठीक है, मैं हर नाम को एक नई पंक्ति में टाइप करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will plant the names in a row in the garden.",
         "ok": false,
-        "textHi": "ठीक है, मैं नामों को बगीचे में एक कतार में बो दूँगी।"
+        "textHi": "ठीक है, मैं नामों को बगीचे में एक कतार में बो दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will fold the spreadsheet into a boat.",
         "ok": false,
-        "textHi": "ठीक है, मैं स्प्रेडशीट को मोड़कर नाव बना लूँगी।"
+        "textHi": "ठीक है, मैं स्प्रेडशीट को मोड़कर नाव बना लूँग{ी|ा}।"
        }
       ],
       "line": "In the spreadsheet, type each name in a new row.",
@@ -4858,17 +4858,17 @@
        {
         "text": "Okay, I will click the cell to show the total.",
         "ok": true,
-        "textHi": "ठीक है, मैं जोड़ देखने के लिए सेल पर क्लिक करूँगी।"
+        "textHi": "ठीक है, मैं जोड़ देखने के लिए सेल पर क्लिक करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will lock the cell like a prison.",
         "ok": false,
-        "textHi": "ठीक है, मैं सेल को जेल की तरह बंद कर दूँगी।"
+        "textHi": "ठीक है, मैं सेल को जेल की तरह बंद कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will count the columns on my fingers only.",
         "ok": false,
-        "textHi": "ठीक है, मैं कॉलम बस अपनी उँगलियों पर गिनूँगी।"
+        "textHi": "ठीक है, मैं कॉलम बस अपनी उँगलियों पर गिनूँग{ी|ा}।"
        }
       ],
       "line": "Click this cell in the last column to show the total.",
@@ -4928,17 +4928,17 @@
        {
         "text": "Okay, I will type my username and password to log in.",
         "ok": true,
-        "textHi": "ठीक है, मैं लॉग इन करने के लिए अपना यूज़रनेम और पासवर्ड टाइप करूँगी।"
+        "textHi": "ठीक है, मैं लॉग इन करने के लिए अपना यूज़रनेम और पासवर्ड टाइप करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tell my password to everyone loudly.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना पासवर्ड सबको ज़ोर से बता दूँगी।"
+        "textHi": "ठीक है, मैं अपना पासवर्ड सबको ज़ोर से बता दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will write my password on the office door.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना पासवर्ड ऑफ़िस के दरवाज़े पर लिख दूँगी।"
+        "textHi": "ठीक है, मैं अपना पासवर्ड ऑफ़िस के दरवाज़े पर लिख दूँग{ी|ा}।"
        }
       ],
       "line": "To use your account, type your username and password to log in.",
@@ -4951,17 +4951,17 @@
        {
         "text": "Okay, I will log out before I leave the computer.",
         "ok": true,
-        "textHi": "ठीक है, मैं कंप्यूटर छोड़ने से पहले लॉग आउट करूँगी।"
+        "textHi": "ठीक है, मैं कंप्यूटर छोड़ने से पहले लॉग आउट करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will leave my account open all night.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना अकाउंट पूरी रात खुला छोड़ दूँगी।"
+        "textHi": "ठीक है, मैं अपना अकाउंट पूरी रात खुला छोड़ दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will share my account with strangers.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना अकाउंट अजनबियों के साथ साझा करूँगी।"
+        "textHi": "ठीक है, मैं अपना अकाउंट अजनबियों के साथ साझा करूँग{ी|ा}।"
        }
       ],
       "line": "When you finish work, please log out of your account.",
@@ -5021,17 +5021,17 @@
        {
         "text": "Okay, I will install the app on the computer.",
         "ok": true,
-        "textHi": "ठीक है, मैं कंप्यूटर पर ऐप इंस्टॉल करूँगी।"
+        "textHi": "ठीक है, मैं कंप्यूटर पर ऐप इंस्टॉल करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will install the app inside my pocket.",
         "ok": false,
-        "textHi": "ठीक है, मैं ऐप को अपनी जेब के अंदर इंस्टॉल करूँगी।"
+        "textHi": "ठीक है, मैं ऐप को अपनी जेब के अंदर इंस्टॉल करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will boil the software in water.",
         "ok": false,
-        "textHi": "ठीक है, मैं सॉफ़्टवेयर को पानी में उबाल दूँगी।"
+        "textHi": "ठीक है, मैं सॉफ़्टवेयर को पानी में उबाल दूँग{ी|ा}।"
        }
       ],
       "line": "We need new software. Please install this app on the computer.",
@@ -5044,17 +5044,17 @@
        {
         "text": "Okay, I will update the app to the new version.",
         "ok": true,
-        "textHi": "ठीक है, मैं ऐप को नए वर्ज़न में अपडेट करूँगी।"
+        "textHi": "ठीक है, मैं ऐप को नए वर्ज़न में अपडेट करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will paint the app a new colour.",
         "ok": false,
-        "textHi": "ठीक है, मैं ऐप को नया रंग पोत दूँगी।"
+        "textHi": "ठीक है, मैं ऐप को नया रंग पोत दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the old version in the river.",
         "ok": false,
-        "textHi": "ठीक है, मैं पुराने वर्ज़न को नदी में फेंक दूँगी।"
+        "textHi": "ठीक है, मैं पुराने वर्ज़न को नदी में फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "This app is old. Please update it to the new version.",
@@ -5116,17 +5116,17 @@
        {
         "text": "Okay, I will plug the printer into the port.",
         "ok": true,
-        "textHi": "ठीक है, मैं प्रिंटर को पोर्ट में लगाऊँगी।"
+        "textHi": "ठीक है, मैं प्रिंटर को पोर्ट में लगाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will put the printer inside the port.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रिंटर को पोर्ट के अंदर डाल दूँगी।"
+        "textHi": "ठीक है, मैं प्रिंटर को पोर्ट के अंदर डाल दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will feed the printer some paper as food.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रिंटर को खाने के तौर पर कागज़ खिलाऊँगी।"
+        "textHi": "ठीक है, मैं प्रिंटर को खाने के तौर पर कागज़ खिलाऊँग{ी|ा}।"
        }
       ],
       "line": "Connect the printer to the computer using this port.",
@@ -5139,17 +5139,17 @@
        {
         "text": "Okay, I will bring the charger and plug it in.",
         "ok": true,
-        "textHi": "ठीक है, मैं चार्जर लाऊँगी और उसे लगा दूँगी।"
+        "textHi": "ठीक है, मैं चार्जर लाऊँग{ी|ा} और उसे लगा दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will charge the device with sunlight only.",
         "ok": false,
-        "textHi": "ठीक है, मैं डिवाइस को बस धूप से चार्ज करूँगी।"
+        "textHi": "ठीक है, मैं डिवाइस को बस धूप से चार्ज करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will drink the battery water.",
         "ok": false,
-        "textHi": "ठीक है, मैं बैटरी का पानी पी जाऊँगी।"
+        "textHi": "ठीक है, मैं बैटरी का पानी पी जाऊँग{ी|ा}।"
        }
       ],
       "line": "The device battery is low. Please bring the charger.",
@@ -5210,17 +5210,17 @@
        {
         "text": "Okay, I will connect the computer to the Wi-Fi network.",
         "ok": true,
-        "textHi": "ठीक है, मैं कंप्यूटर को वाई-फ़ाई नेटवर्क से जोड़ूँगी।"
+        "textHi": "ठीक है, मैं कंप्यूटर को वाई-फ़ाई नेटवर्क से जोड़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tie the Wi-Fi with a rope.",
         "ok": false,
-        "textHi": "ठीक है, मैं वाई-फ़ाई को रस्सी से बाँध दूँगी।"
+        "textHi": "ठीक है, मैं वाई-फ़ाई को रस्सी से बाँध दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will connect the network to the kitchen tap.",
         "ok": false,
-        "textHi": "ठीक है, मैं नेटवर्क को रसोई के नल से जोड़ दूँगी।"
+        "textHi": "ठीक है, मैं नेटवर्क को रसोई के नल से जोड़ दूँग{ी|ा}।"
        }
       ],
       "line": "Connect your computer to the office Wi-Fi network.",
@@ -5233,17 +5233,17 @@
        {
         "text": "Okay, I will sit closer to the router for a better signal.",
         "ok": true,
-        "textHi": "ठीक है, मैं बेहतर सिग्नल के लिए राउटर के पास बैठूँगी।"
+        "textHi": "ठीक है, मैं बेहतर सिग्नल के लिए राउटर के पास बैठूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hit the router to make the signal louder.",
         "ok": false,
-        "textHi": "ठीक है, मैं सिग्नल तेज़ करने के लिए राउटर पर मारूँगी।"
+        "textHi": "ठीक है, मैं सिग्नल तेज़ करने के लिए राउटर पर मारूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hide the router inside a box.",
         "ok": false,
-        "textHi": "ठीक है, मैं राउटर को एक डिब्बे में छिपा दूँगी।"
+        "textHi": "ठीक है, मैं राउटर को एक डिब्बे में छिपा दूँग{ी|ा}।"
        }
       ],
       "line": "The signal is weak here. Please move closer to the router.",
@@ -5301,17 +5301,17 @@
        {
         "text": "Okay, I will upload the file to the cloud.",
         "ok": true,
-        "textHi": "ठीक है, मैं फ़ाइल को क्लाउड पर अपलोड करूँगी।"
+        "textHi": "ठीक है, मैं फ़ाइल को क्लाउड पर अपलोड करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the file up at the sky cloud.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ाइल को आसमान के बादल की ओर ऊपर फेंक दूँगी।"
+        "textHi": "ठीक है, मैं फ़ाइल को आसमान के बादल की ओर ऊपर फेंक दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will upload the chair to the cloud.",
         "ok": false,
-        "textHi": "ठीक है, मैं कुर्सी को क्लाउड पर अपलोड करूँगी।"
+        "textHi": "ठीक है, मैं कुर्सी को क्लाउड पर अपलोड करूँग{ी|ा}।"
        }
       ],
       "line": "Please upload this file to the cloud so the team can see it.",
@@ -5324,17 +5324,17 @@
        {
         "text": "Okay, I will download the report and share the link.",
         "ok": true,
-        "textHi": "ठीक है, मैं रिपोर्ट डाउनलोड करूँगी और लिंक साझा करूँगी।"
+        "textHi": "ठीक है, मैं रिपोर्ट डाउनलोड करूँग{ी|ा} और लिंक साझा करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will share my lunch with the manager instead.",
         "ok": false,
-        "textHi": "ठीक है, मैं इसके बजाय अपना खाना मैनेजर के साथ बाँटूँगी।"
+        "textHi": "ठीक है, मैं इसके बजाय अपना खाना मैनेजर के साथ बाँटूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will download the manager to my computer.",
         "ok": false,
-        "textHi": "ठीक है, मैं मैनेजर को अपने कंप्यूटर पर डाउनलोड करूँगी।"
+        "textHi": "ठीक है, मैं मैनेजर को अपने कंप्यूटर पर डाउनलोड करूँग{ी|ा}।"
        }
       ],
       "line": "Download the report and share the link with the manager.",
@@ -5344,7 +5344,7 @@
     "email": [
      {
       "scenario": "Write to your colleague Ravi to share a file link from the cloud.",
-      "scenarioHi": "अपने सहकर्मी रवि को क्लाउड से फ़ाइल लिंक साझा करने के लिए ईमेल लिखें।",
+      "scenarioHi": "अपने सहकर्मी रवि को ईमेल लिखो और क्लाउड से फ़ाइल का लिंक साझा करो।",
       "to": "ravi@office.com",
       "from": "Asha",
       "slots": [
@@ -5500,17 +5500,17 @@
        {
         "text": "Okay, I will copy the data and make a backup on the drive.",
         "ok": true,
-        "textHi": "ठीक है, मैं डेटा कॉपी करूँगी और ड्राइव पर बैकअप बनाऊँगी।"
+        "textHi": "ठीक है, मैं डेटा कॉपी करूँग{ी|ा} और ड्राइव पर बैकअप बनाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will delete all the data to save storage.",
         "ok": false,
-        "textHi": "ठीक है, मैं जगह बचाने के लिए सारा डेटा डिलीट कर दूँगी।"
+        "textHi": "ठीक है, मैं जगह बचाने के लिए सारा डेटा डिलीट कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will eat the drive for lunch.",
         "ok": false,
-        "textHi": "ठीक है, मैं दोपहर के खाने में ड्राइव खा जाऊँगी।"
+        "textHi": "ठीक है, मैं दोपहर के खाने में ड्राइव खा जाऊँग{ी|ा}।"
        }
       ],
       "line": "Our data is important. Please make a backup on this drive.",
@@ -5523,21 +5523,21 @@
        {
         "text": "Yes, I will restore the file from the backup.",
         "ok": true,
-        "textHi": "हाँ, मैं बैकअप से फ़ाइल वापस ले आऊँगी।"
+        "textHi": "हाँ, मैं बैकअप से फ़ाइल वापस ले आऊँग{ी|ा}।"
        },
        {
         "text": "Yes, I will buy a new file from the market.",
         "ok": false,
-        "textHi": "हाँ, मैं बाज़ार से एक नई फ़ाइल खरीद लूँगी।"
+        "textHi": "हाँ, मैं बाज़ार से एक नई फ़ाइल खरीद लूँग{ी|ा}।"
        },
        {
         "text": "Yes, I will throw the drive away to fix it.",
         "ok": false,
-        "textHi": "हाँ, मैं ठीक करने के लिए ड्राइव को फेंक दूँगी।"
+        "textHi": "हाँ, मैं ठीक करने के लिए ड्राइव को फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "We lost a file. Can you restore it from the backup?",
-      "lineHi": "हमने एक फ़ाइल खो दी। क्या आप बैकअप से उसे वापस ला सकती हैं?"
+      "lineHi": "हमने एक फ़ाइल खो दी। क्या आप बैकअप से उसे वापस ला सकत{ी|े} हैं?"
      }
     ]
    },
@@ -5554,7 +5554,7 @@
       "type": "mass",
       "uncount": true,
       "use": "I write code on the computer",
-      "useHi": "मैं कंप्यूटर पर कोड लिखती हूँ"
+      "useHi": "मैं कंप्यूटर पर कोड लिखत{ी|ा} हूँ"
      },
      {
       "en": "program",
@@ -5564,7 +5564,7 @@
       "type": "thing",
       "plural": "programs",
       "use": "I run my program",
-      "useHi": "मैं अपना प्रोग्राम चलाती हूँ"
+      "useHi": "मैं अपना प्रोग्राम चलात{ी|ा} हूँ"
      },
      {
       "en": "run",
@@ -5573,7 +5573,7 @@
       "emoji": "▶️",
       "type": "verb",
       "use": "I run the program",
-      "useHi": "मैं प्रोग्राम चलाती हूँ"
+      "useHi": "मैं प्रोग्राम चलात{ी|ा} हूँ"
      },
      {
       "en": "instruction",
@@ -5604,17 +5604,17 @@
        {
         "text": "Okay, I will run the program and see the output.",
         "ok": true,
-        "textHi": "ठीक है, मैं प्रोग्राम चलाऊँगी और आउटपुट देखूँगी।"
+        "textHi": "ठीक है, मैं प्रोग्राम चलाऊँग{ी|ा} और आउटपुट देखूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will run around the room with the program.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रोग्राम लेकर कमरे में इधर-उधर दौड़ूँगी।"
+        "textHi": "ठीक है, मैं प्रोग्राम लेकर कमरे में इधर-उधर दौड़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tear up all the instructions.",
         "ok": false,
-        "textHi": "ठीक है, मैं सारे निर्देश फाड़ दूँगी।"
+        "textHi": "ठीक है, मैं सारे निर्देश फाड़ दूँग{ी|ा}।"
        }
       ],
       "line": "A program is a list of instructions. Let us run this small program.",
@@ -5627,17 +5627,17 @@
        {
         "text": "Okay, I will read each instruction in the code carefully.",
         "ok": true,
-        "textHi": "ठीक है, मैं कोड का हर निर्देश ध्यान से पढ़ूँगी।"
+        "textHi": "ठीक है, मैं कोड का हर निर्देश ध्यान से पढ़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will sing the code like a song loudly.",
         "ok": false,
-        "textHi": "ठीक है, मैं कोड को गाने की तरह ज़ोर से गाऊँगी।"
+        "textHi": "ठीक है, मैं कोड को गाने की तरह ज़ोर से गाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hide the program from the computer.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रोग्राम को कंप्यूटर से छिपा दूँगी।"
+        "textHi": "ठीक है, मैं प्रोग्राम को कंप्यूटर से छिपा दूँग{ी|ा}।"
        }
       ],
       "line": "The code tells the computer what to do. Read each instruction slowly.",
@@ -5647,7 +5647,7 @@
     "code": [
      {
       "prompt": "Print the word Hello on the screen.",
-      "promptHi": "स्क्रीन पर Hello छापें।",
+      "promptHi": "स्क्रीन पर Hello छापो।",
       "lines": [
        "print(\"___\")"
       ],
@@ -5658,11 +5658,11 @@
       ],
       "answer": "Hello",
       "teach": "print( ) shows words on the screen. Put the words inside quotes \" \".",
-      "teachHi": "print( ) स्क्रीन पर शब्द दिखाता है। शब्दों को quotes \" \" के अंदर रखें।"
+      "teachHi": "print( ) स्क्रीन पर शब्द दिखाता है। शब्दों को quotes \" \" के अंदर रखो।"
      },
      {
       "prompt": "Print the name stored in the variable.",
-      "promptHi": "वेरिएबल में रखा नाम छापें।",
+      "promptHi": "वैरिएबल में रखा नाम छापो।",
       "lines": [
        "name = \"Asha\"",
        "print(___)"
@@ -5678,7 +5678,7 @@
      },
      {
       "prompt": "Finish the sentence: I can code.",
-      "promptHi": "वाक्य पूरा करें: I can code.",
+      "promptHi": "वाक्य पूरा करो: I can code.",
       "lines": [
        "print(\"I can ___\")"
       ],
@@ -5698,21 +5698,21 @@
       "wrongWord": "writes",
       "fix": "write",
       "teach": "With 'I', use 'write', not 'writes'.",
-      "teachHi": "'I' के साथ 'write'।"
+      "teachHi": "'I' के साथ 'write' आता है, 'writes' नहीं।"
      },
      {
       "sentence": "The program run now",
       "wrongWord": "run",
       "fix": "runs",
       "teach": "The program (it) needs 'runs'.",
-      "teachHi": "program (it) → 'runs'।"
+      "teachHi": "program (it) के साथ 'runs' आता है।"
      },
      {
       "sentence": "She are writing code",
       "wrongWord": "are",
       "fix": "is",
       "teach": "With 'she', use 'is'.",
-      "teachHi": "she → 'is'।"
+      "teachHi": "she के साथ 'is' आता है।"
      }
     ]
    },
@@ -5779,17 +5779,17 @@
        {
         "text": "Okay, I will store the value five in the variable.",
         "ok": true,
-        "textHi": "ठीक है, मैं वेरिएबल में पाँच का मान रखूँगी।"
+        "textHi": "ठीक है, मैं वेरिएबल में पाँच का मान रखूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will store five potatoes in the variable box.",
         "ok": false,
-        "textHi": "ठीक है, मैं वेरिएबल के डिब्बे में पाँच आलू रख दूँगी।"
+        "textHi": "ठीक है, मैं वेरिएबल के डिब्बे में पाँच आलू रख दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will throw the variable out of the screen.",
         "ok": false,
-        "textHi": "ठीक है, मैं वेरिएबल को स्क्रीन से बाहर फेंक दूँगी।"
+        "textHi": "ठीक है, मैं वेरिएबल को स्क्रीन से बाहर फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "A variable is like a box. Store the number five inside it.",
@@ -5802,17 +5802,17 @@
        {
         "text": "Okay, I will change the value stored in the variable.",
         "ok": true,
-        "textHi": "ठीक है, मैं वेरिएबल में रखा मान बदल दूँगी।"
+        "textHi": "ठीक है, मैं वेरिएबल में रखा मान बदल दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will paint the number a bright colour.",
         "ok": false,
-        "textHi": "ठीक है, मैं नंबर को चटक रंग में रंग दूँगी।"
+        "textHi": "ठीक है, मैं नंबर को चटक रंग में रंग दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will eat the text from the screen.",
         "ok": false,
-        "textHi": "ठीक है, मैं स्क्रीन से टेक्स्ट खा जाऊँगी।"
+        "textHi": "ठीक है, मैं स्क्रीन से टेक्स्ट खा जाऊँग{ी|ा}।"
        }
       ],
       "line": "A variable can hold a number or some text. Change its value now.",
@@ -5822,7 +5822,7 @@
     "code": [
      {
       "prompt": "Store the number 5 in the variable age.",
-      "promptHi": "age में संख्या 5 रखें।",
+      "promptHi": "age में संख्या 5 रखो।",
       "lines": [
        "age = ___"
       ],
@@ -5837,7 +5837,7 @@
      },
      {
       "prompt": "Store the town name in the variable city.",
-      "promptHi": "city में शहर का नाम रखें।",
+      "promptHi": "city में शहर का नाम रखो।",
       "lines": [
        "city = \"___\""
       ],
@@ -5852,7 +5852,7 @@
      },
      {
       "prompt": "Print the value stored in age.",
-      "promptHi": "age में रखा मान छापें।",
+      "promptHi": "age में रखा मान छापो।",
       "lines": [
        "age = 5",
        "print(___)"
@@ -5864,7 +5864,7 @@
       ],
       "answer": "age",
       "teach": "Use the variable's name to read its value back later.",
-      "teachHi": "मान बाद में पढ़ने के लिए वैरिएबल का नाम इस्तेमाल करें।"
+      "teachHi": "मान बाद में पढ़ने के लिए वैरिएबल का नाम इस्तेमाल करो।"
      }
     ],
     "fix": [
@@ -5873,21 +5873,21 @@
       "wrongWord": "store",
       "fix": "stores",
       "teach": "A variable (it) needs 'stores'.",
-      "teachHi": "variable (it) → 'stores'।"
+      "teachHi": "variable (it) के साथ 'stores' आता है।"
      },
      {
       "sentence": "I has two variables",
       "wrongWord": "has",
       "fix": "have",
       "teach": "With 'I', use 'have'.",
-      "teachHi": "'I' के साथ 'have'।"
+      "teachHi": "'I' के साथ 'have' आता है।"
      },
      {
       "sentence": "The number are five",
       "wrongWord": "are",
       "fix": "is",
       "teach": "One number needs 'is'.",
-      "teachHi": "एक number → 'is'।"
+      "teachHi": "एक number के साथ 'is' आता है।"
      }
     ]
    },
@@ -5954,17 +5954,17 @@
        {
         "text": "Okay, I will use a loop to repeat the step five times.",
         "ok": true,
-        "textHi": "ठीक है, मैं इस कदम को पाँच बार दोहराने के लिए लूप का इस्तेमाल करूँगी।"
+        "textHi": "ठीक है, मैं इस कदम को पाँच बार दोहराने के लिए लूप का इस्तेमाल करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will tie the loop around my wrist.",
         "ok": false,
-        "textHi": "ठीक है, मैं लूप को अपनी कलाई पर बाँध लूँगी।"
+        "textHi": "ठीक है, मैं लूप को अपनी कलाई पर बाँध लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will repeat the step zero times and skip it.",
         "ok": false,
-        "textHi": "ठीक है, मैं इस कदम को शून्य बार दोहराऊँगी और छोड़ दूँगी।"
+        "textHi": "ठीक है, मैं इस कदम को शून्य बार दोहराऊँग{ी|ा} और छोड़ दूँग{ी|ा}।"
        }
       ],
       "line": "Use a loop to repeat this step five times.",
@@ -5977,17 +5977,17 @@
        {
         "text": "Okay, I will add a condition to make the right choice.",
         "ok": true,
-        "textHi": "ठीक है, मैं सही चुनाव करने के लिए एक शर्त जोड़ूँगी।"
+        "textHi": "ठीक है, मैं सही चुनाव करने के लिए एक शर्त जोड़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will ignore the condition and guess randomly.",
         "ok": false,
-        "textHi": "ठीक है, मैं शर्त को नज़रअंदाज़ करके अंदाज़े से जवाब दूँगी।"
+        "textHi": "ठीक है, मैं शर्त को नज़रअंदाज़ करके अंदाज़े से जवाब दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will erase every choice from the program.",
         "ok": false,
-        "textHi": "ठीक है, मैं प्रोग्राम से हर चुनाव मिटा दूँगी।"
+        "textHi": "ठीक है, मैं प्रोग्राम से हर चुनाव मिटा दूँग{ी|ा}।"
        }
       ],
       "line": "Add a condition: if the number is big, make a different choice.",
@@ -5997,7 +5997,7 @@
     "code": [
      {
       "prompt": "Repeat the steps 3 times.",
-      "promptHi": "कदम 3 बार दोहराएँ।",
+      "promptHi": "कदम 3 बार दोहराओ।",
       "lines": [
        "for i in range(___):",
        "    print(i)"
@@ -6013,7 +6013,7 @@
      },
      {
       "prompt": "Print each number i in the loop.",
-      "promptHi": "लूप में हर संख्या i छापें।",
+      "promptHi": "लूप में हर संख्या i छापो।",
       "lines": [
        "for i in range(5):",
        "    print(___)"
@@ -6029,7 +6029,7 @@
      },
      {
       "prompt": "If age is big, print Adult.",
-      "promptHi": "अगर age बड़ी है, तो Adult छापें।",
+      "promptHi": "अगर age बड़ी है, तो Adult छापो।",
       "lines": [
        "if age > 18:",
        "    print(\"___\")"
@@ -6050,21 +6050,21 @@
       "wrongWord": "repeat",
       "fix": "repeats",
       "teach": "The loop (it) needs 'repeats'.",
-      "teachHi": "loop (it) → 'repeats'।"
+      "teachHi": "loop (it) के साथ 'repeats' आता है।"
      },
      {
       "sentence": "We follows each step",
       "wrongWord": "follows",
       "fix": "follow",
       "teach": "With 'we', use 'follow'.",
-      "teachHi": "'we' के साथ 'follow'।"
+      "teachHi": "'we' के साथ 'follow' आता है।"
      },
      {
       "sentence": "She make a choice",
       "wrongWord": "make",
       "fix": "makes",
       "teach": "With 'she', use 'makes'.",
-      "teachHi": "she → 'makes'।"
+      "teachHi": "she के साथ 'makes' आता है।"
      }
     ]
    },
@@ -6110,7 +6110,7 @@
       "emoji": "🔧",
       "type": "verb",
       "use": "I debug the code to fix it",
-      "useHi": "मैं कोड ठीक करने के लिए डीबग करती हूँ"
+      "useHi": "मैं कोड ठीक करने के लिए डीबग करत{ी|ा} हूँ"
      },
      {
       "en": "test",
@@ -6119,7 +6119,7 @@
       "emoji": "✅",
       "type": "verb",
       "use": "I test the code to check it",
-      "useHi": "मैं कोड जाँचने के लिए टेस्ट करती हूँ"
+      "useHi": "मैं कोड जाँचने के लिए टेस्ट करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6130,17 +6130,17 @@
        {
         "text": "Okay, I will put the work in a function and test it.",
         "ok": true,
-        "textHi": "ठीक है, मैं काम को एक फ़ंक्शन में रखूँगी और उसे जाँचूँगी।"
+        "textHi": "ठीक है, मैं काम को एक फ़ंक्शन में रखूँग{ी|ा} और उसे जाँचूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will spray the function with insect spray.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ंक्शन पर कीड़े मारने वाला स्प्रे छिड़कूँगी।"
+        "textHi": "ठीक है, मैं फ़ंक्शन पर कीड़े मारने वाला स्प्रे छिड़कूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will skip the test and hope it works.",
         "ok": false,
-        "textHi": "ठीक है, मैं जाँच छोड़ दूँगी और उम्मीद करूँगी कि यह चल जाए।"
+        "textHi": "ठीक है, मैं जाँच छोड़ दूँग{ी|ा} और उम्मीद करूँग{ी|ा} कि यह चल जाए।"
        }
       ],
       "line": "Put this work inside a function, then test it once.",
@@ -6153,17 +6153,17 @@
        {
         "text": "Okay, I will find the bug and debug the error.",
         "ok": true,
-        "textHi": "ठीक है, मैं बग ढूँढ़ूँगी और गलती को ठीक करूँगी।"
+        "textHi": "ठीक है, मैं बग ढूँढ़ूँग{ी|ा} और गलती को ठीक करूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will catch the bug in a jar.",
         "ok": false,
-        "textHi": "ठीक है, मैं कीड़े को एक मर्तबान में पकड़ लूँगी।"
+        "textHi": "ठीक है, मैं कीड़े को एक मर्तबान में पकड़ लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will close my eyes and ignore the error.",
         "ok": false,
-        "textHi": "ठीक है, मैं आँखें बंद करके गलती को नज़रअंदाज़ कर दूँगी।"
+        "textHi": "ठीक है, मैं आँखें बंद करके गलती को नज़रअंदाज़ कर दूँग{ी|ा}।"
        }
       ],
       "line": "The program shows an error. There is a bug. Please debug it.",
@@ -6173,7 +6173,7 @@
     "code": [
      {
       "prompt": "Start a function called greet.",
-      "promptHi": "greet नाम का फ़ंक्शन शुरू करें।",
+      "promptHi": "greet नाम का फ़ंक्शन शुरू करो।",
       "lines": [
        "___ greet():",
        "    print(\"Hi\")"
@@ -6189,7 +6189,7 @@
      },
      {
       "prompt": "Call the greet function.",
-      "promptHi": "greet फ़ंक्शन को बुलाएँ।",
+      "promptHi": "greet फ़ंक्शन को बुलाओ।",
       "lines": [
        "def greet():",
        "    print(\"Hi\")",
@@ -6202,11 +6202,11 @@
       ],
       "answer": "greet",
       "teach": "Write the function's name with ( ) after it to run it.",
-      "teachHi": "फ़ंक्शन चलाने के लिए उसके नाम के बाद ( ) लिखें।"
+      "teachHi": "फ़ंक्शन चलाने के लिए उसके नाम के बाद ( ) लिखो।"
      },
      {
       "prompt": "Fix the bug: add a and b.",
-      "promptHi": "बग ठीक करें: a और b जोड़ें।",
+      "promptHi": "बग ठीक करो: a और b जोड़ो।",
       "lines": [
        "def add(a, b):",
        "    return a ___ b"
@@ -6234,14 +6234,14 @@
       "wrongWord": "return",
       "fix": "returns",
       "teach": "The function (it) needs 'returns'.",
-      "teachHi": "function (it) → 'returns'।"
+      "teachHi": "function (it) के साथ 'returns' आता है।"
      },
      {
       "sentence": "He test the code",
       "wrongWord": "test",
       "fix": "tests",
       "teach": "With 'he', use 'tests'.",
-      "teachHi": "he → 'tests'।"
+      "teachHi": "he के साथ 'tests' आता है।"
      }
     ]
    },
@@ -6309,17 +6309,17 @@
        {
         "text": "Okay, I will add the student as a new record in the table.",
         "ok": true,
-        "textHi": "ठीक है, मैं छात्रा को टेबल में एक नए रिकॉर्ड के रूप में जोड़ूँगी।"
+        "textHi": "ठीक है, मैं विद्यार्थी को टेबल में एक नए रिकॉर्ड के रूप में जोड़ूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will put the student inside the computer box.",
         "ok": false,
-        "textHi": "ठीक है, मैं छात्रा को कंप्यूटर के डिब्बे के अंदर रख दूँगी।"
+        "textHi": "ठीक है, मैं विद्यार्थी को कंप्यूटर के डिब्बे के अंदर रख दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will burn the old table to make space.",
         "ok": false,
-        "textHi": "ठीक है, मैं जगह बनाने के लिए पुरानी टेबल जला दूँगी।"
+        "textHi": "ठीक है, मैं जगह बनाने के लिए पुरानी टेबल जला दूँग{ी|ा}।"
        }
       ],
       "line": "Add the new student to the database as one record in this table.",
@@ -6332,21 +6332,21 @@
        {
         "text": "Okay, I will write a query to find those records.",
         "ok": true,
-        "textHi": "ठीक है, मैं उन रिकॉर्ड्स को ढूँढ़ने के लिए एक क्वेरी लिखूँगी।"
+        "textHi": "ठीक है, मैं उन रिकॉर्ड्स को ढूँढ़ने के लिए एक क्वेरी लिखूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will ask the records out loud in the room.",
         "ok": false,
-        "textHi": "ठीक है, मैं कमरे में ज़ोर से रिकॉर्ड्स को पुकारूँगी।"
+        "textHi": "ठीक है, मैं कमरे में ज़ोर से रिकॉर्ड्स को पुकारूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will delete the field so I do not need a query.",
         "ok": false,
-        "textHi": "ठीक है, मैं फ़ील्ड ही डिलीट कर दूँगी ताकि क्वेरी की ज़रूरत न पड़े।"
+        "textHi": "ठीक है, मैं फ़ील्ड ही डिलीट कर दूँग{ी|ा} ताकि क्वेरी की ज़रूरत न पड़े।"
        }
       ],
       "line": "Write a query to find every record where the field 'city' is Motihari.",
-      "lineHi": "एक क्वेरी लिखिए जो हर वह रिकॉर्ड ढूँढे जहाँ 'शहर' फ़ील्ड मोतिहारी हो।"
+      "lineHi": "एक क्वेरी लिखिए जो हर वह रिकॉर्ड ढूँढे जहाँ 'city' फ़ील्ड मोतिहारी हो।"
      }
     ]
    },
@@ -6402,17 +6402,17 @@
        {
         "text": "Okay, I will give the model data so it can learn and predict.",
         "ok": true,
-        "textHi": "ठीक है, मैं मॉडल को डेटा दूँगी ताकि वह सीख सके और भविष्यवाणी कर सके।"
+        "textHi": "ठीक है, मैं मॉडल को डेटा दूँग{ी|ा} ताकि वह सीख सके और अनुमान लगा सके।"
        },
        {
         "text": "Okay, I will take the model to the railway station to train.",
         "ok": false,
-        "textHi": "ठीक है, मैं मॉडल को ट्रेन करने के लिए रेलवे स्टेशन ले जाऊँगी।"
+        "textHi": "ठीक है, मैं मॉडल को ट्रेन करने के लिए रेलवे स्टेशन ले जाऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will hide the data so the model cannot learn.",
         "ok": false,
-        "textHi": "ठीक है, मैं डेटा छिपा दूँगी ताकि मॉडल सीख न सके।"
+        "textHi": "ठीक है, मैं डेटा छिपा दूँग{ी|ा} ताकि मॉडल सीख न सके।"
        }
       ],
       "line": "We train a model with data so it can predict the answer.",
@@ -6435,7 +6435,7 @@
        {
         "text": "Yes, I will throw the robot into the water to teach it.",
         "ok": false,
-        "textHi": "हाँ, मैं रोबोट को सिखाने के लिए उसे पानी में फेंक दूँगी।"
+        "textHi": "हाँ, मैं रोबोट को सिखाने के लिए उसे पानी में फेंक दूँग{ी|ा}।"
        }
       ],
       "line": "Artificial intelligence helps a robot make smart choices.",
@@ -6494,17 +6494,17 @@
        {
         "text": "Okay, I will not open it and I will block the sender.",
         "ok": true,
-        "textHi": "ठीक है, मैं इसे नहीं खोलूँगी और भेजने वाले को ब्लॉक कर दूँगी।"
+        "textHi": "ठीक है, मैं इसे नहीं खोलूँग{ी|ा} और भेजने वाले को ब्लॉक कर दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will reply with my bank password.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपने बैंक का पासवर्ड लिखकर जवाब दूँगी।"
+        "textHi": "ठीक है, मैं अपने बैंक का पासवर्ड लिखकर जवाब दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will forward the scam to all my friends.",
         "ok": false,
-        "textHi": "ठीक है, मैं इस ठगी वाले मैसेज को अपनी सब सहेलियों को आगे भेज दूँगी।"
+        "textHi": "ठीक है, मैं इस ठगी वाले मैसेज को अपने सारे दोस्तों को आगे भेज दूँग{ी|ा}।"
        }
       ],
       "line": "This email looks like a scam. Do not open it; please block the sender.",
@@ -6517,17 +6517,17 @@
        {
         "text": "Okay, I will keep my information private and stay secure.",
         "ok": true,
-        "textHi": "ठीक है, मैं अपनी जानकारी निजी रखूँगी और सुरक्षित रहूँगी।"
+        "textHi": "ठीक है, मैं अपनी जानकारी निजी रखूँग{ी|ा} और सुरक्षित रहूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will post my password online for everyone.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना पासवर्ड सबके लिए ऑनलाइन डाल दूँगी।"
+        "textHi": "ठीक है, मैं अपना पासवर्ड सबके लिए ऑनलाइन डाल दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will download files from any unknown link.",
         "ok": false,
-        "textHi": "ठीक है, मैं किसी भी अनजान लिंक से फ़ाइलें डाउनलोड करूँगी।"
+        "textHi": "ठीक है, मैं किसी भी अनजान लिंक से फ़ाइलें डाउनलोड करूँग{ी|ा}।"
        }
       ],
       "line": "Keep your information private and your computer secure from viruses.",
@@ -6537,7 +6537,7 @@
     "email": [
      {
       "scenario": "Write to the IT team to report a suspicious email you received.",
-      "scenarioHi": "आपको मिले एक संदिग्ध ईमेल की सूचना देने के लिए आईटी टीम को ईमेल लिखें।",
+      "scenarioHi": "तुम्हें मिले एक संदिग्ध ईमेल की सूचना देने के लिए आईटी टीम को ईमेल लिखो।",
       "to": "it-help@office.com",
       "from": "Asha Kumari",
       "slots": [
@@ -6713,17 +6713,17 @@
        {
         "text": "Okay, I will finish my task before the Friday deadline.",
         "ok": true,
-        "textHi": "ठीक है, मैं शुक्रवार की समय-सीमा से पहले अपना काम पूरा कर लूँगी।"
+        "textHi": "ठीक है, मैं शुक्रवार की समय-सीमा से पहले अपना काम पूरा कर लूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will give my task to a stranger on the road.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपना काम सड़क पर किसी अजनबी को दे दूँगी।"
+        "textHi": "ठीक है, मैं अपना काम सड़क पर किसी अजनबी को दे दूँग{ी|ा}।"
        },
        {
         "text": "Okay, I will sleep until the project finishes by itself.",
         "ok": false,
-        "textHi": "ठीक है, मैं तब तक सोऊँगी जब तक प्रोजेक्ट खुद-ब-खुद पूरा न हो जाए।"
+        "textHi": "ठीक है, मैं तब तक सोऊँग{ी|ा} जब तक प्रोजेक्ट खुद-ब-खुद पूरा न हो जाए।"
        }
       ],
       "line": "Our team has a new project. This task is yours; the deadline is Friday.",
@@ -6736,17 +6736,17 @@
        {
         "text": "Okay, I will join the meeting and share my project update.",
         "ok": true,
-        "textHi": "ठीक है, मैं मीटिंग में शामिल होऊँगी और अपने प्रोजेक्ट का अपडेट बताऊँगी।"
+        "textHi": "ठीक है, मैं मीटिंग में शामिल होऊँग{ी|ा} और अपने प्रोजेक्ट का अपडेट बताऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will skip the meeting and tell no one.",
         "ok": false,
-        "textHi": "ठीक है, मैं मीटिंग छोड़ दूँगी और किसी को नहीं बताऊँगी।"
+        "textHi": "ठीक है, मैं मीटिंग छोड़ दूँग{ी|ा} और किसी को नहीं बताऊँग{ी|ा}।"
        },
        {
         "text": "Okay, I will bring the whole team some samosas instead of an update.",
         "ok": false,
-        "textHi": "ठीक है, मैं अपडेट के बजाय पूरी टीम के लिए समोसे ले आऊँगी।"
+        "textHi": "ठीक है, मैं अपडेट के बजाय पूरी टीम के लिए समोसे ले आऊँग{ी|ा}।"
        }
       ],
       "line": "We have a team meeting at ten. Please share your project update.",
@@ -6756,7 +6756,7 @@
     "email": [
      {
       "scenario": "Write to your team that you finished your task.",
-      "scenarioHi": "अपनी टीम को लिखें कि आपने अपना काम पूरा कर लिया।",
+      "scenarioHi": "अपनी टीम को ईमेल लिखो कि तुमने अपना काम पूरा कर लिया है।",
       "to": "team@office.com",
       "from": "Asha",
       "slots": [
@@ -6903,7 +6903,7 @@
     "quiz": [
      {
       "q": "Which animal says 'meow'?",
-      "qHi": "कौन 'म्याऊँ' बोलता है?",
+      "qHi": "कौन 'meow' (म्याऊँ) बोलता है?",
       "choices": [
        "cat",
        "dog",
@@ -7144,7 +7144,7 @@
      },
      {
       "q": "How many eyes do you have?",
-      "qHi": "आपकी कितनी आँखें हैं?",
+      "qHi": "तुम्हारी कितनी आँखें हैं?",
       "emoji": "👀",
       "choices": [
        "two",
@@ -7237,7 +7237,7 @@
       ],
       "answer": "baby",
       "teach": "This is a baby.",
-      "teachHi": "यह एक शिशु है।"
+      "teachHi": "यह नन्हा बच्चा है।"
      },
      {
       "q": "Who is this?",
@@ -7252,7 +7252,7 @@
      },
      {
       "q": "A boy child in your family is your...?",
-      "qHi": "आपके परिवार का लड़का आपका क्या लगता है?",
+      "qHi": "तुम्हारे परिवार का लड़का तुम्हारा क्या लगता है?",
       "emoji": "👦",
       "choices": [
        "brother",
@@ -7263,7 +7263,7 @@
      },
      {
       "q": "A girl child in your family is your...?",
-      "qHi": "आपके परिवार की लड़की आपकी क्या लगती है?",
+      "qHi": "तुम्हारे परिवार की लड़की तुम्हारी क्या लगती है?",
       "emoji": "👧",
       "choices": [
        "sister",
@@ -7477,7 +7477,7 @@
       "type": "thing",
       "plural": "houses",
       "use": "I live in a small house.",
-      "useHi": "मैं छोटे घर में रहती हूँ।"
+      "useHi": "मैं छोटे घर में रहत{ी|ा} हूँ।"
      },
      {
       "en": "door",
@@ -7497,7 +7497,7 @@
       "type": "thing",
       "plural": "beds",
       "use": "I sleep on my bed.",
-      "useHi": "मैं अपने बिस्तर पर सोती हूँ।"
+      "useHi": "मैं अपने बिस्तर पर सोत{ी|ा} हूँ।"
      },
      {
       "en": "chair",
@@ -7517,7 +7517,7 @@
       "type": "thing",
       "plural": "brooms",
       "use": "I clean the floor with a broom.",
-      "useHi": "मैं झाड़ू से फ़र्श साफ़ करती हूँ।"
+      "useHi": "मैं झाड़ू से फ़र्श साफ़ करत{ी|ा} हूँ।"
      }
     ],
     "quiz": [
@@ -7575,7 +7575,7 @@
       "type": "thing",
       "plural": "books",
       "use": "I read a book every day.",
-      "useHi": "मैं रोज़ किताब पढ़ती हूँ।"
+      "useHi": "मैं रोज़ किताब पढ़त{ी|ा} हूँ।"
      },
      {
       "en": "pen",
@@ -7605,7 +7605,7 @@
       "type": "thing",
       "plural": "bags",
       "use": "I keep my books in my bag.",
-      "useHi": "मैं अपनी किताबें बस्ते में रखती हूँ।"
+      "useHi": "मैं अपनी किताबें बस्ते में रखत{ी|ा} हूँ।"
      },
      {
       "en": "teacher",
@@ -7673,7 +7673,7 @@
       "type": "thing",
       "plural": "shops",
       "use": "I buy salt at the shop.",
-      "useHi": "मैं दुकान से नमक खरीदती हूँ।"
+      "useHi": "मैं दुकान से नमक खरीदत{ी|ा} हूँ।"
      },
      {
       "en": "road",
@@ -7777,7 +7777,7 @@
       "pron": "यस",
       "emoji": "👍",
       "use": "Yes, I can read.",
-      "useHi": "हाँ, मैं पढ़ सकती हूँ।"
+      "useHi": "हाँ, मैं पढ़ सकत{ी|ा} हूँ।"
      },
      {
       "en": "no",
@@ -7785,7 +7785,7 @@
       "pron": "नो",
       "emoji": "👎",
       "use": "No, I am not tired.",
-      "useHi": "नहीं, मैं थकी नहीं हूँ।"
+      "useHi": "नहीं, मैं थक{ी|ा} नहीं हूँ।"
      },
      {
       "en": "please",
@@ -7820,7 +7820,7 @@
      },
      {
       "q": "Someone helps you. What do you say?",
-      "qHi": "कोई तुम्हारी मदद करे तो क्या कहोगी?",
+      "qHi": "कोई तुम्हारी मदद करे तो क्या कह{ोगी|ोगे}?",
       "emoji": "😊",
       "choices": [
        "thank you",
@@ -7833,7 +7833,7 @@
      },
      {
       "q": "You ask for water. Which word do you add?",
-      "qHi": "पानी माँगते समय कौन-सा शब्द जोड़ोगी?",
+      "qHi": "पानी माँगते समय कौन-सा शब्द जोड़{ोगी|ोगे}?",
       "emoji": "🙏",
       "choices": [
        "please",
@@ -7921,7 +7921,7 @@
     "quiz": [
      {
       "q": "2 + 1 = ?",
-      "qHi": "",
+      "qHi": "2 और 1 जोड़ो, कितने हुए?",
       "choices": [
        "2",
        "3",
@@ -7931,7 +7931,7 @@
      },
      {
       "q": "3 + 2 = ?",
-      "qHi": "",
+      "qHi": "3 और 2 जोड़ो, कितने हुए?",
       "choices": [
        "4",
        "5",
@@ -7941,7 +7941,7 @@
      },
      {
       "q": "🍎🍎 + 🍎🍎 = ?",
-      "qHi": "",
+      "qHi": "🍎🍎 और 🍎🍎 मिलाकर कितने सेब?",
       "choices": [
        "3",
        "4",
@@ -7952,7 +7952,7 @@
      },
      {
       "q": "5 + 0 = ?",
-      "qHi": "",
+      "qHi": "5 और 0 जोड़ो, कितने हुए?",
       "choices": [
        "0",
        "5",
@@ -8171,8 +8171,8 @@
       "teachHi": "5, 2 से बड़ी है।"
      },
      {
-      "q": "Which side has more mangoes?",
-      "qHi": "ज़्यादा आम किस ओर?",
+      "q": "The side with more mangoes has how many?",
+      "qHi": "जिस ओर ज़्यादा आम हैं, वहाँ कितने आम हैं?",
       "emoji": "🥭🥭🥭🥭 — 🥭🥭",
       "choices": [
        "4",
@@ -9521,7 +9521,7 @@
     "quiz": [
      {
       "q": "Which word is a noun (naming word)?",
-      "qHi": "कौन-सा शब्द संज्ञा है?",
+      "qHi": "कौन-सा शब्द संज्ञा (noun) है?",
       "choices": [
        "table",
        "run",
@@ -9533,7 +9533,7 @@
      },
      {
       "q": "Which word is a verb (action word)?",
-      "qHi": "कौन-सा शब्द क्रिया है?",
+      "qHi": "कौन-सा शब्द क्रिया (verb) है?",
       "choices": [
        "jump",
        "chair",
@@ -9545,7 +9545,7 @@
      },
      {
       "q": "Pick the noun: 'The dog runs fast.'",
-      "qHi": "संज्ञा चुनो",
+      "qHi": "इस वाक्य में संज्ञा (noun) कौन है? 'The dog runs fast.'",
       "choices": [
        "dog",
        "runs",
@@ -9605,7 +9605,7 @@
      },
      {
       "q": "Present tense: 'I ___ to school.'",
-      "qHi": "वर्तमान काल चुनो",
+      "qHi": "वर्तमान काल (present tense) का सही शब्द भरो: 'I ___ to school.'",
       "choices": [
        "walk",
        "walked",
@@ -9638,7 +9638,7 @@
     "quiz": [
      {
       "q": "Which word is an adjective (describing word)?",
-      "qHi": "कौन-सा शब्द विशेषण है?",
+      "qHi": "कौन-सा शब्द विशेषण (adjective) है?",
       "emoji": "🦒",
       "choices": [
        "tall",
@@ -9651,7 +9651,7 @@
      },
      {
       "q": "Which word is an adverb (tells how)?",
-      "qHi": "कौन-सा शब्द क्रिया-विशेषण है?",
+      "qHi": "कौन-सा शब्द क्रिया-विशेषण (adverb) है?",
       "emoji": "🐢",
       "choices": [
        "slowly",
@@ -9664,7 +9664,7 @@
      },
      {
       "q": "Fill in: 'The ___ cat sleeps.'",
-      "qHi": "खाली जगह भरो — बिल्ली का वर्णन करने वाला शब्द चुनो।",
+      "qHi": "खाली जगह भरो: 'The ___ cat sleeps.' — बिल्ली का वर्णन करने वाला शब्द।",
       "emoji": "🐈",
       "choices": [
        "big",
@@ -9733,7 +9733,7 @@
      },
      {
       "q": "Choose the word: '___ sun' — there is only one.",
-      "qHi": "सही शब्द चुनो — सूरज एक ही है।",
+      "qHi": "'sun' से पहले सही शब्द चुनो — सूरज एक ही है।",
       "emoji": "☀️",
       "choices": [
        "the",
@@ -9845,7 +9845,7 @@
     "quiz": [
      {
       "q": "We cannot see the cat; it is ___ the box.",
-      "qHi": "बिल्ली दिखाई नहीं देती; वह बक्से के अंदर है।",
+      "qHi": "बिल्ली दिखाई नहीं देती; वह बक्से के अंदर है: 'it is ___ the box.'",
       "emoji": "🐱",
       "choices": [
        "in",
@@ -9858,7 +9858,7 @@
      },
      {
       "q": "The cup rests ___ the top of the table.",
-      "qHi": "कप मेज़ की ऊपरी सतह पर रखा है।",
+      "qHi": "कप मेज़ की ऊपरी सतह पर रखा है: 'The cup rests ___ the top of the table.'",
       "emoji": "☕",
       "choices": [
        "on",
@@ -9871,7 +9871,7 @@
      },
      {
       "q": "The shoes are ___ the bed, so we bend down to reach them.",
-      "qHi": "जूते बिस्तर के नीचे हैं, इसलिए झुककर उठाते हैं।",
+      "qHi": "जूते बिस्तर के नीचे हैं, इसलिए झुककर उठाते हैं: 'The shoes are ___ the bed.'",
       "emoji": "👟",
       "choices": [
        "under",
@@ -9884,7 +9884,7 @@
      },
      {
       "q": "The bus comes ___ 4 o'clock.",
-      "qHi": "बस 4 बजे आती है।",
+      "qHi": "बस 4 बजे आती है: 'The bus comes ___ 4 o'clock.'",
       "emoji": "🚌",
       "choices": [
        "at",
@@ -10117,7 +10117,7 @@
      },
      {
       "q": "I stayed home ___ it was raining.",
-      "qHi": "बारिश हो रही थी इसलिए घर पर रही: home ___ it was raining.",
+      "qHi": "बारिश हो रही थी इसलिए घर पर रह{ी|ा}: home ___ it was raining.",
       "emoji": "🌧️",
       "choices": [
        "because",
@@ -10160,7 +10160,7 @@
     "quiz": [
      {
       "q": "Tomorrow I ___ go to the mela.",
-      "qHi": "कल मैं मेला देखने जाऊँगी: Tomorrow I ___ go.",
+      "qHi": "कल मैं मेला देखने जाऊँग{ी|ा}: Tomorrow I ___ go.",
       "emoji": "🎡",
       "choices": [
        "will",
@@ -10256,7 +10256,7 @@
     "quiz": [
      {
       "q": "7 × 8 = ?",
-      "qHi": "",
+      "qHi": "7 × 8 कितना होता है?",
       "choices": [
        "54",
        "56",
@@ -10266,7 +10266,7 @@
      },
      {
       "q": "6 × 9 = ?",
-      "qHi": "",
+      "qHi": "6 × 9 कितना होता है?",
       "choices": [
        "54",
        "56",
@@ -10276,7 +10276,7 @@
      },
      {
       "q": "12 × 5 = ?",
-      "qHi": "",
+      "qHi": "12 × 5 कितना होता है?",
       "choices": [
        "55",
        "60",
@@ -10286,7 +10286,7 @@
      },
      {
       "q": "9 × 9 = ?",
-      "qHi": "",
+      "qHi": "9 × 9 कितना होता है?",
       "choices": [
        "81",
        "72",
@@ -10303,7 +10303,7 @@
     "quiz": [
      {
       "q": "What is 1/2 of 8?",
-      "qHi": "8 का आधा कितना?",
+      "qHi": "8 का 1/2 यानी आधा कितना है?",
       "choices": [
        "2",
        "4",
@@ -10315,7 +10315,7 @@
      },
      {
       "q": "Which is bigger: 1/2 or 1/4?",
-      "qHi": "कौन बड़ा है?",
+      "qHi": "कौन बड़ा है: 1/2 या 1/4?",
       "choices": [
        "1/2",
        "1/4",
@@ -10327,7 +10327,7 @@
      },
      {
       "q": "1/3 + 1/3 = ?",
-      "qHi": "",
+      "qHi": "1/3 + 1/3 कितना होता है?",
       "choices": [
        "1/3",
        "2/3",
@@ -10337,7 +10337,7 @@
      },
      {
       "q": "1/4 of 12 = ?",
-      "qHi": "",
+      "qHi": "12 का 1/4 कितना होता है?",
       "choices": [
        "3",
        "4",
@@ -10354,7 +10354,7 @@
     "quiz": [
      {
       "q": "Share 36 pencils equally among 4 girls. Each gets?",
-      "qHi": "4 लड़कियों में 36 पेंसिलें बराबर बाँटें। हर एक को कितनी?",
+      "qHi": "36 पेंसिलें 4 लड़कियों में बराबर बाँटो। हर एक को कितनी मिलेंगी?",
       "emoji": "✏️",
       "choices": [
        "8",
@@ -10367,7 +10367,7 @@
      },
      {
       "q": "56 ÷ 8 = ?",
-      "qHi": "",
+      "qHi": "56 ÷ 8 कितना होता है?",
       "emoji": "",
       "choices": [
        "6",
@@ -10378,7 +10378,7 @@
      },
      {
       "q": "Share 24 mangoes equally among 6 girls. Each gets?",
-      "qHi": "6 लड़कियों में 24 आम बराबर बाँटें। हर एक को कितने?",
+      "qHi": "24 आम 6 लड़कियों में बराबर बाँटो। हर एक को कितने मिलेंगे?",
       "emoji": "🥭",
       "choices": [
        "3",
@@ -10411,7 +10411,7 @@
     "quiz": [
      {
       "q": "0.5 + 0.5 = ?",
-      "qHi": "",
+      "qHi": "0.5 + 0.5 कितना होता है?",
       "emoji": "",
       "choices": [
        "1",
@@ -10431,11 +10431,11 @@
       ],
       "answer": "0.7",
       "teach": "0.7 is seven tenths, much bigger than 0.07.",
-      "teachHi": "0.7 सात दसवाँ भाग (7/10) है, 0.07 से बहुत बड़ा है।"
+      "teachHi": "0.7 यानी 7/10 — यह 0.07 से बहुत बड़ा है।"
      },
      {
       "q": "A ribbon is 0.25 m plus another 0.25 m. How long is it now?",
-      "qHi": "एक रिबन 0.25 मीटर और 0.25 मीटर है। अब वह कितनी लंबी है?",
+      "qHi": "एक रिबन 0.25 मीटर का है, उसमें 0.25 मीटर और जोड़ो। अब वह कितना लंबा है?",
       "emoji": "🎀",
       "choices": [
        "0.5",
@@ -10444,11 +10444,11 @@
       ],
       "answer": "0.5",
       "teach": "0.25 + 0.25 = 0.5, so the ribbon is 0.5 m long.",
-      "teachHi": "0.25 + 0.25 = 0.5, इसलिए रिबन 0.5 मीटर लंबी है।"
+      "teachHi": "0.25 + 0.25 = 0.5, इसलिए रिबन 0.5 मीटर लंबा है।"
      },
      {
       "q": "Write 3/10 as a decimal.",
-      "qHi": "3/10 को दशमलव में लिखें।",
+      "qHi": "3/10 को दशमलव में लिखो।",
       "emoji": "",
       "choices": [
        "0.3",
@@ -10457,7 +10457,7 @@
       ],
       "answer": "0.3",
       "teach": "3/10 means three tenths, which is 0.3.",
-      "teachHi": "3/10 का मतलब तीन दसवाँ भाग, यानी 0.3।"
+      "teachHi": "3/10 यानी तीन बटा दस, जो दशमलव में 0.3 है।"
      }
     ]
    },
@@ -10553,7 +10553,7 @@
      },
      {
       "q": "25% of 40 = ?",
-      "qHi": "",
+      "qHi": "40 का 25% कितना होता है?",
       "emoji": "",
       "choices": [
        "8",
@@ -10566,7 +10566,7 @@
      },
      {
       "q": "Write 1/2 as a percent.",
-      "qHi": "1/2 को प्रतिशत में लिखें।",
+      "qHi": "1/2 को प्रतिशत में लिखो।",
       "emoji": "",
       "choices": [
        "50%",
@@ -10645,7 +10645,7 @@
     "quiz": [
      {
       "q": "You save ₹100 in the bank at 10% per year. How much interest will you get after 1 year?",
-      "qHi": "तुम बैंक में ₹100 जमा करती हो, ब्याज 10% सालाना है। 1 साल बाद कितना ब्याज मिलेगा?",
+      "qHi": "तुम बैंक में ₹100 जमा करत{ी|े} हो, ब्याज 10% सालाना है। 1 साल बाद कितना ब्याज मिलेगा?",
       "emoji": "",
       "choices": [
        "₹5",
@@ -10717,7 +10717,7 @@
     "quiz": [
      {
       "q": "For chai, you mix 1 cup of milk and 2 cups of water. What is the ratio of milk to water?",
-      "qHi": "चाय के लिए 1 कप दूध और 2 कप पानी मिलाती हो। दूध और पानी का अनुपात क्या है?",
+      "qHi": "चाय में तुम 1 कप दूध और 2 कप पानी मिलात{ी|े} हो। दूध और पानी का अनुपात क्या है?",
       "emoji": "",
       "choices": [
        "1:2",
@@ -10785,7 +10785,7 @@
       ],
       "answer": "4",
       "teach": "Add and divide by how many: (2 + 4 + 6) ÷ 3 = 12 ÷ 3 = 4.",
-      "teachHi": "जोड़कर संख्या से बाँटो: (2 + 4 + 6) ÷ 3 = 12 ÷ 3 = 4।"
+      "teachHi": "सब जोड़ो, फिर गिनती से बाँटो: (2 + 4 + 6) ÷ 3 = 12 ÷ 3 = 4।"
      },
      {
       "q": "Sita sold 10, 20 and 30 lemons in 3 days. What is her average per day?",
@@ -11580,7 +11580,7 @@
      },
      {
       "q": "You stand in the sun. What forms on the ground behind you?",
-      "qHi": "तुम धूप में खड़ी हो। पीछे ज़मीन पर क्या बनता है?",
+      "qHi": "तुम धूप में खड़{ी|े} हो। पीछे ज़मीन पर क्या बनता है?",
       "emoji": "👤",
       "choices": [
        "a shadow",
@@ -11823,7 +11823,7 @@
     "quiz": [
      {
       "q": "Choose the correct verb: 'Neither of the boys ___ here.'",
-      "qHi": "सही क्रिया चुनो",
+      "qHi": "सही क्रिया कौन-सी है? 'Neither of the boys ___ here.'",
       "choices": [
        "is",
        "are",
@@ -11835,7 +11835,7 @@
      },
      {
       "q": "Pick the adverb: 'She sings beautifully.'",
-      "qHi": "क्रिया-विशेषण चुनो",
+      "qHi": "इस वाक्य में क्रिया-विशेषण (adverb) कौन है? 'She sings beautifully.'",
       "choices": [
        "beautifully",
        "sings",
@@ -11845,7 +11845,7 @@
      },
      {
       "q": "Passive of 'He writes a letter.'",
-      "qHi": "कर्मवाच्य रूप चुनो",
+      "qHi": "'He writes a letter.' का कर्मवाच्य (passive) रूप कौन-सा है?",
       "choices": [
        "A letter is written by him.",
        "A letter writes him.",
@@ -11911,7 +11911,7 @@
      },
      {
       "q": "Complete: 'This time tomorrow, we ___ travelling to Patna.'",
-      "qHi": "वाक्य पूरा करो।",
+      "qHi": "वाक्य पूरा करो: 'This time tomorrow, we ___ travelling to Patna.'",
       "emoji": "🚌",
       "choices": [
        "will be",
@@ -11954,7 +11954,7 @@
     "quiz": [
      {
       "q": "Report it: He said, 'I am tired.'",
-      "qHi": "अप्रत्यक्ष कथन में बदलो।",
+      "qHi": "अप्रत्यक्ष कथन (indirect speech) में बदलो: He said, 'I am tired.'",
       "emoji": "🗣️",
       "choices": [
        "He said that he was tired.",
@@ -11967,7 +11967,7 @@
      },
      {
       "q": "Report it: She asked, 'Where do you live?'",
-      "qHi": "अप्रत्यक्ष कथन में बदलो।",
+      "qHi": "अप्रत्यक्ष कथन (indirect speech) में बदलो: She asked, 'Where do you live?'",
       "emoji": "❓",
       "choices": [
        "She asked where I lived.",
@@ -11980,7 +11980,7 @@
      },
      {
       "q": "Report it: He said to me, 'Please help me.'",
-      "qHi": "अप्रत्यक्ष कथन में बदलो।",
+      "qHi": "अप्रत्यक्ष कथन (indirect speech) में बदलो: He said to me, 'Please help me.'",
       "emoji": "🙏",
       "choices": [
        "He requested me to help him.",
@@ -12023,7 +12023,7 @@
     "quiz": [
      {
       "q": "Change to passive voice: 'The teacher praised the girl.'",
-      "qHi": "कर्मवाच्य (passive) रूप चुनो।",
+      "qHi": "कर्मवाच्य (passive) में बदलो: 'The teacher praised the girl.'",
       "emoji": "👏",
       "choices": [
        "The girl was praised by the teacher.",
@@ -12049,7 +12049,7 @@
      },
      {
       "q": "Change to passive voice: 'They are building a house.'",
-      "qHi": "कर्मवाच्य (passive) रूप चुनो।",
+      "qHi": "कर्मवाच्य (passive) में बदलो: 'They are building a house.'",
       "emoji": "🏠",
       "choices": [
        "A house is being built by them.",
@@ -12187,7 +12187,7 @@
      },
      {
       "q": "'She ___ be at the mandi; her vegetable basket is gone.' Which modal shows a guess?",
-      "qHi": "'She ___ be at the mandi.' अंदाज़ा बताने वाला modal कौन-सा है?",
+      "qHi": "अंदाज़ा बताने वाला modal चुनो: 'She ___ be at the mandi; her vegetable basket is gone.'",
       "emoji": "🍅",
       "choices": [
        "might",
@@ -12265,7 +12265,7 @@
       ],
       "answer": "unless",
       "teach": "'Unless' means 'if...not' — if you do not leave now, you will miss it.",
-      "teachHi": "'Unless' का अर्थ है 'अगर...नहीं' — अभी नहीं निकलीं तो ट्रेन छूट जाएगी।"
+      "teachHi": "'Unless' का मतलब 'if...not' यानी 'अगर...नहीं' — अभी नहीं निकल{ीं|े} तो ट्रेन छूट जाएगी।"
      },
      {
       "q": "'She saved money ___ she could buy a sewing machine.' Choose the connector.",
@@ -12294,7 +12294,7 @@
       "wrongWord": "and",
       "fix": "or",
       "teach": "'Or' warns what happens if you don't: work hard, or you will fail.",
-      "teachHi": "'Or' चेतावनी देता है — मेहनत करो, वरना फेल हो जाओगी।"
+      "teachHi": "'Or' चेतावनी देता है — मेहनत करो, वरना फेल हो जाओग{ी|े}।"
      },
      {
       "sentence": "Neither Sita or Gita went to the mandi.",
@@ -12338,7 +12338,7 @@
      },
      {
       "q": "'The meeting was put ___ because of rain.' Which word completes the phrasal verb meaning 'postponed'?",
-      "qHi": "'The meeting was put ___ because of rain.' — 'टाल दी गई' के अर्थ वाला शब्द चुनो।",
+      "qHi": "'The meeting was put ___ because of rain.' — 'postponed' (टालना) के अर्थ वाला शब्द चुनो।",
       "emoji": "🌧️",
       "choices": [
        "off",
@@ -12477,7 +12477,7 @@
     "quiz": [
      {
       "q": "Solve: x + 3 = 7.  x = ?",
-      "qHi": "",
+      "qHi": "हल करो: x + 3 = 7। x = ?",
       "choices": [
        "3",
        "4",
@@ -12489,7 +12489,7 @@
      },
      {
       "q": "Solve: 2x = 10.  x = ?",
-      "qHi": "",
+      "qHi": "हल करो: 2x = 10। x = ?",
       "choices": [
        "5",
        "8",
@@ -12499,7 +12499,7 @@
      },
      {
       "q": "Solve: x − 5 = 0.  x = ?",
-      "qHi": "",
+      "qHi": "हल करो: x − 5 = 0। x = ?",
       "choices": [
        "0",
        "5",
@@ -12509,7 +12509,7 @@
      },
      {
       "q": "If x = 2, what is 3x + 1?",
-      "qHi": "",
+      "qHi": "अगर x = 2 है, तो 3x + 1 क्या है?",
       "choices": [
        "6",
        "7",
@@ -12528,7 +12528,7 @@
     "quiz": [
      {
       "q": "What is the degree of 3x² + 5x + 1?",
-      "qHi": "3x² + 5x + 1 की degree क्या है?",
+      "qHi": "3x² + 5x + 1 की घात (degree) क्या है?",
       "emoji": "",
       "choices": [
        "1",
@@ -12537,11 +12537,11 @@
       ],
       "answer": "2",
       "teach": "The degree is the highest power of x, which is 2.",
-      "teachHi": "Degree x की सबसे बड़ी power होती है, जो यहाँ 2 है।"
+      "teachHi": "घात (degree) यानी x की सबसे बड़ी power, जो यहाँ 2 है।"
      },
      {
       "q": "How many terms are in x² + 2x + 7?",
-      "qHi": "x² + 2x + 7 में कितने terms हैं?",
+      "qHi": "x² + 2x + 7 में कितने पद (terms) हैं?",
       "emoji": "",
       "choices": [
        "2",
@@ -12550,7 +12550,7 @@
       ],
       "answer": "3",
       "teach": "Terms are separated by + or −: x², 2x, 7 — that is three terms.",
-      "teachHi": "Terms को + या − से अलग करते हैं: x², 2x, 7 — यानी तीन terms हैं।"
+      "teachHi": "पद (terms) + या − से अलग होते हैं: x², 2x, 7 — यानी तीन पद।"
      },
      {
       "q": "If p(x) = x² + 1, what is p(2)?",
@@ -12576,7 +12576,7 @@
       ],
       "answer": "4x² + 3x",
       "teach": "Add like terms: x² + 3x² = 4x², and 2x + x = 3x.",
-      "teachHi": "Like terms जोड़ो: x² + 3x² = 4x², और 2x + x = 3x।"
+      "teachHi": "समान पद (like terms) जोड़ो: x² + 3x² = 4x², और 2x + x = 3x।"
      }
     ]
    },
@@ -12587,7 +12587,7 @@
     "quiz": [
      {
       "q": "Which is a quadratic equation?",
-      "qHi": "इनमें से quadratic equation कौन-सा है?",
+      "qHi": "इनमें से कौन-सा द्विघात समीकरण (quadratic equation) है?",
       "emoji": "",
       "choices": [
        "x² + 2x + 1 = 0",
@@ -12596,7 +12596,7 @@
       ],
       "answer": "x² + 2x + 1 = 0",
       "teach": "A quadratic equation has an x² term; the others have only x.",
-      "teachHi": "Quadratic equation में x² वाला term होता है; बाकी में सिर्फ़ x है।"
+      "teachHi": "द्विघात समीकरण (quadratic equation) में x² वाला पद होता है; बाकी में सिर्फ़ x।"
      },
      {
       "q": "Solve: x² = 9. A positive value of x?",
@@ -12681,7 +12681,7 @@
       ],
       "answer": "1",
       "teach": "Any non-zero number to the power 0 equals 1.",
-      "teachHi": "किसी भी non-zero संख्या की power 0 हो तो उत्तर 1 होता है।"
+      "teachHi": "शून्य को छोड़कर किसी भी संख्या की power 0 हो, तो उत्तर 1 होता है।"
      },
      {
       "q": "Simplify: x⁶ ÷ x² = ?",
@@ -12705,7 +12705,7 @@
     "quiz": [
      {
       "q": "Common difference of 2, 5, 8, 11, … ?",
-      "qHi": "2, 5, 8, 11, … का common difference क्या है?",
+      "qHi": "2, 5, 8, 11, … का सार्व अंतर (common difference) क्या है?",
       "emoji": "",
       "choices": [
        "2",
@@ -12727,11 +12727,11 @@
       ],
       "answer": "15",
       "teach": "The common difference is 3, so 12 + 3 = 15.",
-      "teachHi": "Common difference 3 है, तो 12 + 3 = 15।"
+      "teachHi": "सार्व अंतर (common difference) 3 है, तो 12 + 3 = 15।"
      },
      {
       "q": "Which sequence is an AP?",
-      "qHi": "इनमें से कौन-सा अनुक्रम AP है?",
+      "qHi": "इनमें से कौन-सा अनुक्रम समांतर श्रेढ़ी (AP) है?",
       "emoji": "",
       "choices": [
        "2, 4, 6, 8",
@@ -12740,11 +12740,11 @@
       ],
       "answer": "2, 4, 6, 8",
       "teach": "An AP adds a fixed number each step; here it adds 2 every time.",
-      "teachHi": "AP में हर बार एक निश्चित संख्या जुड़ती है; यहाँ हर बार 2 जुड़ता है।"
+      "teachHi": "समांतर श्रेढ़ी (AP) में हर बार एक निश्चित संख्या जुड़ती है; यहाँ 2।"
      },
      {
       "q": "In the AP 5, 8, 11, …, the 4th term is?",
-      "qHi": "AP 5, 8, 11, … में चौथा पद क्या है?",
+      "qHi": "समांतर श्रेढ़ी (AP) 5, 8, 11, … में चौथा पद क्या है?",
       "emoji": "",
       "choices": [
        "12",
@@ -12862,7 +12862,7 @@
      },
      {
       "q": "What is the common factor in 6x + 9?",
-      "qHi": "6x + 9 में common factor क्या है?",
+      "qHi": "6x + 9 में सार्व गुणनखंड (common factor) क्या है?",
       "emoji": "",
       "choices": [
        "3",
@@ -12895,7 +12895,7 @@
      },
      {
       "q": "Discriminant of x² − 5x + 6 = 0 is?",
-      "qHi": "x² − 5x + 6 = 0 का discriminant क्या है?",
+      "qHi": "x² − 5x + 6 = 0 का विविक्तकर (discriminant) क्या है?",
       "emoji": "",
       "choices": [
        "1",
@@ -12917,7 +12917,7 @@
       ],
       "answer": "two equal",
       "teach": "Discriminant zero means both roots are equal.",
-      "teachHi": "Discriminant शून्य हो तो दोनों मूल बराबर होते हैं।"
+      "teachHi": "विविक्तकर (discriminant) शून्य हो तो दोनों मूल बराबर होते हैं।"
      },
      {
       "q": "The roots of x² − 5x + 6 = 0 are?",
@@ -12954,7 +12954,7 @@
      },
      {
       "q": "5 kg rice and 2 kg dal cost ₹340. Rice is ₹40 per kg. How much is dal per kg?",
-      "qHi": "5 किलो चावल और 2 किलो दाल ₹340 की। चावल ₹40 किलो है। दाल कितने रुपये किलो है?",
+      "qHi": "5 किलो चावल और 2 किलो दाल का दाम ₹340 है। चावल ₹40 किलो है। दाल कितने रुपये किलो है?",
       "emoji": "",
       "choices": [
        "₹70",
@@ -12993,7 +12993,7 @@
      },
      {
       "q": "An auto charges ₹10 fixed plus ₹5 per km. The fare is ₹35. How far?",
-      "qHi": "ऑटो ₹10 पक्का और ₹5 हर किलोमीटर लेता है। भाड़ा ₹35 हुआ। कितनी दूर गई?",
+      "qHi": "ऑटो ₹10 पक्का और ₹5 हर किलोमीटर लेता है। भाड़ा ₹35 हुआ। कितने किलोमीटर चला?",
       "emoji": "",
       "choices": [
        "5 km",
@@ -13033,7 +13033,7 @@
       "type": "thing",
       "plural": "forces",
       "use": "A force can push or pull",
-      "useHi": "बल धक्का या खिंचाव कर सकता है"
+      "useHi": "बल धक्का दे सकता है या खींच सकता है।"
      },
      {
       "en": "speed",
@@ -13043,7 +13043,7 @@
       "type": "thing",
       "uncount": true,
       "use": "Speed is how fast it moves",
-      "useHi": "चाल बताती है कितनी तेज़"
+      "useHi": "चाल बताती है कि चीज़ कितनी तेज़ चलती है।"
      },
      {
       "en": "gravity",
@@ -13092,7 +13092,7 @@
      },
      {
       "q": "Speed = distance ÷ ___.",
-      "qHi": "",
+      "qHi": "पूरा करो: 'Speed = distance ÷ ___' — चाल = दूरी ÷ क्या?",
       "choices": [
        "time",
        "mass",
@@ -13137,7 +13137,7 @@
       "type": "thing",
       "uncount": true,
       "use": "We breathe oxygen",
-      "useHi": "हम ऑक्सीजन साँस लेते हैं"
+      "useHi": "हम साँस में ऑक्सीजन लेते हैं।"
      },
      {
       "en": "water",
@@ -13994,7 +13994,7 @@
     "quiz": [
      {
       "q": "Which device do you use to type?",
-      "qHi": "टाइप करने के लिए कौन-सा उपकरण?",
+      "qHi": "टाइप करने के लिए कौन-सा उपकरण इस्तेमाल होता है?",
       "choices": [
        "keyboard",
        "mouse",
@@ -14017,7 +14017,7 @@
      },
      {
       "q": "Where are your documents kept?",
-      "qHi": "आपके दस्तावेज़ कहाँ रखे जाते हैं?",
+      "qHi": "तुम्हारे दस्तावेज़ कहाँ रखे जाते हैं?",
       "choices": [
        "in files",
        "on the mouse",
@@ -14034,7 +14034,7 @@
     "quiz": [
      {
       "q": "What do we use to open websites?",
-      "qHi": "वेबसाइट खोलने के लिए क्या प्रयोग करते हैं?",
+      "qHi": "वेबसाइट खोलने के लिए क्या इस्तेमाल करते हैं?",
       "choices": [
        "a browser",
        "a printer",
@@ -14056,7 +14056,7 @@
      },
      {
       "q": "Email is mainly used to ___.",
-      "qHi": "ईमेल किसलिए प्रयोग होती है?",
+      "qHi": "ईमेल का इस्तेमाल मुख्य रूप से किस काम के लिए होता है?",
       "choices": [
        "send messages",
        "cook food",
@@ -14099,7 +14099,7 @@
       "type": "mass",
       "uncount": true,
       "use": "A hard disk gives storage",
-      "useHi": "हार्ड डिस्क भंडारण देती है।"
+      "useHi": "हार्ड डिस्क डेटा रखने की जगह देती है।"
      },
      {
       "en": "save",
@@ -14127,7 +14127,7 @@
      },
      {
       "q": "Which part keeps your files after the computer is switched off?",
-      "qHi": "कंप्यूटर बंद होने के बाद कौन-सा भाग आपकी फ़ाइलें रखता है?",
+      "qHi": "कंप्यूटर बंद होने के बाद कौन-सा भाग तुम्हारी फ़ाइलें रखता है?",
       "emoji": "🗄️",
       "choices": [
        "storage",
@@ -14149,7 +14149,7 @@
       ],
       "answer": "so it is not lost",
       "teach": "Saving stores your work so it is not lost.",
-      "teachHi": "सहेजने से आपका काम सुरक्षित रहता है और खो नहीं जाता।"
+      "teachHi": "सहेजने से तुम्हारा काम सुरक्षित रहता है और खो नहीं जाता।"
      }
     ]
    },
@@ -14186,7 +14186,7 @@
       "type": "thing",
       "plural": "formulas",
       "use": "A formula adds the numbers for you",
-      "useHi": "सूत्र आपके लिए संख्याओं को जोड़ देता है।"
+      "useHi": "सूत्र तुम्हारे लिए संख्याओं को जोड़ देता है।"
      },
      {
       "en": "chart",
@@ -14228,7 +14228,7 @@
      },
      {
       "q": "Which formula adds a whole column of numbers?",
-      "qHi": "कौन-सा सूत्र किसी पूरे स्तंभ की संख्याएँ जोड़ता है?",
+      "qHi": "कौन-सा सूत्र पूरे कॉलम (column) की संख्याएँ जोड़ता है?",
       "emoji": "➕",
       "choices": [
        "SUM",
@@ -14254,7 +14254,7 @@
       "type": "thing",
       "plural": "algorithms",
       "use": "An algorithm is a list of clear steps",
-      "useHi": "कलनविधि साफ़ चरणों की एक सूची है।"
+      "useHi": "एल्गोरिथम (algorithm) साफ़ चरणों की एक सूची है।"
      },
      {
       "en": "program",
@@ -14299,7 +14299,7 @@
       ],
       "answer": "algorithm",
       "teach": "An algorithm is a step-by-step plan.",
-      "teachHi": "कलनविधि एक चरण-दर-चरण योजना है।"
+      "teachHi": "एल्गोरिथम (algorithm) एक चरण-दर-चरण योजना है।"
      },
      {
       "q": "What do we call a step that repeats many times?",
@@ -14342,7 +14342,7 @@
       "type": "mass",
       "uncount": true,
       "use": "Privacy keeps your personal details safe",
-      "useHi": "निजता आपकी निजी जानकारी को सुरक्षित रखती है।"
+      "useHi": "निजता तुम्हारी निजी जानकारी को सुरक्षित रखती है।"
      },
      {
       "en": "scam",
@@ -14352,7 +14352,7 @@
       "type": "thing",
       "plural": "scams",
       "use": "A scam tries to trick you for money",
-      "useHi": "स्कैम पैसों के लिए आपको धोखा देने की कोशिश करता है।"
+      "useHi": "स्कैम पैसों के लिए तुम्हें धोखा देने की कोशिश करता है।"
      },
      {
       "en": "virus",
@@ -14362,7 +14362,7 @@
       "type": "thing",
       "plural": "viruses",
       "use": "A virus can harm your computer",
-      "useHi": "वायरस आपके कंप्यूटर को नुकसान पहुँचा सकता है।"
+      "useHi": "वायरस तुम्हारे कंप्यूटर को नुकसान पहुँचा सकता है।"
      },
      {
       "en": "respect",
@@ -14400,7 +14400,7 @@
       ],
       "answer": "to stay safe",
       "teach": "Keeping details private helps keep you safe.",
-      "teachHi": "जानकारी को निजी रखना आपको सुरक्षित रखता है।"
+      "teachHi": "जानकारी को निजी रखना तुम्हें सुरक्षित रखता है।"
      },
      {
       "q": "How should you treat other people online?",
@@ -14724,7 +14724,7 @@
       "type": "thing",
       "plural": "careers",
       "use": "A career is the work you learn and grow in",
-      "useHi": "करियर वह काम है जिसे सीखकर तुम आगे बढ़ती हो।"
+      "useHi": "करियर वह काम है जिसे सीखकर तुम आगे बढ़त{ी|े} हो।"
      },
      {
       "en": "skill",
@@ -14842,7 +14842,7 @@
       "emoji": "✋",
       "plural": "hands",
       "use": "I wash my hands",
-      "useHi": "मैं अपने हाथ धोती हूँ"
+      "useHi": "मैं अपने हाथ धोत{ी|ा} हूँ"
      },
      {
       "en": "ear",
@@ -14851,7 +14851,7 @@
       "emoji": "👂",
       "plural": "ears",
       "use": "I hear with my ears",
-      "useHi": "मैं अपने कानों से सुनती हूँ"
+      "useHi": "मैं अपने कानों से सुनत{ी|ा} हूँ"
      },
      {
       "en": "nose",
@@ -14876,20 +14876,22 @@
      {
       "who": "👩‍⚕️",
       "line": "How do you feel today?",
-      "lineHi": "आज तुम कैसा महसूस कर रही हो?",
+      "lineHi": "आज तुम कैसा महसूस कर रह{ी|े} हो?",
       "replies": [
        {
         "text": "I feel fine, thank you.",
-        "textHi": "मैं ठीक महसूस करती हूँ, धन्यवाद।",
+        "textHi": "मैं ठीक महसूस करत{ी|ा} हूँ, धन्यवाद।",
         "ok": true
        },
        {
         "text": "I want two bananas.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे दो केले चाहिए।"
        },
        {
         "text": "It is on the table.",
-        "ok": false
+        "ok": false,
+        "textHi": "यह मेज़ पर है।"
        }
       ],
       "then": "That is good to hear."
@@ -14901,16 +14903,18 @@
       "replies": [
        {
         "text": "Okay, I will wash my hands.",
-        "textHi": "ठीक है, मैं अपने हाथ धो लूँगी।",
+        "textHi": "ठीक है, मैं अपने हाथ धो ल{ूँगी|ूँगा}।",
         "ok": true
        },
        {
         "text": "The bus is late.",
-        "ok": false
+        "ok": false,
+        "textHi": "बस देर से है।"
        },
        {
         "text": "I am ten years old.",
-        "ok": false
+        "ok": false,
+        "textHi": "मैं दस साल क{ी|ा} हूँ।"
        }
       ],
       "then": "Good. Clean hands keep you healthy."
@@ -14997,7 +15001,7 @@
       "emoji": "🏥",
       "plural": "clinics",
       "use": "I go to the clinic",
-      "useHi": "मैं क्लिनिक जाती हूँ"
+      "useHi": "मैं क्लिनिक जात{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -15013,11 +15017,13 @@
        },
        {
         "text": "I want to buy rice.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे चावल खरीदना है।"
        },
        {
         "text": "My name is Sita.",
-        "ok": false
+        "ok": false,
+        "textHi": "मेरा नाम सीता है।"
        }
       ],
       "then": "Take this medicine and rest well."
@@ -15034,11 +15040,13 @@
        },
        {
         "text": "I have three pens.",
-        "ok": false
+        "ok": false,
+        "textHi": "मेरे पास तीन कलम हैं।"
        },
        {
         "text": "The shop is open.",
-        "ok": false
+        "ok": false,
+        "textHi": "दुकान खुली है।"
        }
       ],
       "then": "Get well soon!"
@@ -15129,7 +15137,7 @@
       "emoji": "🥴",
       "uncount": true,
       "use": "I feel weak today",
-      "useHi": "मैं आज कमज़ोर महसूस करती हूँ।"
+      "useHi": "मैं आज कमज़ोर महसूस करत{ी|ा} हूँ।"
      }
     ],
     "dialogues": [
@@ -15159,7 +15167,7 @@
      {
       "who": "👩‍⚕️",
       "line": "You look weak. What is the problem?",
-      "lineHi": "तुम कमज़ोर लग रही हो। क्या तकलीफ़ है?",
+      "lineHi": "तुम कमज़ोर लग रह{ी|े} हो। क्या तकलीफ़ है?",
       "then": "Rest at home and eat well. You will feel better soon.",
       "replies": [
        {
@@ -15255,7 +15263,7 @@
      {
       "who": "🧑‍⚕️",
       "line": "What medicine do you need?",
-      "lineHi": "आपको कौन सी दवा चाहिए?",
+      "lineHi": "तुम्हें कौन-सी दवा चाहिए?",
       "then": "Here is the syrup. Take one dose after food.",
       "replies": [
        {
@@ -15293,7 +15301,7 @@
        },
        {
         "text": "I can sing a very long song.",
-        "textHi": "मैं एक बहुत लंबा गाना गा सकती हूँ।",
+        "textHi": "मैं एक बहुत लंबा गाना गा सकत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -15305,7 +15313,7 @@
       "titleHi": "सीता सिरप खरीदती है",
       "emoji": "💊",
       "text": "Sita has a bad cough. She goes to the chemist. He gives her a bottle of syrup and tells her one dose after food.",
-      "textHi": "सीता को तेज़ खाँसी है। वह दवा दुकानदार के पास जाती है। वह उसे सिरप की एक बोतल देता है और खाने के बाद एक खुराक बताता है।",
+      "textHi": "सीता को तेज़ खाँसी है। वह दवा दुकानदार के पास जाती है। वह उसे सिरप की एक बोतल देता है और खाने के बाद एक खुराक लेने को कहता है।",
       "q": "What does the chemist give Sita?",
       "qHi": "दवा दुकानदार सीता को क्या देता है?",
       "choices": [
@@ -15331,7 +15339,7 @@
       "emoji": "🏃‍♀️",
       "uncount": true,
       "use": "I do exercise every day",
-      "useHi": "मैं रोज़ व्यायाम करती हूँ।"
+      "useHi": "मैं रोज़ व्यायाम करत{ी|ा} हूँ।"
      },
      {
       "en": "sleep",
@@ -15374,22 +15382,22 @@
      {
       "who": "👩‍⚕️",
       "line": "How do you stay healthy?",
-      "lineHi": "तुम सेहतमंद कैसे रहती हो?",
+      "lineHi": "तुम सेहतमंद कैसे रहत{ी|े} हो?",
       "then": "Very good! Keep doing that every day.",
       "replies": [
        {
         "text": "I do exercise and eat fruit.",
-        "textHi": "मैं व्यायाम करती हूँ और फल खाती हूँ।",
+        "textHi": "मैं व्यायाम करत{ी|ा} हूँ और फल खात{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I paint the door blue.",
-        "textHi": "मैं दरवाज़ा नीला रंगती हूँ।",
+        "textHi": "मैं दरवाज़ा नीला रंगत{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I count ten stars at night.",
-        "textHi": "मैं रात को दस तारे गिनती हूँ।",
+        "textHi": "मैं रात को दस तारे गिनत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -15402,7 +15410,7 @@
       "replies": [
        {
         "text": "Yes, I will wash my hands.",
-        "textHi": "हाँ, मैं अपने हाथ धोऊँगी।",
+        "textHi": "हाँ, मैं अपने हाथ धोऊँग{ी|ा}।",
         "ok": true
        },
        {
@@ -15498,7 +15506,7 @@
       "replies": [
        {
         "text": "Yes, I will bring my baby.",
-        "textHi": "हाँ, मैं अपने बच्चे को लाऊँगी।",
+        "textHi": "हाँ, मैं अपने बच्चे को लाऊँग{ी|ा}।",
         "ok": true
        },
        {
@@ -15521,7 +15529,7 @@
       "replies": [
        {
         "text": "Yes, I will take good care.",
-        "textHi": "हाँ, मैं अच्छी देखभाल करूँगी।",
+        "textHi": "हाँ, मैं अच्छी देखभाल करूँग{ी|ा}।",
         "ok": true
        },
        {
@@ -15731,17 +15739,17 @@
      {
       "who": "👩‍⚕️",
       "line": "What do you eat every day?",
-      "lineHi": "तुम रोज़ क्या खाती हो?",
+      "lineHi": "तुम रोज़ क्या खात{ी|े} हो?",
       "then": "Good. Dal, rice and vegetables keep you strong.",
       "replies": [
        {
         "text": "I eat dal, rice and vegetables.",
-        "textHi": "मैं दाल, चावल और सब्ज़ी खाती हूँ।",
+        "textHi": "मैं दाल, चावल और सब्ज़ी खात{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I ride a horse to the hill.",
-        "textHi": "मैं घोड़े पर पहाड़ी पर जाती हूँ।",
+        "textHi": "मैं घोड़े पर पहाड़ी तक जात{ी|ा} हूँ।",
         "ok": false
        },
        {
@@ -15754,12 +15762,12 @@
      {
       "who": "👩‍⚕️",
       "line": "You look pale. Eat food with iron.",
-      "lineHi": "तुम पीली लग रही हो। आयरन वाला खाना खाओ।",
+      "lineHi": "तुम्हारा चेहरा पीला लग रहा है। आयरन वाला खाना खाओ।",
       "then": "Yes. Green vegetables and dal give you iron.",
       "replies": [
        {
         "text": "Okay, I will eat green vegetables.",
-        "textHi": "ठीक है, मैं हरी सब्ज़ी खाऊँगी।",
+        "textHi": "ठीक है, मैं हरी सब्ज़ी खाऊँग{ी|ा}।",
         "ok": true
        },
        {
@@ -15854,7 +15862,7 @@
       "replies": [
        {
         "text": "I will bring my little sister and her card.",
-        "textHi": "मैं अपनी छोटी बहन और उसका कार्ड लेकर आऊँगी।",
+        "textHi": "मैं अपनी छोटी बहन और उसका कार्ड लेकर आऊँग{ी|ा}।",
         "ok": true
        },
        {
@@ -15988,7 +15996,7 @@
      {
       "who": "👵",
       "line": "Why do you cover the water pot, beta?",
-      "lineHi": "पानी का घड़ा क्यों ढकती हो, बेटा?",
+      "lineHi": "पानी का घड़ा क्यों ढकत{ी|े} हो, बेटा?",
       "then": "Wah! You have learned a good habit.",
       "replies": [
        {
@@ -15998,7 +16006,7 @@
        },
        {
         "text": "I will sing at the mela tonight.",
-        "textHi": "मैं आज रात मेले में गाऊँगी।",
+        "textHi": "मैं आज रात मेले में गाऊँग{ी|ा}।",
         "ok": false
        },
        {
@@ -16338,11 +16346,13 @@
        },
        {
         "text": "I am a teacher.",
-        "ok": false
+        "ok": false,
+        "textHi": "मैं {शिक्षिका|शिक्षक} हूँ।"
        },
        {
         "text": "It is very hot.",
-        "ok": false
+        "ok": false,
+        "textHi": "बहुत गर्मी है।"
        }
       ],
       "then": "Thank you. Here is your change."
@@ -16359,11 +16369,13 @@
        },
        {
         "text": "I want to sleep.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे सोना है।"
        },
        {
         "text": "The dog is black.",
-        "ok": false
+        "ok": false,
+        "textHi": "कुत्ता काला है।"
        }
       ],
       "then": "Thank you very much."
@@ -16418,7 +16430,7 @@
       "emoji": "🏦",
       "plural": "banks",
       "use": "I go to the bank",
-      "useHi": "मैं बैंक जाती हूँ"
+      "useHi": "मैं बैंक जात{ी|ा} हूँ"
      },
      {
       "en": "save",
@@ -16462,16 +16474,18 @@
       "replies": [
        {
         "text": "I want to open an account.",
-        "textHi": "मैं एक खाता खोलना चाहती हूँ।",
+        "textHi": "मैं एक खाता खोलना चाहत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I have a red bag.",
-        "ok": false
+        "ok": false,
+        "textHi": "मेरे पास एक लाल थैला है।"
        },
        {
         "text": "The tea is hot.",
-        "ok": false
+        "ok": false,
+        "textHi": "चाय गरम है।"
        }
       ],
       "then": "Sure. Please fill this form."
@@ -16479,7 +16493,7 @@
      {
       "who": "🧑‍💼",
       "line": "Do you want to save this money?",
-      "lineHi": "क्या आप यह पैसा बचाना चाहती हैं?",
+      "lineHi": "क्या आप यह पैसा बचाना चाहत{ी|े} हैं?",
       "replies": [
        {
         "text": "Yes, please save it.",
@@ -16488,11 +16502,13 @@
        },
        {
         "text": "I can sing a song.",
-        "ok": false
+        "ok": false,
+        "textHi": "मैं एक गाना गा सकत{ी|ा} हूँ।"
        },
        {
         "text": "It is my birthday.",
-        "ok": false
+        "ok": false,
+        "textHi": "आज मेरा जन्मदिन है।"
        }
       ],
       "then": "Good idea. Your money is safe here."
@@ -16521,9 +16537,9 @@
       "titleHi": "पैसा सुरक्षित है",
       "emoji": "💳",
       "text": "It is not safe to keep all your money at home. A bank keeps your money safe. You can take it out when you need it.",
-      "textHi": "अपना सारा पैसा घर पर रखना सुरक्षित नहीं है। बैंक आपके पैसे को सुरक्षित रखता है। ज़रूरत होने पर आप इसे निकाल सकती हैं।",
+      "textHi": "अपना सारा पैसा घर पर रखना सुरक्षित नहीं है। बैंक तुम्हारा पैसा सुरक्षित रखता है। ज़रूरत हो तो तुम इसे निकाल सकत{ी|े} हो।",
       "q": "Where is your money safe?",
-      "qHi": "आपका पैसा कहाँ सुरक्षित है?",
+      "qHi": "तुम्हारा पैसा कहाँ सुरक्षित है?",
       "choices": [
        "In a bank",
        "On the road",
@@ -16531,7 +16547,7 @@
       ],
       "answer": "In a bank",
       "teach": "The story says a bank keeps your money safe.",
-      "teachHi": "कहानी कहती है बैंक आपके पैसे को सुरक्षित रखता है।"
+      "teachHi": "कहानी कहती है कि बैंक तुम्हारा पैसा सुरक्षित रखता है।"
      }
     ]
    },
@@ -16556,7 +16572,7 @@
       "emoji": "📦",
       "plural": "boxes",
       "use": "I keep coins in a box",
-      "useHi": "मैं सिक्के डिब्बे में रखती हूँ।"
+      "useHi": "मैं सिक्के डिब्बे में रखत{ी|ा} हूँ।"
      },
      {
       "en": "extra",
@@ -16565,7 +16581,7 @@
       "emoji": "➕",
       "uncount": true,
       "use": "I save the extra money",
-      "useHi": "मैं अतिरिक्त पैसा बचाती हूँ।"
+      "useHi": "मैं अतिरिक्त पैसा बचात{ी|ा} हूँ।"
      },
      {
       "en": "future",
@@ -16574,7 +16590,7 @@
       "emoji": "🔮",
       "uncount": true,
       "use": "I save for the future",
-      "useHi": "मैं भविष्य के लिए बचाती हूँ।"
+      "useHi": "मैं भविष्य के लिए बचात{ी|ा} हूँ।"
      },
      {
       "en": "spend",
@@ -16590,12 +16606,12 @@
      {
       "who": "👩",
       "line": "How do you save money each week?",
-      "lineHi": "आप हर हफ़्ते पैसा कैसे बचाती हैं?",
+      "lineHi": "आप हर हफ़्ते पैसा कैसे बचात{ी|े} हैं?",
       "then": "That is a very good habit.",
       "replies": [
        {
         "text": "I keep some extra money in a box.",
-        "textHi": "मैं कुछ अतिरिक्त पैसा डिब्बे में रखती हूँ।",
+        "textHi": "मैं कुछ पैसे बचाकर डिब्बे में रखत{ी|ा} हूँ।",
         "ok": true
        },
        {
@@ -16613,17 +16629,17 @@
      {
       "who": "👩",
       "line": "Why do you save money?",
-      "lineHi": "आप पैसा क्यों बचाती हैं?",
+      "lineHi": "आप पैसा क्यों बचात{ी|े} हैं?",
       "then": "Saving for the future is wise.",
       "replies": [
        {
         "text": "I save for my future.",
-        "textHi": "मैं अपने भविष्य के लिए बचाती हूँ।",
+        "textHi": "मैं अपने भविष्य के लिए बचात{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I can touch the moon.",
-        "textHi": "मैं चाँद छू सकती हूँ।",
+        "textHi": "मैं चाँद छू सकत{ी|ा} हूँ।",
         "ok": false
        },
        {
@@ -16666,7 +16682,7 @@
       "emoji": "🏧",
       "plural": "ATMs",
       "use": "I go to the ATM",
-      "useHi": "मैं एटीएम जाती हूँ।"
+      "useHi": "मैं एटीएम जात{ी|ा} हूँ।"
      },
      {
       "en": "PIN",
@@ -16684,7 +16700,7 @@
       "emoji": "💵",
       "uncount": true,
       "use": "I want to withdraw money",
-      "useHi": "मैं पैसे निकालना चाहती हूँ।"
+      "useHi": "मैं पैसे निकालना चाहत{ी|ा} हूँ।"
      },
      {
       "en": "machine",
@@ -16709,22 +16725,22 @@
      {
       "who": "💂",
       "line": "What do you want to do at the ATM?",
-      "lineHi": "आप एटीएम पर क्या करना चाहती हैं?",
+      "lineHi": "आप एटीएम पर क्या करना चाहत{ी|े} हैं?",
       "then": "Okay. Please enter your PIN yourself.",
       "replies": [
        {
         "text": "I want to withdraw some money.",
-        "textHi": "मैं कुछ पैसे निकालना चाहती हूँ।",
+        "textHi": "मैं कुछ पैसे निकालना चाहत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I want to fly a kite.",
-        "textHi": "मैं पतंग उड़ाना चाहती हूँ।",
+        "textHi": "मैं पतंग उड़ाना चाहत{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I want to plant a tree.",
-        "textHi": "मैं पेड़ लगाना चाहती हूँ।",
+        "textHi": "मैं पेड़ लगाना चाहत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -16737,7 +16753,7 @@
       "replies": [
        {
         "text": "No, I keep my PIN secret.",
-        "textHi": "नहीं, मैं अपना पिन गुप्त रखती हूँ।",
+        "textHi": "नहीं, मैं अपना पिन गुप्त रखत{ी|ा} हूँ।",
         "ok": true
        },
        {
@@ -16785,7 +16801,7 @@
       "emoji": "📱",
       "plural": "phones",
       "use": "I pay with my phone",
-      "useHi": "मैं अपने फ़ोन से भुगतान करती हूँ।"
+      "useHi": "मैं अपने फ़ोन से भुगतान करत{ी|ा} हूँ।"
      },
      {
       "en": "app",
@@ -16812,7 +16828,7 @@
       "emoji": "💸",
       "uncount": true,
       "use": "I send money to my sister",
-      "useHi": "मैं अपनी बहन को पैसे भेजती हूँ।"
+      "useHi": "मैं अपनी बहन को पैसे भेजत{ी|ा} हूँ।"
      },
      {
       "en": "OTP",
@@ -16833,17 +16849,17 @@
       "replies": [
        {
         "text": "I will pay with my phone.",
-        "textHi": "मैं अपने फ़ोन से भुगतान करूँगी।",
+        "textHi": "मैं अपने फ़ोन से भुगतान करूँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will paint the wall.",
-        "textHi": "मैं दीवार रंगूँगी।",
+        "textHi": "मैं दीवार रंगूँग{ी|ा}।",
         "ok": false
        },
        {
         "text": "I will feed the birds.",
-        "textHi": "मैं पक्षियों को खाना दूँगी।",
+        "textHi": "मैं पक्षियों को खाना दूँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -16856,7 +16872,7 @@
       "replies": [
        {
         "text": "No, I will not share my OTP.",
-        "textHi": "नहीं, मैं अपना ओटीपी नहीं बताऊँगी।",
+        "textHi": "नहीं, मैं अपना ओटीपी नहीं बताऊँग{ी|ा}।",
         "ok": true
        },
        {
@@ -16931,7 +16947,7 @@
       "emoji": "📅",
       "uncount": true,
       "use": "The bill is due today",
-      "useHi": "बिल आज देय है।"
+      "useHi": "बिल आज भरना है।"
      },
      {
       "en": "pay",
@@ -16940,7 +16956,7 @@
       "emoji": "💵",
       "uncount": true,
       "use": "I pay the bill on time",
-      "useHi": "मैं समय पर बिल भरती हूँ।"
+      "useHi": "मैं समय पर बिल भरत{ी|ा} हूँ।"
      }
     ],
     "dialogues": [
@@ -16952,12 +16968,12 @@
       "replies": [
        {
         "text": "Okay, I will pay it now.",
-        "textHi": "ठीक है, मैं अभी भुगतान करती हूँ।",
+        "textHi": "ठीक है, मैं अभी भुगतान करत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "Okay, I will climb the tree.",
-        "textHi": "ठीक है, मैं पेड़ पर चढ़ूँगी।",
+        "textHi": "ठीक है, मैं पेड़ पर चढ़ूँग{ी|ा}।",
         "ok": false
        },
        {
@@ -16980,7 +16996,7 @@
        },
        {
         "text": "Yes, I will eat the door.",
-        "textHi": "हाँ, मैं दरवाज़ा खाऊँगी।",
+        "textHi": "हाँ, मैं दरवाज़ा खाऊँग{ी|ा}।",
         "ok": false
        },
        {
@@ -17041,7 +17057,7 @@
       "emoji": "🔄",
       "uncount": true,
       "use": "I repay the loan every month",
-      "useHi": "मैं हर महीने क़र्ज़ चुकाती हूँ।"
+      "useHi": "मैं हर महीने क़र्ज़ चुकात{ी|ा} हूँ।"
      },
      {
       "en": "group",
@@ -17066,22 +17082,22 @@
      {
       "who": "👩",
       "line": "Why do you want a loan?",
-      "lineHi": "आप क़र्ज़ क्यों लेना चाहती हैं?",
+      "lineHi": "आप क़र्ज़ क्यों लेना चाहत{ी|े} हैं?",
       "then": "Good plan. Our group can help you.",
       "replies": [
        {
         "text": "I want to start a small shop.",
-        "textHi": "मैं एक छोटी दुकान शुरू करना चाहती हूँ।",
+        "textHi": "मैं एक छोटी दुकान शुरू करना चाहत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I want to swim in the sky.",
-        "textHi": "मैं आसमान में तैरना चाहती हूँ।",
+        "textHi": "मैं आसमान में तैरना चाहत{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I want to eat a cloud.",
-        "textHi": "मैं बादल खाना चाहती हूँ।",
+        "textHi": "मैं बादल खाना चाहत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -17089,22 +17105,22 @@
      {
       "who": "👩",
       "line": "When will you repay the loan?",
-      "lineHi": "आप क़र्ज़ कब चुकाएँगी?",
+      "lineHi": "आप क़र्ज़ कब चुकाएँग{ी|े}?",
       "then": "Very good. Repay on time to keep trust.",
       "replies": [
        {
         "text": "I will repay a little every month.",
-        "textHi": "मैं हर महीने थोड़ा-थोड़ा चुकाऊँगी।",
+        "textHi": "मैं हर महीने थोड़ा-थोड़ा चुकाऊँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will paint my hair blue.",
-        "textHi": "मैं अपने बाल नीले रंगूँगी।",
+        "textHi": "मैं अपने बाल नीले रंगूँग{ी|ा}।",
         "ok": false
        },
        {
         "text": "I will teach the goat to read.",
-        "textHi": "मैं बकरी को पढ़ना सिखाऊँगी।",
+        "textHi": "मैं बकरी को पढ़ना सिखाऊँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -17208,22 +17224,22 @@
      {
       "who": "👩",
       "line": "Where do you keep your money?",
-      "lineHi": "आप अपना पैसा कहाँ रखती हैं?",
+      "lineHi": "आप अपना पैसा कहाँ रखत{ी|े} हैं?",
       "then": "Wise. The bank is safer than home.",
       "replies": [
        {
         "text": "I keep it safe in the bank.",
-        "textHi": "मैं इसे बैंक में सुरक्षित रखती हूँ।",
+        "textHi": "मैं इसे बैंक में सुरक्षित रखत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I keep it inside a cloud.",
-        "textHi": "मैं इसे बादल के अंदर रखती हूँ।",
+        "textHi": "मैं इसे बादल के अंदर रखत{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I keep it under the river.",
-        "textHi": "मैं इसे नदी के नीचे रखती हूँ।",
+        "textHi": "मैं इसे नदी के नीचे रखत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -17304,22 +17320,22 @@
      {
       "who": "👩",
       "line": "Your income is small. How will you manage the house?",
-      "lineHi": "तुम्हारी आमदनी कम है। घर कैसे चलाओगी?",
+      "lineHi": "तुम्हारी आमदनी कम है। घर कैसे चलाओग{ी|े}?",
       "then": "Smart. A budget makes a little money go far.",
       "replies": [
        {
         "text": "I will make a budget for the month.",
-        "textHi": "मैं महीने का बजट बनाऊँगी।",
+        "textHi": "मैं महीने का बजट बनाऊँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will buy a talking parrot.",
-        "textHi": "मैं एक बोलने वाला तोता खरीदूँगी।",
+        "textHi": "मैं एक बोलने वाला तोता खरीदूँग{ी|ा}।",
         "ok": false
        },
        {
         "text": "I will fill the pot with stars.",
-        "textHi": "मैं घड़े में तारे भरूँगी।",
+        "textHi": "मैं घड़े में तारे भरूँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -17327,22 +17343,22 @@
      {
       "who": "👵",
       "line": "The mela is coming. Will you spend all your money there?",
-      "lineHi": "मेला आने वाला है। क्या तुम सारा पैसा वहीं ख़र्च कर दोगी?",
+      "lineHi": "मेला आने वाला है। क्या तुम सारा पैसा वहीं ख़र्च कर दोग{ी|े}?",
       "then": "Good thinking. Enjoy the mela within your budget.",
       "replies": [
        {
         "text": "No, I will spend a little and save the rest.",
-        "textHi": "नहीं, मैं थोड़ा ख़र्च करूँगी और बाक़ी बचाऊँगी।",
+        "textHi": "नहीं, मैं थोड़ा ख़र्च करूँग{ी|ा} और बाक़ी बचाऊँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "Yes, and I will also buy the moon.",
-        "textHi": "हाँ, और मैं चाँद भी खरीद लूँगी।",
+        "textHi": "हाँ, और मैं चाँद भी खरीद लूँग{ी|ा}।",
         "ok": false
        },
        {
         "text": "I will give all my money to the crow.",
-        "textHi": "मैं अपना सारा पैसा कौए को दे दूँगी।",
+        "textHi": "मैं अपना सारा पैसा कौए को दे दूँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -17398,7 +17414,7 @@
       "emoji": "📥",
       "uncount": true,
       "use": "I deposit money every month",
-      "useHi": "मैं हर महीने पैसा जमा करती हूँ।"
+      "useHi": "मैं हर महीने पैसा जमा करत{ी|ा} हूँ।"
      },
      {
       "en": "clerk",
@@ -17499,7 +17515,7 @@
       "emoji": "💪",
       "uncount": true,
       "use": "I earn money by stitching clothes",
-      "useHi": "मैं कपड़े सिलकर पैसा कमाती हूँ।"
+      "useHi": "मैं कपड़े सिलकर पैसा कमात{ी|ा} हूँ।"
      },
      {
       "en": "profit",
@@ -17526,7 +17542,7 @@
       "emoji": "🧺",
       "uncount": true,
       "use": "I sell papad in the haat",
-      "useHi": "मैं हाट में पापड़ बेचती हूँ।"
+      "useHi": "मैं हाट में पापड़ बेचत{ी|ा} हूँ।"
      },
      {
       "en": "customer",
@@ -17542,7 +17558,7 @@
      {
       "who": "🧑",
       "line": "You sell papad in the haat. How do you make a profit?",
-      "lineHi": "तुम हाट में पापड़ बेचती हो। मुनाफ़ा कैसे मिलता है?",
+      "lineHi": "तुम हाट में पापड़ बेचत{ी|े} हो। मुनाफ़ा कैसे मिलता है?",
       "then": "Very good. Profit is price minus cost.",
       "replies": [
        {
@@ -17557,7 +17573,7 @@
        },
        {
         "text": "I sell them to the wind.",
-        "textHi": "मैं उन्हें हवा को बेच देती हूँ।",
+        "textHi": "मैं उन्हें हवा को बेच देत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -17565,22 +17581,22 @@
      {
       "who": "👩",
       "line": "How do you keep your customers happy?",
-      "lineHi": "तुम अपने ग्राहकों को खुश कैसे रखती हो?",
+      "lineHi": "तुम अपने ग्राहकों को खुश कैसे रखत{ी|े} हो?",
       "then": "Yes! Honest sellers win more customers.",
       "replies": [
        {
         "text": "I speak sweetly and give the right weight.",
-        "textHi": "मैं मीठा बोलती हूँ और सही तौल देती हूँ।",
+        "textHi": "मैं मीठा बोलत{ी|ा} हूँ और सही तौल देत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I hide behind the big drum.",
-        "textHi": "मैं बड़े ढोल के पीछे छिप जाती हूँ।",
+        "textHi": "मैं बड़े ढोल के पीछे छिप जात{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I give them empty boxes.",
-        "textHi": "मैं उन्हें खाली डिब्बे देती हूँ।",
+        "textHi": "मैं उन्हें खाली डिब्बे देत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -17684,17 +17700,17 @@
      {
       "who": "🧑",
       "line": "Your premium is due this month. What will you do?",
-      "lineHi": "इस महीने तुम्हें बीमे की क़िस्त भरनी है। क्या करोगी?",
+      "lineHi": "इस महीने तुम्हें बीमे की क़िस्त भरनी है। क्या करोग{ी|े}?",
       "then": "Good. Pay on time so the insurance does not stop.",
       "replies": [
        {
         "text": "I will pay it on time at the bank.",
-        "textHi": "मैं इसे समय पर बैंक में भर दूँगी।",
+        "textHi": "मैं इसे समय पर बैंक में भर दूँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will pay it with mango leaves.",
-        "textHi": "मैं इसे आम के पत्तों से भरूँगी।",
+        "textHi": "मैं इसे आम के पत्तों से भरूँग{ी|ा}।",
         "ok": false
        },
        {
@@ -17749,7 +17765,7 @@
       "emoji": "🚌",
       "plural": "buses",
       "use": "I go by bus",
-      "useHi": "मैं बस से जाती हूँ"
+      "useHi": "मैं बस से जात{ी|ा} हूँ"
      },
      {
       "en": "train",
@@ -17784,27 +17800,29 @@
       "emoji": "🚉",
       "plural": "stations",
       "use": "I wait at the station",
-      "useHi": "मैं स्टेशन पर इंतज़ार करती हूँ"
+      "useHi": "मैं स्टेशन पर इंतज़ार करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
      {
       "who": "🧑",
       "line": "Where do you want to go?",
-      "lineHi": "आप कहाँ जाना चाहती हैं?",
+      "lineHi": "तुम कहाँ जाना चाहत{ी|े} हो?",
       "replies": [
        {
         "text": "I want to go to the market.",
-        "textHi": "मैं बाज़ार जाना चाहती हूँ।",
+        "textHi": "मैं बाज़ार जाना चाहत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I have a blue pen.",
-        "ok": false
+        "ok": false,
+        "textHi": "मेरे पास एक नीली कलम है।"
        },
        {
         "text": "She is my teacher.",
-        "ok": false
+        "ok": false,
+        "textHi": "वो मेरी टीचर हैं।"
        }
       ],
       "then": "Okay. One ticket for the market."
@@ -17821,11 +17839,13 @@
        },
        {
         "text": "I like to dance.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे नाचना पसंद है।"
        },
        {
         "text": "The door is open.",
-        "ok": false
+        "ok": false,
+        "textHi": "दरवाज़ा खुला है।"
        }
       ],
       "then": "Thank you. Please sit down."
@@ -17922,16 +17942,18 @@
       "replies": [
        {
         "text": "Turn left at the shop.",
-        "textHi": "दुकान पर बाएँ मुड़ो।",
+        "textHi": "दुकान पर बाएँ मुड़िए।",
         "ok": true
        },
        {
         "text": "I am eating rice.",
-        "ok": false
+        "ok": false,
+        "textHi": "मैं चावल खा रह{ी|ा} हूँ।"
        },
        {
         "text": "It is my book.",
-        "ok": false
+        "ok": false,
+        "textHi": "यह मेरी किताब है।"
        }
       ],
       "then": "Thank you for your help!"
@@ -17948,11 +17970,13 @@
        },
        {
         "text": "I have two sisters.",
-        "ok": false
+        "ok": false,
+        "textHi": "मेरी दो बहनें हैं।"
        },
        {
         "text": "The cat is sleeping.",
-        "ok": false
+        "ok": false,
+        "textHi": "बिल्ली सो रही है।"
        }
       ],
       "then": "Oh good, I will walk there."
@@ -17964,7 +17988,7 @@
       "titleHi": "क्लिनिक का रास्ता",
       "emoji": "🗺️",
       "text": "A woman asks Geeta where the clinic is. Geeta says, 'Go straight, then turn right. The clinic is near the big tree.'",
-      "textHi": "एक महिला गीता से पूछती है कि क्लिनिक कहाँ है। गीता कहती है, 'सीधे जाओ, फिर दाएँ मुड़ो। क्लिनिक बड़े पेड़ के पास है।'",
+      "textHi": "एक महिला गीता से पूछती है कि क्लिनिक कहाँ है। गीता कहती है, 'Go straight, then turn right.' यानी सीधे जाओ, फिर दाएँ मुड़ो। क्लिनिक बड़े पेड़ के पास है।",
       "q": "Which way is the clinic?",
       "qHi": "क्लिनिक किस तरफ़ है?",
       "choices": [
@@ -17981,9 +18005,9 @@
       "titleHi": "नक्शे का उपयोग",
       "emoji": "🗺️",
       "text": "A map shows us the way to a new place. It has roads and names on it. When you are lost, a map can help you find your way.",
-      "textHi": "नक्शा हमें किसी नई जगह का रास्ता दिखाता है। इस पर सड़कें और नाम होते हैं। जब आप खो जाएँ, तो नक्शा आपको रास्ता ढूँढने में मदद कर सकता है।",
+      "textHi": "नक्शा हमें किसी नई जगह का रास्ता दिखाता है। इस पर सड़कें और नाम होते हैं। जब तुम खो जाओ, तो नक्शा तुम्हें रास्ता ढूँढने में मदद कर सकता है।",
       "q": "How can a map help you?",
-      "qHi": "नक्शा आपकी कैसे मदद कर सकता है?",
+      "qHi": "नक्शा तुम्हारी कैसे मदद कर सकता है?",
       "choices": [
        "Find your way",
        "Cook food",
@@ -17991,7 +18015,7 @@
       ],
       "answer": "Find your way",
       "teach": "A map helps you find your way when you are lost.",
-      "teachHi": "जब आप खो जाएँ तो नक्शा रास्ता ढूँढने में मदद करता है।"
+      "teachHi": "जब तुम खो जाओ तो नक्शा रास्ता ढूँढने में मदद करता है।"
      }
     ]
    },
@@ -18034,7 +18058,7 @@
       "emoji": "🧍‍♀️",
       "plural": "queues",
       "use": "Please stand in the queue",
-      "useHi": "कृपया कतार में खड़ी रहें।"
+      "useHi": "कृपया कतार में खड़{ी|े} रहो।"
      },
      {
       "en": "board",
@@ -18050,12 +18074,12 @@
      {
       "who": "🧑‍✈️",
       "line": "Which bus are you waiting for?",
-      "lineHi": "आप कौन सी बस का इंतज़ार कर रही हैं?",
+      "lineHi": "तुम कौन सी बस का इंतज़ार कर रह{ी|े} हो?",
       "then": "That bus stops right here. Please wait.",
       "replies": [
        {
         "text": "I am waiting for the Motihari bus.",
-        "textHi": "मैं मोतिहारी की बस का इंतज़ार कर रही हूँ।",
+        "textHi": "मैं मोतिहारी की बस का इंतज़ार कर रह{ी|ा} हूँ।",
         "ok": true
        },
        {
@@ -18073,12 +18097,12 @@
      {
       "who": "🧑‍✈️",
       "line": "Please stand in the queue to board.",
-      "lineHi": "चढ़ने के लिए कतार में खड़ी रहें।",
+      "lineHi": "चढ़ने के लिए कतार में खड़{ी|े} रहो।",
       "then": "Good. Now find an empty seat inside.",
       "replies": [
        {
         "text": "Okay, I will stand in the line.",
-        "textHi": "ठीक है, मैं कतार में खड़ी रहूँगी।",
+        "textHi": "ठीक है, मैं कतार में खड़{ी|ा} रह{ूँगी|ूँगा}।",
         "ok": true
        },
        {
@@ -18169,7 +18193,7 @@
      {
       "who": "🧑‍💼",
       "line": "Which train do you want to take?",
-      "lineHi": "आप कौन सी रेलगाड़ी लेना चाहती हैं?",
+      "lineHi": "तुम कौन सी रेलगाड़ी लेना चाहत{ी|े} हो?",
       "then": "It will come on platform two. Please wait there.",
       "replies": [
        {
@@ -18192,7 +18216,7 @@
      {
       "who": "🧑",
       "line": "Did you hear the announcement?",
-      "lineHi": "क्या आपने घोषणा सुनी?",
+      "lineHi": "क्या तुमने घोषणा सुनी?",
       "then": "Yes, your train is late by ten minutes.",
       "replies": [
        {
@@ -18202,7 +18226,7 @@
        },
        {
         "text": "Yes, I can lift a big elephant.",
-        "textHi": "हाँ, मैं बड़ा हाथी उठा सकती हूँ।",
+        "textHi": "हाँ, मैं बड़ा हाथी उठा सकत{ी|ा} हूँ।",
         "ok": false
        },
        {
@@ -18245,7 +18269,7 @@
       "emoji": "🛺",
       "plural": "autos",
       "use": "I go to work by auto",
-      "useHi": "मैं ऑटो से काम पर जाती हूँ।"
+      "useHi": "मैं ऑटो से काम पर जात{ी|ा} हूँ।"
      },
      {
       "en": "rickshaw",
@@ -18288,7 +18312,7 @@
      {
       "who": "🧑",
       "line": "Which place do you need to reach?",
-      "lineHi": "आपको किस जगह पहुँचना है?",
+      "lineHi": "तुम्हें किस जगह पहुँचना है?",
       "then": "The fare will be thirty rupees. Please sit down.",
       "replies": [
        {
@@ -18321,7 +18345,7 @@
        },
        {
         "text": "I am reading a very big book.",
-        "textHi": "मैं एक बहुत बड़ी किताब पढ़ रही हूँ।",
+        "textHi": "मैं एक बहुत बड़ी किताब पढ़ रह{ी|ा} हूँ।",
         "ok": false
        },
        {
@@ -18407,12 +18431,12 @@
      {
       "who": "👮",
       "line": "How do you cross a busy road?",
-      "lineHi": "व्यस्त सड़क कैसे पार करती हो?",
+      "lineHi": "तुम भीड़ वाली सड़क कैसे पार करत{ी|े} हो?",
       "then": "Very good. Always look both ways first.",
       "replies": [
        {
         "text": "I wait for the green signal.",
-        "textHi": "मैं हरी बत्ती का इंतज़ार करती हूँ।",
+        "textHi": "मैं हरी बत्ती का इंतज़ार करत{ी|ा} हूँ।",
         "ok": true
        },
        {
@@ -18549,22 +18573,22 @@
      {
       "who": "👵",
       "line": "Where do you buy your vegetables?",
-      "lineHi": "आप सब्ज़ियाँ कहाँ से खरीदती हैं?",
+      "lineHi": "तुम सब्ज़ियाँ कहाँ से खरीदत{ी|े} हो?",
       "then": "The market has the freshest vegetables.",
       "replies": [
        {
         "text": "I buy them at the market.",
-        "textHi": "मैं उन्हें बाज़ार से खरीदती हूँ।",
+        "textHi": "मैं उन्हें बाज़ार से खरीदत{ी|ा} हूँ।",
         "ok": true
        },
        {
         "text": "I keep them inside a big drum.",
-        "textHi": "मैं उन्हें एक बड़े ढोल के अंदर रखती हूँ।",
+        "textHi": "मैं उन्हें एक बड़े ढोल के अंदर रखत{ी|ा} हूँ।",
         "ok": false
        },
        {
         "text": "I write them on my left hand.",
-        "textHi": "मैं उन्हें अपने बाएँ हाथ पर लिखती हूँ।",
+        "textHi": "मैं उन्हें अपने बाएँ हाथ पर लिखत{ी|ा} हूँ।",
         "ok": false
        }
       ]
@@ -18673,12 +18697,12 @@
       "replies": [
        {
         "text": "Yes, I wrote her address in my book.",
-        "textHi": "हाँ, मैंने उसका पता अपनी किताब में लिखा है।",
+        "textHi": "हाँ, मैंने उनका पता अपनी किताब में लिखा है।",
         "ok": true
        },
        {
         "text": "Yes, I can jump over the deep well.",
-        "textHi": "हाँ, मैं गहरे कुएँ के ऊपर से कूद सकती हूँ।",
+        "textHi": "हाँ, मैं गहरे कुएँ के ऊपर से कूद सकत{ी|ा} हूँ।",
         "ok": false
        },
        {
@@ -18748,7 +18772,7 @@
       "emoji": "❌",
       "uncount": true,
       "use": "You can cancel the ticket at the counter",
-      "useHi": "तुम काउंटर पर टिकट रद्द कर सकती हो।"
+      "useHi": "तुम काउंटर पर टिकट रद्द कर सकत{ी|े} हो।"
      },
      {
       "en": "passenger",
@@ -18764,7 +18788,7 @@
      {
       "who": "🧑",
       "line": "Do you want to book a seat for tomorrow?",
-      "lineHi": "क्या तुम कल के लिए सीट बुक करना चाहती हो?",
+      "lineHi": "क्या तुम कल के लिए सीट बुक करना चाहत{ी|े} हो?",
       "then": "Done. Your seat is confirmed.",
       "replies": [
        {
@@ -18911,12 +18935,12 @@
       "replies": [
        {
         "text": "Then I will take only light luggage.",
-        "textHi": "तो मैं सिर्फ़ हल्का सामान ले जाऊँगी।",
+        "textHi": "तो मैं सिर्फ़ हल्का सामान ले जाऊँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will carry the whole house.",
-        "textHi": "मैं पूरा घर उठाकर ले जाऊँगी।",
+        "textHi": "मैं पूरा घर उठाकर ले जाऊँग{ी|ा}।",
         "ok": false
        },
        {
@@ -19002,22 +19026,22 @@
      {
       "who": "🧑",
       "line": "How will you find the new hospital in town?",
-      "lineHi": "शहर में नया अस्पताल कैसे ढूँढोगी?",
+      "lineHi": "तुम शहर में नया अस्पताल कैसे ढूँढ{ोगी|ोगे}?",
       "then": "Yes, the map will show you the route.",
       "replies": [
        {
         "text": "I will search for it on the phone map.",
-        "textHi": "मैं फ़ोन के नक्शे पर उसे खोजूँगी।",
+        "textHi": "मैं फ़ोन के नक्शे पर उसे खोजूँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will ask the crow to lead me.",
-        "textHi": "मैं कौए से कहूँगी कि आगे-आगे चले।",
+        "textHi": "मैं कौए से कहूँग{ी|ा} कि आगे-आगे चले।",
         "ok": false
        },
        {
         "text": "I will close my eyes and run.",
-        "textHi": "मैं आँखें बंद करके दौड़ूँगी।",
+        "textHi": "मैं आँखें बंद करके दौड़ूँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -19025,7 +19049,7 @@
      {
       "who": "👩",
       "line": "The map shows two routes. Which one will you take?",
-      "lineHi": "नक्शा दो मार्ग दिखा रहा है। तुम कौन-सा लोगी?",
+      "lineHi": "नक्शा दो रास्ते दिखा रहा है। तुम कौन-सा {लोगी|लोगे}?",
       "then": "Smart choice. You will reach early.",
       "replies": [
        {
@@ -19144,22 +19168,22 @@
      {
       "who": "👩",
       "line": "You are lost in a new town. What will you do first?",
-      "lineHi": "तुम नए शहर में रास्ता भटक गई हो। सबसे पहले क्या करोगी?",
+      "lineHi": "तुम नए शहर में रास्ता भटक ग{ई|ए} हो। सबसे पहले क्या कर{ोगी|ोगे}?",
       "then": "Right. Calm mind, phone call, then ask for help.",
       "replies": [
        {
         "text": "I will stay calm and call my family.",
-        "textHi": "मैं शांत रहूँगी और घरवालों को फ़ोन करूँगी।",
+        "textHi": "मैं शांत रह{ूँगी|ूँगा} और घरवालों को फ़ोन करूँग{ी|ा}।",
         "ok": true
        },
        {
         "text": "I will follow a dancing dog.",
-        "textHi": "मैं नाचते कुत्ते के पीछे चल दूँगी।",
+        "textHi": "मैं नाचते कुत्ते के पीछे चल दूँग{ी|ा}।",
         "ok": false
        },
        {
         "text": "I will build a house right there.",
-        "textHi": "मैं वहीं घर बना लूँगी।",
+        "textHi": "मैं वहीं घर बना लूँग{ी|ा}।",
         "ok": false
        }
       ]
@@ -19209,7 +19233,7 @@
       "emoji": "💻",
       "uncount": true,
       "use": "I write code",
-      "useHi": "मैं कोड लिखती हूँ"
+      "useHi": "मैं कोड लिखत{ी|ा} हूँ"
      },
      {
       "en": "print",
@@ -19246,7 +19270,7 @@
     "code": [
      {
       "prompt": "Print your name on the screen.",
-      "promptHi": "स्क्रीन पर अपना नाम छापें।",
+      "promptHi": "स्क्रीन पर अपना नाम छापो।",
       "lines": [
        "print(\"___\")"
       ],
@@ -19257,11 +19281,11 @@
       ],
       "answer": "Sita",
       "teach": "Put the text you want to show inside the quotes.",
-      "teachHi": "जो दिखाना है उसे quotes के अंदर रखें।"
+      "teachHi": "जो दिखाना है उसे quotes के अंदर रखो।"
      },
      {
       "prompt": "Finish the code to show a message.",
-      "promptHi": "संदेश दिखाने के लिए कोड पूरा करें।",
+      "promptHi": "संदेश दिखाने के लिए कोड पूरा करो।",
       "lines": [
        "___(\"Good morning\")"
       ],
@@ -19272,7 +19296,7 @@
       ],
       "answer": "print",
       "teach": "Use print( ) to show a message on the screen.",
-      "teachHi": "संदेश दिखाने के लिए print( ) का उपयोग करें।"
+      "teachHi": "संदेश दिखाने के लिए print( ) का इस्तेमाल करो।"
      }
     ],
     "quiz": [
@@ -19373,7 +19397,7 @@
     "code": [
      {
       "prompt": "Store the number 5 in x.",
-      "promptHi": "x में संख्या 5 रखें।",
+      "promptHi": "x में संख्या 5 रखो।",
       "lines": [
        "x = ___"
       ],
@@ -19388,7 +19412,7 @@
      },
      {
       "prompt": "Store your name in a variable.",
-      "promptHi": "अपना नाम एक वेरिएबल में रखें।",
+      "promptHi": "अपना नाम एक वेरिएबल में रखो।",
       "lines": [
        "name = \"___\""
       ],
@@ -19399,11 +19423,11 @@
       ],
       "answer": "Meena",
       "teach": "Text values go inside quotes.",
-      "teachHi": "टेक्स्ट को quotes के अंदर रखें।"
+      "teachHi": "टेक्स्ट को quotes के अंदर रखो।"
      },
      {
       "prompt": "Show the value stored in x.",
-      "promptHi": "x में रखा मान दिखाएँ।",
+      "promptHi": "x में रखा मान दिखाओ।",
       "lines": [
        "print(___)"
       ],
@@ -19423,7 +19447,7 @@
       "wrongWord": "store",
       "fix": "stores",
       "teach": "With 'x' (it), add 's' to the verb: stores.",
-      "teachHi": "'x' (it) के साथ verb में 's': stores।"
+      "teachHi": "'x' (it) के साथ verb में 's' लगाओ: stores।"
      }
     ],
     "quiz": [
@@ -19492,7 +19516,7 @@
     "code": [
      {
       "prompt": "Ask the user for their name.",
-      "promptHi": "उपयोगकर्ता से उनका नाम पूछें।",
+      "promptHi": "उपयोगकर्ता से उसका नाम पूछो।",
       "lines": [
        "name = ___(\"What is your name? \")"
       ],
@@ -19507,7 +19531,7 @@
      },
      {
       "prompt": "Show a hello message to the user.",
-      "promptHi": "उपयोगकर्ता को नमस्ते दिखाएँ।",
+      "promptHi": "उपयोगकर्ता को नमस्ते दिखाओ।",
       "lines": [
        "print(\"Hello, \" + ___)"
       ],
@@ -19542,7 +19566,7 @@
       "titleHi": "बातचीत करता प्रोग्राम",
       "emoji": "💬",
       "text": "Ravi writes a program that asks for your name. When you type your name, the program says hello to you. It uses input to listen and print to answer.",
-      "textHi": "रवि एक प्रोग्राम लिखता है जो तुम्हारा नाम पूछता है। जब तुम नाम लिखते हो, प्रोग्राम तुम्हें नमस्ते कहता है। यह सुनने के लिए input और जवाब देने के लिए print इस्तेमाल करता है।",
+      "textHi": "रवि एक प्रोग्राम लिखता है जो तुम्हारा नाम पूछता है। जब तुम नाम लिखत{ी|े} हो, प्रोग्राम तुम्हें नमस्ते कहता है। यह सुनने के लिए input और जवाब देने के लिए print इस्तेमाल करता है।",
       "q": "What does the program ask for?",
       "qHi": "प्रोग्राम क्या पूछता है?",
       "choices": [
@@ -19604,7 +19628,7 @@
     "code": [
      {
       "prompt": "Check if x is bigger than 10.",
-      "promptHi": "जाँचें कि x, 10 से बड़ा है।",
+      "promptHi": "जाँचो कि x 10 से बड़ा है या नहीं।",
       "lines": [
        "___ x > 10:",
        "    print(\"Big\")"
@@ -19620,7 +19644,7 @@
      },
      {
       "prompt": "Run this when the if is not true.",
-      "promptHi": "जब if सही न हो तब यह चलाएँ।",
+      "promptHi": "जब if सही न हो तब यह चलाओ।",
       "lines": [
        "if x > 10:",
        "    print(\"Big\")",
@@ -19643,7 +19667,7 @@
       "wrongWord": "prints",
       "fix": "print",
       "teach": "After 'we', use print with no 's'.",
-      "teachHi": "'we' के बाद print (बिना s)।"
+      "teachHi": "'we' के बाद print लिखो, 's' नहीं।"
      }
     ],
     "quiz": [
@@ -19710,7 +19734,7 @@
     "code": [
      {
       "prompt": "Repeat the message 5 times.",
-      "promptHi": "संदेश को 5 बार दोहराएँ।",
+      "promptHi": "संदेश को 5 बार दोहराओ।",
       "lines": [
        "for i in range(___):",
        "    print(\"Hi\")"
@@ -19726,7 +19750,7 @@
      },
      {
       "prompt": "Start a loop that repeats.",
-      "promptHi": "दोहराने वाला लूप शुरू करें।",
+      "promptHi": "दोहराने वाला लूप शुरू करो।",
       "lines": [
        "___ i in range(3):",
        "    print(i)"
@@ -19747,7 +19771,7 @@
       "wrongWord": "repeat",
       "fix": "repeats",
       "teach": "With 'the loop' (it), add 's': repeats.",
-      "teachHi": "'the loop' (it) के साथ 's': repeats।"
+      "teachHi": "'the loop' (it) के साथ 's' लगाओ: repeats।"
      }
     ],
     "read": [
@@ -19756,7 +19780,7 @@
       "titleHi": "फिर से करना",
       "emoji": "🔁",
       "text": "A loop lets the computer repeat work. Instead of writing the same line ten times, we write it once inside a loop. The computer does it again and again for us.",
-      "textHi": "लूप कंप्यूटर से काम दोहरवाता है। एक ही लाइन दस बार लिखने के बजाय, हम इसे लूप के अंदर एक बार लिखते हैं। कंप्यूटर इसे बार-बार करता है।",
+      "textHi": "लूप की मदद से कंप्यूटर काम दोहराता है। एक ही लाइन दस बार लिखने के बजाय, हम इसे लूप के अंदर एक बार लिखते हैं। कंप्यूटर इसे बार-बार करता है।",
       "q": "Why do we use a loop?",
       "qHi": "हम लूप क्यों इस्तेमाल करते हैं?",
       "choices": [
@@ -19868,11 +19892,13 @@
        },
        {
         "text": "I want two apples.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे दो सेब चाहिए।"
        },
        {
         "text": "It is raining today.",
-        "ok": false
+        "ok": false,
+        "textHi": "आज बारिश हो रही है।"
        }
       ],
       "then": "Sure! Let us write it together."
@@ -19910,7 +19936,7 @@
       "emoji": "💬",
       "plural": "prompts",
       "use": "I write a clear prompt",
-      "useHi": "मैं साफ़ प्रॉम्प्ट लिखती हूँ"
+      "useHi": "मैं साफ़ प्रॉम्प्ट लिखत{ी|ा} हूँ"
      },
      {
       "en": "chatbot",
@@ -19956,7 +19982,7 @@
       "answer": "What you ask the AI",
       "emoji": "💬",
       "teach": "A prompt is the question or task you give the AI.",
-      "teachHi": "प्रॉम्प्ट वह सवाल या काम है जो तुम AI को देते हो।"
+      "teachHi": "प्रॉम्प्ट वह सवाल या काम है जो तुम AI को देत{ी|े} हो।"
      },
      {
       "q": "Which is a better prompt?",
@@ -19976,7 +20002,7 @@
      {
       "who": "🤖",
       "line": "What would you like me to do?",
-      "lineHi": "तुम मुझसे क्या करवाना चाहती हो?",
+      "lineHi": "तुम मुझसे क्या करवाना चाहत{ी|े} हो?",
       "replies": [
        {
         "text": "Please explain this word simply.",
@@ -19985,11 +20011,13 @@
        },
        {
         "text": "I am fine, thank you.",
-        "ok": false
+        "ok": false,
+        "textHi": "मैं ठीक हूँ, धन्यवाद।"
        },
        {
         "text": "Give me two mangoes.",
-        "ok": false
+        "ok": false,
+        "textHi": "मुझे दो आम दे दो।"
        }
       ],
       "then": "Sure, here is a simple explanation."
@@ -20001,9 +20029,9 @@
       "titleHi": "साफ़ पूछो",
       "emoji": "💬",
       "text": "When you talk to an AI, ask in a clear way. Say exactly what you want. A clear prompt like 'Explain water in easy words' gives a better answer than just 'water'.",
-      "textHi": "जब तुम AI से बात करो, साफ़ तरीके से पूछो। ठीक-ठीक बताओ कि क्या चाहिए। 'पानी को आसान शब्दों में समझाओ' जैसा साफ़ प्रॉम्प्ट सिर्फ़ 'पानी' से बेहतर जवाब देता है।",
+      "textHi": "जब तुम AI से बात करो, साफ़ तरीके से पूछो। ठीक-ठीक बताओ कि क्या चाहिए। 'Explain water in easy words' जैसा साफ़ प्रॉम्प्ट सिर्फ़ 'water' लिखने से बेहतर जवाब देता है।",
       "q": "What makes a good prompt?",
-      "qHi": "अच्छा प्रॉम्प्ट क्या बनाता है?",
+      "qHi": "अच्छा प्रॉम्प्ट कैसा होता है?",
       "choices": [
        "Being clear",
        "Being empty",
@@ -20070,7 +20098,7 @@
       "answer": "No, keep it private",
       "emoji": "🔒",
       "teach": "Never share passwords or secrets with an AI or online.",
-      "teachHi": "AI या ऑनलाइन पासवर्ड कभी न बताओ।"
+      "teachHi": "AI को या ऑनलाइन कहीं भी अपना पासवर्ड या राज़ कभी न बताओ।"
      },
      {
       "q": "Can AI make mistakes?",
@@ -20092,7 +20120,7 @@
       "wrongWord": "make",
       "fix": "makes",
       "teach": "With 'AI' (it), add 's': makes.",
-      "teachHi": "'AI' (it) के साथ 's': makes।"
+      "teachHi": "'AI' (it) के साथ 's' लगाओ: makes।"
      }
     ],
     "read": [
@@ -20366,7 +20394,7 @@
      },
      {
       "q": "Which word means 'water'?",
-      "qHi": "किस शब्द का अर्थ 'पानी' है?",
+      "qHi": "किस शब्द का अर्थ 'water' है?",
       "choices": [
        "पानी",
        "पंखा",
@@ -20393,7 +20421,7 @@
       "answer": "नल",
       "emoji": "🚰",
       "teach": "न + ल = नल (tap).",
-      "teachHi": "न + ल = नल (नल)।"
+      "teachHi": "न + ल = नल (tap)।"
      },
      {
       "q": "What does 'घर' mean?",
@@ -20466,7 +20494,7 @@
      },
      {
       "q": "Which word means 'red'?",
-      "qHi": "किस शब्द का अर्थ 'लाल' है?",
+      "qHi": "किस शब्द का अर्थ 'red' है?",
       "choices": [
        "लाल",
        "सफ़ेद",
@@ -20527,7 +20555,7 @@
      },
      {
       "q": "Which means 'ten'?",
-      "qHi": "किसका अर्थ 'दस' है?",
+      "qHi": "किसका अर्थ 'ten' है?",
       "choices": [
        "दस",
        "नौ",
@@ -20574,7 +20602,7 @@
      },
      {
       "q": "Which word means 'sister'?",
-      "qHi": "किस शब्द का अर्थ 'बहन' है?",
+      "qHi": "किस शब्द का अर्थ 'sister' है?",
       "choices": [
        "बहन",
        "भाई",
@@ -20968,7 +20996,7 @@
      },
      {
       "q": "We hear with our...",
-      "qHi": "हम सुनते हैं अपने...",
+      "qHi": "हम किस अंग से सुनते हैं?",
       "choices": [
        "ears / कान",
        "eyes / आँख",
@@ -21196,7 +21224,7 @@
      },
      {
       "q": "Rain comes from...",
-      "qHi": "बारिश आती है...",
+      "qHi": "बारिश कहाँ से आती है?",
       "choices": [
        "clouds / बादल",
        "the sun / सूरज",
@@ -21407,7 +21435,7 @@
     "quiz": [
      {
       "q": "To open a drawer, you...",
-      "qHi": "दराज़ खोलने के लिए आप...",
+      "qHi": "दराज़ खोलने के लिए क्या करते हैं?",
       "choices": [
        "pull it / खींचते हैं",
        "push it / धक्का देते हैं",
@@ -21431,7 +21459,7 @@
      },
      {
       "q": "To ring a bell you give it a...",
-      "qHi": "घंटी बजाने के लिए आप देते हैं...",
+      "qHi": "घंटी बजाने के लिए उसे क्या देते हैं?",
       "choices": [
        "pull / खिंचाव",
        "smell / गंध",
@@ -21507,7 +21535,7 @@
      },
      {
       "q": "We wear warm clothes in...",
-      "qHi": "हम गरम कपड़े पहनते हैं...",
+      "qHi": "हम गरम कपड़े कब पहनते हैं?",
       "choices": [
        "winter / सर्दी",
        "summer / गर्मी",
@@ -21639,7 +21667,7 @@
       "type": "thing",
       "uncount": true,
       "use": "The wind lifts the kite high.",
-      "useHi": "पवन पतंग को ऊँचा उड़ाता है।"
+      "useHi": "हवा पतंग को ऊँचा उड़ाती है।"
      },
      {
       "en": "breathe",
@@ -21658,7 +21686,7 @@
       "type": "thing",
       "plural": "balloons",
       "use": "Air fills the balloon.",
-      "useHi": "गुब्बारे में हवा भरती है।"
+      "useHi": "गुब्बारे में हवा भर जाती है।"
      },
      {
       "en": "fan",
@@ -22098,7 +22126,7 @@
      },
      {
       "q": "Which describes a quantity?",
-      "qHi": "कौन-सा परिमाण बताता है?",
+      "qHi": "कौन-सा शब्द परिमाण (मात्रा) बताता है?",
       "choices": [
        "थोड़ा",
        "काला",
@@ -22999,7 +23027,7 @@
      },
      {
       "q": "The Constitution says all citizens are...",
-      "qHi": "संविधान कहता है कि सभी नागरिक हैं...",
+      "qHi": "संविधान कहता है कि सभी नागरिक कैसे हैं?",
       "choices": [
        "equal",
        "different",
@@ -23010,7 +23038,7 @@
      },
      {
       "q": "Keeping your surroundings clean is a...",
-      "qHi": "अपने आस-पास सफ़ाई रखना एक...",
+      "qHi": "अपने आस-पास सफ़ाई रखना क्या कहलाता है?",
       "choices": [
        "duty",
        "punishment",
@@ -23105,7 +23133,7 @@
      },
      {
       "q": "Blue colour on a map usually shows...",
-      "qHi": "मानचित्र पर नीला रंग आमतौर पर दिखाता है...",
+      "qHi": "मानचित्र पर नीला रंग आमतौर पर क्या दिखाता है?",
       "choices": [
        "water",
        "roads",
@@ -23181,7 +23209,7 @@
      },
      {
       "q": "Day and night happen because the Earth...",
-      "qHi": "दिन और रात होते हैं क्योंकि पृथ्वी...",
+      "qHi": "दिन और रात इसलिए होते हैं क्योंकि पृथ्वी क्या करती है?",
       "choices": [
        "spins on its axis",
        "stops moving",
@@ -23225,7 +23253,7 @@
       "type": "thing",
       "plural": "members",
       "use": "The villagers choose each panchayat member",
-      "useHi": "गाँव के लोग पंचायत का हर सदस्य चुनते हैं।"
+      "useHi": "गाँव के लोग पंचायत के हर सदस्य को चुनते हैं।"
      },
      {
       "en": "meeting",
@@ -23833,7 +23861,7 @@
      },
      {
       "q": "Which one lets you hear sound?",
-      "qHi": "किससे आप ध्वनि सुनते हैं?",
+      "qHi": "तुम आवाज़ किससे सुनत{ी|े} हो?",
       "choices": [
        "speaker",
        "keyboard",
@@ -23968,7 +23996,7 @@
     "quiz": [
      {
       "q": "To open a program, you ___ its icon.",
-      "qHi": "प्रोग्राम खोलने के लिए आप उसके आइकन पर ___ करते हैं।",
+      "qHi": "प्रोग्राम खोलने के लिए तुम उसके आइकन पर ___ करत{ी|े} हो।",
       "choices": [
        "double-click",
        "shout at",
@@ -24055,7 +24083,7 @@
      },
      {
       "q": "To keep your work for later, you must...",
-      "qHi": "अपना काम बाद के लिए रखने हेतु आपको करना होगा...",
+      "qHi": "अपना काम बाद के लिए रखना है, तो तुम्हें क्या करना होगा?",
       "choices": [
        "save it",
        "delete it",
@@ -24127,7 +24155,7 @@
       "answer": "Paint",
       "emoji": "🎨",
       "teach": "Paint lets you draw and colour on the computer.",
-      "teachHi": "पेंट से आप कंप्यूटर पर चित्र बना और रंग सकते हैं।"
+      "teachHi": "पेंट से तुम कंप्यूटर पर चित्र बना और रंग सकत{ी|े} हो।"
      },
      {
       "q": "Which program is used to type a letter?",
@@ -24142,7 +24170,7 @@
      },
      {
       "q": "To make text bigger you change the...",
-      "qHi": "अक्षर बड़े करने के लिए आप बदलते हैं...",
+      "qHi": "अक्षर बड़े करने के लिए तुम क्या बदलत{ी|े} हो?",
       "choices": [
        "font size",
        "mouse",
@@ -24192,7 +24220,7 @@
     "quiz": [
      {
       "q": "You should keep your password...",
-      "qHi": "अपना पासवर्ड आपको रखना चाहिए...",
+      "qHi": "तुम्हें अपना पासवर्ड रखना चाहिए...",
       "choices": [
        "secret",
        "on the wall",
@@ -24201,11 +24229,11 @@
       "answer": "secret",
       "emoji": "🔑",
       "teach": "Never share your password — keep it secret.",
-      "teachHi": "अपना पासवर्ड कभी साझा न करें — इसे गुप्त रखें।"
+      "teachHi": "अपना पासवर्ड कभी किसी को मत बताओ — इसे गुप्त रखो।"
      },
      {
       "q": "If a stranger online asks where you live, you...",
-      "qHi": "अगर कोई ऑनलाइन अजनबी पूछे कि आप कहाँ रहती हैं, तो आप...",
+      "qHi": "अगर कोई ऑनलाइन अजनबी पूछे कि तुम कहाँ रहत{ी|े} हो, तो तुम...",
       "choices": [
        "do not tell and inform an elder",
        "send your address",
@@ -24259,7 +24287,7 @@
       "emoji": "🔍",
       "type": "action",
       "use": "I search for my answer online.",
-      "useHi": "मैं अपना जवाब ऑनलाइन खोजती हूँ।"
+      "useHi": "मैं अपना जवाब ऑनलाइन खोजत{ी|ा} हूँ।"
      },
      {
       "en": "link",
@@ -24297,7 +24325,7 @@
      },
      {
       "q": "To find information online, you use a...",
-      "qHi": "ऑनलाइन जानकारी ढूँढने के लिए तुम क्या इस्तेमाल करती हो?",
+      "qHi": "ऑनलाइन जानकारी ढूँढने के लिए तुम क्या इस्तेमाल करत{ी|े} हो?",
       "choices": [
        "search engine",
        "spoon",
@@ -24310,7 +24338,7 @@
      },
      {
       "q": "You can use the internet to...",
-      "qHi": "इंटरनेट से तुम क्या कर सकती हो?",
+      "qHi": "इंटरनेट से तुम क्या कर सकत{ी|े} हो?",
       "choices": [
        "learn new things",
        "cook rice",
@@ -24345,7 +24373,7 @@
       "emoji": "📤",
       "type": "action",
       "use": "I send an email to my teacher.",
-      "useHi": "मैं अपनी शिक्षिका को ईमेल भेजती हूँ।"
+      "useHi": "मैं अपनी शिक्षिका को ईमेल भेजत{ी|ा} हूँ।"
      },
      {
       "en": "inbox",
@@ -24374,7 +24402,7 @@
       "emoji": "📎",
       "type": "action",
       "use": "I attach a photo to the email.",
-      "useHi": "मैं ईमेल के साथ फ़ोटो जोड़ती हूँ।"
+      "useHi": "मैं ईमेल के साथ फ़ोटो जोड़त{ी|ा} हूँ।"
      }
     ],
     "quiz": [
@@ -24472,7 +24500,7 @@
       "type": "thing",
       "plural": "cameras",
       "use": "I take a photo with the camera.",
-      "useHi": "मैं कैमरे से फ़ोटो खींचती हूँ।"
+      "useHi": "मैं कैमरे से फ़ोटो खींचत{ी|ा} हूँ।"
      }
     ],
     "quiz": [
@@ -24491,7 +24519,7 @@
      },
      {
       "q": "When your talk time ends, you get a...",
-      "qHi": "बात करने का बैलेंस ख़त्म होने पर तुम क्या करवाती हो?",
+      "qHi": "बात करने का बैलेंस ख़त्म होने पर तुम क्या करवात{ी|े} हो?",
       "choices": [
        "recharge",
        "haircut",
@@ -24513,7 +24541,7 @@
       "answer": "talk face to face from far away",
       "emoji": "📲",
       "teach": "With a video call you can see and talk to family far away.",
-      "teachHi": "वीडियो कॉल से तुम दूर बैठे घरवालों को देखकर बात कर सकती हो।"
+      "teachHi": "वीडियो कॉल से तुम दूर बैठे घरवालों को देखकर बात कर सकत{ी|े} हो।"
      }
     ]
    },
@@ -24566,7 +24594,7 @@
       "emoji": "🔎",
       "type": "action",
       "use": "I check the news before sharing it.",
-      "useHi": "मैं ख़बर साझा करने से पहले जाँचती हूँ।"
+      "useHi": "मैं ख़बर साझा करने से पहले जाँचत{ी|ा} हूँ।"
      }
     ],
     "quiz": [
@@ -25236,7 +25264,7 @@
      },
      {
       "q": "'Swadeshi' means using goods made in...",
-      "qHi": "'स्वदेशी' का अर्थ है वस्तुएँ बनी हुई...",
+      "qHi": "'स्वदेशी' (Swadeshi) का मतलब है — कहाँ बनी चीज़ें इस्तेमाल करना?",
       "choices": [
        "our own country",
        "England",
@@ -25262,7 +25290,7 @@
       ],
       "answer": "it broke an unjust law peacefully / अन्यायी कानून को शांति से तोड़ा",
       "teach": "Ordinary people breaking an unjust law peacefully shook British rule.",
-      "teachHi": "आम लोगों द्वारा अन्यायी कानून को शांति से तोड़ना अंग्रेज़ी शासन को हिला गया।"
+      "teachHi": "आम लोगों ने शांति से अन्यायी कानून तोड़ा और अंग्रेज़ी शासन हिल गया।"
      }
     ]
    },
@@ -25646,7 +25674,7 @@
      },
      {
       "q": "India being 'secular' means the state...",
-      "qHi": "भारत का 'पंथनिरपेक्ष' होना अर्थात राज्य...",
+      "qHi": "भारत 'पंथनिरपेक्ष' (secular) है — इसका मतलब है कि सरकार...",
       "choices": [
        "treats all religions equally",
        "has one religion",
@@ -25657,7 +25685,7 @@
      },
      {
       "q": "The Constitution of India came into force in...",
-      "qHi": "भारत का संविधान लागू हुआ...",
+      "qHi": "भारत का संविधान किस साल लागू हुआ?",
       "choices": [
        "1950",
        "1947",
@@ -25722,7 +25750,7 @@
      },
      {
       "q": "Extra money paid for using a loan is called...",
-      "qHi": "ऋण के उपयोग के बदले चुकाया गया अतिरिक्त धन कहलाता है...",
+      "qHi": "कर्ज़ लेने पर जो अतिरिक्त पैसा चुकाना पड़ता है, उसे क्या कहते हैं?",
       "choices": [
        "interest",
        "savings",

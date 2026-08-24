@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-08-20 10:00:00.000000",
+ "description": "One phone-verification challenge sent to a GUARDIAN's number. Holds no phone number and no code in recoverable form: the number is an HMAC (key lives in site_config.json, never in the database) plus its last 4 digits for support, and the code is a pbkdf2 hash. A database dump therefore yields neither a list of guardians' numbers nor a usable code.",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "purpose",
+  "mobile_hash",
+  "mobile_last4",
+  "student",
+  "sec_code",
+  "code_hash",
+  "expires_on",
+  "attempts",
+  "consumed_on",
+  "sec_ticket",
+  "ticket_hash",
+  "ticket_expires_on",
+  "ticket_used_on",
+  "sec_delivery",
+  "channel",
+  "sent_ok",
+  "send_error"
+ ],
+ "fields": [
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Purpose",
+   "options": "Consent\nRecovery",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "description": "HMAC-SHA256 of the E.164 number, keyed on the site encryption key. NOT the number.",
+   "fieldname": "mobile_hash",
+   "fieldtype": "Data",
+   "label": "Guardian number (hashed)",
+   "length": 64,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "description": "Last 4 digits only — lets a facilitator confirm \"the number ending 3210?\" without the app holding the number.",
+   "fieldname": "mobile_last4",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ends in",
+   "length": 4,
+   "read_only": 1
+  },
+  {
+   "description": "Set for a Recovery challenge (we know whose PIN is being reset). Empty for Consent — no profile exists yet.",
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Student",
+   "options": "Student",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_code",
+   "fieldtype": "Section Break",
+   "label": "The code"
+  },
+  {
+   "description": "pbkdf2:sha256 of the 6 digits. The code itself is never stored, logged, or recoverable.",
+   "fieldname": "code_hash",
+   "fieldtype": "Data",
+   "label": "Code (hashed)",
+   "length": 200,
+   "read_only": 1
+  },
+  {
+   "fieldname": "expires_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Code expires on",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "description": "Wrong guesses so far. The challenge voids at the ceiling.",
+   "fieldname": "attempts",
+   "fieldtype": "Int",
+   "label": "Wrong attempts",
+   "read_only": 1
+  },
+  {
+   "description": "When the right code was entered. Set once — a used challenge can never be verified again.",
+   "fieldname": "consumed_on",
+   "fieldtype": "Datetime",
+   "label": "Verified on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_ticket",
+   "fieldtype": "Section Break",
+   "label": "One-time ticket"
+  },
+  {
+   "description": "Hash of the single-use ticket handed back after a correct code. The ticket authorises exactly ONE follow-up call (signup, or a PIN reset) for this purpose and this number.",
+   "fieldname": "ticket_hash",
+   "fieldtype": "Data",
+   "label": "Ticket (hashed)",
+   "length": 64,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ticket_expires_on",
+   "fieldtype": "Datetime",
+   "label": "Ticket expires on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ticket_used_on",
+   "fieldtype": "Datetime",
+   "label": "Ticket used on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_delivery",
+   "fieldtype": "Section Break",
+   "label": "Delivery"
+  },
+  {
+   "fieldname": "channel",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Channel",
+   "options": "\nWhatsApp\nSMS\nConsole",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sent_ok",
+   "fieldtype": "Check",
+   "label": "Handed to the gateway",
+   "read_only": 1
+  },
+  {
+   "description": "Transport failure, for ops. Never contains the code.",
+   "fieldname": "send_error",
+   "fieldtype": "Small Text",
+   "label": "Send error",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "in_create": 1,
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-20 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Hikmat",
+ "name": "Hikmat OTP",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "purpose",
+ "track_changes": 0
+}

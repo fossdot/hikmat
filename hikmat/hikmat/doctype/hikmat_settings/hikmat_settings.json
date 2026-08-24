@@ -25,7 +25,19 @@
   "stt_endpoint",
   "tts_endpoint",
   "tts_voice",
-  "attendance_min_minutes"
+  "attendance_min_minutes",
+  "sec_otp",
+  "otp_enabled",
+  "otp_channel",
+  "otp_ttl_minutes",
+  "sec_otp_wa",
+  "wa_phone_number_id",
+  "wa_token",
+  "wa_template",
+  "wa_lang",
+  "wa_send_button",
+  "wa_button_subtype",
+  "wa_api_version"
  ],
  "fields": [
   {
@@ -89,12 +101,12 @@
   {
    "fieldname": "ai_system_prompt",
    "fieldtype": "Long Text",
-   "label": "Roshni system prompt (Hindi) \u2014 blank uses the built-in default"
+   "label": "Roshni system prompt (Hindi) — blank uses the built-in default"
   },
   {
    "fieldname": "ai_crisis_reply",
    "fieldtype": "Small Text",
-   "label": "Crisis safe reply (Hindi) \u2014 blank uses the built-in default"
+   "label": "Crisis safe reply (Hindi) — blank uses the built-in default"
   },
   {
    "default": "light",
@@ -144,6 +156,82 @@
    "fieldname": "attendance_min_minutes",
    "fieldtype": "Int",
    "label": "Attendance minimum (minutes/day)"
+  },
+  {
+   "fieldname": "sec_otp",
+   "fieldtype": "Section Break",
+   "label": "Guardian phone verification (OTP)"
+  },
+  {
+   "fieldname": "otp_enabled",
+   "fieldtype": "Check",
+   "label": "Enable guardian phone verification",
+   "description": "Off by default. While off, the game falls back to the plain consent tickbox and no message is ever sent, so a site with no WhatsApp credentials behaves exactly as before."
+  },
+  {
+   "fieldname": "otp_channel",
+   "fieldtype": "Select",
+   "label": "Channel",
+   "options": "WhatsApp\nConsole (testing only)",
+   "default": "WhatsApp",
+   "description": "WhatsApp Cloud API, called directly (no BSP, no platform fee). Console never sends anything and only reveals the code when the site is in developer_mode — local testing only, never production."
+  },
+  {
+   "fieldname": "otp_ttl_minutes",
+   "fieldtype": "Int",
+   "label": "Code valid for (minutes)",
+   "default": "10",
+   "description": "10 is deliberate, not 5: rural SMS can take a minute or two to land and the guardian may be in another room."
+  },
+  {
+   "fieldname": "sec_otp_wa",
+   "fieldtype": "Section Break",
+   "label": "WhatsApp Cloud API"
+  },
+  {
+   "fieldname": "wa_phone_number_id",
+   "fieldtype": "Data",
+   "label": "Phone number ID",
+   "description": "From Meta > WhatsApp > API Setup. Not the phone number — the numeric ID beside it."
+  },
+  {
+   "fieldname": "wa_token",
+   "fieldtype": "Password",
+   "label": "Access token",
+   "description": "A System User permanent token. Stored encrypted (Frappe __Auth), never returned to the game."
+  },
+  {
+   "fieldname": "wa_template",
+   "fieldtype": "Data",
+   "label": "Authentication template name",
+   "default": "hikmat_otp"
+  },
+  {
+   "fieldname": "wa_lang",
+   "fieldtype": "Data",
+   "label": "Template language code",
+   "default": "en",
+   "description": "Must match the approved template exactly (e.g. en, en_US, hi)."
+  },
+  {
+   "fieldname": "wa_send_button",
+   "fieldtype": "Check",
+   "label": "Template has an OTP button",
+   "default": "1",
+   "description": "Meta requires authentication templates to carry a copy-code or one-tap button, and the code must then be repeated in a button component. Uncheck only if your approved template has no button, otherwise Meta rejects the send."
+  },
+  {
+   "fieldname": "wa_button_subtype",
+   "fieldtype": "Data",
+   "label": "Button sub_type",
+   "default": "url",
+   "description": "Copy-code buttons send as sub_type \"url\". Exposed as a setting so a template mismatch is a Desk edit, not a deploy."
+  },
+  {
+   "fieldname": "wa_api_version",
+   "fieldtype": "Data",
+   "label": "Graph API version",
+   "default": "v21.0"
   }
  ],
  "grid_page_length": 50,
