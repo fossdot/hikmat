@@ -235,6 +235,16 @@
     box-shadow:0 -10px 40px rgba(20,14,33,.3); animation:sheetUp .26s cubic-bezier(.2,.9,.3,1); }
   @keyframes sheetUp { from{ transform:translateY(100%); } to{ transform:translateY(0); } }
   @media (prefers-reduced-motion:reduce){ .sheetwrap,.sheet{ animation:none; } }
+  /* ---- Sheet close (×) ---- */
+  .settingsheet .doubthead { position:sticky; top:-4px; z-index:3; background:var(--card);
+                             padding-top:8px; padding-bottom:8px; }
+  .sheetx { margin-left:auto; align-self:flex-start; flex:0 0 auto;
+            width:44px; height:44px; border-radius:50%;      /* 44px: WCAG 2.5.5, and a child aims badly */
+            border:2px solid var(--line); background:var(--card); color:var(--muted);
+            font-size:22px; line-height:1; font-weight:800; cursor:pointer;
+            display:inline-flex; align-items:center; justify-content:center; }
+  .sheetx:active { transform:translateY(2px); }
+  .sheetx:hover, .sheetx:focus-visible { border-color:var(--primary); color:var(--ink); }
   /* ---- ☰ Menu sheet ---- */
   .menurows { display:flex; flex-direction:column; gap:8px; margin:4px 0 14px; }
   .menurow { display:flex; align-items:center; gap:12px; width:100%; text-align:left;
@@ -2498,13 +2508,14 @@ function openMenu(){
   const m = mascotById(currentMascot());
   const title = tx("Menu","मेन्यू");
   const sheet = el(`<div class="sheetwrap" id="menuWrap">
-    <div class="sheet menusheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
+    <div class="sheet menusheet settingsheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
       <div class="doubthead">
         <div class="mascot small">${mascotSVG()}</div>
         <div class="doubttitle">
           <div class="doubtq">${esc(title)}</div>
           <div class="doubtsub">${esc(tx("Your friend, your settings, and your group.","तुम्हारी सहेली, तुम्हारी सेटिंग और तुम्हारा समूह।"))}</div>
         </div>
+        <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
       <div class="menurows">
         <button class="menurow" id="mFriend">
@@ -2552,7 +2563,9 @@ function openMenu(){
   document.body.appendChild(sheet);
   const close = () => sheet.remove();
   // #dClose, not a new id: hkBack() looks for that selector to close a sheet on a back press.
-  sheet.querySelector("#dClose").onclick = () => { sfx.back(); close(); };
+  const closeMenu = () => { sfx.back(); close(); };
+  sheet.querySelector("#dClose").onclick = closeMenu;
+  sheet.querySelector("[data-x]").onclick = closeMenu;
   sheet.querySelector("#mFriend").onclick = () => { close(); openMascotPicker(); };
   sheet.querySelector("#mGender").onclick = () => { close(); openGenderPicker(); };
   sheet.querySelector("#mSound").onclick = () => { close(); document.getElementById("hearBtn").click(); };
@@ -2579,13 +2592,14 @@ function openMascotPicker(){
   const cur = currentMascot();
   const title = tx("Choose your friend","अपनी सहेली चुनो");
   const sheet = el(`<div class="sheetwrap" id="friendWrap">
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
+    <div class="sheet settingsheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
       <div class="doubthead">
         <div class="mascot small m-happy" id="friendBig">${mascotSVG(cur)}</div>
         <div class="doubttitle">
           <div class="doubtq">${esc(title)}</div>
           <div class="doubtsub" id="friendSub">${esc(tx("She will ask you the questions and cheer for you.","वही तुमसे सवाल पूछेगी और तुम्हारा हौसला बढ़ाएगी।"))}</div>
         </div>
+        <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
       ${guest ? `<div class="teachbox">💛 <span>${esc(tx("Pick anyone you like. Make a profile and your friend follows you to any phone or laptop.","जो पसंद हो उसे चुनो। प्रोफ़ाइल बनाओ तो तुम्हारी सहेली हर फ़ोन और लैपटॉप पर तुम्हारे साथ रहेगी।"))}</span></div>` : ""}
       <div class="friendgrid" id="friendGrid"></div>
@@ -2612,7 +2626,9 @@ function openMascotPicker(){
     };
     grid.appendChild(b);
   });
-  sheet.querySelector("#dClose").onclick = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
+  const doneFriend = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
+  sheet.querySelector("#dClose").onclick = doneFriend;
+  sheet.querySelector("[data-x]").onclick = doneFriend;
   srSay(tx("Choose your friend","अपनी सहेली चुनो"));   // silent; see the note in openMenu
 }
 // One writer for the choice, so the local state and the server never disagree about who her
@@ -2654,10 +2670,11 @@ function openGenderPicker(){
   const body  = tx("Hindi words change for a girl and for a boy. Tap what fits you.",
                    "हिंदी के शब्द लड़की और लड़के के लिए बदल जाते हैं। जो तुम पर लागू हो, वह चुनो।");
   const sheet = el(`<div class="sheetwrap" id="genWrap">
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
+    <div class="sheet settingsheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
       <div class="doubthead">
         <div class="mascot small">${mascotSVG()}</div>
         <div class="doubttitle"><div class="doubtq">${esc(title)}</div><div class="doubtsub">${esc(body)}</div></div>
+        <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
       <div class="bandpick" id="genPick"></div>
       <div class="teachbox" id="genEx">💡 <span></span></div>
@@ -2680,7 +2697,9 @@ function openGenderPicker(){
     pick.appendChild(b);
   });
   ex.textContent = sample();
-  sheet.querySelector("#dClose").onclick = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
+  const doneGender = () => { sfx.back(); sheet.remove(); rerender(); refreshTop(); };
+  sheet.querySelector("#dClose").onclick = doneGender;
+  sheet.querySelector("[data-x]").onclick = doneGender;
   srSay(title + " " + body);   // silent; the spoken sample below is the useful part
 }
 
