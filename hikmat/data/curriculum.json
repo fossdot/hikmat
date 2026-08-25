@@ -61,9 +61,9 @@
       "then": "Good. The potatoes are fresh today.",
       "replies": [
        {
-        "text": "I want some potatoes.",
+        "text": "I want two kilos of potatoes.",
         "ok": true,
-        "textHi": "मुझे कुछ आलू चाहिए।"
+        "textHi": "मुझे दो किलो आलू चाहिए।"
        },
        {
         "text": "I want to sleep.",
@@ -84,9 +84,9 @@
       "then": "Sure, here are some fresh onions.",
       "replies": [
        {
-        "text": "Yes, I need onions.",
+        "text": "Yes, I need one kilo of onions.",
         "ok": true,
-        "textHi": "हाँ, मुझे प्याज़ चाहिए।"
+        "textHi": "हाँ, मुझे एक किलो प्याज़ चाहिए।"
        },
        {
         "text": "Yes, I need a phone.",
@@ -179,9 +179,9 @@
       "then": "Great choice! Mangoes are the best now.",
       "replies": [
        {
-        "text": "I like mangoes. Please give me some.",
+        "text": "I like mangoes. Please give me one kilo.",
         "ok": true,
-        "textHi": "मुझे आम पसंद हैं। थोड़े दे दीजिए।"
+        "textHi": "मुझे आम पसंद हैं। एक किलो दे दीजिए।"
        },
        {
         "text": "I like to drive a bus.",
@@ -202,9 +202,9 @@
       "then": "Okay, the bananas are ripe and yellow.",
       "replies": [
        {
-        "text": "I want bananas, please.",
+        "text": "I want a dozen bananas, please.",
         "ok": true,
-        "textHi": "कृपया मुझे केले दे दीजिए।"
+        "textHi": "कृपया मुझे एक दर्जन केले दे दीजिए।"
        },
        {
         "text": "I want a chair, please.",
@@ -297,9 +297,9 @@
       "then": "Okay, our rice is very clean and fresh.",
       "replies": [
        {
-        "text": "I need some rice, please.",
+        "text": "I need two kilos of rice, please.",
         "ok": true,
-        "textHi": "कृपया मुझे कुछ चावल दे दीजिए।"
+        "textHi": "कृपया मुझे दो किलो चावल दे दीजिए।"
        },
        {
         "text": "I need a new sari, please.",
@@ -320,9 +320,9 @@
       "then": "Done. The salt is good quality.",
       "replies": [
        {
-        "text": "Yes, please add some salt.",
+        "text": "Yes, please add one packet of salt.",
         "ok": true,
-        "textHi": "हाँ, थोड़ा नमक डाल दीजिए।"
+        "textHi": "हाँ, नमक का एक पैकेट डाल दीजिए।"
        },
        {
         "text": "Yes, please add a goat.",
@@ -431,8 +431,8 @@
         "textHi": "कृपया मुझे एक गाना दे दीजिए।"
        }
       ],
-      "line": "How many potatoes do you want?",
-      "lineHi": "आप कितने आलू चाहत{ी|े} हैं?"
+      "line": "How many kilos of potatoes do you want?",
+      "lineHi": "आप कितने किलो आलू चाहत{ी|े} हैं?"
      },
      {
       "who": "🧑‍🦱",

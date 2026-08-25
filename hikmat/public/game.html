@@ -27,6 +27,7 @@
   :root {
     --bg: #fbf9f1;            /* Radiant cream surface */
     --bg2: #fdf1e0;           /* warm glow tint */
+    --bg3: #ffe9f0;           /* the second page-wash, bottom-right — MUST be themed (see body) */
     --card: #ffffff;
     --ink: #2d3436;           /* soft charcoal — AA ~10:1 on cream */
     --muted: #574237;         /* on-surface-variant — AA ~7:1 on cream */
@@ -70,7 +71,7 @@
   }
   /* ===== Dark theme (toggled via <html data-theme="dark">) ===== */
   [data-theme="dark"]{
-    --bg:#15121f; --bg2:#1f1b2e; --card:#221d33; --ink:#f1ecfb; --muted:#b9b2cc; --line:#39314f;
+    --bg:#15121f; --bg2:#1f1b2e; --bg3:#2b1f33; --card:#221d33; --ink:#f1ecfb; --muted:#b9b2cc; --line:#39314f;
     --good-d:#4ade80; --bad-d:#fb7185;
     --shadow-sm:0 2px 8px rgba(0,0,0,.40); --shadow:0 8px 22px rgba(0,0,0,.50);
     --shadow-teal:0 8px 22px rgba(0,0,0,.50); --shadow-primary:0 10px 24px rgba(244,123,32,.30);
@@ -82,6 +83,22 @@
   [data-theme="dark"] .echip,[data-theme="dark"] .email,[data-theme="dark"] .pill,
   [data-theme="dark"] .toggle,[data-theme="dark"] .speakbtn,[data-theme="dark"] .speakchip{
     background:#2a2240; color:var(--ink); border-color:var(--line); box-shadow:var(--shadow-sm); }
+  /* Reported on device 2026-08-25: in dark mode the shopkeeper's line on Talk & Reply was
+     invisible — a pale #e6f5f6 bubble inheriting the near-white dark --ink. Same treatment as
+     .bubble2 gets above; #2a2240 is the dark surface every other raised element already uses. */
+  [data-theme="dark"] .bubble.them{ background:#2a2240; color:var(--ink); }
+  /* Everything below is the SAME bug as the bubble, found by measuring real contrast ratios on
+     15 rendered screens in dark mode rather than by eye: an ink chosen against the cream light
+     surface (deep teal #006972, brown #994700, grey #6f6886/#666) left on a dark surface, or a
+     light chip background left unthemed. Each was under WCAG AA on its own panel. */
+  [data-theme="dark"] .pill.star{ color:#ffd28a; border-color:#5c4826; }
+  [data-theme="dark"] .pill.coin{ color:#ffbe93; border-color:#5c3b26; }
+  [data-theme="dark"] .display .say .pron{ color:var(--teal-light); }
+  [data-theme="dark"] .email .elabel{ color:var(--teal-light); }
+  [data-theme="dark"] .eplace,
+  [data-theme="dark"] .oglabel,
+  [data-theme="dark"] .email .esig{ color:var(--muted); }
+  [data-theme="dark"] .av.sel{ background:#123c40; border-color:var(--teal-light); }
   [data-theme="dark"] .opt.correct{ background:#15341f; }
   [data-theme="dark"] .opt.wrong{ background:#3a1622; }
   [data-theme="dark"] .searchbox::placeholder{ color:var(--muted); }
@@ -93,7 +110,7 @@
     font-family: "Nunito", "Mukta", -apple-system, "Segoe UI", system-ui, sans-serif;
     background:
       radial-gradient(900px 500px at 15% -5%, var(--bg2), transparent),
-      radial-gradient(700px 500px at 100% 110%, #ffe9f0, transparent),
+      radial-gradient(700px 500px at 100% 110%, var(--bg3), transparent),
       var(--bg);
     color: var(--ink);
     /* Top-align, never centre — do not "restore" this to `safe center`.
@@ -270,6 +287,8 @@
   .pill.coin.gempop { animation: gempop .34s cubic-bezier(.3,1.6,.5,1); }
   @keyframes gempop { 0%{transform:scale(1)} 45%{transform:scale(1.22)} 100%{transform:scale(1)} }
   @media (prefers-reduced-motion:reduce){ .gemfly, .gemfly .gemflyi { transition:none; } }
+  .menuguest { cursor:default; box-shadow:none; background:transparent; border-style:dashed; }
+  .menuguest:active { transform:none; }
   .menulegal { text-align:center; font-size:13px; margin:0 0 14px; color:var(--muted); }
   .menulegal a { color:var(--muted); }
   /* ---- Guide picker ---- */
@@ -466,6 +485,11 @@
   #hkToast.out { opacity:0; }
   .profilebtn.primary, .profilebtn.signup { background:var(--primary); color:#fff; border-color:var(--primary); }
   .profilerow { display:flex; gap:2px; justify-content:center; align-items:center; flex-wrap:wrap; }
+  /* The Log in / Sign up row used to live on Home AND the class screen, in two positions with
+     two different margins, so it jumped from below the cards to above them between two taps.
+     Identity now lives in exactly one place — the ☰ menu (profileRows / openMenu) — which is
+     reachable from the top bar of every screen. .profilebtn/.profilerow are kept because the
+     signup and campus-roster screens still use them. */
   /* Tap-to-hear button — primary-tinted so it reads as "play", distinct from the mute toggle */
   .toggle.hearbtn { background:var(--grape); border-color:var(--grape); }
   .toggle.hearbtn.muted { background:#fff; border-color:var(--line); }
@@ -586,7 +610,7 @@
   /* conversation */
   .chat { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
   .bubble { max-width:80%; padding:12px 15px; border-radius:18px; font-size:16px; line-height:1.4; font-weight:700;}
-  .bubble.them { background:#e6f5f6; align-self:flex-start; border-bottom-left-radius:4px;}
+  .bubble.them { background:#e6f5f6; color:var(--ink); align-self:flex-start; border-bottom-left-radius:4px;}
   .bubble.me { background:var(--grape); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
   .bubble small { display:block; opacity:.7; font-size:12px; margin-top:4px; font-weight:600;}
 
@@ -881,7 +905,7 @@
   <div id="topnav"></div>
   <div id="app">
     <div class="topbar">
-      <div class="brand" id="brandSlot"><button class="backbtn" id="topBack" style="display:none">← <span id="backLabel"></span></button><span class="brandwrap" id="brandWrap"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></span></div>
+      <div class="brand" id="brandSlot"><button class="backbtn" id="topBack" style="display:none">← <span id="backLabel"></span></button><span class="brandwrap" id="brandWrap" role="button" tabindex="0" title="Home / घर"><span class="logo" id="brandLogo">🪔</span> <span id="appName">Hikmat</span></span></div>
       <div class="stats">
         <span class="pill star"><span class="staricon" id="starIcon">★</span> <span id="totalStars">0</span></span>
         <span class="pill coin"><span id="coinIcon">💎</span> <span id="coins">0</span></span>
@@ -2487,6 +2511,15 @@ $("#hearBtn").onclick = () => {
 };
 $("#helpNeedBtn").onclick = () => helpNeeded();
 $("#menuBtn").onclick = () => openMenu();
+// Tapping the wordmark goes Home — the one thing every app trains you to expect, and the only
+// way back from a screen that shows the brand instead of a back button (the login screen).
+(function(){
+  const bw = document.getElementById("brandWrap");
+  if(!bw) return;
+  const go = () => { sfx.back(); renderHome(); };
+  bw.onclick = go;
+  bw.onkeydown = (e) => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } };
+})();
 
 // ============================================================
 //  ☰ MENU — one place for the things that are not "play a lesson"
@@ -2517,7 +2550,7 @@ function openMenu(){
         </div>
         <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
-      <div class="menurows">
+      <div class="menurows" id="menuRows">
         <button class="menurow" id="mFriend">
           <span class="mi">🧑‍🤝‍🧑</span>
           <span class="ml"><b>${esc(tx("Choose your friend","अपनी सहेली चुनो"))}</b>
@@ -2563,6 +2596,13 @@ function openMenu(){
   document.body.appendChild(sheet);
   const close = () => sheet.remove();
   // #dClose, not a new id: hkBack() looks for that selector to close a sheet on a back press.
+  // identity first — it answers "who am I / how do I save this" before any setting does
+  const rows = sheet.querySelector("#menuRows");
+  rows._close = close;
+  const first = rows.firstElementChild;
+  const tmp = document.createDocumentFragment();
+  profileRows({ appendChild: n => tmp.appendChild(n), _close: close });
+  rows.insertBefore(tmp, first);
   const closeMenu = () => { sfx.back(); close(); };
   sheet.querySelector("#dClose").onclick = closeMenu;
   sheet.querySelector("[data-x]").onclick = closeMenu;
@@ -2783,19 +2823,41 @@ function lifeSkillsCard(){
   return node;
 }
 
-function profileChip(host){
+// Who is playing — rendered as menu rows. This used to be a chip bolted onto Home and the class
+// screen, in two different positions; identity now lives in ONE place a learner can always reach,
+// because the ☰ button is in the top bar of every screen (Vishal, 2026-08-25).
+// Login and signup are offered even with no backend: signup falls back to a local-only profile.
+function profileRows(host){
   if(currentStudent){
-    const b = el(`<button class="profilebtn">${esc(currentStudent.avatar||"🙂")} ${esc(currentStudent.name)} · ${tx("Switch","बदलें")}</button>`);
-    b.onclick = () => { sfx.tap(); startLogin(); }; host.appendChild(b);
-  } else {
-    // Login/signup are always offered, even offline: signup falls back to a local-only profile,
-    // and campus-mode login verifies the PIN on-device — so both work without a backend.
-    host.classList.add("profilerow");           // flex row: aligned, small even gap
-    const login = el(`<button class="profilebtn primary">${tx("Log in","लॉग इन")}</button>`);
-    login.onclick = () => { sfx.tap(); startLogin(); }; host.appendChild(login);
-    const signup = el(`<button class="profilebtn">${tx("✨ Sign up","✨ साइन अप")}</button>`);
-    signup.onclick = () => { sfx.tap(); renderSignup(); }; host.appendChild(signup);
+    const b = el(`<button class="menurow" id="mWho">
+      <span class="mi">${esc(currentStudent.avatar || "🙂")}</span>
+      <span class="ml"><b>${esc(currentStudent.name)}</b>
+        <small>${esc(tx("Switch to another profile","दूसरी प्रोफ़ाइल पर जाओ"))}</small></span>
+      <span class="mc">›</span></button>`);
+    b.onclick = () => { sfx.tap(); host._close(); startLogin(); };
+    host.appendChild(b);
+    return;
   }
+  const guest = el(`<div class="menurow menuguest">
+    <span class="mi">🙂</span>
+    <span class="ml"><b>${esc(tx("You are playing as a guest","तुम मेहमान के रूप में खेल रही हो"))}</b>
+      <small>${esc(tx("Sign up to keep your stars and gems","अपने सितारे और रत्न बचाने के लिए साइन अप करो"))}</small></span>
+  </div>`);
+  host.appendChild(guest);
+  const su = el(`<button class="menurow" id="mSignup">
+    <span class="mi">✨</span>
+    <span class="ml"><b>${esc(tx("Sign up","साइन अप"))}</b>
+      <small>${esc(tx("Make a profile — it takes a minute","प्रोफ़ाइल बनाओ — एक मिनट लगेगा"))}</small></span>
+    <span class="mc">›</span></button>`);
+  su.onclick = () => { sfx.tap(); host._close(); renderSignup(); };
+  host.appendChild(su);
+  const li = el(`<button class="menurow" id="mLogin">
+    <span class="mi">👋</span>
+    <span class="ml"><b>${esc(tx("Log in","लॉग इन"))}</b>
+      <small>${esc(tx("Already have a profile","पहले से प्रोफ़ाइल है"))}</small></span>
+    <span class="mc">›</span></button>`);
+  li.onclick = () => { sfx.tap(); host._close(); startLogin(); };
+  host.appendChild(li);
 }
 
 // HOME — "By Class" grade bands on top, the original thematic tracks as "Life Skills" below.
@@ -2823,11 +2885,9 @@ function renderHome(){
       <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
     </div>
     <div id="homeSections"></div>
-    <div class="center" id="profileRow" style="margin:6px 0 18px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
   </div>`);
   root.appendChild(s);
   setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
-  profileChip($("#profileRow"));
   const host = $("#homeSections");
   const seeBtn = (label, fn) => { const b = el(`<button class="btn ghost seeother">${label}</button>`); b.onclick = () => { sfx.tap(); fn(); }; const c = el(`<div class="center" style="margin:2px 0 4px"></div>`); c.appendChild(b); host.appendChild(c); };
   // Life Skills used to get its own heading and grid underneath the class groups. It now rides
@@ -2871,12 +2931,10 @@ function renderBand(band){
       <h2>${iconFor("band:"+band.key, band.icon)} ${esc(tx(band.title, band.titleHi))}</h2>
       <div class="sub">${tx("Choose a subject","कोई विषय चुनो")}</div></div>
     </div>
-    <div class="center" id="profileRow" style="margin:2px 0 16px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap"></div>
     <div class="themes" id="subjects"></div>
   </div>`);
   root.appendChild(s);
   setBack(tx("← Home","← घर"), renderHome);
-  profileChip($("#profileRow"));
   setNarration(tx(band.title,band.titleHi)+". "+tx("Choose a subject.","कोई विषय चुनो।"), tx(band.title,band.titleHi)+". "+tx("Choose a subject.","कोई विषय चुनो।"));
   const wrap = $("#subjects");
   const subs = subjectsInBand(band.key);
@@ -5216,10 +5274,8 @@ function renderLogin(){
       <div class="center"><button class="btn primary" id="loginGo">${tx("Log in →","लॉग इन →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
         <button class="btn ghost" id="toSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
-        <button class="btn ghost" id="toOnline">${tx("🌐 Online? Use your username","🌐 ऑनलाइन? यूज़रनेम से")}</button>
         <button class="btn ghost" id="guestBtn">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
         ${(SETTINGS.otpEnabled && backendLive && !campusRoster()) ? `<button class="btn ghost" id="forgotPin">${tx("🔑 Forgot your PIN?","🔑 पिन भूल ग{ई|ए}?")}</button>` : ``}
-        <button class="btn ghost" id="toSetup">${tx("⚙️ Set up this laptop","⚙️ यह लैपटॉप सेट करो")}</button>
       </div>
     </div>
   </div>`));
@@ -5227,9 +5283,7 @@ function renderLogin(){
   const name = $("#loginName"), pin = $("#loginPin"), err = $("#loginErr");
   setTimeout(() => name.focus(), 60);
   $("#toSignup").onclick = () => { sfx.tap(); renderSignup(); };
-  $("#toOnline").onclick = () => { sfx.tap(); renderOnlineLogin(); };
   $("#guestBtn").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
-  $("#toSetup").onclick = () => { sfx.tap(); renderDeviceSetup(); };
   // Only present when the backend offers guardian verification — without it there is no way to
   // prove who is asking, and a self-serve PIN reset would be an account-takeover button.
   //
