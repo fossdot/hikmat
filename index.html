@@ -252,6 +252,21 @@
     box-shadow:0 -10px 40px rgba(20,14,33,.3); animation:sheetUp .26s cubic-bezier(.2,.9,.3,1); }
   @keyframes sheetUp { from{ transform:translateY(100%); } to{ transform:translateY(0); } }
   @media (prefers-reduced-motion:reduce){ .sheetwrap,.sheet{ animation:none; } }
+  /* ---- Continue with Google / Facebook ---- */
+  .sociallogins { display:flex; flex-direction:column; gap:10px; margin:2px 0 6px; }
+  .socialbtn { display:flex; align-items:center; justify-content:center; gap:10px;
+               min-height:52px; padding:12px 18px; border-radius:var(--r-pill);
+               border:2px solid var(--line); background:var(--card); color:var(--ink);
+               font-weight:800; font-size:16px; text-decoration:none; cursor:pointer;
+               box-shadow:var(--shadow-sm); }
+  .socialbtn:active { transform:translateY(2px); }
+  .socialbtn:hover, .socialbtn:focus-visible { border-color:var(--primary); }
+  .socialicon { display:inline-flex; line-height:0; flex:0 0 auto; }
+  /* a rule with the word sitting in the gap, so "or" reads as a separator not a label */
+  .socialor { display:flex; align-items:center; gap:12px; color:var(--muted);
+              font-size:13px; font-weight:800; margin:4px 0 2px; }
+  .socialor::before, .socialor::after { content:""; flex:1 1 auto; height:2px; background:var(--line); }
+  [data-theme="dark"] .socialbtn { background:#2a2240; color:var(--ink); border-color:var(--line); }
   /* ---- Sheet close (×) ---- */
   .settingsheet .doubthead { position:sticky; top:-4px; z-index:3; background:var(--card);
                              padding-top:8px; padding-bottom:8px; }
@@ -1018,6 +1033,7 @@ const SETTINGS = {
   appName: "Hikmat",
   logo: "",                                   // image URL from Hikmat Settings; empty = the diya 🪔
   tagline: { en: "Learn  by playing", hi: "खेल-खेल में सीखो" },
+  socialLogins: [],                           // [{key,label,url}] — providers the SERVER can complete a handshake with
   aiEnabled: false,                           // Roshni AI tutor — on only when the backend says so
   voiceEnabled: false,                        // mic + neural Hindi voice — on only when the backend says so
   // Guardian phone verification (a code over WhatsApp). Off unless the backend says on, so a
@@ -2530,6 +2546,26 @@ $("#menuBtn").onclick = () => openMenu();
 // Every row is an icon + a word, both languages, and the sheet narrates itself on open,
 // because the girl who most needs the menu is the one who cannot read the labels.
 const WHATSAPP_GROUP = "https://chat.whatsapp.com/JCfqZgLZcl20qQKsfcuiIw?mode=gi_t";
+// Provider marks, inline like every other icon here — the app ships no external assets, and a
+// sign-in button that waits on a CDN is a sign-in button that fails offline.
+const PROVIDER_ICON = {
+  google: `<svg viewBox="0 0 48 48" width="22" height="22" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.9c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 6.9-10 6.9-17.3z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.8-6.1C1 16.7 0 20.2 0 24s1 7.3 2.6 10.4l7.8-5.7z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.7-3.7-13.6-9.1l-7.8 5.7C6.5 42.6 14.6 48 24 48z"/></svg>`,
+  facebook: `<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill="#1877F2" d="M32 16C32 7.2 24.8 0 16 0S0 7.2 0 16c0 8 5.9 14.6 13.5 15.8V20.6H9.4V16h4.1v-3.5c0-4.1 2.4-6.3 6.1-6.3 1.8 0 3.6.3 3.6.3v3.9h-2c-2 0-2.6 1.2-2.6 2.5V16h4.4l-.7 4.6h-3.7v11.2C26.1 30.6 32 24 32 16z"/></svg>`,
+  github: `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.4 4.7 18.4 5 18.4 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>`,
+};
+// One row of "Continue with X" buttons, or nothing at all when the server has no provider
+// enabled. Rendered from SETTINGS.socialLogins so a provider can never be offered that the
+// backend cannot finish — enable the Social Login Key in Desk and the button appears.
+function socialButtons(){
+  const list = (SETTINGS.socialLogins || []).filter(p => p && p.url);
+  if(!list.length) return "";
+  return `<div class="sociallogins">
+    ${list.map(p => `<a class="socialbtn" href="${escAttr(BACKEND_BASE + p.url)}" data-social="${escAttr(p.key)}">
+      <span class="socialicon">${PROVIDER_ICON[p.key] || ""}</span>
+      <span>${esc(tx("Continue with " + p.label, p.label + " से आगे बढ़ो"))}</span></a>`).join("")}
+    <div class="socialor"><span>${esc(tx("or","या"))}</span></div>
+  </div>`;
+}
 const WA_ICON = `<span class="iconsvg" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.347-.347.52-.52.174-.174.232-.298.347-.497.116-.198.058-.371-.03-.52-.087-.148-.66-1.594-.905-2.183-.238-.573-.48-.5-.66-.51-.17-.008-.365-.01-.56-.01-.194 0-.51.073-.776.372-.267.298-1.02.995-1.02 2.426 0 1.432 1.043 2.815 1.19 3.008.148.198 2.052 3.135 4.97 4.396.696.3 1.24.48 1.665.615.7.222 1.336.191 1.84.116.56-.084 1.925-.788 2.197-1.55.272-.76.272-1.412.19-1.55-.082-.138-.297-.223-.594-.372m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></span>`;
 
 function openMenu(){
@@ -4483,6 +4519,7 @@ async function loadFromBackend(){
         if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi;
         SETTINGS.aiEnabled = !!s.aiEnabled;
         SETTINGS.voiceEnabled = !!s.voiceEnabled;
+        if(Array.isArray(s.socialLogins)) SETTINGS.socialLogins = s.socialLogins;
         applySettingsDefaults(s);
         try { localStorage.setItem("hikmat_settings_cache", JSON.stringify(s)); } catch(e){}
       }
@@ -5601,6 +5638,7 @@ function renderOnlineLogin(){
     <div class="hero"><h1>${tx("Log in 🌐","लॉग इन 🌐")}</h1>
       <p>${tx("Use your email and password.","अपना ईमेल और पासवर्ड डालो।")}</p></div>
     <div class="authform">
+      ${socialButtons()}
       <label class="fieldlabel">${tx("Email","ईमेल")}</label>
       <input id="olUser" class="searchbox" type="email" autocomplete="email" autocapitalize="none"
              spellcheck="false" inputmode="email" maxlength="140"
@@ -5653,6 +5691,7 @@ function renderOnlineSignup(){
     <div class="hero"><h1>${tx("Create your account ✨","अपना खाता बनाओ ✨")}</h1>
       <p>${tx("An email and a password — that is all.","एक ईमेल और एक पासवर्ड — बस इतना ही।")}</p></div>
     <div class="signup">
+      ${socialButtons()}
       <label class="fieldlabel">${tx("Email","ईमेल")}</label>
       <input id="osEmail" class="searchbox" type="email" autocomplete="email" autocapitalize="none"
              spellcheck="false" inputmode="email" maxlength="140" placeholder="you@example.com">

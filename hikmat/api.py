@@ -956,6 +956,32 @@ def _track_json(t, with_content):
     return track
 
 
+# Providers the site can actually authenticate against, in the order they should be shown.
+# `social_login_provider` is Frappe's own field; the redirect URL it builds is the documented
+# entry point (frappe.integrations.oauth2_logins), so we are not inventing an auth route.
+_SOCIAL_LABELS = {"Google": "Google", "Facebook": "Facebook", "GitHub": "GitHub"}
+
+
+def _enabled_social_logins():
+    if not frappe.db.exists("DocType", "Social Login Key"):
+        return []
+    out = []
+    try:
+        rows = frappe.get_all("Social Login Key",
+                              filters={"enable_social_login": 1},
+                              fields=["name", "provider_name", "social_login_provider"],
+                              order_by="creation asc")
+    except Exception:
+        return []
+    for r in rows:
+        key = r.social_login_provider or r.provider_name or r.name
+        label = _SOCIAL_LABELS.get(key, r.provider_name or key)
+        out.append({"key": str(key).lower(), "label": label,
+                    "url": "/api/method/frappe.integrations.oauth2_logins.login_via_%s"
+                           % str(key).lower()})
+    return out
+
+
 @frappe.whitelist(allow_guest=True)
 def get_settings():
     return _cached(SETTINGS_CACHE_KEY, _build_settings)
@@ -972,6 +998,12 @@ def _build_settings():
         "helpDefaultOn": bool(s.help_default_on),
         "defaultTheme": s.get("default_theme") or "light",
         "defaultSound": bool(s.get("default_sound")),
+        # Which "Continue with X" buttons to draw. Read from Frappe's OWN Social Login Key
+        # doctype rather than a flag of ours, so the app can never offer a provider the server
+        # cannot actually complete a handshake with: enable the key in Desk and the button
+        # appears, disable it and the button goes. Only the provider name and its sign-in URL
+        # cross the wire — never the client id, and certainly never the secret.
+        "socialLogins": _enabled_social_logins(),
         # Only the on/off flags are public — the model, endpoints, system prompt and crisis
         # copy stay server-side (read from the Single inside ai_ask/ai_transcribe/ai_tts),
         # never in this cached payload that any guest can fetch.
