@@ -259,40 +259,6 @@ def create_doctypes():
         f("occurred_on", "Datetime", "Occurred on", in_list_view=1),
     ], autoname="hash", title_field="question")
 
-    # Milestone "belt" gates — admin-configurable star thresholds. When a girl's total
-    # stars cross a threshold, new content locks until a facilitator evaluates her
-    # in person and marks the Evaluation Passed (online-first clearing; the client only
-    # DETECTS the gate locally — clearing is server-authoritative).
-    _mk("Hikmat Milestone", [
-        f("milestone_key", "Data", "Key", reqd=1, unique=1, in_list_view=1),
-        f("title", "Data", "Title", reqd=1, in_list_view=1),
-        f("title_hi", "Data", "Title (Hindi)"),
-        f("icon", "Data", "Icon (emoji)"),
-        f("threshold_gems", "Int", "Threshold (total gems 💎)", reqd=1, in_list_view=1),
-        f("sort_order", "Int", "Sort order"),
-        f("active", "Check", "Active", default="1", in_list_view=1),
-    ], autoname="field:milestone_key", title_field="title")
-
-    # One row per (student, milestone) — created Pending by submit_attempt when the
-    # threshold is crossed; the facilitator fills in the rubric outcome in Desk.
-    # autoname format makes student+milestone unique at the DB level.
-    _mk("Evaluation", [
-        f("student", "Link", "Student", options="Student", reqd=1, in_list_view=1),
-        f("student_name", "Data", "Student name", in_list_view=1),
-        f("cohort", "Link", "Cohort", options="Cohort"),
-        f("campus", "Link", "Campus", options="Campus"),
-        f("milestone", "Link", "Milestone", options="Hikmat Milestone", reqd=1, in_list_view=1),
-        f("threshold_gems", "Int", "Threshold when reached"),
-        f("gems_at_reach", "Int", "Gems when reached"),
-        f("status", "Select", "Status", options="Pending\nPassed\nNeeds Practice",
-          default="Pending", reqd=1, in_list_view=1),
-        f("score", "Int", "Rubric score"),
-        f("rubric_notes", "Small Text", "Rubric notes (speak / read / write)"),
-        f("evaluated_by", "Link", "Evaluated by", options="User"),
-        f("evaluated_on", "Datetime", "Evaluated on"),
-        f("reached_on", "Datetime", "Reached on", in_list_view=1),
-    ], autoname="format:EV-{student}-{milestone}", title_field="student_name")
-
     # Roshni AI — one row per tutoring SESSION (parent). Turns link back to it so the
     # facilitator review queue and confusion mining can GROUP BY turn.
     _mk("AI Conversation", [
@@ -514,41 +480,6 @@ def seed_structure():
     print("=== seeded", len(GRADE_BANDS), "bands +", len(SUBJECTS), "subjects ===")
 
 
-# Milestone belts — CONFIGURABLE thresholds, never hardcoded in the client. Measured in
-# GEMS 💎 (the game's earned currency: score*5 + stars*10 per attempt) — unlike stars,
-# gems keep accumulating on replays, so practice counts toward the next belt.
-MILESTONES = [
-    {"key": "belt_1", "title": "Level 1 Belt", "titleHi": "स्तर 1 बेल्ट", "icon": "🟡", "threshold": 1000},
-    {"key": "belt_2", "title": "Level 2 Belt", "titleHi": "स्तर 2 बेल्ट", "icon": "🟢", "threshold": 2500},
-    {"key": "belt_3", "title": "Level 3 Belt", "titleHi": "स्तर 3 बेल्ट", "icon": "🔵", "threshold": 5000},
-    {"key": "belt_4", "title": "Level 4 Belt", "titleHi": "स्तर 4 बेल्ट", "icon": "⚫", "threshold": 10000},
-]
-
-
-def seed_milestones():
-    """Create/refresh the belt milestones (idempotent — updates thresholds if they exist)."""
-    for i, m in enumerate(MILESTONES):
-        doc = frappe.get_doc("Hikmat Milestone", m["key"]) if frappe.db.exists("Hikmat Milestone", m["key"]) \
-            else frappe.new_doc("Hikmat Milestone")
-        doc.update({"milestone_key": m["key"], "title": m["title"], "title_hi": m["titleHi"],
-                    "icon": m["icon"], "threshold_gems": m["threshold"],
-                    "sort_order": i, "active": 1})
-        doc.save(ignore_permissions=1)
-    frappe.db.commit()
-    print("=== seeded", len(MILESTONES), "milestones ===")
-
-
-def setup_evaluation_report():
-    """Facilitator 'Pending Evaluations' list: who reached a belt and is waiting for an
-    in-person rubric evaluation — oldest wait first, so nobody is left locked.
-
-    The SQL moved to hikmat/hikmat/report/pending_evaluations/ so that `student_name`
-    (and the other plain-Data columns) can be escaped for the grid and formula-guarded
-    for the export — see _adopt_script_report. Defined ABOVE _adopt_script_report in this
-    file, so the import is resolved at call time, not at def time."""
-    _adopt_script_report("Pending Evaluations", "pending_evaluations")
-
-
 def seed_operational_defaults():
     """Everything a FRESH site needs beyond content. Patches are marked complete —
     NOT executed — when the app installs on a new site, so the records and System
@@ -590,8 +521,8 @@ def seed_operational_defaults():
 
 def wipe_demo_data():
     """Production-cutover reset: erase ALL learner data — students (and their linked
-    Website Users), attempts, doubts, learning events, evaluations and AI chats — while
-    keeping content, milestones, cohorts, campuses and settings untouched.
+    Website Users), attempts, doubts, learning events and AI chats — while
+    keeping content, cohorts, campuses and settings untouched.
 
     This used to also walk the Boli voice trail and unlink the audio bytes off disk. That
     pipeline is gone; v12_remove_boli erases what older builds left behind, so there is no
@@ -1136,7 +1067,6 @@ def setup_analytics():
     setup_student_report()
     setup_doubt_report()
     setup_ai_report()
-    setup_evaluation_report()
     setup_trouble_report()
     setup_hard_questions_report()
     setup_engagement_report()
@@ -1172,8 +1102,6 @@ def setup_workspace(cards=None, charts=None):
                  ("Dialogues", "Dialogue", "DocType"), ("Students", "Student", "DocType"),
                  ("Cohorts", "Cohort", "DocType"), ("Attempts", "Lesson Attempt", "DocType"),
                  ("Doubts", "Lesson Doubt", "DocType"),
-                 ("Pending Evaluations", "Pending Evaluations", "Report"),
-                 ("Milestones", "Hikmat Milestone", "DocType"),
                  ("Daily Attendance", "Daily Attendance", "Report"),
                  ("Attendance Summary", "Attendance Summary", "Report"),
                  ("Module Tests", "Module Test", "DocType"),
@@ -1183,7 +1111,7 @@ def setup_workspace(cards=None, charts=None):
                  ("Settings", "Hikmat Settings", "DocType")]
     # report → its ref doctype (a Report shortcut needs report_ref_doctype set)
     _report_ref = {"Student Progress": "Lesson Attempt", "Confusion Heatmap": "Lesson Doubt",
-                   "AI Review Queue": "AI Conversation", "Pending Evaluations": "Evaluation",
+                   "AI Review Queue": "AI Conversation",
                    "Lesson Trouble Spots": "Lesson Attempt", "Hardest Questions": "Learning Event",
                    "Student Engagement": "Student", "Activity Drill-down": "Lesson Attempt",
                    "Daily Attendance": "Attendance Day", "Attendance Summary": "Attendance Day"}

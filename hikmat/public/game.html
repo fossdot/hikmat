@@ -275,7 +275,7 @@
   .menurow .ml small { font-size:13px; color:var(--muted); font-weight:700; }
   .menurow .mc { flex:0 0 auto; color:var(--muted); font-size:20px; font-weight:900; }
   /* ---- Gems flying into the counter (see flyGems) ---- */
-  /* z-index 70 is above .sheetwrap(60): a belt sheet can open on the result screen and the
+  /* z-index 70 is above .sheetwrap(60): a sheet can open on the result screen and the
      gems must still be seen arriving, not vanish behind the scrim. pointer-events:none so a
      gem in flight can never eat the tap on "Next". */
   .gemfly { position:fixed; z-index:70; pointer-events:none; width:0; height:0;
@@ -1020,7 +1020,6 @@ const SETTINGS = {
   tagline: { en: "Learn  by playing", hi: "खेल-खेल में सीखो" },
   aiEnabled: false,                           // Roshni AI tutor — on only when the backend says so
   voiceEnabled: false,                        // mic + neural Hindi voice — on only when the backend says so
-  milestones: [],                             // belt gates [{key,title,titleHi,icon,threshold}] from the backend; empty = no gates (standalone/offline-fresh)
   // Guardian phone verification (a code over WhatsApp). Off unless the backend says on, so a
   // standalone/offline copy behaves exactly as it did before this existed.
   otpEnabled: false,
@@ -2364,7 +2363,7 @@ function fmtCount(n){ n = Math.max(0, n|0); return n < 1000 ? String(n) : ((n/10
 // ---------- Gems fly into the counter ----------
 // Asked for after on-device testing (Vishal, 2026-08-22): "the collected gems should go upwards
 // to the gems box above, like Candy Crush". It is not decoration. The gem total is the metric
-// the milestone belts are gated on (see crossedMilestone), and until now finishing a lesson
+// the reward she is actually collecting, and until now finishing a lesson
 // just silently changed a number in a corner she was not looking at. Watching her own gems
 // travel from the result card into the counter is what makes the reward legible to a child who
 // cannot read "+45 gems".
@@ -2764,7 +2763,7 @@ function trackCard(course, back){
   const earned = trackEarned(course.key), maxStars = trackMax(course);
   const locked = !course.published || course.lessons.length===0;
   // module-test chain: a NEVER-played track stays behind the previous track's test;
-  // anything already started remains fully accessible (soft lock, like belt gates)
+  // anything already started remains fully accessible (soft lock)
   const blocker = (!locked && earned===0) ? prevTestBlocker(course) : null;
   const node = el(`<button class="theme ${locked?"locked":""}" ${locked?"disabled":""}
       style="${locked?"":`--tc:${col(course.color)};background:${col(course.color)}14;border-color:${col(course.color)}55`}">
@@ -3042,7 +3041,7 @@ function migrateGuestProgress(snap){
   }
   // Gems ride along as a FLOOR, never a decrease — same rule mergeServerProgress uses. Without
   // this she would watch her gem count drop to zero on the screen right after logging in, and
-  // the milestone belts are gated on gems.
+  // gems are the reward she is collecting.
   if(typeof snap.coins === "number" && snap.coins > (state.coins || 0)){ state.coins = snap.coins; any = true; }
   if(any) save();
 }
@@ -3069,23 +3068,8 @@ function renderGuestWall(group, backFn){
   refreshTop();
 }
 
-// ---------- Milestone "belt" gates ----------
-// Belts are a CELEBRATION ONLY. They used to be a gate: crossing a gem threshold locked every
-// new lesson until a facilitator marked the Evaluation "Passed" in Desk, and the girl got a
-// "Waiting for your teacher's evaluation" screen instead of the next lesson. Removed on
-// Vishal's instruction 2026-08-26 — a learner who has just earned 1,420 gems should not be
-// stopped by an adult's queue, least of all one that only clears when somebody is online.
-// What is left is the reward: crossedMilestone() still fires the belt banner on the result
-// screen. Thresholds still come from the backend (SETTINGS.milestones) so it works offline,
-// and the Evaluation doctype, the facilitator report and the state.gates sync are all still
-// there — so this is a gate that is switched off, not a feature torn out.
-function sortedMilestones(){ return (SETTINGS.milestones||[]).slice().sort((a,b)=>a.threshold-b.threshold); }
-// milestone newly crossed by going from prevGems → newGems 💎 (for the celebration)
-function crossedMilestone(prevGems, newGems){
-  return sortedMilestones().find(m => prevGems < m.threshold && newGems >= m.threshold) || null;
-}
 // ---------- Module-test gates ----------
-// Same soft-lock philosophy as the belt gates: NEW content waits behind the previous
+// Soft lock: NEW content waits behind the previous
 // module's test, but anything she has already played stays replayable. Detection is
 // client-side (works offline); a pass on another device syncs down via get_progress.
 function testGate(course, lesson, back){
@@ -3954,9 +3938,7 @@ function startLevel(course, lesson, lv, back){
     const secs = actEnd(true);                             // completed: time rides on the attempt row
     const pct = rounds.length ? score/rounds.length : 0;   // guard: admin lesson could yield 0 rounds
     const stars = pct>=0.99?3 : pct>=0.6?2 : pct>=0.3?1 : 0;
-    const prevGems = (state.coins||0) - score*5;              // gems before this attempt (in-round +5s already added)
     setStars(course.key, lesson.key, lv.id, stars); state.coins += stars*10; save(); refreshTop();
-    const belt = crossedMilestone(prevGems, state.coins||0);  // did this attempt's gems cross a belt threshold?
     recordAttempt({ track: course.key, lesson: lesson.key, activity: lv.id,
                     stars: stars, score: score, total: rounds.length, coins: stars*10 + score*5,
                     duration_secs: secs });
@@ -3979,7 +3961,6 @@ function startLevel(course, lesson, lv, back){
       <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
       <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
       <div class="muted" id="gemLine">+${score*5 + stars*10} ${tx("💎 gems","💎 रत्न")}</div>
-      ${belt ? `<div class="savechip" style="font-size:1.05em">${esc(belt.icon||"🏅")} ${esc(tx("You reached the "+belt.title+"!","तुम "+(belt.titleHi||belt.title)+" तक पहुँच ग{ई|ए}!"))} 🎉</div>` : ""}
       ${currentStudent ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
       <div class="actionrow">
         <button class="btn ${canGoOn ? "ghost" : "primary"}" id="again">${tx("Play again","फिर से खेलो")}</button>
@@ -3987,9 +3968,7 @@ function startLevel(course, lesson, lv, back){
         ${canGoOn ? `<button class="btn primary" id="next">${nextLv ? tx("Next →","आगे →") : tx("Next lesson →","अगला पाठ →")}</button>` : ""}
       </div>
     </div>`));
-    if(belt) speak(tx("Shabash! You reached the "+belt.title+"! Your teacher will evaluate you soon.",
-                      "शाबाश! तुम "+(belt.titleHi||belt.title)+" तक पहुँच ग{ई|ए}! जल्द ही टीचर तुम्हारी जाँच करेंगी।"), state.lang==="hi"?"hi":"en");
-    else speak(stars>=2?"Shabash! Well done":"Good try");
+    speak(stars >= 2 ? "Shabash! Well done" : "Good try");
     srSay(tx("You got "+score+" of "+rounds.length+", "+stars+" stars", rounds.length+" में से "+score+" सही, "+stars+" सितारे"));
     if(canGoOn) speak(tx("Tap Next to keep going.","आगे बढ़ने के लिए 'आगे' दबाओ।"), state.lang==="hi"?"hi":"en", { queue:true });
     const rh=root.querySelector(".result h2"); if(rh){ rh.setAttribute("tabindex","-1"); try{ rh.focus({preventScroll:true}); }catch(e){} }
@@ -4006,7 +3985,7 @@ function startLevel(course, lesson, lv, back){
       sfx.enter(); actEnd(false);                       // no-op if finish() already closed the clock
       if(nextLv){ startLevel(course, lesson, nextLv, back); return; }
       // Rolling on to the NEXT LESSON must pass exactly the gates the lesson map applies on
-      // tap (the guest two-lesson wall, a pending milestone belt, a due module test). Landing
+      // tap (the guest two-lesson wall, a due module test). Landing
       // on the next lesson's map rather than straight into its first activity keeps that
       // check, and lets her see the new path before committing.
       if(!guestGate(course, nextLesson, back)) return;
@@ -4504,7 +4483,6 @@ async function loadFromBackend(){
         if(s.taglineHi) SETTINGS.tagline.hi = s.taglineHi;
         SETTINGS.aiEnabled = !!s.aiEnabled;
         SETTINGS.voiceEnabled = !!s.voiceEnabled;
-        if(Array.isArray(s.milestones)) SETTINGS.milestones = s.milestones;
         applySettingsDefaults(s);
         try { localStorage.setItem("hikmat_settings_cache", JSON.stringify(s)); } catch(e){}
       }
@@ -5020,7 +4998,6 @@ async function mergeServerProgress(){
   const p = res && res.progress;
   if(!p) return;
   for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]) setStars(ck, lk, aid, p[ck][lk][aid]);
-  if(res.gates) state.gates = res.gates;   // server-authoritative belt clearing syncs down here
   if(typeof res.gems === "number") state.coins = Math.max(state.coins||0, res.gems);  // gem total follows her across laptops
   // Module tests: monotone unions, safe under any interleaving of devices and queues.
   if(res.tests){

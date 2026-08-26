@@ -144,26 +144,9 @@ class TestHikmatApi(FrappeTestCase):
 		self.assertIn("bands", st)
 		self.assertIn("subjects", st)
 
-	# ---------------- Milestone "belt" gates ----------------
-	# _check_milestones commits mid-test (it must — the attempt is already committed in
-	# real use), which defeats FrappeTestCase's rollback. So every helper registers an
-	# explicit cleanup; nothing test-made may survive into the live DB.
-	def _mk_test_milestone(self):
-		if not frappe.db.exists("Hikmat Milestone", "belt_test"):
-			frappe.get_doc({"doctype": "Hikmat Milestone", "milestone_key": "belt_test",
-			                "title": "Test Belt", "threshold_gems": 20, "active": 1,
-			                "sort_order": 99}).insert(ignore_permissions=True)
-		def _rm():
-			frappe.db.delete("Evaluation", {"milestone": "belt_test"})
-			frappe.db.delete("Hikmat Milestone", {"name": "belt_test"})
-			frappe.db.commit()
-			api.clear_content_cache()
-		self.addCleanup(_rm)
-
 	def _mk_student(self, name):
 		def _rm():
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				frappe.db.delete("Evaluation", {"student": s})
 				frappe.db.delete("Lesson Attempt", {"student": s})
 				frappe.db.delete("Student", {"name": s})
 			frappe.db.commit()
@@ -184,39 +167,6 @@ class TestHikmatApi(FrappeTestCase):
 		self._attempt(stu, "l1", "spell", 1, coins=25)
 		self.assertEqual(api._total_gems(stu.name), 120)
 
-	def test_milestone_crossing_creates_pending_evaluation(self):
-		stu = self._mk_student("Belt Cross Girl")
-		sinfo = frappe._dict(student_name=stu.student_name, cohort=None)
-		self._mk_test_milestone()   # a tiny milestone the student has already crossed
-		self._attempt(stu, "l1", "learn", 3, coins=30)
-		crossed = api._check_milestones(stu.name, sinfo)
-		self.assertEqual(crossed, "belt_test")
-		ev = frappe.get_doc("Evaluation", {"student": stu.name, "milestone": "belt_test"})
-		self.assertEqual(ev.status, "Pending")
-		self.assertEqual(ev.gems_at_reach, 30)
-		# idempotent: crossing again never makes a second row
-		self.assertIsNone(api._check_milestones(stu.name, sinfo))
-		self.assertEqual(frappe.db.count("Evaluation",
-			{"student": stu.name, "milestone": "belt_test"}), 1)
-
-	def test_get_progress_returns_gates(self):
-		stu = self._mk_student("Belt Gate Girl")
-		tok = api._token_for(stu.name)
-		self._mk_test_milestone()
-		frappe.get_doc({"doctype": "Evaluation", "student": stu.name,
-		                "milestone": "belt_test", "status": "Passed",
-		                "reached_on": frappe.utils.now()}).insert(ignore_permissions=True)
-		res = api.get_progress(student=stu.name, token=tok)
-		self.assertEqual(res.get("gates", {}).get("belt_test"), "Passed")
-
-	def test_settings_payload_carries_milestones(self):
-		s = api._build_settings()
-		self.assertIn("milestones", s)
-		for m in s["milestones"]:
-			for key in ("key", "title", "titleHi", "icon", "threshold"):
-				self.assertIn(key, m)
-
-	# ---------------- Learning-event stream (wrong answers) ----------------
 	def test_log_event_rejects_unknown_kind(self):
 		self.assertEqual(api.log_event(kind="dance_party").get("error"), "bad_kind")
 
@@ -746,12 +696,14 @@ class TestErasure(FrappeTestCase):
 		                "student_name": girl.student_name, "track": "t1", "lesson": "l1",
 		                "activity": "learn", "question": "समझ नहीं आया", "resolved": 0,
 		                "raised_on": frappe.utils.now()}).insert(ignore_permissions=True)
-		milestone = frappe.get_all("Hikmat Milestone", limit=1, pluck="name")
-		if milestone:                       # facilitator free text ABOUT the child
-			frappe.get_doc({"doctype": "Evaluation", "student": girl.name,
-			                "student_name": girl.student_name, "milestone": milestone[0],
-			                "status": "Pending", "rubric_notes": "notes about the child",
-			                }).insert(ignore_permissions=True)
+		# Free text written ABOUT the child, rather than by her — the erasure has to take
+		# this too. It used to be an Evaluation's rubric notes; that doctype was removed with
+		# the belt gates (v17), so the same coverage now rides on an AI Conversation.
+		frappe.get_doc({"doctype": "AI Conversation", "student": girl.name,
+		                "student_name": girl.student_name,
+		                "conversation_id": "erase-" + frappe.generate_hash(length=10),
+		                "flagged": 1, "flag_reason": "notes about the child",
+		                "started_on": frappe.utils.now()}).insert(ignore_permissions=True)
 		frappe.db.commit()
 
 	def test_delete_student_erases_her_whole_trail_and_her_user(self):
@@ -1971,7 +1923,7 @@ class TestIngestSanitisation(FrappeTestCase):
 			frappe.set_user("Administrator")
 			frappe.db.commit()
 			for dt in ("Lesson Attempt", "Test Attempt", "Lesson Doubt", "Learning Event",
-			           "Attendance Ping", "Attendance Day", "Evaluation"):
+			           "Attendance Ping", "Attendance Day"):
 				frappe.db.delete(dt, {"student": doc.name})
 			frappe.db.delete("Student", {"name": doc.name})
 			frappe.db.commit()
@@ -2194,7 +2146,7 @@ class TestRound3ReportGuards(FrappeTestCase):
 	"""The five reports round 2 missed, plus a sweep that refuses to let a sixth hide."""
 
 	CONVERTED = ("Hardest Questions", "Student Progress", "Confusion Heatmap",
-	             "AI Review Queue", "Pending Evaluations")
+	             "AI Review Queue")
 	# `onerror` writes to a global so a browser harness can count executions; the string
 	# only has to contain angle brackets for the assertions here.
 	XSS = '<img src=x onerror="window.__fired=(window.__fired||0)+1">'
@@ -2255,11 +2207,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 		camp = self.TAG + " Campus"
 		if not frappe.db.exists("Campus", camp):
 			self._mk({"doctype": "Campus", "campus_name": camp, "location": "t", "active": 1})
-		mile = frappe.get_all("Hikmat Milestone", pluck="name", limit=1)
-		mile = mile[0] if mile else self._mk({
-			"doctype": "Hikmat Milestone", "milestone_key": self.TAG.lower(),
-			"title": "R3 Belt", "threshold_gems": 10, "sort_order": 99, "active": 1}).name
-
 		now = frappe.utils.now()
 		for i, base in enumerate((self.FORMULA + self.XSS, self.DEVANAGARI, self.DDE + self.XSS)):
 			pay = base + " " + self.TAG
@@ -2295,12 +2242,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			self._raw("AI Conversation", c.name, student_name=pay, cohort=pay,
 			          lesson=pay, flag_reason=pay)
 
-			v = self._mk({"doctype": "Evaluation", "student": girl.name, "student_name": "s",
-			              "cohort": coh, "campus": camp, "milestone": mile,
-			              "threshold_gems": 10, "gems_at_reach": 20, "status": "Pending",
-			              "reached_on": now})
-			self._raw("Evaluation", v.name, student_name=pay, cohort=pay,
-			          campus=pay, milestone=pay)
 		frappe.db.commit()
 
 	def _control(self):
@@ -2391,9 +2332,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			"AI Review Queue": ("AI Conversation", [
 				("Conversation", 150), ("Name", 130), ("Cohort", 120), ("Lesson", 110),
 				("Flagged", 70), ("Reason", 110), ("Reviewed", 80), ("When", 160)]),
-			"Pending Evaluations": ("Evaluation", [
-				("Evaluation", 160), ("Student", 140), ("Cohort", 120), ("Campus", 140),
-				("Milestone", 110), ("Threshold", 100), ("Gems", 90), ("Reached", 160)]),
 		}
 		for name, (ref, cols) in expected.items():
 			self.assertEqual(frappe.db.get_value("Report", name, "ref_doctype"), ref, name)
@@ -2420,8 +2358,10 @@ class TestRound3ReportGuards(FrappeTestCase):
 				self.assertNotIn(v[:1], self.LEAD,
 				                 f"{report}[{label}] leads with a formula char: {v!r}")
 			checked += len(cells)
-		# every learner-authored column of all five, three girls each
-		self.assertGreaterEqual(checked, 3 * (6 + 2 + 3 + 4 + 4))
+		# every learner-authored column of all four, three girls each. The fifth report,
+		# Pending Evaluations, went with the belt gates in v17 — its 4 columns come off the
+		# total rather than the assertion being loosened.
+		self.assertGreaterEqual(checked, 3 * (6 + 2 + 3 + 4))
 
 	def test_every_learner_column_is_actually_reached_by_the_guard(self):
 		"""Inertness is worthless if a column simply never carried the payload: name the
@@ -2434,7 +2374,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			"Student Progress": {"Name", "Cohort"},
 			"Confusion Heatmap": {"Track", "Lesson", "Activity"},
 			"AI Review Queue": {"Name", "Cohort", "Lesson", "Reason"},
-			"Pending Evaluations": {"Student", "Cohort", "Campus", "Milestone"},
 		}
 		for report, labels in expected.items():
 			seen = {label for label, _v in self._mine(report)}
@@ -2507,8 +2446,7 @@ class TestRound3ReportGuards(FrappeTestCase):
 		applied to the DB row. Each seeder now adopts the on-disk script report instead."""
 		from hikmat import setup_data
 		for setup in (setup_data.setup_hard_questions_report, setup_data.setup_student_report,
-		              setup_data.setup_doubt_report, setup_data.setup_ai_report,
-		              setup_data.setup_evaluation_report):
+		              setup_data.setup_doubt_report, setup_data.setup_ai_report):
 			setup()
 			setup()                                   # idempotent: called twice on purpose
 		for name in self.CONVERTED:

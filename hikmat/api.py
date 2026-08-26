@@ -698,7 +698,7 @@ def _require_staff():
 
 # ---------------------------------------------------------------------------
 # Facilitator notifications — surface a learner's "I'm stuck" tap (and, later,
-# milestone checkpoints) to every facilitator's Desk bell. Best-effort: a
+# doubts and help requests) to every facilitator's Desk bell. Best-effort: a
 # notification failure must never block the child's action.
 # ---------------------------------------------------------------------------
 def _facilitator_users():
@@ -990,11 +990,6 @@ def _build_settings():
         "consentVersion": _CONSENT_VERSION,
         "consentText": _CONSENT_TEXT_EN,
         "consentTextHi": _CONSENT_TEXT_HI,
-        # Belt thresholds ship with settings so gate DETECTION works fully offline;
-        # CLEARING stays server-side (Evaluation status, synced via get_progress).
-        "milestones": [{"key": m.milestone_key, "title": m.title, "titleHi": m.title_hi or "",
-                        "icon": m.icon or "🏅", "threshold": m.threshold_gems}
-                       for m in _active_milestones()],
     }
 
 
@@ -1052,11 +1047,7 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
         existing = frappe.db.get_value("Lesson Attempt", {"client_id": client_id}, "name")
         return {"ok": True, "name": existing, "dedup": True}
     frappe.db.commit()
-    gate = _check_milestones(student, sinfo)                 # belt threshold crossed? (never blocks the write)
-    out = {"ok": True, "name": doc.name}
-    if gate:
-        out["milestone"] = gate
-    return out
+    return {"ok": True, "name": doc.name}
 
 
 _TEST_STATUS = {"completed": "Completed", "exited": "Exited", "timed_out": "Timed Out"}
@@ -1133,69 +1124,21 @@ def submit_test(student=None, token=None, track=None, paper=None, score=0, total
 
 
 # ---------------------------------------------------------------------------
-# Milestone "belt" gates — configurable star thresholds; crossing one creates a
-# Pending Evaluation (an in-person facilitator rubric) and notifies facilitators.
-# Clearing is server-authoritative: a facilitator marks the Evaluation Passed in
-# Desk; the client syncs gate status down via get_progress.
+# Gems — the only progress metric the app rewards. There used to be "belt" gates on top of
+# these: crossing a gem threshold created a Pending Evaluation and LOCKED every new lesson
+# until a facilitator marked it Passed in Desk. Removed 2026-08-26 (v17) — a learner should
+# never be stopped by an adult's queue. Gems themselves are unchanged.
 # ---------------------------------------------------------------------------
-def _active_milestones():
-    """Active milestones, cheapest-first. Cached with the settings payload lifecycle."""
-    return frappe.get_all("Hikmat Milestone", filters={"active": 1},
-                          fields=["milestone_key", "title", "title_hi", "icon", "threshold_gems"],
-                          order_by="threshold_gems asc")
-
-
 def _total_gems(student):
     """A student's global gem total 💎 = SUM of coins over every lesson attempt
     (score*5 + stars*10 each) — mirrors the client's state.coins, and unlike stars it keeps
     growing on replays, so practice keeps counting toward the next belt.
 
     Corpus XP used to be added here too. The Bhojpuri AI / Boli pipeline is gone and its
-    ledger table with it, so lesson attempts are now the whole story. A girl who had banked
-    corpus XP therefore sees her SERVER-side gem total drop by that much, which can un-cross
-    a belt she had reached — Evaluations already created are untouched, but the next one may
-    take longer. v12_remove_boli prints who was affected so a facilitator can clear them by
-    hand rather than the loss going unnoticed."""
+    ledger table with it, so lesson attempts are now the whole story."""
     r = frappe.db.sql(
         "select coalesce(sum(coins), 0) from `tabLesson Attempt` where student=%s", student)
     return int(r[0][0]) if r else 0
-
-
-def _check_milestones(student, sinfo):
-    """After a committed attempt: create a Pending Evaluation for every newly-crossed
-    active milestone and ping the facilitators. Failures here must never undo the
-    attempt (already committed), so everything is wrapped and rolled back on error.
-    Returns the highest newly-crossed milestone key (for the client's celebration)."""
-    try:
-        milestones = _active_milestones()
-        if not milestones:
-            return None
-        total = _total_gems(student)
-        campus = frappe.db.get_value("Student", student, "campus")
-        crossed = None
-        for m in milestones:
-            if total < (m.threshold_gems or 0):
-                break                                        # sorted ascending — nothing further is reached
-            if frappe.db.exists("Evaluation", {"student": student, "milestone": m.milestone_key}):
-                continue                                     # already pending/passed — one row per belt, ever
-            frappe.get_doc({
-                "doctype": "Evaluation", "student": student,
-                "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
-                "campus": campus, "milestone": m.milestone_key,
-                "threshold_gems": m.threshold_gems, "gems_at_reach": total,
-                "status": "Pending", "reached_on": frappe.utils.now(),
-            }).insert(ignore_permissions=True)
-            frappe.db.commit()
-            _notify_facilitators(
-                "🏅 %s reached %s (%s💎) — evaluation needed" %
-                (sinfo.get("student_name") or student, m.title, total),
-                "Evaluation", "EV-%s-%s" % (student, m.milestone_key))
-            crossed = m.milestone_key
-        return crossed
-    except Exception:
-        frappe.db.rollback()
-        frappe.log_error(frappe.get_traceback(), "hikmat milestone check")
-        return None
 
 
 def validate_cohort(doc, method=None):
@@ -3457,8 +3400,6 @@ def get_progress(student=None, token=None):
     prog = {}
     for r in rows:
         prog.setdefault(r.track, {}).setdefault(r.lesson, {})[r.activity] = r.stars or 0
-    gates = {e.milestone: e.status for e in frappe.get_all(
-        "Evaluation", filters={"student": student}, fields=["milestone", "status"])}
     # Module tests: pass/best per track, plus the union of every question id this
     # student has ever been served (ordered by first exposure) — so a girl on a NEW
     # device keeps her no-repeat guarantee once she's online. Bounded by bank sizes.
@@ -3479,7 +3420,7 @@ def get_progress(student=None, token=None):
             for qid in ids:
                 if qid not in dst:
                     dst.append(qid)
-    return {"progress": prog, "gates": gates, "gems": _total_gems(student),
+    return {"progress": prog, "gems": _total_gems(student),
             "tests": tests, "testSeen": test_seen}
 
 
@@ -3501,7 +3442,7 @@ def get_progress(student=None, token=None):
 _LEARNER_DOCTYPES = ("Hikmat Consent", "Hikmat OTP",
                      "AI Conversation Turn", "AI Conversation", "Lesson Doubt",
                      "Lesson Attempt", "Test Attempt", "Learning Event",
-                     "Attendance Ping", "Attendance Day", "Evaluation")
+                     "Attendance Ping", "Attendance Day")
 # Hikmat Consent is listed FIRST, and it is not optional. It denormalises student_name, so
 # leaving it out meant an "erase ALL her data" that left the child's NAME behind — the exact
 # residue the rest of this section exists to remove — plus her guardian's number hash. There
@@ -3643,8 +3584,9 @@ def _scrub_name_residue(receipt, student=None, user=None):
                 subjects += ["%s %s" % (label, n) for n in chunk]
             _safe_delete("Comment", {"comment_type": "Deleted", "reference_doctype": dt,
                                      "subject": ["in", subjects]})
-    # Bell alerts whose document_name is a COMPOSITE embedding her id — _check_milestones
-    # writes document_name="EV-<student>-<milestone>", which no (doctype, name) pair matches.
+    # Bell alerts whose document_name is a COMPOSITE embedding her id. Nothing writes these
+    # any more (the milestone check that produced "EV-<student>-<milestone>" was removed in
+    # v17), but rows from before that are still on disk and must still be erased on request.
     if student and frappe.db.exists("DocType", "Notification Log"):
         _safe_delete("Notification Log",
                      {"document_name": ("like", "%" + _like_literal(student) + "%")})

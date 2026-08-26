@@ -17,7 +17,6 @@ def after_install():
 
     # belts + campus/cohorts/invite-code/login-settings — patches DON'T run on a fresh
     # install (Frappe marks them completed), so everything they'd seed must happen here
-    m.seed_milestones()
     m.seed_operational_defaults()
 
     # teacher backoffice (dashboard, charts, workspace) — best-effort, never block install
