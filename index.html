@@ -3070,67 +3070,20 @@ function renderGuestWall(group, backFn){
 }
 
 // ---------- Milestone "belt" gates ----------
-// Thresholds come from the backend (SETTINGS.milestones) so detection works OFFLINE;
-// clearing is server-authoritative: a facilitator marks the Evaluation "Passed" in Desk
-// and it syncs down as state.gates via get_progress. Belts are measured in GEMS 💎
-// (state.coins ≡ the server's SUM of attempt coins) — gems keep growing on replays, so
-// practice counts toward the next belt. Soft-hard lock: NEW lessons (zero stars) are
-// locked while a gate is pending, but everything already played stays replayable —
-// she's never left idle waiting for her evaluation.
+// Belts are a CELEBRATION ONLY. They used to be a gate: crossing a gem threshold locked every
+// new lesson until a facilitator marked the Evaluation "Passed" in Desk, and the girl got a
+// "Waiting for your teacher's evaluation" screen instead of the next lesson. Removed on
+// Vishal's instruction 2026-08-26 — a learner who has just earned 1,420 gems should not be
+// stopped by an adult's queue, least of all one that only clears when somebody is online.
+// What is left is the reward: crossedMilestone() still fires the belt banner on the result
+// screen. Thresholds still come from the backend (SETTINGS.milestones) so it works offline,
+// and the Evaluation doctype, the facilitator report and the state.gates sync are all still
+// there — so this is a gate that is switched off, not a feature torn out.
 function sortedMilestones(){ return (SETTINGS.milestones||[]).slice().sort((a,b)=>a.threshold-b.threshold); }
-function gateStatus(key){ return ((state.gates||{})[key]) || ""; }
-function activeGate(){
-  const t = state.coins || 0;
-  for(const m of sortedMilestones()){
-    if(t >= m.threshold && gateStatus(m.key) !== "Passed") return m;
-  }
-  return null;
-}
 // milestone newly crossed by going from prevGems → newGems 💎 (for the celebration)
 function crossedMilestone(prevGems, newGems){
   return sortedMilestones().find(m => prevGems < m.threshold && newGems >= m.threshold) || null;
 }
-function gateGate(course, lesson, back){
-  const m = activeGate();
-  if(!m) return true;
-  if(lessonEarned(course.key, lesson.key) > 0) return true;   // already-played lesson → replay freely
-  renderGateWall(m, () => renderTrack(course, back));
-  return false;
-}
-function renderGateWall(m, backFn){
-  stopSpeech(); rerender = () => renderGateWall(m, backFn);
-  root.innerHTML = "";
-  setBack(tx("← Back","← वापस"), backFn || renderHome);
-  const title = esc(tx(m.title, m.titleHi || m.title));
-  root.appendChild(el(`<div class="screen">
-    <div class="hero">
-      <div class="mascot big m-happy">${mascotSVG()}</div>
-      <h1>${esc(m.icon||"🏅")} ${tx("You reached the "+m.title+"!", "तुम "+(m.titleHi||m.title)+" तक पहुँच ग{ई|ए}!")} 🎉</h1>
-      <p>${tx("Amazing work — "+(state.coins||0)+" 💎 gems! Your teacher will now check your speaking, reading and writing. New lessons unlock after that.",
-              "कमाल का काम — "+(state.coins||0)+" 💎 रत्न! अब तुम्हारी टीचर तुम्हारी बोलने, पढ़ने और लिखने की जाँच करेंगी। उसके बाद नए पाठ खुलेंगे।")}</p>
-    </div>
-    <div class="center" style="margin-top:10px">
-      <div class="savechip">🧑‍🏫 ${tx("Waiting for your teacher's evaluation","टीचर की जाँच का इंतज़ार है")}</div>
-    </div>
-    <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px">
-      <button class="btn primary" id="gateReplay">${tx("⭐ Practice earlier lessons","⭐ पुराने पाठ दोहराओ")}</button>
-      <button class="btn ghost" id="gateCheck">${tx("🔄 Check again","🔄 फिर से देखो")}</button>
-    </div>
-  </div>`));
-  const narr = tx("Wonderful! You reached the "+m.title+". Your teacher will evaluate you, then new lessons open. Until then you can practice earlier lessons.",
-                  "बहुत बढ़िया! तुम "+(m.titleHi||m.title)+" तक पहुँच ग{ई|ए}। टीचर तुम्हारी जाँच करेंगी, फिर नए पाठ खुलेंगे। तब तक पुराने पाठ दोहरा सकत{ी|े} हो।");
-  setNarration(narr, narr);
-  $("#gateReplay").onclick = () => { sfx.tap(); (backFn || renderHome)(); };
-  $("#gateCheck").onclick  = async () => {
-    sfx.tap();
-    await mergeServerProgress();                 // pulls state.gates; no-op offline/guest
-    if(activeGate() && activeGate().key === m.key){
-      flashToast(tx("Not cleared yet — ask your teacher 💛","अभी जाँच बाकी है — टीचर से पूछो 💛"));
-    } else { sfx.complete(); (backFn || renderHome)(); }
-  };
-  refreshTop();
-}
-
 // ---------- Module-test gates ----------
 // Same soft-lock philosophy as the belt gates: NEW content waits behind the previous
 // module's test, but anything she has already played stays replayable. Detection is
@@ -3203,7 +3156,7 @@ function renderTrack(course, back){
       extras: cls==="current" ? `<span class="starttag">${tx("START","शुरू")}</span><span class="sparkle">✨</span>` : "",
       label: tx(ls.title, ls.titleHi),
       sub: `<span class="lstars"><span class="staricon">★</span> ${earned}/${lessonMax(ls)}</span>`,
-      onClick: () => { if(!guestGate(course, ls, back)) return; if(!gateGate(course, ls, back)) return; if(!testGate(course, ls, back)) return; sfx.enter(); renderLessonMap(course, ls, back); },
+      onClick: () => { if(!guestGate(course, ls, back)) return; if(!testGate(course, ls, back)) return; sfx.enter(); renderLessonMap(course, ls, back); },
     };
   });
   let narr = tx(course.title,course.titleHi)+". "+tx("Choose a lesson.","कोई पाठ चुनो।");
@@ -4057,7 +4010,6 @@ function startLevel(course, lesson, lv, back){
       // on the next lesson's map rather than straight into its first activity keeps that
       // check, and lets her see the new path before committing.
       if(!guestGate(course, nextLesson, back)) return;
-      if(!gateGate(course, nextLesson, back)) return;
       if(!testGate(course, nextLesson, back)) return;
       renderLessonMap(course, nextLesson, back);
     };
