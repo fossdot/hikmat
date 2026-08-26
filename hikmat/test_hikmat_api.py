@@ -3932,3 +3932,90 @@ class TestGenderAndMascot(FrappeTestCase):
 			self.assertTrue(api.set_profile(student=r["id"], token=r["token"],
 			                                mascot=mid).get("ok"), mid)
 			self.assertEqual(frappe.db.get_value("Student", r["id"], "mascot"), mid)
+
+
+class TestEmailSignup(FrappeTestCase):
+	"""Open sign-up with a real email and a real password — the online door.
+
+	This replaces username+PIN for online learners (2026-08-26). A 4-digit PIN typed on a
+	shared classroom laptop and a password protecting an internet-facing account are not the
+	same security problem, and treating them as one is how the PIN came to be stored as a User
+	password in the first place.
+	"""
+
+	EMAIL = "unit.test.learner@example.com"
+	PWD = "correct horse battery"
+
+	def setUp(self):
+		self._purge()
+		self.addCleanup(self._purge)
+
+	def _purge(self):
+		for s in frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"):
+			frappe.db.delete("Student", {"name": s})
+		frappe.db.delete("Student", {"student_name": "Unit Test Learner"})
+		if frappe.db.exists("User", self.EMAIL):
+			frappe.delete_doc("User", self.EMAIL, force=True, ignore_permissions=True)
+		frappe.db.commit()
+
+	def test_creates_a_website_user_and_a_linked_student(self):
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner",
+		                     gender="Female", mascot="zoya")
+		self.assertTrue(r.get("ok"), r)
+		u = frappe.db.get_value("User", self.EMAIL, ["user_type", "enabled", "first_name"], as_dict=True)
+		self.assertEqual(u.user_type, "Website User")     # never a Desk user
+		self.assertTrue(u.enabled)
+		stu = frappe.db.get_value("Student", r["id"],
+		                          ["user", "mode", "cohort", "gender", "mascot"], as_dict=True)
+		self.assertEqual(stu.user, self.EMAIL)
+		self.assertEqual(stu.mode, "Online")
+		self.assertEqual(stu.gender, "Female")
+		self.assertEqual(stu.mascot, "zoya")
+
+	def test_the_password_actually_authenticates(self):
+		"""The whole point: the client signs in afterwards through Frappe's own /api/method/login,
+		so the password we stored has to be the one that check_password accepts."""
+		from frappe.utils.password import check_password
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(check_password(self.EMAIL, self.PWD), self.EMAIL)
+		with self.assertRaises(frappe.AuthenticationError):
+			check_password(self.EMAIL, self.PWD + "x")
+
+	def test_rejects_a_short_or_obvious_password(self):
+		self.assertEqual(api.signup_email(email=self.EMAIL, password="short1", name="X Y").get("error"),
+		                 "weak_password")
+		self.assertFalse(frappe.db.exists("User", self.EMAIL))
+		self.assertEqual(api.signup_email(email=self.EMAIL, password="password123", name="X Y").get("error"),
+		                 "common_password")
+		self.assertFalse(frappe.db.exists("User", self.EMAIL))
+
+	def test_rejects_a_malformed_email(self):
+		for bad in ("not-an-email", "a@b", "@example.com", "two@@example.com", "x y@example.com", ""):
+			self.assertEqual(api.signup_email(email=bad, password=self.PWD, name="X Y").get("error"),
+			                 "bad_email", bad)
+
+	def test_a_taken_email_is_refused_and_nothing_is_overwritten(self):
+		first = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(first.get("ok"), first)
+		again = api.signup_email(email=self.EMAIL, password="a different one", name="Someone Else")
+		self.assertEqual(again.get("error"), "email_taken")
+		# the original account is untouched — a second signup must not be a password reset
+		from frappe.utils.password import check_password
+		self.assertEqual(check_password(self.EMAIL, self.PWD), self.EMAIL)
+		self.assertEqual(frappe.db.get_value("User", self.EMAIL, "first_name"), "Unit Test Learner")
+
+	def test_email_is_normalised_and_no_markup_survives_in_the_name(self):
+		r = api.signup_email(email="  " + self.EMAIL.upper() + " ", password=self.PWD,
+		                     name="<b>Unit</b> Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(r["email"], self.EMAIL)                 # lower-cased, trimmed
+		self.assertTrue(frappe.db.exists("User", self.EMAIL))
+		self.assertNotIn("<", frappe.db.get_value("Student", r["id"], "student_name"))
+
+	def test_no_invite_code_is_required(self):
+		"""Unlike signup_online, this door is open — it is for people who find the app
+		themselves, not for enrolling someone into a facilitator's cohort."""
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(frappe.db.get_value("Student", r["id"], "cohort"), "Online")

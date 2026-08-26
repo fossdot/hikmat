@@ -5622,34 +5622,39 @@ function renderOnlineLogin(){
   setBack(tx("← Back","← वापस"), renderLogin);
   root.appendChild(el(`<div class="screen">
     <div class="hero"><h1>${tx("Log in 🌐","लॉग इन 🌐")}</h1>
-      <p>${tx("Type your username and PIN.","अपना यूज़रनेम और पिन डालो।")}</p></div>
+      <p>${tx("Use your email and password.","अपना ईमेल और पासवर्ड डालो।")}</p></div>
     <div class="authform">
-      <label class="fieldlabel">${tx("Username","यूज़रनेम")}</label>
-      <input id="olUser" class="searchbox" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30"
-             placeholder="${tx('e.g. asha01','जैसे: asha01')}">
-      <label class="fieldlabel">${tx("PIN","पिन")}</label>
-      <input id="olPin" class="searchbox" type="password" inputmode="numeric" maxlength="8" autocomplete="current-password"
-             placeholder="${tx('4–8 digits','4–8 अंक')}">
+      <label class="fieldlabel">${tx("Email","ईमेल")}</label>
+      <input id="olUser" class="searchbox" type="email" autocomplete="email" autocapitalize="none"
+             spellcheck="false" inputmode="email" maxlength="140"
+             placeholder="${tx('you@example.com','you@example.com')}">
+      <label class="fieldlabel">${tx("Password","पासवर्ड")}</label>
+      <input id="olPin" class="searchbox" type="password" autocomplete="current-password" maxlength="128"
+             placeholder="${tx('your password','तुम्हारा पासवर्ड')}">
       <div class="feedback bad" id="olErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="olGo">${tx("Log in →","लॉग इन →")}</button></div>
       <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
-        <button class="btn ghost" id="olToSignup">${tx("✨ Have an invite code? Sign up","✨ इनवाइट कोड है? साइन अप")}</button>
-        <button class="btn ghost" id="olToName">${tx("Use name + PIN instead","नाम + पिन से")}</button>
+        <button class="btn ghost" id="olToSignup">${tx("✨ New here? Sign up","✨ नई हो? साइन अप")}</button>
+        <button class="btn ghost" id="olGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
       </div>
     </div>
   </div>`));
-  const narr = tx("Log in with your username and PIN.","अपने यूज़रनेम और पिन से लॉग इन करो।");
+  const narr = tx("Log in with your email and password.","अपने ईमेल और पासवर्ड से लॉग इन करो।");
   setNarration(narr, narr);
   const u = $("#olUser"), p = $("#olPin"), err = $("#olErr");
   setTimeout(() => u.focus(), 60);
   $("#olToSignup").onclick = () => { sfx.tap(); renderOnlineSignup(); };
-  $("#olToName").onclick   = () => { sfx.back(); renderLogin(); };
+  $("#olGuest").onclick    = () => { sfx.tap(); setStudent(null); renderHome(); };
   const submit = async () => {
-    const un = u.value.trim().toLowerCase(), pin = p.value.trim();
-    if(!un || !pin){ err.textContent = tx("Type your username and PIN.","यूज़रनेम और पिन डालो।"); return; }
+    const em = u.value.trim().toLowerCase(), pwd = p.value;
+    if(!em || !pwd){ err.textContent = tx("Type your email and password.","ईमेल और पासवर्ड डालो।"); return; }
     err.textContent = tx("Checking…","जाँच रहे हैं…");
-    if(!(await frappeLogin(un, pin))){
-      err.textContent = tx("Wrong username or PIN — try again.","ग़लत यूज़रनेम या पिन — फिर कोशिश करो।");
+    // Frappe's own /api/method/login takes the email as `usr`, so signing in uses exactly the
+    // path the framework maintains — no bespoke session endpoint of ours to get wrong.
+    if(!(await frappeLogin(em, pwd))){
+      // One message for "no such account" and "wrong password": a different one would let
+      // anyone check which email addresses have an account here.
+      err.textContent = tx("Wrong email or password — try again.","ग़लत ईमेल या पासवर्ड — फिर कोशिश करो।");
       p.value = ""; p.focus(); return;
     }
     const r = await api("get_my_student");
@@ -5661,7 +5666,6 @@ function renderOnlineLogin(){
   p.onkeydown = (e) => { if(e.key==="Enter") submit(); };
   refreshTop();
 }
-
 function renderOnlineSignup(){
   stopSpeech(); rerender = renderOnlineSignup; root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderOnlineLogin);
@@ -5669,18 +5673,19 @@ function renderOnlineSignup(){
   const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
   const haveBands = bandList.length > 0;
   root.appendChild(el(`<div class="screen">
-    <div class="hero"><h1>${tx("Sign up online 🌐","ऑनलाइन साइन अप 🌐")}</h1>
-      <p>${tx("Use the invite code from your teacher.","अपने शिक्षक से मिला इनवाइट कोड डालो।")}</p></div>
+    <div class="hero"><h1>${tx("Create your account ✨","अपना खाता बनाओ ✨")}</h1>
+      <p>${tx("An email and a password — that is all.","एक ईमेल और एक पासवर्ड — बस इतना ही।")}</p></div>
     <div class="signup">
-      <label class="fieldlabel">${tx("Invite code","इनवाइट कोड")}</label>
-      <input id="osCode" class="searchbox" type="text" autocapitalize="characters" spellcheck="false" maxlength="40"
-             placeholder="${tx('from your teacher','शिक्षक से मिला')}">
-      <label class="fieldlabel">${tx("Choose a username","यूज़रनेम चुनो")}</label>
-      <input id="osUser" class="searchbox" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="30"
-             placeholder="${tx('letters & numbers, e.g. asha01','अक्षर और अंक, जैसे: asha01')}">
-      <label class="fieldlabel">${tx("Your name or nickname","तुम्हारा नाम या उपनाम")}</label>
-      <input id="osName" class="searchbox" type="text" autocomplete="off" maxlength="40"
+      <label class="fieldlabel">${tx("Email","ईमेल")}</label>
+      <input id="osEmail" class="searchbox" type="email" autocomplete="email" autocapitalize="none"
+             spellcheck="false" inputmode="email" maxlength="140" placeholder="you@example.com">
+      <label class="fieldlabel">${tx("Your name","तुम्हारा नाम")}</label>
+      <input id="osName" class="searchbox" type="text" autocomplete="name" maxlength="40"
              placeholder="${tx('e.g. Asha','जैसे: आशा')}">
+      <label class="fieldlabel">${tx("Password","पासवर्ड")}</label>
+      <input id="osPwd" class="searchbox" type="password" autocomplete="new-password" maxlength="128"
+             placeholder="${tx('at least 8 characters','कम से कम 8 अक्षर')}">
+      <div class="hint2" id="osPwdHint">${tx("At least 8 characters. Longer is stronger.","कम से कम 8 अक्षर। जितना लंबा, उतना मज़बूत।")}</div>
       ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
       <div class="bandpick" id="osBand"></div>` : ``}
       <label class="fieldlabel">${tx("I am a…","मैं हूँ…")}</label>
@@ -5690,21 +5695,19 @@ function renderOnlineSignup(){
       <div class="avpick" id="osAv"></div>
       <label class="fieldlabel">${tx("Choose your friend","अपनी सहेली चुनो")}</label>
       <div class="friendgrid" id="osFriend"></div>
-      <label class="fieldlabel">${tx("Choose a PIN","एक पिन चुनो")}</label>
-      <input id="osPin" class="searchbox" type="password" inputmode="numeric" maxlength="8"
-             placeholder="${tx('4–8 digits — keeps your progress safe','4–8 अंक — प्रगति सुरक्षित रखे')}">
       <label class="consent"><input type="checkbox" id="osConsent">
-        <span>${tx("A parent or teacher said it's okay for me to make a profile.","माता-पिता या शिक्षक ने मुझे प्रोफ़ाइल बनाने की अनुमति दी है।")}</span></label>
+        <span>${tx("A parent or teacher said it's okay for me to make an account.","माता-पिता या शिक्षक ने मुझे खाता बनाने की अनुमति दी है।")}</span></label>
       <div class="feedback bad" id="osErr" style="min-height:18px"></div>
       <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
       <div class="center" style="margin-top:14px"><button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button></div>
     </div>
   </div>`));
-  const narr = tx("Sign up online. Enter your invite code, choose a username and a PIN.","ऑनलाइन साइन अप। इनवाइट कोड डालो, यूज़रनेम और पिन चुनो।");
+  const narr = tx("Create your account with an email and a password.","ईमेल और पासवर्ड से अपना खाता बनाओ।");
   setNarration(narr, narr);
+
   const avwrap = $("#osAv");
   AVATARS.forEach((a,i) => {
-    const b = el(`<button class="av ${i===0?'sel':''}">${a}</button>`);
+    const b = el(`<button type="button" class="av ${i===0?'sel':''}">${a}</button>`);
     b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
     avwrap.appendChild(b);
   });
@@ -5728,56 +5731,62 @@ function renderOnlineSignup(){
       speak(tx(mm.line, mm.lineHi), state.lang==="hi" ? "hi" : "en"); };
     fw.appendChild(b);
   });
-  const code = $("#osCode"), user = $("#osUser"), nm = $("#osName"), pin = $("#osPin"),
-        go = $("#osGo"), err = $("#osErr"), consent = $("#osConsent");
-  const userOK = () => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(user.value.trim().toLowerCase());
-  const pinOK  = () => /^\d{4,8}$/.test(pin.value.trim());
-  const refreshGo = () => { go.disabled = !(code.value.trim() && userOK() && pinOK() && consent.checked && (!haveBands || band) && gender); };
-  [code, user, pin].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
-  consent.onchange = refreshGo;
   if(haveBands){
     const bw = $("#osBand");
     bandList.forEach(b => {
-      const btn = el(`<button class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+      const btn = el(`<button type="button" class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
       btn.onclick = () => { band = b.key; sfx.tap(); bw.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
       bw.appendChild(btn);
     });
   }
-  setTimeout(() => code.focus(), 60);
+
+  const email = $("#osEmail"), nm = $("#osName"), pwd = $("#osPwd"),
+        go = $("#osGo"), err = $("#osErr"), consent = $("#osConsent");
+  const emailOK = () => /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email.value.trim());
+  const pwdOK   = () => pwd.value.length >= 8;
+  const refreshGo = () => { go.disabled = !(emailOK() && pwdOK() && nm.value.trim() && consent.checked && gender && (!haveBands || band)); };
+  [email, nm, pwd].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
+  consent.onchange = refreshGo;
+  refreshGo();
+  setTimeout(() => email.focus(), 60);
   $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+
   const submit = async () => {
-    const un = user.value.trim().toLowerCase();
-    if(!userOK()){ err.textContent = tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -"); return; }
-    if(!pinOK()){ err.textContent = tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।"); return; }
-    if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
+    const em = email.value.trim().toLowerCase(), pw = pwd.value, who = nm.value.trim();
+    if(!emailOK()){ err.textContent = tx("Please type a real email address.","सही ईमेल पता लिखो।"); return; }
+    if(who.length < 2){ err.textContent = tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।"); return; }
+    if(!pwdOK()){ err.textContent = tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।"); return; }
     if(!gender){ err.textContent = tx("Please tap one: a girl, a boy, or rather not say.","कृपया एक चुनो: लड़की, लड़का, या नहीं बताना।"); return; }
+    if(haveBands && !band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
+    if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
     go.disabled = true; err.textContent = tx("Creating…","बना रहे हैं…");
-    const r = await api("signup_online",
-      { username: un, pin: pin.value.trim(), invite_code: code.value.trim(),
-        name: nm.value.trim(), avatar, band, gender, mascot }, true);
-    if(r && r.ok){ finishLogin(r, { gender, mascot }); return; }
+    const r = await api("signup_email", { email: em, password: pw, name: who, avatar, band, gender, mascot }, true);
+    if(r && r.ok){
+      // Sign in through the SAME door she will use every day after this, rather than being
+      // handed a session by the signup call — one login path, exercised from minute one.
+      if(await frappeLogin(em, pw)){
+        const me = await api("get_my_student");
+        if(me && me.ok){ finishLogin(me, { gender, mascot }); return; }
+      }
+      err.textContent = tx("Account made — please log in.","खाता बन गया — अब लॉग इन करो।");
+      setTimeout(() => renderOnlineLogin(), 900);
+      return;
+    }
     go.disabled = false;
     const e = r && r.error;
     err.textContent =
-      e==="bad_invite" ? tx("That invite code isn't right.","इनवाइट कोड सही नहीं है।") :
-      e==="username_taken" ? tx("That username is taken — try another.","यह यूज़रनेम लिया जा चुका — दूसरा चुनो।") :
-      e==="bad_username" ? tx("Username: 3–30 letters, numbers, . _ -","यूज़रनेम: 3–30 अक्षर/अंक, . _ -") :
-      e==="bad_pin" ? tx("Please choose a 4–8 digit PIN.","कृपया 4–8 अंकों का पिन चुनो।") :
+      e==="email_taken" ? tx("That email already has an account — log in instead.","इस ईमेल का खाता पहले से है — लॉग इन करो।") :
+      e==="bad_email" ? tx("Please type a real email address.","सही ईमेल पता लिखो।") :
+      e==="weak_password" ? tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।") :
+      e==="common_password" ? tx("That password is too easy to guess — pick another.","यह पासवर्ड बहुत आसान है — दूसरा चुनो।") :
+      e==="bad_name" ? tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।") :
       e==="rate_limited" ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
       tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।");
   };
   go.onclick = submit;
-  refreshGo();
+  pwd.onkeydown = (e) => { if(e.key==="Enter" && !go.disabled) submit(); };
   refreshTop();
 }
-
-// ---------- CAMPUS device: offline roster login ----------
-// A campus laptop is provisioned once (renderDeviceSetup) by a facilitator: it caches the
-// campus roster (names + avatars + PIN hashes + tokens). Girls then tap their name and type a
-// PIN verified ON-DEVICE against the cached werkzeug hash, so login works with no network.
-// Attempts sync when the laptop is next online (the cached token authorises them).
-const DEVICE_MODE_KEY = "hikmat_device_mode";       // "campus" | "" (online/personal — the default)
-const CAMPUS_ROSTER_KEY = "hikmat_campus_roster";   // { campus, ts, students:[{id,name,avatar,pinHash,token,band}] }
 function deviceMode(){ try { return localStorage.getItem(DEVICE_MODE_KEY) || ""; } catch(e){ return ""; } }
 function campusRoster(){ try { return JSON.parse(localStorage.getItem(CAMPUS_ROSTER_KEY)); } catch(e){ return null; } }
 function setCampusDevice(campus, students){
@@ -5787,7 +5796,12 @@ function setCampusDevice(campus, students){
   } catch(e){}
 }
 function clearCampusDevice(){ try { localStorage.removeItem(CAMPUS_ROSTER_KEY); localStorage.removeItem(DEVICE_MODE_KEY); } catch(e){} }
-function startLogin(){ deviceMode()==="campus" ? renderCampusLogin() : renderLogin(); }   // route by device
+// Online-only sign-in (Vishal, 2026-08-26). The campus branch — a provisioned laptop that
+// verified a PIN against a roster hash cached on the device, so a centre with no internet could
+// still log a girl in — is no longer reachable from any button. renderCampusLogin and
+// renderDeviceSetup are left in the file rather than deleted: the offline centre is a real
+// deployment that may come back, and nothing routes to them today.
+function startLogin(){ renderOnlineLogin(); }
 
 // Verify a PIN against werkzeug's "pbkdf2:sha256:<iters>$<salt>$<hex>" hash entirely in-browser
 // (validated to match werkzeug's output). Constant-time-ish hex compare.

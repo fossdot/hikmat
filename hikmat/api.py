@@ -2441,6 +2441,110 @@ def signup_online(username=None, pin=None, invite_code=None, name=None, avatar=N
             "username": username}
 
 
+_EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[A-Za-z0-9]([A-Za-z0-9.-]{0,251}[A-Za-z0-9])?\.[A-Za-z]{2,24}$")
+_MIN_PASSWORD = 8
+
+# The commonest passwords, refused outright. Not a security theatre list — these are what a
+# rushed adult actually types, and this account is the only thing standing between a stranger
+# and a child's learning record.
+_WEAK_PASSWORDS = frozenset("""
+password password1 password123 12345678 123456789 1234567890 qwerty123 qwertyui
+iloveyou1 letmein1 welcome1 abc12345 admin123 bodhya123 hikmat123 changeme
+""".split())
+
+
+def _validated_password(pwd):
+    """(password, None) or (None, error_code). Length first, then the obvious-guess list.
+
+    Deliberately NOT delegating to Frappe's password policy: v2_online_auth switched that off
+    site-wide so that 4-digit PINs could be stored as passwords. Turning it back on now would
+    reject every existing PIN account at next login, so this door enforces its own floor and
+    leaves the site setting alone."""
+    pwd = pwd if isinstance(pwd, str) else ""
+    if len(pwd) < _MIN_PASSWORD:
+        return None, "weak_password"
+    if pwd.strip().lower() in _WEAK_PASSWORDS:
+        return None, "common_password"
+    return pwd, None
+
+
+def _normalised_email(value):
+    e = _plain_text(value).strip().lower()
+    return e if (len(e) <= 140 and _EMAIL_RE.match(e)) else ""
+
+
+@frappe.whitelist(allow_guest=True)
+def signup_email(email=None, password=None, name=None, avatar=None, band=None,
+                 gender=None, mascot=None):
+    """Open sign-up for ONLINE learners: a real email address and a real password.
+
+    This is the door for people who find the app themselves, and it deliberately has no invite
+    code — unlike signup_online, which gates on a cohort code because it enrols someone into a
+    facilitator's cohort. It also has no PIN: a 4-digit PIN typed on a shared classroom laptop
+    and a password protecting an internet-facing account are not the same security problem, and
+    pretending otherwise is how the PIN ended up being stored as a User password.
+
+    Creates a Website User (no Desk, no welcome mail) plus the linked Student, then answers
+    ok. The CLIENT logs in afterwards through Frappe's own /api/method/login with the same
+    address and password — one tested path for signing in, exercised from the first minute,
+    rather than a bespoke session handed out here that only ever runs once.
+
+    NOT verified by email. There is no outbound mail configured on this site, so a verification
+    step would either block every signup or be a link nobody receives. The address is stored as
+    given; treat it as a login identifier, not as proof of ownership, until mail is set up."""
+    if not _rate_ok("signup:" + _client_ip(), 60, 3600, fail_closed=True):   # see signup_student
+        return {"ok": False, "error": "rate_limited"}
+
+    email = _normalised_email(email)
+    if not email:
+        return {"ok": False, "error": "bad_email"}
+    password, err = _validated_password(password)
+    if err:
+        return {"ok": False, "error": err}
+
+    display = _display_name(name) or email.split("@")[0]
+    if not (2 <= len(display) <= 40):
+        return {"ok": False, "error": "bad_name"}
+
+    if frappe.db.exists("User", email):
+        # Same wording as a wrong password would produce on the login screen, so this endpoint
+        # is not a membership oracle for arbitrary addresses.
+        return {"ok": False, "error": "email_taken"}
+
+    avatar = _plain_text(avatar)[:20] or "🙂"
+    band = _docname(band)
+    band = band if (band and frappe.db.exists("Grade Band", band)) else None
+    g = _plain_text(gender)
+    g = g if g in GENDERS else "Other"
+    mas = _plain_text(mascot).lower()
+    mas = mas if mas in MASCOT_IDS else "roshni"
+
+    user = frappe.get_doc({
+        "doctype": "User", "email": email, "first_name": display,
+        "user_type": "Website User", "send_welcome_email": 0, "enabled": 1,
+        "new_password": password,
+    })
+    user.flags.no_welcome_mail = True
+    user.insert(ignore_permissions=True)
+
+    cohort = "Online"
+    if not frappe.db.exists("Cohort", cohort):
+        try:
+            frappe.get_doc({"doctype": "Cohort", "cohort_name": cohort, "mode": "Online",
+                            "center": "Self sign-up"}).insert(ignore_permissions=True)
+        except frappe.DuplicateEntryError:
+            pass
+
+    stu = frappe.get_doc({
+        "doctype": "Student", "student_name": display, "avatar": avatar,
+        "cohort": cohort, "active": 1, "gender": g, "mascot": mas,
+        "band": band, "mode": "Online", "user": user.name,
+    }).insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"ok": True, "id": stu.name, "email": email, "name": display,
+            "avatar": stu.avatar or "🙂", "band": band or "", "gender": g, "mascot": mas}
+
+
 @frappe.whitelist(allow_guest=True)
 def get_my_student():
     """After an ONLINE Frappe login (POST /api/method/login with the username + PIN), the game
