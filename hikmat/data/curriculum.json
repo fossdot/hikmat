@@ -125,6 +125,10 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "pairs": true,
+    "skip": [
+     "fix"
     ]
    },
    {
@@ -243,6 +247,75 @@
       "teach": "For more than one, make the noun plural.",
       "teachHi": "एक से ज़्यादा हो तो noun को plural बनाते हैं।"
      }
+    ],
+    "sort": {
+     "buckets": [
+      {
+       "key": "fruit",
+       "en": "Fruit",
+       "hi": "फल",
+       "emoji": "🍇"
+      },
+      {
+       "key": "veg",
+       "en": "Vegetable",
+       "hi": "सब्ज़ी",
+       "emoji": "🥬"
+      }
+     ],
+     "items": [
+      {
+       "en": "mango",
+       "hi": "आम",
+       "emoji": "🥭",
+       "bucket": "fruit"
+      },
+      {
+       "en": "banana",
+       "hi": "केला",
+       "emoji": "🍌",
+       "bucket": "fruit"
+      },
+      {
+       "en": "apple",
+       "hi": "सेब",
+       "emoji": "🍎",
+       "bucket": "fruit"
+      },
+      {
+       "en": "guava",
+       "hi": "अमरूद",
+       "emoji": "🍐",
+       "bucket": "fruit"
+      },
+      {
+       "en": "potato",
+       "hi": "आलू",
+       "emoji": "🥔",
+       "bucket": "veg"
+      },
+      {
+       "en": "onion",
+       "hi": "प्याज़",
+       "emoji": "🧅",
+       "bucket": "veg"
+      },
+      {
+       "en": "tomato",
+       "hi": "टमाटर",
+       "emoji": "🍅",
+       "bucket": "veg"
+      },
+      {
+       "en": "carrot",
+       "hi": "गाजर",
+       "emoji": "🥕",
+       "bucket": "veg"
+      }
+     ]
+    },
+    "skip": [
+     "phrase"
     ]
    },
    {
@@ -361,6 +434,152 @@
       "teach": "Salt cannot be counted, so use 'some'.",
       "teachHi": "नमक गिना नहीं जाता, इसलिए 'some' लगता है।"
      }
+    ],
+    "odd": [
+     {
+      "items": [
+       {
+        "en": "mango",
+        "hi": "आम",
+        "emoji": "🥭"
+       },
+       {
+        "en": "banana",
+        "hi": "केला",
+        "emoji": "🍌"
+       },
+       {
+        "en": "potato",
+        "hi": "आलू",
+        "emoji": "🥔"
+       },
+       {
+        "en": "apple",
+        "hi": "सेब",
+        "emoji": "🍎"
+       }
+      ],
+      "answer": "potato",
+      "teach": "Mango, banana and apple are fruits — a potato is a vegetable.",
+      "teachHi": "आम, केला और सेब फल हैं — आलू एक सब्ज़ी है।"
+     },
+     {
+      "items": [
+       {
+        "en": "rice",
+        "hi": "चावल",
+        "emoji": "🍚"
+       },
+       {
+        "en": "wheat",
+        "hi": "गेहूँ",
+        "emoji": "🌾"
+       },
+       {
+        "en": "chilli",
+        "hi": "मिर्च",
+        "emoji": "🌶️"
+       }
+      ],
+      "answer": "chilli",
+      "teach": "Rice and wheat are grains — chilli is a spice.",
+      "teachHi": "चावल और गेहूँ अनाज हैं — मिर्च एक मसाला है।"
+     },
+     {
+      "items": [
+       {
+        "en": "salt",
+        "hi": "नमक",
+        "emoji": "🧂"
+       },
+       {
+        "en": "chilli",
+        "hi": "मिर्च",
+        "emoji": "🌶️"
+       },
+       {
+        "en": "banana",
+        "hi": "केला",
+        "emoji": "🍌"
+       }
+      ],
+      "answer": "banana",
+      "teach": "Salt and chilli make food tasty — a banana is a fruit.",
+      "teachHi": "नमक और मिर्च खाने का स्वाद बढ़ाते हैं — केला एक फल है।"
+     },
+     {
+      "items": [
+       {
+        "en": "potato",
+        "hi": "आलू",
+        "emoji": "🥔"
+       },
+       {
+        "en": "onion",
+        "hi": "प्याज़",
+        "emoji": "🧅"
+       },
+       {
+        "en": "carrot",
+        "hi": "गाजर",
+        "emoji": "🥕"
+       },
+       {
+        "en": "wheat",
+        "hi": "गेहूँ",
+        "emoji": "🌾"
+       }
+      ],
+      "answer": "wheat",
+      "teach": "Potato, onion and carrot are vegetables — wheat is a grain.",
+      "teachHi": "आलू, प्याज़ और गाजर सब्ज़ियाँ हैं — गेहूँ एक अनाज है।"
+     }
+    ],
+    "sort": {
+     "buckets": [
+      {
+       "key": "grain",
+       "en": "Grain",
+       "hi": "अनाज",
+       "emoji": "🌾"
+      },
+      {
+       "key": "spice",
+       "en": "Spice",
+       "hi": "मसाला",
+       "emoji": "🥘"
+      }
+     ],
+     "items": [
+      {
+       "en": "rice",
+       "hi": "चावल",
+       "emoji": "🍚",
+       "bucket": "grain"
+      },
+      {
+       "en": "wheat",
+       "hi": "गेहूँ",
+       "emoji": "🌾",
+       "bucket": "grain"
+      },
+      {
+       "en": "salt",
+       "hi": "नमक",
+       "emoji": "🧂",
+       "bucket": "spice"
+      },
+      {
+       "en": "chilli",
+       "hi": "मिर्च",
+       "emoji": "🌶️",
+       "bucket": "spice"
+      }
+     ]
+    },
+    "skip": [
+     "listen",
+     "spell"
     ]
    },
    {

@@ -816,7 +816,7 @@ def _track_json(t, with_content):
 
     lessons = frappe.get_all(
         "Lesson", filters={"track": t.name, "published": 1},
-        fields=["name", "lesson_key", "title", "title_hi",
+        fields=["name", "lesson_key", "title", "title_hi", "extras_json",
                 "video", "video_title", "video_title_hi", "video_duration_secs"],
         order_by="sort_order asc, creation asc",
     )
@@ -931,6 +931,17 @@ def _track_json(t, with_content):
             ld["videoTitleHi"] = l.get("video_title_hi") or ""
             if _int(l.get("video_duration_secs")):
                 ld["videoDuration"] = _int(l.get("video_duration_secs"))
+        # Rotation-era activities (pairs / odd / sort) and per-lesson curation (skip) ride one
+        # JSON blob rather than a child DocType each — merged into the lesson verbatim, and the
+        # game ignores keys it does not know. Malformed JSON must cost that lesson its extras,
+        # never the whole curriculum payload.
+        if (l.get("extras_json") or "").strip():
+            try:
+                extras = json.loads(l.extras_json)
+                if isinstance(extras, dict):
+                    ld.update(extras)
+            except Exception:
+                pass
         track["lessons"].append(ld)
 
     # Module test: the question bank ships WITH the curriculum so tests work fully

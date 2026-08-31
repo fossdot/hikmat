@@ -31,7 +31,9 @@
   "sec_read",
   "read",
   "sec_reply",
-  "reply"
+  "reply",
+  "sec_extras",
+  "extras_json"
  ],
  "fields": [
   {
@@ -173,12 +175,24 @@
    "fieldtype": "Table",
    "label": "Reply to the Email exercises",
    "options": "Lesson Reply"
+  },
+  {
+   "fieldname": "sec_extras",
+   "fieldtype": "Section Break",
+   "label": "Extra activities (rotation)"
+  },
+  {
+   "fieldname": "extras_json",
+   "fieldtype": "Code",
+   "label": "Extras JSON",
+   "options": "JSON",
+   "description": "Rotation-era activity data merged verbatim into the lesson the game receives. Keys: pairs (true = memory board from this lesson's words, or an authored [{en,hi,emoji}] board), odd ([{items,answer,teach,teachHi}]), sort ({buckets:[{key,en,hi,emoji}], items:[{en,hi,emoji,bucket}]}), skip ([activity ids this lesson does not carry])"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-07 00:00:00.000000",
+ "modified": "2026-08-31 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Lesson",

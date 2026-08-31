@@ -443,6 +443,30 @@
   .opt.correct { border-color:var(--good); color:var(--good-d); background:#eafaf2; box-shadow:var(--shadow-sm); }
   .opt.wrong { border-color:var(--bad); color:var(--bad-d); background:#fff0f0; box-shadow:var(--shadow-sm); }
   .opt.disabled { pointer-events:none; }
+  /* Match the Pairs — the memory board. Face-down cards wear a dotted grape back; a revealed
+     card is a plain white card (picture or word); matched pairs settle green and stay tappable
+     so she can re-hear them. Grid capped near phone width — 12 cards must not become a mural. */
+  .pairgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px auto 0; max-width:440px; }
+  @media (max-width:420px){ .pairgrid { grid-template-columns:repeat(3,1fr); } }
+  .pcard {
+    aspect-ratio:5/6; border-radius:14px; border:2px solid var(--grape-d); cursor:pointer;
+    background:var(--grape); box-shadow:var(--shadow-sm); display:grid; place-items:center; padding:4px;
+    transition: transform .12s, background .12s, border-color .12s;
+    background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,.28) 0 4px, transparent 5px),
+                      radial-gradient(circle at 70% 62%, rgba(255,255,255,.20) 0 3px, transparent 4px);
+  }
+  .pcard:active { transform: translateY(2px); }
+  .pcard.up { background:#fff; background-image:none; border-color:var(--line); }
+  .pcard.up.pic .pface { font-size:34px; line-height:1.1; }
+  .pcard.up.word .pface { font-size:15px; font-weight:900; color:var(--ink); word-break:break-word; text-align:center; line-height:1.15; }
+  .pcard.matched { border-color:var(--good); background:#eafaf2; }
+  [data-theme="dark"] .pcard.up { background:#2a2240; }
+  [data-theme="dark"] .pcard.matched { background:#15341f; }
+  /* First-time "how to play" coaching screen */
+  .coach .display { margin-top:14px; }
+  .coach .actico { font-size:84px; line-height:1; text-align:center; }
+  .coach .actico svg { width:104px; height:104px; }
+  .coach .actionrow { justify-content:center; margin-top:18px; }
   /* Class 1–10 home sections + Quiz activity */
   .sectionhead { font-size:14px; font-weight:900; color:var(--muted); letter-spacing:.04em;
                  text-transform:uppercase; margin:22px 4px 10px; }
@@ -1013,6 +1037,12 @@ window.HIKMAT_ICONS = {
 
   "act:read": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-rd-pg" x1="16" y1="8" x2="48" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient></defs><path d="M16 8h20l12 12v34a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z" fill="url(#hk-rd-pg)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M36 8v12h12" fill="none" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g stroke="#9fb6d4" stroke-width="2" stroke-linecap="round" opacity=".85"><path d="M21 28h22M21 34h22M21 40h14"/></g><circle cx="43" cy="45" r="9" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M39 45l3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
+  "act:pairs": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-pr-a" x1="10" y1="14" x2="30" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe0d6"/></linearGradient><linearGradient id="hk-pr-b" x1="34" y1="18" x2="54" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient></defs><g transform="rotate(-7 19 28)"><rect x="8" y="13" width="22" height="30" rx="5" fill="url(#hk-pr-a)" stroke="#00000026" stroke-width="1.6"/><circle cx="19" cy="25" r="6" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><path d="M20 18c1-3 4-3 4-3" fill="none" stroke="#7cc36a" stroke-width="2" stroke-linecap="round"/></g><g transform="rotate(6 45 36)"><rect x="34" y="21" width="22" height="30" rx="5" fill="url(#hk-pr-b)" stroke="#00000026" stroke-width="1.6"/><text x="45" y="41" font-family="Arial,sans-serif" font-size="15" font-weight="800" text-anchor="middle" fill="#4a90d9">A</text></g><circle cx="32" cy="10" r="2.2" fill="#f2b134"/><circle cx="30" cy="56" r="2.2" fill="#f2b134"/></svg>`,
+
+  "act:odd": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-odd-gl" x1="34" y1="22" x2="56" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs><g fill="#4a90d9" stroke="#00000022" stroke-width="1.4"><circle cx="14" cy="16" r="7"/><circle cx="33" cy="13" r="7"/><circle cx="13" cy="36" r="7"/></g><path d="M43 22l2.7 5.4 6 .9-4.3 4.3 1 6-5.4-2.9-5.4 2.9 1-6-4.3-4.3 6-.9z" fill="#f2b134" stroke="#00000022" stroke-width="1.4" stroke-linejoin="round"/><circle cx="43" cy="30" r="12" fill="url(#hk-odd-gl)" fill-opacity=".35" stroke="#e8714f" stroke-width="2.2"/><path d="M51.5 39l8 8" stroke="#e8714f" stroke-width="3.4" stroke-linecap="round"/></svg>`,
+
+  "act:sort": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-srt-l" x1="8" y1="36" x2="26" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f4e6cf"/></linearGradient><linearGradient id="hk-srt-r" x1="38" y1="36" x2="56" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff2d6"/></linearGradient></defs><circle cx="32" cy="12" r="5.5" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><path d="M33 6c2-3 5-3 5-3" fill="none" stroke="#7cc36a" stroke-width="2" stroke-linecap="round"/><path d="M28 20c-4 3-8 6-11 8" fill="none" stroke="#f2b134" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 5"/><path d="M18 26l-2 4 4-1" fill="none" stroke="#f2b134" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 34h22l-2.4 14a4.4 4.4 0 0 1-4.3 3.8h-8.6a4.4 4.4 0 0 1-4.3-3.8z" fill="url(#hk-srt-l)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M35 34h22l-2.4 14a4.4 4.4 0 0 1-4.3 3.8h-8.6a4.4 4.4 0 0 1-4.3-3.8z" fill="url(#hk-srt-r)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 34h22M35 34h22" stroke="#00000026" stroke-width="1.6"/><g stroke="#c9a86a" stroke-width="1.6" opacity=".6"><path d="M13 38l-1 9M18 38v9M23 38l1 9"/></g><g stroke="#8fbf78" stroke-width="1.6" opacity=".6"><path d="M41 38l-1 9M46 38v9M51 38l1 9"/></g></svg>`,
+
   "gem": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-gem-t" x1="20" y1="14" x2="44" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9be9ff"/><stop offset="1" stop-color="#4ec8e8"/></linearGradient><linearGradient id="hk-gem-b" x1="14" y1="24" x2="40" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3fb6e0"/><stop offset="1" stop-color="#2c84c4"/></linearGradient></defs><path d="M20 12h24l10 14-22 26L12 26z" fill="url(#hk-gem-b)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 12h24l-3 14H23z" fill="url(#hk-gem-t)" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 12l10 14H41zM20 12L12 26h11z" fill="#6fd6f0" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M23 26h18l-9 26z" fill="#5cc6ea"/><path d="M23 26l9 26-20-26zM41 26l-9 26 22-26z" fill="#4ab6df"/><path d="M27 16l-4 8" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>`,
 
   "star": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-star-g" x1="32" y1="8" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff2bd"/><stop offset="1" stop-color="#f5b730"/></linearGradient></defs><path d="M32 8c1.6 0 3 .9 3.7 2.4l5.2 10.6 11.7 1.7c3.4.5 4.8 4.7 2.3 7.1l-8.5 8.3 2 11.6c.6 3.4-3 6-6 4.4L32 49.1l-10.4 5.5c-3 1.6-6.6-1-6-4.4l2-11.6-8.5-8.3c-2.5-2.4-1.1-6.6 2.3-7.1l11.7-1.7 5.2-10.6A4 4 0 0 1 32 8z" fill="url(#hk-star-g)" stroke="#d99a1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 18l-6 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="32" r="2" fill="#fff" opacity=".5"/></svg>`,
@@ -1088,6 +1118,7 @@ let COURSES = [
     blurb:"Food & market words", blurbHi:"खाने और बाज़ार के शब्द", published:true,
     lessons:[
       { key:"fruits", title:"Fruits & Drinks", titleHi:"फल और पेय",
+        pairs:true,   /* rotation demo: memory board built from this lesson's own words */
         words:[
           { en:"apple",  hi:"सेब",  pron:"ऐप्पल", emoji:"🍎", plural:"apples" },
           { en:"banana", hi:"केला", pron:"बनाना", emoji:"🍌", plural:"bananas" },
@@ -1104,6 +1135,23 @@ let COURSES = [
             then:"Okay! Have a nice day." },
         ] },
       { key:"veg", title:"Veg & Staples", titleHi:"सब्ज़ी और अनाज",
+        /* rotation demo: this lesson varies the ladder with Sort + Odd instead of Pairs */
+        sort:{
+          buckets:[ {key:"food", en:"Food", hi:"खाना", emoji:"🍽️"}, {key:"drink", en:"Drink", hi:"पेय", emoji:"🥤"} ],
+          items:[
+            {en:"milk",  hi:"दूध",   emoji:"🥛", bucket:"drink"},
+            {en:"tea",   hi:"चाय",   emoji:"🍵", bucket:"drink"},
+            {en:"apple", hi:"सेब",   emoji:"🍎", bucket:"food"},
+            {en:"egg",   hi:"अंडा",  emoji:"🥚", bucket:"food"},
+            {en:"bread", hi:"रोटी",  emoji:"🍞", bucket:"food"},
+            {en:"fish",  hi:"मछली", emoji:"🐟", bucket:"food"},
+          ] },
+        odd:[
+          { items:[ {en:"milk",hi:"दूध",emoji:"🥛"}, {en:"tea",hi:"चाय",emoji:"🍵"}, {en:"apple",hi:"सेब",emoji:"🍎"} ],
+            answer:"apple", teach:"Milk and tea are drinks — an apple is food.", teachHi:"दूध और चाय पेय हैं — सेब खाने की चीज़ है।" },
+          { items:[ {en:"apple",hi:"सेब",emoji:"🍎"}, {en:"banana",hi:"केला",emoji:"🍌"}, {en:"fish",hi:"मछली",emoji:"🐟"} ],
+            answer:"fish", teach:"Apple and banana are fruits — a fish is not a fruit.", teachHi:"सेब और केला फल हैं — मछली फल नहीं है।" },
+        ],
         words:[
           { en:"tomato", hi:"टमाटर", pron:"टमैटो", emoji:"🍅", plural:"tomatoes" },
           { en:"potato", hi:"आलू",   pron:"पटैटो", emoji:"🥔", plural:"potatoes" },
@@ -1447,21 +1495,62 @@ const FIX_LEVEL   = { id:"fix",   name:"Find the Bug",      nameHi:"गलती
 const EMAIL_LEVEL = { id:"email", name:"Write an Email",    nameHi:"ईमेल लिखो",   sub:"Compose & send",    subHi:"लिखो और भेजो",   ico:"📧", type:"email" };
 const READ_LEVEL  = { id:"read",  name:"Read & Answer",     nameHi:"पढ़ो और बताओ",  sub:"Read, then answer", subHi:"पढ़ो, फिर उत्तर दो", ico:"📃", type:"read" };
 const REPLY_LEVEL = { id:"reply", name:"Reply to the Email", nameHi:"ईमेल का जवाब दो", sub:"Read it, then reply", subHi:"पढ़ो, फिर जवाब दो", ico:"📨", type:"reply" };
+// Recognition games (the rotation set): light, tap-only, and mostly fed by the lesson's own
+// words — so a curriculum author can vary which of these a lesson carries at zero extra
+// authoring cost. They sit between Listen and Spell (hear → recognize → produce).
+const PAIRS_LEVEL = { id:"pairs", name:"Match the Pairs", nameHi:"जोड़ी मिलाओ",  sub:"Find word + picture", subHi:"शब्द और तस्वीर की जोड़ी ढूँढो", ico:"🎴", type:"pairs" };
+const ODD_LEVEL   = { id:"odd",   name:"Odd One Out",     nameHi:"अलग कौन?",    sub:"Tap the different one", subHi:"जो अलग है उसे चुनो",        ico:"🔍", type:"odd" };
+const SORT_LEVEL  = { id:"sort",  name:"Sort the Baskets",nameHi:"टोकरी में डालो", sub:"Put each in its place", subHi:"हर चीज़ सही टोकरी में डालो",  ico:"🧺", type:"sort" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
+// `skip` is the curation half of the rotation model: a lesson names the steps it does NOT
+// want ("skip":["spell","fix"]) so no lesson has to carry every activity its data could feed.
 function levelsFor(lesson){
   const hasWords = !!(lesson && lesson.words && lesson.words.length);
   const hasTalk  = !!(lesson && lesson.dialogues && lesson.dialogues.length);
   let lv = LEVELS.filter(l => l.type==="talk" ? hasTalk : hasWords);
+  // pairs:true reuses the lesson's own words as the board; an array is an authored board
+  const recog = [];
+  if(lesson && (Array.isArray(lesson.pairs) ? lesson.pairs.length : (lesson.pairs===true && hasWords))) recog.push(PAIRS_LEVEL);
+  if(lesson && lesson.odd  && lesson.odd.length) recog.push(ODD_LEVEL);
+  if(lesson && lesson.sort && lesson.sort.items && lesson.sort.items.length) recog.push(SORT_LEVEL);
+  if(recog.length){
+    const li = lv.findIndex(l => l.id==="listen");   // -1 (no words) → recognition games lead
+    lv = lv.slice(0, li+1).concat(recog, lv.slice(li+1));
+  }
   if(lesson && lesson.read  && lesson.read.length)  lv = lv.concat([READ_LEVEL]);
   if(lesson && lesson.quiz  && lesson.quiz.length)  lv = lv.concat([QUIZ_LEVEL]);
   if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
   if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
   if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
   if(lesson && lesson.reply && lesson.reply.length) lv = lv.concat([REPLY_LEVEL]);
+  if(lesson && Array.isArray(lesson.skip) && lesson.skip.length) lv = lv.filter(l => lesson.skip.indexOf(l.id) < 0);
   return lv;
 }
+
+// One-time "how to play" coaching, spoken the FIRST time a learner ever meets each activity
+// type (ledger: state.seenTypes). This is what lets a new mechanic debut in the middle of a
+// track: the game explains itself, once, out loud, in her language — no reader required
+// beside her. Keyed by lv.type; a type with no entry never shows the screen.
+const COACH = {
+  learn:  { en:"See the picture, hear the word, and say it out loud.",                          hi:"तस्वीर देखो, शब्द सुनो, और ज़ोर से बोलो।" },
+  listen: { en:"Press the speaker, listen carefully, then tap the picture you heard.",          hi:"स्पीकर दबाओ, ध्यान से सुनो, फिर जो सुना उसकी तस्वीर चुनो।" },
+  spell:  { en:"Tap the letters in the right order to build the word.",                         hi:"अक्षरों को सही क्रम में छूकर शब्द बनाओ।" },
+  phrase: { en:"Tap the words in the right order to make the sentence.",                        hi:"शब्दों को सही क्रम में लगाकर वाक्य बनाओ।" },
+  talk:   { en:"Listen to what they say, then pick the best reply.",                            hi:"जो वे कहें उसे सुनो, फिर सबसे अच्छा जवाब चुनो।" },
+  quiz:   { en:"Listen to the question, then tap the right answer.",                            hi:"सवाल सुनो, फिर सही जवाब चुनो।" },
+  code:   { en:"Read the code and tap the right piece for the blank.",                          hi:"कोड पढ़ो और खाली जगह के लिए सही टुकड़ा चुनो।" },
+  fix:    { en:"One word is wrong. Find it and tap it.",                                        hi:"एक शब्द गलत है। उसे ढूँढो और छुओ।" },
+  email:  { en:"Read what is needed, fill each part, then send your email.",                    hi:"जो चाहिए उसे पढ़ो, हर हिस्सा भरो, फिर ईमेल भेजो।" },
+  read:   { en:"Read the story, then answer the question.",                                     hi:"कहानी पढ़ो, फिर सवाल का जवाब दो।" },
+  reply:  { en:"Read the email, then write your reply.",                                        hi:"ईमेल पढ़ो, फिर उसका जवाब लिखो।" },
+  pairs:  { en:"The cards are face down. Tap two to open them. When the picture and its word match, they stay open. Find all the pairs!",
+            hi:"कार्ड उल्टे रखे हैं। दो कार्ड छूकर खोलो। तस्वीर और उसका शब्द मिल जाएँ तो जोड़ी बन गई। सारी जोड़ियाँ ढूँढो!" },
+  odd:    { en:"Most of them belong together. One does not. Tap the odd one out.",              hi:"इनमें से ज़्यादातर एक जैसे हैं। एक अलग है। जो अलग है उसे छुओ।" },
+  sort:   { en:"Look at each thing and listen to its word. Then tap the basket where it belongs.",
+            hi:"हर चीज़ को देखो और उसका शब्द सुनो। फिर वह जिस टोकरी की है, उसे चुनो।" },
+};
 
 // ---------- Accounts: on for the web, off for the Play build ----------
 // Sign-in and sign-up are ANDROID-ONLY casualties (Vishal, 2026-08-27). The web app served by
@@ -1494,7 +1583,7 @@ let currentStudent = null;
 try { currentStudent = JSON.parse(localStorage.getItem("hikmat_current")) || null; } catch(e){}
 function stateKeyFor(id){ return "hikmat_state_" + (id || "guest"); }
 function stateKey(){ return stateKeyFor(currentStudent && currentStudent.id); }
-function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true, testSeen:{}, testPassed:{}, videosSeen:{} }; }
+function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true, testSeen:{}, testPassed:{}, videosSeen:{}, seenTypes:{} }; }
 function loadState(){
   let st;
   try { st = JSON.parse(localStorage.getItem(stateKey())) || fresh(); }
@@ -1504,6 +1593,15 @@ function loadState(){
   // default instead of stranding her in a mode with no exit. The `state.hindi` reads scattered
   // through the activity renderers stay valid; they simply never fire now.
   st.hindi = false;
+  // First-time-coaching ledger (see COACH). A save that predates the ledger but already holds
+  // progress belongs to a girl who has played the original activities — coaching her on Listen
+  // after fifty Listen rounds would be noise, so those types start as seen. A truly fresh save
+  // gets coached on everything, basics included.
+  if(!st.seenTypes){
+    st.seenTypes = {};
+    if(Object.keys(st.progress || {}).length)
+      ["learn","listen","spell","phrase","talk","quiz","code","fix","email","read","reply"].forEach(t => st.seenTypes[t] = 1);
+  }
   return st;
 }
 function save(){ localStorage.setItem(stateKey(), JSON.stringify(state)); }
@@ -1538,6 +1636,7 @@ function mergeSavedState(into, from){
     into.testSeen[tk] = have.concat((ts[tk] || []).filter(id => have.indexOf(id) < 0));
   }
   into.videosSeen = Object.assign({}, from.videosSeen || {}, into.videosSeen || {});
+  into.seenTypes = Object.assign({}, from.seenTypes || {}, into.seenTypes || {});   // coached once anywhere = coached
   return into;
 }
 
@@ -3683,8 +3782,38 @@ function startLevel(course, lesson, lv, back){
   const backToLesson = () => { actEnd(false); renderLessonMap(course, lesson, back); };
   const backLbl = "← " + tx(lesson.title, lesson.titleHi);
   setBack(backLbl, backToLesson);
-  rerender = runRound;   // language toggle re-renders the current round in place
-  runRound();
+  // First time EVER on this type of game → one spoken "how to play" screen (see COACH).
+  // Once per learner per TYPE, not per lesson — so a mechanic can debut mid-track safely.
+  state.seenTypes = state.seenTypes || {};
+  if(!state.seenTypes[lv.type] && COACH[lv.type]){
+    rerender = coach;    // language toggle re-reads the coaching in the new language
+    coach();
+  } else {
+    rerender = runRound;   // language toggle re-renders the current round in place
+    runRound();
+  }
+
+  function coach(){
+    const how = tx(COACH[lv.type].en, COACH[lv.type].hi);
+    const intro = tx("New game: ","नया खेल: ") + tx(lv.name, lv.nameHi);
+    root.innerHTML = "";
+    root.appendChild(el(`<div class="screen coach">
+      <div class="mascotrow"><div class="mascot" id="mascot">${mascotSVG()}</div>
+        <div class="bubble2"><div class="q">${esc(intro)}</div><div class="hint">${esc(how)}</div></div></div>
+      <div class="display"><div class="actico pop">${iconFor("act:"+lv.id, lv.ico)}</div></div>
+      <div class="actionrow"><button class="btn primary" id="go">${tx("Let's play →","चलो खेलें →")}</button></div>
+    </div>`));
+    setBack(backLbl, backToLesson);
+    setNarration(intro+". "+how, intro+". "+how);
+    moveFocusToTop();
+    announce(() => speak(intro+". "+how, state.lang==="hi" ? "hi" : "en"));
+    $("#go").onclick = () => {
+      state.seenTypes[lv.type] = 1; save();
+      sfx.enter(); clearAnnounce();
+      rerender = runRound;
+      runRound();
+    };
+  }
 
   function header(){
     return `<div class="screen gameplay">
@@ -3724,6 +3853,9 @@ function startLevel(course, lesson, lv, back){
     const r = rounds[idx];
     if(lv.type==="learn")  return roundLearn(r);
     if(lv.type==="listen") return roundListen(r);
+    if(lv.type==="pairs")  return roundPairs();
+    if(lv.type==="odd")    return roundOdd(r);
+    if(lv.type==="sort")   return roundSort(r);
     if(lv.type==="spell")  return roundSpell(r);
     if(lv.type==="phrase") return roundPhrase(r);
     if(lv.type==="talk")   return roundTalk(r);
@@ -3778,6 +3910,155 @@ function startLevel(course, lesson, lv, back){
                fb.textContent=tx("Try to remember: ","याद रखो: ")+r.answer.en; fb.className="feedback bad";
                document.querySelectorAll(".opt").forEach(o=>{ if(o.dataset.en===r.answer.en) o.classList.add("correct"); }); }
         setTimeout(()=>next(correct), correct?900:1600);
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- PAIRS: memory match — picture cards ↔ word cards, ONE board for the whole activity.
+  // Every reveal speaks the card, so a non-reader plays the same board entirely by ear (for
+  // her it is a listening-memory game; for a reader, a reading game — same data). Misses are
+  // part of how memory works, so they cost accuracy, never a sad mascot, and they are NOT
+  // logged as wrong answers — the facilitator's "Hardest Questions" report is about
+  // comprehension, and forgetting where a card sits is not a comprehension problem.
+  function roundPairs(){
+    const N = rounds.length;
+    const _d = (tileDraft && tileDraft.idx===idx && tileDraft.pairs) ? tileDraft.pairs : null;   // board survives the 🌐 toggle
+    const cards = _d ? _d.cards : shuffle(rounds.flatMap((it,i) => [
+      { pair:i, kind:"pic",  face:it.emoji, say:it.en },
+      { pair:i, kind:"word", face:it.en,    say:it.en },
+    ]));
+    let found  = _d ? _d.found.slice() : [];   // pair numbers already matched
+    let misses = _d ? _d.misses : 0;
+    let open = [], lock = false;               // the (up to two) face-up cards, by position
+    mount(`${head(tx("Find the pairs","जोड़ियाँ ढूँढो"), tx("Tap two cards — match each picture with its word","दो कार्ड छुओ — हर तस्वीर को उसके शब्द से मिलाओ"),"दो कार्ड छूकर खोलो और तस्वीर को उसके शब्द से मिलाओ।")}
+      <div class="pairgrid" id="grid"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const grid = $("#grid");
+    const draft = () => { tileDraft = { idx, pairs: { cards, found: found.slice(), misses } }; };
+    const bar = () => { const b=$("#bar"); if(b) b.style.width = (found.length/N*100)+"%"; };
+    draft(); bar();
+    function redraw(){
+      grid.innerHTML = "";
+      cards.forEach((c, k) => {
+        const up = found.indexOf(c.pair) >= 0 || open.indexOf(k) >= 0;
+        const b = el(`<button type="button" class="pcard ${up ? "up" : ""} ${found.indexOf(c.pair)>=0 ? "matched" : ""} ${c.kind}"
+          aria-label="${up ? escAttr(c.say) : escAttr(tx("Hidden card","बंद कार्ड")+" "+(k+1))}">
+          <span class="pface">${up ? esc(c.face) : ""}</span></button>`);
+        b.onclick = () => {
+          if(found.indexOf(c.pair) >= 0){ speak(c.say); return; }   // matched cards re-speak on tap
+          if(lock || open.indexOf(k) >= 0 || open.length === 2) return;
+          open.push(k); sfx.tap(); speak(c.say); redraw();
+          if(open.length < 2) return;
+          const [a, b2] = open.map(i => cards[i]);
+          if(a.pair === b2.pair){
+            found.push(a.pair); open = [];
+            sfx.correct(); setMood("happy");
+            srSay(tx(a.say+" — matched!", a.say+" — जोड़ी मिल गई!"));
+            draft(); bar(); redraw();
+            if(found.length === N) win();
+          } else {
+            misses++; lock = true; setMood("think");
+            setTimeout(() => { open = []; lock = false; setMood(null); draft(); redraw(); }, 900);
+          }
+        };
+        grid.appendChild(b);
+      });
+    }
+    function win(){
+      // Fold memory accuracy into the runner's score/stars scale: perfect recall = full marks;
+      // finishing at all keeps at least one star — she DID find every pair.
+      score = Math.max(Math.ceil(N*0.34), Math.round(N * (N / (N + misses))));
+      state.coins += score*5;
+      idx = rounds.length; save();
+      setTimeout(finish, 700);   // let the last match land before the result card
+    }
+    redraw();
+  }
+
+  // --- ODD: most belong together, one does not — tap the odd one out
+  function roundOdd(r){
+    mount(`${head(tx("Which one is different?","कौन अलग है?"), tx("Tap the one that doesn't belong","जो मेल नहीं खाता उसे चुनो"),"ज़्यादातर एक जैसे हैं, एक अलग है। जो अलग है उसे चुनो।")}
+      <div class="center"><button class="speakbtn" id="sayall">🔊 ${tx("Hear them all","सब सुनो")}</button></div>
+      <div class="options" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const items = shuffle(r.items.slice());
+    const sayAll = () => items.forEach((c,i) => speak(c.en, "en", { queue: i>0 }));
+    $("#sayall").onclick = sayAll;
+    announce(sayAll);
+    const showTeach = () => {
+      if(!r.teach) return;
+      const tb = $("#teach"); tb.style.display = "flex";
+      const main = tx(r.teach, r.teachHi || r.teach);
+      tb.innerHTML = `💡 <span>${esc(main)}</span>`;
+      setNarration(main, main);
+    };
+    const opts = $("#opts");
+    let done = false;
+    items.forEach(c => {
+      const b = el(`<button class="opt" data-en="${escAttr(c.en)}"><span class="oe">${esc(c.emoji||"")}</span><span>${esc(c.en)}</span></button>`);
+      b.onclick = () => {
+        if(done) return;
+        done = true;
+        const correct = c.en === r.answer;
+        document.querySelectorAll(".opt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("Yes — that one is different! 🎉","हाँ — वही अलग है! 🎉"); fb.className = "feedback good"; }
+        else {
+          logWrong("odd: " + items.map(i=>i.en).join(", "), c.en, r.answer);
+          fb.textContent = tx("The odd one was ","अलग था ") + r.answer; fb.className = "feedback bad";
+          document.querySelectorAll(".opt").forEach(o => { if(o.dataset.en === r.answer) o.classList.add("correct"); });
+        }
+        showTeach();
+        setTimeout(() => next(correct), r.teach ? 2000 : (correct ? 900 : 1600));
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- SORT: one thing at a time — see it, hear it, tap the basket it belongs in
+  function roundSort(r){
+    const it = r.item, buckets = r.buckets;
+    if(!buckets.length) return next(true);   // malformed content → skip, never trap the child
+    mount(`${head(tx("Which basket?","कौन-सी टोकरी?"), tx("Tap the right basket for it","इसके लिए सही टोकरी चुनो"),"चीज़ को देखो, सुनो, और उसकी सही टोकरी चुनो।")}
+      <div class="display">
+        <div class="emoji pop tap-emoji" id="thing">${esc(it.emoji||"")}</div>
+        <div class="wordrow"><span class="word">${esc(it.en)}</span>
+          <button class="speakchip" id="say" title="Hear it">🔊</button></div>
+        <div class="say"><span class="meaning">${esc(it.hi||"")}</span></div>
+      </div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    $("#say").onclick = () => speak(it.en);
+    $("#thing").onclick = () => speak(it.en);
+    announce(() => speak(it.en));
+    const opts = $("#opts");
+    const rightBucket = buckets.filter(x => x.key === it.bucket)[0];
+    const bkName = b => tx(b.en, b.hi || b.en);
+    buckets.forEach((bk, i) => {
+      const b = el(`<button class="opt bucket" data-i="${i}"><span class="oe">${esc(bk.emoji||"🧺")}</span><span>${esc(bkName(bk))}</span></button>`);
+      b.onclick = () => {
+        const correct = bk.key === it.bucket;
+        document.querySelectorAll(".bucket").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("Right basket! 🎉","सही टोकरी! 🎉"); fb.className = "feedback good"; }
+        else {
+          logWrong(it.en, bkName(bk), rightBucket ? bkName(rightBucket) : "");
+          if(rightBucket) fb.textContent = tx(it.en+" goes in the "+bkName(rightBucket)+" basket", it.hi+" — "+bkName(rightBucket)+" की टोकरी में");
+          fb.className = "feedback bad";
+          document.querySelectorAll(".bucket").forEach(o => { if(buckets[+o.dataset.i].key === it.bucket) o.classList.add("correct"); });
+        }
+        setTimeout(() => next(correct), correct ? 900 : 1800);
       };
       opts.appendChild(b);
     });
@@ -4669,6 +4950,16 @@ function buildRounds(lv, lesson){
       const v = frames[i % frames.length](it);
       return { emoji:it.emoji, ...v };
     });
+  }
+  if(lv.type==="pairs"){
+    // one board = the whole activity; up to 6 pairs, and a word needs a picture to pair with
+    const src = (Array.isArray(lesson.pairs) ? lesson.pairs : (ITEMS||[])).filter(w => w.emoji);
+    return pick(src, 6);
+  }
+  if(lv.type==="odd") return (lesson.odd||[]).slice();
+  if(lv.type==="sort"){
+    const s = lesson.sort || {};
+    return shuffle((s.items||[]).slice()).map(it => ({ item: it, buckets: s.buckets || [] }));
   }
   if(lv.type==="talk") return lesson.dialogues.slice();
   if(lv.type==="quiz") return (lesson.quiz||[]).slice();

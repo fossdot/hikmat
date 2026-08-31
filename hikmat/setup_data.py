@@ -668,6 +668,13 @@ def export_offline_curriculum():
 # ---------------------------------------------------------------------------
 # Seed content — the prototype's curriculum, so the API returns the same data
 # ---------------------------------------------------------------------------
+# Lesson keys that ride the extras_json blob instead of a child DocType each. These are the
+# rotation-era activity types (pairs / odd / sort) plus per-lesson curation (skip): the game
+# merges the blob's keys into the lesson verbatim (see api.get_courses), so adding another
+# such activity later is a content change, not a schema change.
+EXTRA_LESSON_KEYS = ("pairs", "odd", "sort", "skip")
+
+
 COURSES = [
     {
         "key": "bazaar", "title": "The Bazaar", "titleHi": "बाज़ार", "icon": "🛒", "color": "#ff7a45",
@@ -828,6 +835,9 @@ def seed_content():
                     "message": e["msg"], "message_hi": e.get("msgHi", ""),
                     "spec_json": json.dumps({"slots": e["slots"]}, ensure_ascii=False),
                 } for e in les.get("reply", [])],
+                "extras_json": json.dumps(
+                    {k: les[k] for k in EXTRA_LESSON_KEYS if k in les}, ensure_ascii=False
+                ) if any(k in les for k in EXTRA_LESSON_KEYS) else "",
             }).insert(ignore_permissions=1)
 
             for di, dl in enumerate(les.get("dialogues", [])):

@@ -3,6 +3,7 @@
 """Contract + validation tests for the public API. Run with:
     bench --site <site> run-tests --app hikmat
 """
+import json
 import time
 
 import frappe
@@ -4256,3 +4257,49 @@ class TestSocialSignupAndProfile(FrappeTestCase):
 			r = api.signup_email(email=email, password=self.PWD, name="Age Test Girl", age=age)
 			self.assertTrue(r.get("ok"), r)
 			self.assertEqual(frappe.db.get_value("Student", r["id"], "age"), expected)
+
+
+class TestLessonExtras(FrappeTestCase):
+	"""extras_json: rotation-era activity data (pairs/odd/sort/skip) riding one JSON blob."""
+
+	def _mk(self, key, extras_json):
+		def _rm():
+			frappe.db.delete("Lesson", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		t = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "X Track",
+		                    "published": 1}).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Lesson", "track": t.name, "lesson_key": "x01",
+		                "title": "X", "title_hi": "क्ष", "published": 1,
+		                "extras_json": extras_json}).insert(ignore_permissions=True)
+		api.clear_content_cache()
+		return next(c for c in api._build_courses() if c["key"] == key)["lessons"][0]
+
+	def test_extras_merge_into_the_lesson_verbatim(self):
+		lesson = self._mk("extras-t", json.dumps({
+			"pairs": True, "skip": ["fix"],
+			"odd": [{"items": [{"en": "a"}, {"en": "b"}], "answer": "b"}],
+			"sort": {"buckets": [{"key": "k", "en": "K"}],
+			         "items": [{"en": "a", "bucket": "k"}]},
+		}))
+		self.assertIs(lesson["pairs"], True)
+		self.assertEqual(lesson["skip"], ["fix"])
+		self.assertEqual(lesson["odd"][0]["answer"], "b")
+		self.assertEqual(lesson["sort"]["items"][0]["bucket"], "k")
+
+	def test_malformed_extras_cost_the_extras_never_the_payload(self):
+		lesson = self._mk("extras-bad", "{not json")
+		self.assertEqual(lesson["key"], "x01")          # the lesson still ships
+		self.assertNotIn("pairs", lesson)
+
+	def test_the_bazaar_pilot_carries_the_rotation(self):
+		# the seeded curriculum itself: l01 pairs, l02 sort, l03 odd+sort — each with a skip
+		baz = next(c for c in api._build_courses() if c["key"] == "bazaar")
+		l = {x["key"]: x for x in baz["lessons"]}
+		self.assertIs(l["l01"]["pairs"], True)
+		self.assertEqual(l["l01"]["skip"], ["fix"])
+		self.assertEqual(len(l["l02"]["sort"]["items"]), 8)
+		self.assertEqual(len(l["l03"]["odd"]), 4)
+		self.assertEqual(l["l03"]["skip"], ["listen", "spell"])
