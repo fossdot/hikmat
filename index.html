@@ -6155,11 +6155,16 @@ function artFor(w){
   if(/^(hour|honest|honou?r|heir)/i.test(w)) return "an";           // silent h: an hour
   return /^[aeiou]/i.test(w) ? "an" : "a";
 }
+// A frame may return null to say "not for this word" — that is how a countable-only sentence
+// stays away from a word with no plural ("Give me two water"), and it is checked per word
+// rather than per type, because the type alone cannot know.
 const PHRASE_FRAMES = {
   thing: [
-    it => ({ words:["I","want","one",it.en],        hintHi:`"मुझे एक ${it.hi} चाहिए"`, hintHiSpoken:`मुझे एक ${it.hi} चाहिए` }),
+    // "I want one mango" is stiff, and for a generic noun ("one vegetable") it is wrong; the
+    // article reads the way a person actually asks. Counting lives in the "two" frame below.
+    it => ({ words:["I","want",artFor(it.en),it.en],  hintHi:`"मुझे एक ${it.hi} चाहिए"`, hintHiSpoken:`मुझे एक ${it.hi} चाहिए` }),
     it => ({ words:["This","is",artFor(it.en),it.en], hintHi:`"यह एक ${it.hi} है"`,     hintHiSpoken:`यह एक ${it.hi} है` }),
-    it => ({ words:["Give","me","two",it.plural||it.en], hintHi:`"मुझे दो ${it.hi} दीजिए"`, hintHiSpoken:`मुझे दो ${it.hi} दीजिए` }),
+    it => it.plural ? ({ words:["Give","me","two",it.plural], hintHi:`"मुझे दो ${it.hi} दीजिए"`, hintHiSpoken:`मुझे दो ${it.hi} दीजिए` }) : null,
   ],
   mass: [
     it => ({ words:["I","want","some",it.en],        hintHi:`"मुझे कुछ ${it.hi} चाहिए"`, hintHiSpoken:`मुझे कुछ ${it.hi} चाहिए` }),
@@ -6168,7 +6173,9 @@ const PHRASE_FRAMES = {
   ],
   person: [
     it => ({ words:["This","is","my",it.en],          hintHi:`"यह मेरा ${it.hi} है"`,    hintHiSpoken:`यह मेरा ${it.hi} है` }),
-    it => ({ words:["She","is","my",it.en],           hintHi:`"वह मेरी ${it.hi} है"`,    hintHiSpoken:`वह मेरी ${it.hi} है` }),
+    // was "She is my X" — which taught a child to say "She is my father". A frame cannot know
+    // a person's gender, so it must not claim one.
+    it => ({ words:["My",it.en,"is","here"],          hintHi:`"मेरा ${it.hi} यहाँ है"`,  hintHiSpoken:`मेरा ${it.hi} यहाँ है` }),
     it => ({ words:["I","have",artFor(it.en),it.en],  hintHi:`"मेरा एक ${it.hi} है"`,    hintHiSpoken:`मेरा एक ${it.hi} है` }),
   ],
   verb: [
@@ -6182,12 +6189,28 @@ const PHRASE_FRAMES = {
     it => ({ words:["This","is","very",it.en],        hintHi:`"यह बहुत ${it.hi} है"`,    hintHiSpoken:`यह बहुत ${it.hi} है` }),
   ],
 };
+// Curriculum authors have used two names for word classes the frames already had, and an
+// unknown type used to fall silently through to "thing" — which is how a girl was offered
+// "I want one push" and "This is a renewable".
+const TYPE_ALIAS = { action:"verb", describe:"adj", colour:"adj", color:"adj", noun:"thing", place:"thing" };
 // resolve a usable frame-type for a word; null = skip in Build a Sentence
 function phraseType(it){
-  if(it.type && PHRASE_FRAMES[it.type]) return it.type;
-  if(it.type==="time" || it.type==="phrase") return null;   // no good sentence frame
-  if(it.uncount) return "mass";                              // fallback for untyped content
+  const t = TYPE_ALIAS[it.type] || it.type;
+  // uncount BEATS a declared "thing". Plenty of words carry both — the type says "noun", the
+  // flag says "you cannot count it" — and taking the type at its word produced "I want an
+  // independence" and "Give me two justices". Nothing else can override the flag: a verb or an
+  // adjective marked uncountable is just a mistake, and its own frames still read fine.
+  if(it.uncount && (!t || t === "thing")) return "mass";
+  if(t && PHRASE_FRAMES[t]) return t;
+  if(t==="time" || t==="phrase") return null;   // no good sentence frame
+  if(it.uncount) return "mass";                 // fallback for untyped content
   return "thing";
+}
+// The frames a given word can actually fill (a frame returns null when it does not fit).
+function framesFor(it, t){
+  const out = (PHRASE_FRAMES[t] || []).map(f => f(it)).filter(Boolean);
+  return out.length ? out
+    : [{ words:["This","is",artFor(it.en),it.en], hintHi:`"यह एक ${it.hi} है"`, hintHiSpoken:`यह एक ${it.hi} है` }];
 }
 
 // ---------- Build rounds per activity type, from a lesson's content ----------
@@ -6223,8 +6246,8 @@ function buildRounds(lv, lesson){
                  hintHi:`"${it.useHi||it.hi}"`, hintHiSpoken: it.useHi||it.hi };
       }
       const t = phraseType(it) || (it.uncount ? "mass" : "thing");
-      const frames = PHRASE_FRAMES[t];
-      const v = frames[i % frames.length](it);
+      const frames = framesFor(it, t);
+      const v = frames[i % frames.length];
       return { emoji:it.emoji, ...v };
     });
   }

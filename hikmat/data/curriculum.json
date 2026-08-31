@@ -52,7 +52,9 @@
       "pron": "वेजिटेबल",
       "emoji": "🥬",
       "type": "thing",
-      "plural": "vegetables"
+      "plural": "vegetables",
+      "use": "A potato is a vegetable",
+      "useHi": "आलू एक सब्ज़ी है"
      }
     ],
     "dialogues": [
@@ -174,7 +176,9 @@
       "pron": "फ्रूट",
       "emoji": "🍇",
       "type": "thing",
-      "plural": "fruits"
+      "plural": "fruits",
+      "use": "A mango is a fruit",
+      "useHi": "आम एक फल है"
      }
     ],
     "dialogues": [
@@ -610,7 +614,7 @@
       "pron": "डजन",
       "emoji": "🥚",
       "type": "thing",
-      "plural": "dozens"
+      "plural": "dozen"
      },
      {
       "en": "bag",
@@ -626,7 +630,9 @@
       "pron": "वेट",
       "emoji": "⚖️",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "What is the weight of rice",
+      "useHi": "चावल का वज़न कितना है"
      }
     ],
     "dialogues": [
@@ -768,7 +774,9 @@
       "pron": "प्राइस",
       "emoji": "🏷️",
       "type": "thing",
-      "plural": "prices"
+      "plural": "prices",
+      "use": "What is the price of rice",
+      "useHi": "चावल का दाम क्या है"
      }
     ],
     "dialogues": [
@@ -885,21 +893,27 @@
       "pron": "कॉस्ट",
       "emoji": "💰",
       "type": "thing",
-      "plural": "costs"
+      "plural": "costs",
+      "use": "How much does it cost",
+      "useHi": "इसकी कीमत कितनी है"
      },
      {
       "en": "cheap",
       "hi": "सस्ता",
       "pron": "चीप",
       "emoji": "🟢",
-      "type": "adj"
+      "type": "adj",
+      "use": "The rice is cheap today",
+      "useHi": "आज चावल सस्ता है"
      },
      {
       "en": "expensive",
       "hi": "महँगा",
       "pron": "एक्सपेंसिव",
       "emoji": "🔴",
-      "type": "adj"
+      "type": "adj",
+      "use": "This mango is very expensive",
+      "useHi": "यह आम बहुत महँगा है"
      },
      {
       "en": "total",
@@ -907,7 +921,9 @@
       "pron": "टोटल",
       "emoji": "🧮",
       "type": "thing",
-      "plural": "totals"
+      "plural": "totals",
+      "use": "What is the total please",
+      "useHi": "कुल कितना हुआ"
      },
      {
       "en": "change",
@@ -1071,14 +1087,18 @@
       "hi": "ताज़ा",
       "pron": "फ्रेश",
       "emoji": "🌿",
-      "type": "adj"
+      "type": "adj",
+      "use": "These vegetables are very fresh",
+      "useHi": "ये सब्ज़ियाँ बहुत ताज़ी हैं"
      },
      {
       "en": "ripe",
       "hi": "पका",
       "pron": "राइप",
       "emoji": "🥭",
-      "type": "adj"
+      "type": "adj",
+      "use": "This mango is not ripe",
+      "useHi": "यह आम पका नहीं है"
      },
      {
       "en": "discount",
@@ -1086,7 +1106,9 @@
       "pron": "डिस्काउंट",
       "emoji": "💸",
       "type": "thing",
-      "plural": "discounts"
+      "plural": "discounts",
+      "use": "Please give me a discount",
+      "useHi": "कृपया थोड़ी छूट दीजिए"
      }
     ],
     "dialogues": [
@@ -1244,21 +1266,27 @@
       "pron": "शॉप",
       "emoji": "🏪",
       "type": "thing",
-      "plural": "shops"
+      "plural": "shops",
+      "use": "The shop is near my house",
+      "useHi": "दुकान मेरे घर के पास है"
      },
      {
       "en": "seller",
       "hi": "दुकानदार",
       "pron": "सेलर",
       "emoji": "🧑‍💼",
-      "type": "person"
+      "type": "person",
+      "use": "The seller is very kind",
+      "useHi": "दुकानदार बहुत अच्छे हैं"
      },
      {
       "en": "buyer",
       "hi": "ग्राहक",
       "pron": "बायर",
       "emoji": "🧍",
-      "type": "person"
+      "type": "person",
+      "use": "I am the buyer today",
+      "useHi": "आज मैं ख़रीदार हूँ"
      },
      {
       "en": "basket",
@@ -1601,7 +1629,9 @@
       "pron": "डिलीवरी",
       "emoji": "🛵",
       "type": "thing",
-      "plural": "deliveries"
+      "plural": "deliveries",
+      "use": "Is home delivery free",
+      "useHi": "क्या घर पहुँचाना मुफ़्त है"
      }
     ],
     "dialogues": [
@@ -1913,7 +1943,9 @@
       "pron": "किचन",
       "emoji": "🍳",
       "type": "thing",
-      "plural": "kitchens"
+      "plural": "kitchens",
+      "use": "The kitchen is very clean",
+      "useHi": "रसोई बहुत साफ़ है"
      },
      {
       "en": "plate",
@@ -2314,7 +2346,9 @@
       "hi": "बच्चा",
       "pron": "बेबी",
       "emoji": "👶",
-      "type": "person"
+      "type": "person",
+      "use": "The baby is sleeping now",
+      "useHi": "बच्चा अभी सो रहा है"
      }
     ],
     "dialogues": [
@@ -3099,7 +3133,9 @@
       "pron": "ब्रेकफ़ास्ट",
       "emoji": "🥣",
       "type": "thing",
-      "plural": "breakfasts"
+      "plural": "breakfasts",
+      "use": "I eat breakfast in the morning",
+      "useHi": "मैं सुबह नाश्ता करत{ी|ा} हूँ"
      },
      {
       "en": "lunch",
@@ -3107,7 +3143,9 @@
       "pron": "लंच",
       "emoji": "🍱",
       "type": "thing",
-      "plural": "lunches"
+      "plural": "lunches",
+      "use": "I eat lunch at school",
+      "useHi": "मैं स्कूल में दोपहर का खाना खात{ी|ा} हूँ"
      },
      {
       "en": "dinner",
@@ -3115,7 +3153,9 @@
       "pron": "डिनर",
       "emoji": "🍛",
       "type": "thing",
-      "plural": "dinners"
+      "plural": "dinners",
+      "use": "We eat dinner together at night",
+      "useHi": "हम रात में साथ खाना खाते हैं"
      },
      {
       "en": "rice",
@@ -3130,7 +3170,9 @@
       "hi": "भूखा",
       "pron": "हंग्री",
       "emoji": "😣",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am very hungry now",
+      "useHi": "मुझे अभी बहुत भूख लगी है"
      }
     ],
     "dialogues": [
@@ -3299,7 +3341,9 @@
       "hi": "थका हुआ",
       "pron": "टायर्ड",
       "emoji": "😩",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am very tired today",
+      "useHi": "मैं आज बहुत थक{ी|ा} हूँ"
      },
      {
       "en": "rest",
@@ -3327,7 +3371,9 @@
       "hi": "तैयार",
       "pron": "रेडी",
       "emoji": "✅",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am ready for school",
+      "useHi": "मैं स्कूल के लिए तैयार हूँ"
      }
     ],
     "dialogues": [
@@ -3839,7 +3885,9 @@
       "hi": "छात्र",
       "pron": "स्टूडेंट",
       "emoji": "🧑‍🎓",
-      "type": "person"
+      "type": "person",
+      "use": "Every student has a notebook",
+      "useHi": "हर विद्यार्थी के पास कॉपी है"
      },
      {
       "en": "friend",
@@ -3853,14 +3901,18 @@
       "hi": "प्रधानाचार्य",
       "pron": "प्रिंसिपल",
       "emoji": "🧑‍💼",
-      "type": "person"
+      "type": "person",
+      "use": "Our principal is very kind",
+      "useHi": "हमारे प्रधानाचार्य बहुत अच्छे हैं"
      },
      {
       "en": "girl",
       "hi": "लड़की",
       "pron": "गर्ल",
       "emoji": "👧",
-      "type": "person"
+      "type": "person",
+      "use": "That girl is my friend",
+      "useHi": "वह लड़की मेरी सहेली है"
      }
     ],
     "dialogues": [
@@ -4030,7 +4082,9 @@
       "pron": "क्लास",
       "emoji": "🏫",
       "type": "thing",
-      "plural": "classes"
+      "plural": "classes",
+      "use": "My class starts at nine",
+      "useHi": "मेरी कक्षा नौ बजे शुरू होती है"
      },
      {
       "en": "desk",
@@ -4187,7 +4241,9 @@
       "pron": "सब्जेक्ट",
       "emoji": "📚",
       "type": "thing",
-      "plural": "subjects"
+      "plural": "subjects",
+      "use": "Maths is my favourite subject",
+      "useHi": "गणित मेरा प्रिय विषय है"
      },
      {
       "en": "maths",
@@ -4195,7 +4251,9 @@
       "pron": "मैथ्स",
       "emoji": "➗",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "I like maths very much",
+      "useHi": "मुझे गणित बहुत पसंद है"
      },
      {
       "en": "science",
@@ -4203,7 +4261,9 @@
       "pron": "साइंस",
       "emoji": "🔬",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "We learn science at school",
+      "useHi": "हम स्कूल में विज्ञान सीखते हैं"
      },
      {
       "en": "English",
@@ -4211,7 +4271,9 @@
       "pron": "इंग्लिश",
       "emoji": "🔤",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "I can speak a little English",
+      "useHi": "मैं थोड़ी अंग्रेज़ी बोल सकत{ी|ा} हूँ"
      },
      {
       "en": "Hindi",
@@ -4219,7 +4281,9 @@
       "pron": "हिंदी",
       "emoji": "🇮🇳",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "We read Hindi every day",
+      "useHi": "हम रोज़ हिंदी पढ़ते हैं"
      }
     ],
     "dialogues": [
@@ -4880,7 +4944,9 @@
       "pron": "क्वेश्चन",
       "emoji": "❓",
       "type": "thing",
-      "plural": "questions"
+      "plural": "questions",
+      "use": "May I ask a question",
+      "useHi": "क्या मैं एक सवाल पूछ सकत{ी|ा} हूँ"
      },
      {
       "en": "again",
@@ -4894,14 +4960,18 @@
       "hi": "समझना",
       "pron": "अंडरस्टैंड",
       "emoji": "💡",
-      "type": "verb"
+      "type": "verb",
+      "use": "I understand the lesson now",
+      "useHi": "मैं अब पाठ समझ ग{ई|या} हूँ"
      },
      {
       "en": "slow",
       "hi": "धीमा",
       "pron": "स्लो",
       "emoji": "🐢",
-      "type": "adj"
+      "type": "adj",
+      "use": "The bus is very slow",
+      "useHi": "बस बहुत धीमी है"
      },
      {
       "en": "help",
@@ -5041,21 +5111,27 @@
       "pron": "होमवर्क",
       "emoji": "📝",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "I finish my homework every day",
+      "useHi": "मैं रोज़ अपना गृहकार्य पूरा करत{ी|ा} हूँ"
      },
      {
       "en": "ready",
       "hi": "तैयार",
       "pron": "रेडी",
       "emoji": "✅",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am ready for class",
+      "useHi": "मैं कक्षा के लिए तैयार हूँ"
      },
      {
       "en": "late",
       "hi": "देर",
       "pron": "लेट",
       "emoji": "⏰",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am late for school",
+      "useHi": "मुझे स्कूल के लिए देर हो गई"
      },
      {
       "en": "absent",
@@ -5224,7 +5300,9 @@
       "pron": "पावर",
       "emoji": "⚡",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "I press the power button",
+      "useHi": "मैं पावर बटन दबात{ी|ा} हूँ"
      },
      {
       "en": "button",
@@ -5527,7 +5605,9 @@
       "hi": "क्लिक करना",
       "pron": "क्लिक",
       "emoji": "🖱️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I click on the icon",
+      "useHi": "मैं आइकन पर क्लिक करत{ी|ा} हूँ"
      },
      {
       "en": "pointer",
@@ -5535,28 +5615,36 @@
       "pron": "पॉइंटर",
       "emoji": "👆",
       "type": "thing",
-      "plural": "pointers"
+      "plural": "pointers",
+      "use": "The pointer moves on the screen",
+      "useHi": "पॉइंटर स्क्रीन पर चलता है"
      },
      {
       "en": "scroll",
       "hi": "स्क्रॉल करना",
       "pron": "स्क्रॉल",
       "emoji": "🖲️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I scroll down the page",
+      "useHi": "मैं पेज नीचे स्क्रॉल करत{ी|ा} हूँ"
      },
      {
       "en": "drag",
       "hi": "खींचना",
       "pron": "ड्रैग",
       "emoji": "✋",
-      "type": "verb"
+      "type": "verb",
+      "use": "I drag the icon",
+      "useHi": "मैं आइकन को खींचत{ी|ा} हूँ"
      },
      {
       "en": "select",
       "hi": "चुनना",
       "pron": "सिलेक्ट",
       "emoji": "☑️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I select the file",
+      "useHi": "मैं फ़ाइल चुनत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -5677,7 +5765,9 @@
       "pron": "की",
       "emoji": "🔡",
       "type": "thing",
-      "plural": "keys"
+      "plural": "keys",
+      "use": "I press the enter key",
+      "useHi": "मैं एंटर की दबात{ी|ा} हूँ"
      },
      {
       "en": "type",
@@ -5692,14 +5782,18 @@
       "pron": "स्पेस",
       "emoji": "⬜",
       "type": "thing",
-      "plural": "spaces"
+      "plural": "spaces",
+      "use": "I press the space key",
+      "useHi": "मैं स्पेस की दबात{ी|ा} हूँ"
      },
      {
       "en": "enter",
       "hi": "एंटर दबाना",
       "pron": "एंटर",
       "emoji": "↩️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I enter my name here",
+      "useHi": "मैं यहाँ अपना नाम दर्ज करत{ी|ा} हूँ"
      },
      {
       "en": "letter",
@@ -5707,7 +5801,9 @@
       "pron": "लेटर",
       "emoji": "🔠",
       "type": "thing",
-      "plural": "letters"
+      "plural": "letters",
+      "use": "I type each letter slowly",
+      "useHi": "मैं हर अक्षर धीरे धीरे टाइप करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -5807,7 +5903,9 @@
       "pron": "डेस्कटॉप",
       "emoji": "🖥️",
       "type": "thing",
-      "plural": "desktops"
+      "plural": "desktops",
+      "use": "The icons are on the desktop",
+      "useHi": "आइकन डेस्कटॉप पर हैं"
      },
      {
       "en": "icon",
@@ -5815,21 +5913,27 @@
       "pron": "आइकन",
       "emoji": "🔣",
       "type": "thing",
-      "plural": "icons"
+      "plural": "icons",
+      "use": "I tap the icon",
+      "useHi": "मैं आइकन पर टैप करत{ी|ा} हूँ"
      },
      {
       "en": "open",
       "hi": "खोलना",
       "pron": "ओपन",
       "emoji": "📂",
-      "type": "verb"
+      "type": "verb",
+      "use": "I open the file",
+      "useHi": "मैं फ़ाइल खोलत{ी|ा} हूँ"
      },
      {
       "en": "close",
       "hi": "बंद करना",
       "pron": "क्लोज़",
       "emoji": "❌",
-      "type": "verb"
+      "type": "verb",
+      "use": "I close the file",
+      "useHi": "मैं फ़ाइल बंद करत{ी|ा} हूँ"
      },
      {
       "en": "menu",
@@ -5837,7 +5941,9 @@
       "pron": "मेन्यू",
       "emoji": "📋",
       "type": "thing",
-      "plural": "menus"
+      "plural": "menus",
+      "use": "I open the menu",
+      "useHi": "मैं मेन्यू खोलत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -5931,21 +6037,27 @@
       "pron": "नेम",
       "emoji": "🏷️",
       "type": "thing",
-      "plural": "names"
+      "plural": "names",
+      "use": "I give the file a name",
+      "useHi": "मैं फ़ाइल को एक नाम देत{ी|ा} हूँ"
      },
      {
       "en": "save",
       "hi": "सेव करना",
       "pron": "सेव",
       "emoji": "💾",
-      "type": "verb"
+      "type": "verb",
+      "use": "I save my file",
+      "useHi": "मैं अपनी फ़ाइल सेव करत{ी|ा} हूँ"
      },
      {
       "en": "find",
       "hi": "ढूँढना",
       "pron": "फ़ाइंड",
       "emoji": "🔍",
-      "type": "verb"
+      "type": "verb",
+      "use": "I find my file quickly",
+      "useHi": "मैं अपनी फ़ाइल जल्दी ढूँढ लेत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6082,35 +6194,45 @@
       "hi": "कॉपी करना",
       "pron": "कॉपी",
       "emoji": "📑",
-      "type": "verb"
+      "type": "verb",
+      "use": "I copy the file",
+      "useHi": "मैं फ़ाइल कॉपी करत{ी|ा} हूँ"
      },
      {
       "en": "paste",
       "hi": "चिपकाना",
       "pron": "पेस्ट",
       "emoji": "📋",
-      "type": "verb"
+      "type": "verb",
+      "use": "I paste the text here",
+      "useHi": "मैं यहाँ टेक्स्ट पेस्ट करत{ी|ा} हूँ"
      },
      {
       "en": "cut",
       "hi": "काटना",
       "pron": "कट",
       "emoji": "✂️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I cut the text",
+      "useHi": "मैं टेक्स्ट काटत{ी|ा} हूँ"
      },
      {
       "en": "delete",
       "hi": "मिटाना",
       "pron": "डिलीट",
       "emoji": "🗑️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I delete the old file",
+      "useHi": "मैं पुरानी फ़ाइल मिटात{ी|ा} हूँ"
      },
      {
       "en": "rename",
       "hi": "नाम बदलना",
       "pron": "रीनेम",
       "emoji": "✏️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I rename the folder",
+      "useHi": "मैं फ़ोल्डर का नाम बदलत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6243,7 +6365,9 @@
       "pron": "इंटरनेट",
       "emoji": "🌐",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "The internet is very slow today",
+      "useHi": "आज इंटरनेट बहुत धीमा है"
      },
      {
       "en": "browser",
@@ -6251,7 +6375,9 @@
       "pron": "ब्राउज़र",
       "emoji": "🧭",
       "type": "thing",
-      "plural": "browsers"
+      "plural": "browsers",
+      "use": "I open the browser",
+      "useHi": "मैं ब्राउज़र खोलत{ी|ा} हूँ"
      },
      {
       "en": "website",
@@ -6266,7 +6392,9 @@
       "hi": "खोजना",
       "pron": "सर्च",
       "emoji": "🔎",
-      "type": "verb"
+      "type": "verb",
+      "use": "I search for a video",
+      "useHi": "मैं एक वीडियो खोजत{ी|ा} हूँ"
      },
      {
       "en": "link",
@@ -6274,7 +6402,9 @@
       "pron": "लिंक",
       "emoji": "🔗",
       "type": "thing",
-      "plural": "links"
+      "plural": "links",
+      "use": "I tap the link",
+      "useHi": "मैं लिंक पर टैप करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6424,28 +6554,36 @@
       "pron": "इनबॉक्स",
       "emoji": "📥",
       "type": "thing",
-      "plural": "inboxes"
+      "plural": "inboxes",
+      "use": "My inbox has three emails",
+      "useHi": "मेरे इनबॉक्स में तीन ईमेल हैं"
      },
      {
       "en": "send",
       "hi": "भेजना",
       "pron": "सेंड",
       "emoji": "📤",
-      "type": "verb"
+      "type": "verb",
+      "use": "I send an email",
+      "useHi": "मैं एक ईमेल भेजत{ी|ा} हूँ"
      },
      {
       "en": "reply",
       "hi": "जवाब देना",
       "pron": "रिप्लाई",
       "emoji": "💬",
-      "type": "verb"
+      "type": "verb",
+      "use": "I reply to her email",
+      "useHi": "मैं उसके ईमेल का जवाब देत{ी|ा} हूँ"
      },
      {
       "en": "attach",
       "hi": "फ़ाइल जोड़ना",
       "pron": "अटैच",
       "emoji": "📎",
-      "type": "verb"
+      "type": "verb",
+      "use": "I attach a photo",
+      "useHi": "मैं एक फ़ोटो जोड़त{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6755,21 +6893,27 @@
       "pron": "फ़ॉन्ट",
       "emoji": "🔤",
       "type": "thing",
-      "plural": "fonts"
+      "plural": "fonts",
+      "use": "This font is very big",
+      "useHi": "यह फ़ॉन्ट बहुत बड़ा है"
      },
      {
       "en": "print",
       "hi": "छापना",
       "pron": "प्रिंट",
       "emoji": "🖨️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I print the page",
+      "useHi": "मैं पेज प्रिंट करत{ी|ा} हूँ"
      },
      {
       "en": "edit",
       "hi": "एडिट करना",
       "pron": "एडिट",
       "emoji": "✏️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I edit my document",
+      "useHi": "मैं अपना दस्तावेज़ ठीक करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -6997,7 +7141,9 @@
       "pron": "रो",
       "emoji": "↔️",
       "type": "thing",
-      "plural": "rows"
+      "plural": "rows",
+      "use": "This row has five names",
+      "useHi": "इस पंक्ति में पाँच नाम हैं"
      },
      {
       "en": "column",
@@ -7005,7 +7151,9 @@
       "pron": "कॉलम",
       "emoji": "↕️",
       "type": "thing",
-      "plural": "columns"
+      "plural": "columns",
+      "use": "This column shows the prices",
+      "useHi": "यह कॉलम कीमतें दिखाता है"
      },
      {
       "en": "cell",
@@ -7013,7 +7161,9 @@
       "pron": "सेल",
       "emoji": "🔲",
       "type": "thing",
-      "plural": "cells"
+      "plural": "cells",
+      "use": "I type in the cell",
+      "useHi": "मैं सेल में टाइप करत{ी|ा} हूँ"
      },
      {
       "en": "total",
@@ -7021,7 +7171,9 @@
       "pron": "टोटल",
       "emoji": "🧮",
       "type": "thing",
-      "plural": "totals"
+      "plural": "totals",
+      "use": "The total is fifty rupees",
+      "useHi": "कुल पचास रुपये हैं"
      }
     ],
     "dialogues": [
@@ -7149,7 +7301,9 @@
       "pron": "अकाउंट",
       "emoji": "👤",
       "type": "thing",
-      "plural": "accounts"
+      "plural": "accounts",
+      "use": "I have my own account",
+      "useHi": "मेरा अपना अकाउंट है"
      },
      {
       "en": "password",
@@ -7157,7 +7311,9 @@
       "pron": "पासवर्ड",
       "emoji": "🔑",
       "type": "thing",
-      "plural": "passwords"
+      "plural": "passwords",
+      "use": "I keep my password secret",
+      "useHi": "मैं अपना पासवर्ड गुप्त रखत{ी|ा} हूँ"
      },
      {
       "en": "username",
@@ -7165,21 +7321,27 @@
       "pron": "यूज़रनेम",
       "emoji": "🆔",
       "type": "thing",
-      "plural": "usernames"
+      "plural": "usernames",
+      "use": "I type my username here",
+      "useHi": "मैं यहाँ अपना यूज़रनेम लिखत{ी|ा} हूँ"
      },
      {
       "en": "login",
       "hi": "लॉगिन करना",
       "pron": "लॉगिन",
       "emoji": "🔓",
-      "type": "verb"
+      "type": "verb",
+      "use": "I tap the login button",
+      "useHi": "मैं लॉगिन बटन दबात{ी|ा} हूँ"
      },
      {
       "en": "logout",
       "hi": "लॉगआउट करना",
       "pron": "लॉगआउट",
       "emoji": "🚪",
-      "type": "verb"
+      "type": "verb",
+      "use": "I tap the logout button",
+      "useHi": "मैं लॉगआउट बटन दबात{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -7319,7 +7481,9 @@
       "pron": "सॉफ़्टवेयर",
       "emoji": "🧩",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "I install new software",
+      "useHi": "मैं नया सॉफ़्टवेयर इंस्टॉल करत{ी|ा} हूँ"
      },
      {
       "en": "app",
@@ -7334,14 +7498,18 @@
       "hi": "इंस्टॉल करना",
       "pron": "इंस्टॉल",
       "emoji": "⬇️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I install the app",
+      "useHi": "मैं ऐप इंस्टॉल करत{ी|ा} हूँ"
      },
      {
       "en": "update",
       "hi": "अपडेट करना",
       "pron": "अपडेट",
       "emoji": "🔄",
-      "type": "verb"
+      "type": "verb",
+      "use": "I update the app",
+      "useHi": "मैं ऐप अपडेट करत{ी|ा} हूँ"
      },
      {
       "en": "version",
@@ -7349,7 +7517,9 @@
       "pron": "वर्ज़न",
       "emoji": "🔢",
       "type": "thing",
-      "plural": "versions"
+      "plural": "versions",
+      "use": "This is a new version",
+      "useHi": "यह नया वर्शन है"
      }
     ],
     "dialogues": [
@@ -7482,7 +7652,9 @@
       "pron": "हार्डवेयर",
       "emoji": "🔩",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "The keyboard is hardware",
+      "useHi": "कीबोर्ड हार्डवेयर है"
      },
      {
       "en": "device",
@@ -7514,7 +7686,9 @@
       "pron": "पोर्ट",
       "emoji": "🕳️",
       "type": "thing",
-      "plural": "ports"
+      "plural": "ports",
+      "use": "I put the cable in the port",
+      "useHi": "मैं केबल को पोर्ट में लगात{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -7626,7 +7800,9 @@
       "pron": "नेटवर्क",
       "emoji": "🕸️",
       "type": "thing",
-      "plural": "networks"
+      "plural": "networks",
+      "use": "My phone has no network",
+      "useHi": "मेरे फ़ोन में नेटवर्क नहीं है"
      },
      {
       "en": "wifi",
@@ -7634,14 +7810,18 @@
       "pron": "वाई-फ़ाई",
       "emoji": "📶",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "The wifi is not working",
+      "useHi": "वाईफ़ाई काम नहीं कर रहा है"
      },
      {
       "en": "connect",
       "hi": "जोड़ना",
       "pron": "कनेक्ट",
       "emoji": "🔗",
-      "type": "verb"
+      "type": "verb",
+      "use": "I connect to the wifi",
+      "useHi": "मैं वाईफ़ाई से जुड़त{ी|ा} हूँ"
      },
      {
       "en": "signal",
@@ -7649,7 +7829,9 @@
       "pron": "सिग्नल",
       "emoji": "📳",
       "type": "thing",
-      "plural": "signals"
+      "plural": "signals",
+      "use": "There is no signal here",
+      "useHi": "यहाँ सिग्नल नहीं है"
      },
      {
       "en": "router",
@@ -7765,7 +7947,9 @@
       "hi": "ऑनलाइन",
       "pron": "ऑनलाइन",
       "emoji": "🟢",
-      "type": "adj"
+      "type": "adj",
+      "use": "I am online right now",
+      "useHi": "मैं अभी ऑनलाइन हूँ"
      },
      {
       "en": "cloud",
@@ -7773,28 +7957,36 @@
       "pron": "क्लाउड",
       "emoji": "☁️",
       "type": "thing",
-      "plural": "clouds"
+      "plural": "clouds",
+      "use": "I save my photos in the cloud",
+      "useHi": "मैं अपनी फ़ोटो क्लाउड में सेव करत{ी|ा} हूँ"
      },
      {
       "en": "upload",
       "hi": "अपलोड करना",
       "pron": "अपलोड",
       "emoji": "⬆️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I upload my photo",
+      "useHi": "मैं अपनी फ़ोटो अपलोड करत{ी|ा} हूँ"
      },
      {
       "en": "download",
       "hi": "डाउनलोड करना",
       "pron": "डाउनलोड",
       "emoji": "⬇️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I download the file",
+      "useHi": "मैं फ़ाइल डाउनलोड करत{ी|ा} हूँ"
      },
      {
       "en": "share",
       "hi": "शेयर करना",
       "pron": "शेयर",
       "emoji": "📲",
-      "type": "verb"
+      "type": "verb",
+      "use": "I share the file with her",
+      "useHi": "मैं उसके साथ फ़ाइल साझा करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -8037,7 +8229,9 @@
       "pron": "डेटा",
       "emoji": "🗂️",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "My phone has no data left",
+      "useHi": "मेरे फ़ोन में डेटा नहीं बचा"
      },
      {
       "en": "backup",
@@ -8045,7 +8239,9 @@
       "pron": "बैकअप",
       "emoji": "🛟",
       "type": "thing",
-      "plural": "backups"
+      "plural": "backups",
+      "use": "I keep a backup of my files",
+      "useHi": "मैं अपनी फ़ाइलों का बैकअप रखत{ी|ा} हूँ"
      },
      {
       "en": "storage",
@@ -8053,14 +8249,18 @@
       "pron": "स्टोरेज",
       "emoji": "💾",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "My phone storage is full",
+      "useHi": "मेरे फ़ोन की स्टोरेज भर गई है"
      },
      {
       "en": "restore",
       "hi": "वापस लाना",
       "pron": "रिस्टोर",
       "emoji": "♻️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I restore my old files",
+      "useHi": "मैं अपनी पुरानी फ़ाइलें वापस लात{ी|ा} हूँ"
      },
      {
       "en": "drive",
@@ -8068,7 +8268,9 @@
       "pron": "ड्राइव",
       "emoji": "💽",
       "type": "thing",
-      "plural": "drives"
+      "plural": "drives",
+      "use": "I save the file on my drive",
+      "useHi": "मैं फ़ाइल अपनी ड्राइव में सेव करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -9250,7 +9452,9 @@
       "pron": "इंटेलिजेंस",
       "emoji": "🧠",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "Artificial intelligence can answer questions",
+      "useHi": "आर्टिफ़िशियल इंटेलिजेंस सवालों का जवाब दे सकता है"
      },
      {
       "en": "robot",
@@ -9266,21 +9470,27 @@
       "pron": "मॉडल",
       "emoji": "📈",
       "type": "thing",
-      "plural": "models"
+      "plural": "models",
+      "use": "The model learns from data",
+      "useHi": "मॉडल डेटा से सीखता है"
      },
      {
       "en": "train",
       "hi": "सिखाना",
       "pron": "ट्रेन",
       "emoji": "🎓",
-      "type": "verb"
+      "type": "verb",
+      "use": "We train the model with data",
+      "useHi": "हम मॉडल को डेटा से सिखाते हैं"
      },
      {
       "en": "predict",
       "hi": "अनुमान लगाना",
       "pron": "प्रिडिक्ट",
       "emoji": "🔮",
-      "type": "verb"
+      "type": "verb",
+      "use": "The model can predict the weather",
+      "useHi": "मॉडल मौसम का अनुमान लगा सकता है"
      }
     ],
     "dialogues": [
@@ -9381,7 +9591,9 @@
       "pron": "वायरस",
       "emoji": "🦠",
       "type": "thing",
-      "plural": "viruses"
+      "plural": "viruses",
+      "use": "A virus can harm my computer",
+      "useHi": "वायरस मेरे कंप्यूटर को नुकसान पहुँचा सकता है"
      },
      {
       "en": "scam",
@@ -9389,7 +9601,9 @@
       "pron": "स्कैम",
       "emoji": "🎣",
       "type": "thing",
-      "plural": "scams"
+      "plural": "scams",
+      "use": "This message is a scam",
+      "useHi": "यह संदेश एक धोखा है"
      },
      {
       "en": "secure",
@@ -9403,14 +9617,18 @@
       "hi": "निजी",
       "pron": "प्राइवेट",
       "emoji": "🔐",
-      "type": "adj"
+      "type": "adj",
+      "use": "My password is private",
+      "useHi": "मेरा पासवर्ड निजी है"
      },
      {
       "en": "block",
       "hi": "रोकना",
       "pron": "ब्लॉक",
       "emoji": "🚫",
-      "type": "verb"
+      "type": "verb",
+      "use": "I block the unknown number",
+      "useHi": "मैं अनजान नंबर को ब्लॉक करत{ी|ा} हूँ"
      }
     ],
     "dialogues": [
@@ -9689,7 +9907,9 @@
       "pron": "टीम",
       "emoji": "👥",
       "type": "thing",
-      "plural": "teams"
+      "plural": "teams",
+      "use": "I work with my team",
+      "useHi": "मैं अपनी टीम के साथ काम करत{ी|ा} हूँ"
      },
      {
       "en": "task",
@@ -9713,7 +9933,9 @@
       "pron": "डेडलाइन",
       "emoji": "⏰",
       "type": "thing",
-      "plural": "deadlines"
+      "plural": "deadlines",
+      "use": "The deadline is on Friday",
+      "useHi": "आख़िरी तारीख़ शुक्रवार को है"
      },
      {
       "en": "meeting",
@@ -9721,7 +9943,9 @@
       "pron": "मीटिंग",
       "emoji": "🤝",
       "type": "thing",
-      "plural": "meetings"
+      "plural": "meetings",
+      "use": "We have a team meeting today",
+      "useHi": "आज हमारी टीम की मीटिंग है"
      }
     ],
     "dialogues": [
@@ -10238,7 +10462,9 @@
       "pron": "रेड",
       "emoji": "🔴",
       "type": "adj",
-      "plural": "reds"
+      "plural": "reds",
+      "use": "The tomato is red",
+      "useHi": "टमाटर लाल है"
      },
      {
       "en": "blue",
@@ -10246,7 +10472,9 @@
       "pron": "ब्लू",
       "emoji": "🔵",
       "type": "adj",
-      "plural": "blues"
+      "plural": "blues",
+      "use": "The sky is blue",
+      "useHi": "आसमान नीला है"
      },
      {
       "en": "green",
@@ -10254,7 +10482,9 @@
       "pron": "ग्रीन",
       "emoji": "🟢",
       "type": "adj",
-      "plural": "greens"
+      "plural": "greens",
+      "use": "The leaf is green",
+      "useHi": "पत्ता हरा है"
      },
      {
       "en": "yellow",
@@ -10262,7 +10492,9 @@
       "pron": "यलो",
       "emoji": "🟡",
       "type": "adj",
-      "plural": "yellows"
+      "plural": "yellows",
+      "use": "The mango is yellow",
+      "useHi": "आम पीला है"
      },
      {
       "en": "black",
@@ -10270,7 +10502,9 @@
       "pron": "ब्लैक",
       "emoji": "⚫",
       "type": "adj",
-      "plural": "blacks"
+      "plural": "blacks",
+      "use": "My hair is black",
+      "useHi": "मेरे बाल काले हैं"
      }
     ],
     "quiz": [
@@ -10379,7 +10613,9 @@
       "pron": "वन",
       "emoji": "1️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I have one nose",
+      "useHi": "मेरी एक नाक है"
      },
      {
       "en": "two",
@@ -10387,7 +10623,9 @@
       "pron": "टू",
       "emoji": "2️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I have two hands",
+      "useHi": "मेरे दो हाथ हैं"
      },
      {
       "en": "three",
@@ -10395,7 +10633,9 @@
       "pron": "थ्री",
       "emoji": "3️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I see three birds",
+      "useHi": "मैं तीन चिड़ियाँ देखत{ी|ा} हूँ"
      },
      {
       "en": "four",
@@ -10403,7 +10643,9 @@
       "pron": "फ़ोर",
       "emoji": "4️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "A cow has four legs",
+      "useHi": "गाय के चार पैर होते हैं"
      },
      {
       "en": "five",
@@ -10411,7 +10653,9 @@
       "pron": "फ़ाइव",
       "emoji": "5️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "My hand has five fingers",
+      "useHi": "मेरे हाथ में पाँच उँगलियाँ हैं"
      },
      {
       "en": "six",
@@ -10419,7 +10663,9 @@
       "pron": "सिक्स",
       "emoji": "6️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I can count to six",
+      "useHi": "मैं छह तक गिन सकत{ी|ा} हूँ"
      },
      {
       "en": "seven",
@@ -10427,7 +10673,9 @@
       "pron": "सेवन",
       "emoji": "7️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "A week has seven days",
+      "useHi": "हफ़्ते में सात दिन होते हैं"
      },
      {
       "en": "eight",
@@ -10435,7 +10683,9 @@
       "pron": "एट",
       "emoji": "8️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "A spider has eight legs",
+      "useHi": "मकड़ी के आठ पैर होते हैं"
      },
      {
       "en": "nine",
@@ -10443,7 +10693,9 @@
       "pron": "नाइन",
       "emoji": "9️⃣",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I can count to nine",
+      "useHi": "मैं नौ तक गिन सकत{ी|ा} हूँ"
      },
      {
       "en": "ten",
@@ -10451,7 +10703,9 @@
       "pron": "टेन",
       "emoji": "🔟",
       "type": "adj",
-      "uncount": true
+      "uncount": true,
+      "use": "I have ten fingers",
+      "useHi": "मेरी दस उँगलियाँ हैं"
      }
     ],
     "quiz": [
@@ -10601,7 +10855,9 @@
       "pron": "बेबी",
       "emoji": "👶",
       "type": "person",
-      "plural": "babies"
+      "plural": "babies",
+      "use": "The baby is sleeping",
+      "useHi": "शिशु सो रहा है"
      }
     ],
     "quiz": [
@@ -11037,7 +11293,7 @@
       "emoji": "🏠",
       "type": "thing",
       "plural": "houses",
-      "use": "I live in a small house.",
+      "use": "I live in a small house",
       "useHi": "मैं छोटे घर में रहत{ी|ा} हूँ।"
      },
      {
@@ -11047,7 +11303,7 @@
       "emoji": "🚪",
       "type": "thing",
       "plural": "doors",
-      "use": "Please open the door.",
+      "use": "Please open the door",
       "useHi": "ज़रा दरवाज़ा खोलो।"
      },
      {
@@ -11057,7 +11313,7 @@
       "emoji": "🛏️",
       "type": "thing",
       "plural": "beds",
-      "use": "I sleep on my bed.",
+      "use": "I sleep on my bed",
       "useHi": "मैं अपने बिस्तर पर सोत{ी|ा} हूँ।"
      },
      {
@@ -11067,7 +11323,7 @@
       "emoji": "🪑",
       "type": "thing",
       "plural": "chairs",
-      "use": "Sit on the chair.",
+      "use": "Sit on the chair",
       "useHi": "कुर्सी पर बैठो।"
      },
      {
@@ -11077,7 +11333,7 @@
       "emoji": "🧹",
       "type": "thing",
       "plural": "brooms",
-      "use": "I clean the floor with a broom.",
+      "use": "I clean the floor with a broom",
       "useHi": "मैं झाड़ू से फ़र्श साफ़ करत{ी|ा} हूँ।"
      }
     ],
@@ -11168,7 +11424,7 @@
       "emoji": "📖",
       "type": "thing",
       "plural": "books",
-      "use": "I read a book every day.",
+      "use": "I read a book every day",
       "useHi": "मैं रोज़ किताब पढ़त{ी|ा} हूँ।"
      },
      {
@@ -11178,7 +11434,7 @@
       "emoji": "🖊️",
       "type": "thing",
       "plural": "pens",
-      "use": "Write your name with a pen.",
+      "use": "Write your name with a pen",
       "useHi": "कलम से अपना नाम लिखो।"
      },
      {
@@ -11188,7 +11444,7 @@
       "emoji": "✏️",
       "type": "thing",
       "plural": "pencils",
-      "use": "My pencil is small.",
+      "use": "My pencil is small",
       "useHi": "मेरी पेंसिल छोटी है।"
      },
      {
@@ -11198,7 +11454,7 @@
       "emoji": "🎒",
       "type": "thing",
       "plural": "bags",
-      "use": "I keep my books in my bag.",
+      "use": "I keep my books in my bag",
       "useHi": "मैं अपनी किताबें बस्ते में रखत{ी|ा} हूँ।"
      },
      {
@@ -11208,7 +11464,7 @@
       "emoji": "👩‍🏫",
       "type": "person",
       "plural": "teachers",
-      "use": "My teacher helps me.",
+      "use": "My teacher helps me",
       "useHi": "मेरी शिक्षिका मेरी मदद करती हैं।"
      }
     ],
@@ -11295,7 +11551,7 @@
       "emoji": "🏪",
       "type": "thing",
       "plural": "shops",
-      "use": "I buy salt at the shop.",
+      "use": "I buy salt at the shop",
       "useHi": "मैं दुकान से नमक खरीदत{ी|ा} हूँ।"
      },
      {
@@ -11305,7 +11561,7 @@
       "emoji": "🛣️",
       "type": "thing",
       "plural": "roads",
-      "use": "The bus runs on the road.",
+      "use": "The bus runs on the road",
       "useHi": "बस सड़क पर चलती है।"
      },
      {
@@ -11315,7 +11571,7 @@
       "emoji": "🛕",
       "type": "thing",
       "plural": "temples",
-      "use": "The temple has a big bell.",
+      "use": "The temple has a big bell",
       "useHi": "मंदिर में बड़ी घंटी है।"
      },
      {
@@ -11325,7 +11581,7 @@
       "emoji": "🌾",
       "type": "thing",
       "plural": "fields",
-      "use": "Rice grows in the field.",
+      "use": "Rice grows in the field",
       "useHi": "खेत में धान उगता है।"
      },
      {
@@ -11335,7 +11591,7 @@
       "emoji": "🏞️",
       "type": "thing",
       "plural": "rivers",
-      "use": "The river has water.",
+      "use": "The river has water",
       "useHi": "नदी में पानी है।"
      }
     ],
@@ -11461,7 +11717,7 @@
       "hi": "नमस्ते",
       "pron": "हैलो",
       "emoji": "👋",
-      "use": "Hello! How are you?",
+      "use": "Hello how are you",
       "useHi": "नमस्ते! तुम कैसी हो?"
      },
      {
@@ -11469,7 +11725,7 @@
       "hi": "हाँ",
       "pron": "यस",
       "emoji": "👍",
-      "use": "Yes, I can read.",
+      "use": "Yes I can read",
       "useHi": "हाँ, मैं पढ़ सकत{ी|ा} हूँ।"
      },
      {
@@ -11477,7 +11733,7 @@
       "hi": "नहीं",
       "pron": "नो",
       "emoji": "👎",
-      "use": "No, I am not tired.",
+      "use": "No I am not tired",
       "useHi": "नहीं, मैं थक{ी|ा} नहीं हूँ।"
      },
      {
@@ -11485,7 +11741,7 @@
       "hi": "कृपया",
       "pron": "प्लीज़",
       "emoji": "🙏",
-      "use": "Please give me water.",
+      "use": "Please give me water",
       "useHi": "कृपया मुझे पानी दो।"
      },
      {
@@ -11493,7 +11749,7 @@
       "hi": "धन्यवाद",
       "pron": "थैंक यू",
       "emoji": "😊",
-      "use": "Thank you for the mango.",
+      "use": "Thank you for the mango",
       "useHi": "आम के लिए धन्यवाद।"
      }
     ],
@@ -12500,7 +12756,9 @@
       "pron": "नोट",
       "emoji": "💵",
       "type": "thing",
-      "plural": "notes"
+      "plural": "notes",
+      "use": "This note is fifty rupees",
+      "useHi": "यह नोट पचास रुपये का है"
      },
      {
       "en": "rupee",
@@ -13246,7 +13504,9 @@
       "pron": "हैंड",
       "emoji": "✋",
       "type": "thing",
-      "plural": "hands"
+      "plural": "hands",
+      "use": "I write with my hand",
+      "useHi": "मैं हाथ से लिखत{ी|ा} हूँ"
      },
      {
       "en": "eye",
@@ -13254,7 +13514,9 @@
       "pron": "आई",
       "emoji": "👁️",
       "type": "thing",
-      "plural": "eyes"
+      "plural": "eyes",
+      "use": "I see with my eyes",
+      "useHi": "मैं आँखों से देखत{ी|ा} हूँ"
      },
      {
       "en": "ear",
@@ -13262,7 +13524,9 @@
       "pron": "इयर",
       "emoji": "👂",
       "type": "thing",
-      "plural": "ears"
+      "plural": "ears",
+      "use": "I hear with my ears",
+      "useHi": "मैं कानों से सुनत{ी|ा} हूँ"
      },
      {
       "en": "nose",
@@ -13270,7 +13534,9 @@
       "pron": "नोज़",
       "emoji": "👃",
       "type": "thing",
-      "plural": "noses"
+      "plural": "noses",
+      "use": "I smell with my nose",
+      "useHi": "मैं नाक से सूँघत{ी|ा} हूँ"
      },
      {
       "en": "leg",
@@ -13278,7 +13544,9 @@
       "pron": "लेग",
       "emoji": "🦵",
       "type": "thing",
-      "plural": "legs"
+      "plural": "legs",
+      "use": "I run with my legs",
+      "useHi": "मैं टाँगों से दौड़त{ी|ा} हूँ"
      }
     ],
     "quiz": [
@@ -13655,35 +13923,41 @@
       "hi": "रोटी",
       "pron": "रोटी",
       "emoji": "🫓",
-      "plural": "rotis"
+      "plural": "rotis",
+      "type": "thing"
      },
      {
       "en": "dal",
       "hi": "दाल",
       "pron": "दाल",
       "emoji": "🍲",
-      "uncount": true
+      "uncount": true,
+      "type": "mass"
      },
      {
       "en": "egg",
       "hi": "अंडा",
       "pron": "एग",
       "emoji": "🥚",
-      "plural": "eggs"
+      "plural": "eggs",
+      "type": "thing"
      },
      {
       "en": "apple",
       "hi": "सेब",
       "pron": "ऐप्पल",
       "emoji": "🍎",
-      "plural": "apples"
+      "plural": "apples",
+      "type": "thing"
      },
      {
       "en": "vegetable",
       "hi": "सब्ज़ी",
       "pron": "वेजिटेबल",
       "emoji": "🥦",
-      "plural": "vegetables"
+      "plural": "vegetables",
+      "use": "I eat vegetables every day",
+      "useHi": "मैं रोज़ सब्ज़ी खात{ी|ा} हूँ"
      }
     ],
     "quiz": [
@@ -14127,7 +14401,7 @@
       "pron": "सन",
       "emoji": "☀️",
       "type": "thing",
-      "use": "The sun rises in the morning.",
+      "use": "The sun rises in the morning",
       "useHi": "सूरज सुबह उगता है।"
      },
      {
@@ -14136,7 +14410,7 @@
       "pron": "मून",
       "emoji": "🌙",
       "type": "thing",
-      "use": "The moon shines at night.",
+      "use": "The moon shines at night",
       "useHi": "चाँद रात में चमकता है।"
      },
      {
@@ -14146,7 +14420,7 @@
       "emoji": "⭐",
       "type": "thing",
       "plural": "stars",
-      "use": "Stars twinkle at night.",
+      "use": "Stars twinkle at night",
       "useHi": "तारे रात में टिमटिमाते हैं।"
      },
      {
@@ -14156,7 +14430,7 @@
       "emoji": "☁️",
       "type": "thing",
       "plural": "clouds",
-      "use": "Clouds bring rain.",
+      "use": "Clouds bring rain",
       "useHi": "बादल बारिश लाते हैं।"
      },
      {
@@ -14166,7 +14440,7 @@
       "emoji": "🌧️",
       "type": "mass",
       "uncount": true,
-      "use": "Rain gives water to the fields.",
+      "use": "Rain gives water to the fields",
       "useHi": "बारिश खेतों को पानी देती है।"
      }
     ],
@@ -14303,7 +14577,7 @@
       "emoji": "🕊️",
       "type": "thing",
       "plural": "pigeons",
-      "use": "The pigeon sits on the roof.",
+      "use": "The pigeon sits on the roof",
       "useHi": "कबूतर छत पर बैठता है।"
      },
      {
@@ -14313,7 +14587,7 @@
       "emoji": "🦜",
       "type": "thing",
       "plural": "parrots",
-      "use": "The parrot is green.",
+      "use": "The parrot is green",
       "useHi": "तोता हरा होता है।"
      },
      {
@@ -14323,7 +14597,7 @@
       "emoji": "🦚",
       "type": "thing",
       "plural": "peacocks",
-      "use": "The peacock dances in the rain.",
+      "use": "The peacock dances in the rain",
       "useHi": "मोर बारिश में नाचता है।"
      },
      {
@@ -14333,7 +14607,7 @@
       "emoji": "🦆",
       "type": "thing",
       "plural": "ducks",
-      "use": "The duck swims in the pond.",
+      "use": "The duck swims in the pond",
       "useHi": "बत्तख तालाब में तैरती है।"
      },
      {
@@ -14343,7 +14617,7 @@
       "emoji": "🐦",
       "type": "thing",
       "plural": "crows",
-      "use": "The crow is black.",
+      "use": "The crow is black",
       "useHi": "कौआ काला होता है।"
      }
     ],
@@ -14453,7 +14727,7 @@
       "emoji": "👩‍🌾",
       "type": "person",
       "plural": "farmers",
-      "use": "The farmer works in the field.",
+      "use": "The farmer works in the field",
       "useHi": "किसान खेत में काम करती है।"
      },
      {
@@ -14463,7 +14737,7 @@
       "emoji": "🌱",
       "type": "thing",
       "plural": "seeds",
-      "use": "A plant grows from a seed.",
+      "use": "A plant grows from a seed",
       "useHi": "बीज से पौधा उगता है।"
      },
      {
@@ -14473,7 +14747,7 @@
       "emoji": "🌾",
       "type": "mass",
       "uncount": true,
-      "use": "Roti is made from wheat.",
+      "use": "Roti is made from wheat",
       "useHi": "रोटी गेहूँ से बनती है।"
      },
      {
@@ -14483,7 +14757,7 @@
       "emoji": "🚜",
       "type": "thing",
       "plural": "tractors",
-      "use": "The tractor pulls a big load.",
+      "use": "The tractor pulls a big load",
       "useHi": "ट्रैक्टर बड़ा बोझ खींचता है।"
      },
      {
@@ -14493,7 +14767,7 @@
       "emoji": "🐂",
       "type": "thing",
       "plural": "oxen",
-      "use": "The ox pulls the cart.",
+      "use": "The ox pulls the cart",
       "useHi": "बैल गाड़ी खींचता है।"
      }
     ],
@@ -14618,7 +14892,7 @@
       "emoji": "🦋",
       "type": "thing",
       "plural": "butterflies",
-      "use": "The butterfly sits on flowers.",
+      "use": "The butterfly sits on flowers",
       "useHi": "तितली फूलों पर बैठती है।"
      },
      {
@@ -14628,7 +14902,7 @@
       "emoji": "🐜",
       "type": "thing",
       "plural": "ants",
-      "use": "The ant is very small.",
+      "use": "The ant is very small",
       "useHi": "चींटी बहुत छोटी होती है।"
      },
      {
@@ -14638,7 +14912,7 @@
       "emoji": "🐝",
       "type": "thing",
       "plural": "bees",
-      "use": "The bee makes honey.",
+      "use": "The bee makes honey",
       "useHi": "मधुमक्खी शहद बनाती है।"
      },
      {
@@ -14648,7 +14922,7 @@
       "emoji": "🐸",
       "type": "thing",
       "plural": "frogs",
-      "use": "The frog jumps in the rain.",
+      "use": "The frog jumps in the rain",
       "useHi": "मेंढक बारिश में कूदता है।"
      },
      {
@@ -14658,7 +14932,7 @@
       "emoji": "🐌",
       "type": "thing",
       "plural": "snails",
-      "use": "The snail moves very slowly.",
+      "use": "The snail moves very slowly",
       "useHi": "घोंघा बहुत धीरे-धीरे चलता है।"
      }
     ],
@@ -18101,7 +18375,9 @@
       "pron": "स्टीम",
       "emoji": "♨️",
       "type": "mass",
-      "uncount": true
+      "uncount": true,
+      "use": "Boiling water turns into steam",
+      "useHi": "उबलता पानी भाप बन जाता है"
      }
     ],
     "quiz": [
@@ -18269,7 +18545,9 @@
       "pron": "मून",
       "emoji": "🌙",
       "type": "thing",
-      "plural": "moons"
+      "plural": "moons",
+      "use": "The moon has no light of its own",
+      "useHi": "चाँद की अपनी रोशनी नहीं होती"
      },
      {
       "en": "star",
@@ -18277,7 +18555,9 @@
       "pron": "स्टार",
       "emoji": "⭐",
       "type": "thing",
-      "plural": "stars"
+      "plural": "stars",
+      "use": "Stars look small because they are far",
+      "useHi": "तारे दूर हैं इसलिए छोटे दिखते हैं"
      },
      {
       "en": "planet",
@@ -18285,7 +18565,9 @@
       "pron": "प्लैनेट",
       "emoji": "🪐",
       "type": "thing",
-      "plural": "planets"
+      "plural": "planets",
+      "use": "The earth is a planet",
+      "useHi": "पृथ्वी एक ग्रह है"
      }
     ],
     "quiz": [
@@ -19056,7 +19338,7 @@
       "emoji": "🌬️",
       "type": "mass",
       "uncount": true,
-      "use": "We cannot see air, but we can feel it",
+      "use": "We cannot see air but we feel it",
       "useHi": "हवा दिखती नहीं, पर महसूस होती है।"
      },
      {
@@ -22570,8 +22852,8 @@
       "emoji": "💧",
       "type": "thing",
       "uncount": true,
-      "use": "Water is made of two gases",
-      "useHi": "पानी दो गैसों से बना है"
+      "use": "Water is made of hydrogen and oxygen",
+      "useHi": "पानी हाइड्रोजन और ऑक्सीजन से बना है"
      }
     ],
     "quiz": [
@@ -22709,8 +22991,8 @@
       "emoji": "🏋️",
       "type": "thing",
       "uncount": true,
-      "use": "Work is done when a force moves an object",
-      "useHi": "जब कोई बल किसी वस्तु को खिसकाता है तब कार्य होता है।"
+      "use": "Work is done by a force",
+      "useHi": "कार्य किसी बल द्वारा किया जाता है।"
      },
      {
       "en": "joule",
@@ -22739,7 +23021,7 @@
       "emoji": "💡",
       "type": "thing",
       "plural": "watts",
-      "use": "A 60 watt bulb glows bright",
+      "use": "A 60 watt bulb glows brightly",
       "useHi": "60 वाट का बल्ब तेज़ चमकता है।"
      }
     ],
@@ -22872,7 +23154,7 @@
       "emoji": "🔦",
       "type": "thing",
       "plural": "rays",
-      "use": "A ray of light travels in a straight line",
+      "use": "A ray of light travels straight",
       "useHi": "प्रकाश की किरण सीधी रेखा में चलती है।"
      }
     ],
@@ -25294,7 +25576,7 @@
       "emoji": "🤖",
       "type": "thing",
       "plural": "robots",
-      "use": "A robot is a machine that works by itself",
+      "use": "A robot is a machine that works",
       "useHi": "रोबोट एक मशीन है जो खुद काम करती है।"
      },
      {
@@ -25454,8 +25736,8 @@
       "emoji": "🎯",
       "type": "thing",
       "plural": "careers",
-      "use": "A career is the work you learn and grow in",
-      "useHi": "करियर वह काम है जिसे सीखकर तुम आगे बढ़त{ी|े} हो।"
+      "use": "A career is the work you learn",
+      "useHi": "करियर वह काम है जिसे तुम सीखत{ी|े} हो।"
      },
      {
       "en": "skill",
@@ -27893,7 +28175,9 @@
       "pron": "नोट",
       "emoji": "💵",
       "plural": "notes",
-      "type": "thing"
+      "type": "thing",
+      "use": "This is a ten rupee note",
+      "useHi": "यह दस रुपये का नोट है।"
      },
      {
       "en": "price",
@@ -28049,7 +28333,9 @@
       "hi": "बचाना",
       "pron": "सेव",
       "emoji": "🐷",
-      "type": "verb"
+      "type": "verb",
+      "use": "I save money in the bank",
+      "useHi": "मैं बैंक में पैसे बचात{ी|ा} हूँ।"
      },
      {
       "en": "account",
@@ -28066,7 +28352,9 @@
       "pron": "कार्ड",
       "emoji": "💳",
       "plural": "cards",
-      "type": "thing"
+      "type": "thing",
+      "use": "Keep your bank card safe",
+      "useHi": "अपना बैंक कार्ड सुरक्षित रखो।"
      },
      {
       "en": "form",
@@ -28868,7 +29156,7 @@
       "pron": "टोटल",
       "emoji": "🧮",
       "plural": "totals",
-      "use": "What is the total?",
+      "use": "What is the total",
       "useHi": "कुल कितना है?"
      },
      {
@@ -29449,8 +29737,8 @@
       "pron": "नीड",
       "emoji": "✅",
       "plural": "needs",
-      "use": "Rice and oil are needs, so buy them first",
-      "useHi": "चावल और तेल ज़रूरत की चीज़ें हैं, इसलिए पहले उन्हें खरीदो।"
+      "use": "Rice and oil are needs",
+      "useHi": "चावल और तेल ज़रूरत की चीज़ें हैं।"
      },
      {
       "en": "want",
@@ -29458,8 +29746,8 @@
       "pron": "वॉन्ट",
       "emoji": "🎈",
       "plural": "wants",
-      "use": "A new bangle is a want, not a need",
-      "useHi": "नई चूड़ी एक इच्छा है, ज़रूरत नहीं।"
+      "use": "A new bangle is a want",
+      "useHi": "नई चूड़ी एक इच्छा है।"
      }
     ],
     "dialogues": [
@@ -30945,7 +31233,7 @@
       "pron": "फ़ेयर",
       "emoji": "💰",
       "plural": "fares",
-      "use": "What is the fare to the market?",
+      "use": "What is the fare to the market",
       "useHi": "बाज़ार का किराया कितना है?"
      },
      {
@@ -31521,7 +31809,7 @@
       "pron": "टाइम",
       "emoji": "🕐",
       "uncount": true,
-      "use": "What is the time now?",
+      "use": "What is the time now",
       "useHi": "अभी समय क्या है?"
      },
      {
@@ -32537,7 +32825,9 @@
       "hi": "छापना",
       "pron": "प्रिंट",
       "emoji": "🖨️",
-      "type": "verb"
+      "type": "verb",
+      "use": "The program can print the answer",
+      "useHi": "प्रोग्राम जवाब प्रिंट कर सकता है"
      },
      {
       "en": "program",
@@ -32545,14 +32835,18 @@
       "pron": "प्रोग्राम",
       "emoji": "📄",
       "plural": "programs",
-      "type": "thing"
+      "type": "thing",
+      "use": "This program prints a message",
+      "useHi": "यह प्रोग्राम एक संदेश दिखाता है"
      },
      {
       "en": "run",
       "hi": "चलाना",
       "pron": "रन",
       "emoji": "▶️",
-      "type": "verb"
+      "type": "verb",
+      "use": "I run the program",
+      "useHi": "मैं प्रोग्राम चलात{ी|ा} हूँ"
      },
      {
       "en": "output",
@@ -32713,7 +33007,9 @@
       "pron": "वैल्यू",
       "emoji": "🔢",
       "plural": "values",
-      "type": "thing"
+      "type": "thing",
+      "use": "The variable has a value",
+      "useHi": "वेरिएबल में एक मान होता है"
      },
      {
       "en": "number",
@@ -32737,7 +33033,9 @@
       "hi": "रखना",
       "pron": "स्टोर",
       "emoji": "📥",
-      "type": "verb"
+      "type": "verb",
+      "use": "A variable can store a number",
+      "useHi": "वेरिएबल एक संख्या रख सकता है"
      }
     ],
     "code": [
@@ -33162,7 +33460,9 @@
       "pron": "लूप",
       "emoji": "🔁",
       "plural": "loops",
-      "type": "thing"
+      "type": "thing",
+      "use": "A loop repeats the same lines",
+      "useHi": "लूप वही लाइनें दोहराता है"
      },
      {
       "en": "repeat",
@@ -33446,14 +33746,18 @@
       "pron": "चैटबॉट",
       "emoji": "🗨️",
       "plural": "chatbots",
-      "type": "thing"
+      "type": "thing",
+      "use": "The chatbot answers my question",
+      "useHi": "चैटबॉट मेरे सवाल का जवाब देता है"
      },
      {
       "en": "clear",
       "hi": "साफ़",
       "pron": "क्लियर",
       "emoji": "✨",
-      "type": "adj"
+      "type": "adj",
+      "use": "My prompt is very clear",
+      "useHi": "मेरा प्रॉम्प्ट बहुत साफ़ है"
      },
      {
       "en": "ask",
@@ -33611,7 +33915,9 @@
       "hi": "निजी",
       "pron": "प्राइवेट",
       "emoji": "🔒",
-      "type": "adj"
+      "type": "adj",
+      "use": "My password is private",
+      "useHi": "मेरा पासवर्ड निजी है"
      },
      {
       "en": "check",
@@ -33626,7 +33932,9 @@
       "pron": "मिस्टेक",
       "emoji": "⚠️",
       "plural": "mistakes",
-      "type": "thing"
+      "type": "thing",
+      "use": "AI can make a mistake",
+      "useHi": "एआई ग़लती कर सकता है"
      },
      {
       "en": "secret",
@@ -33634,7 +33942,9 @@
       "pron": "सीक्रेट",
       "emoji": "🤫",
       "plural": "secrets",
-      "type": "thing"
+      "type": "thing",
+      "use": "My password is a secret",
+      "useHi": "मेरा पासवर्ड एक राज़ है"
      }
     ],
     "quiz": [
@@ -35646,7 +35956,9 @@
       "pron": "आई",
       "emoji": "👁️",
       "type": "thing",
-      "plural": "eyes"
+      "plural": "eyes",
+      "use": "I see with my eyes",
+      "useHi": "मैं अपनी आँखों से देखत{ी|ा} हूँ"
      },
      {
       "en": "ear",
@@ -35654,7 +35966,9 @@
       "pron": "इयर",
       "emoji": "👂",
       "type": "thing",
-      "plural": "ears"
+      "plural": "ears",
+      "use": "I hear with my ears",
+      "useHi": "मैं अपने कानों से सुनत{ी|ा} हूँ"
      },
      {
       "en": "nose",
@@ -35662,7 +35976,9 @@
       "pron": "नोज़",
       "emoji": "👃",
       "type": "thing",
-      "plural": "noses"
+      "plural": "noses",
+      "use": "I smell with my nose",
+      "useHi": "मैं अपनी नाक से सूँघत{ी|ा} हूँ"
      },
      {
       "en": "tongue",
@@ -35670,7 +35986,9 @@
       "pron": "टंग",
       "emoji": "👅",
       "type": "thing",
-      "plural": "tongues"
+      "plural": "tongues",
+      "use": "I taste with my tongue",
+      "useHi": "मैं अपनी जीभ से चखत{ी|ा} हूँ"
      },
      {
       "en": "skin",
@@ -35678,7 +35996,9 @@
       "pron": "स्किन",
       "emoji": "🖐️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "I feel with my skin",
+      "useHi": "मैं अपनी त्वचा से महसूस करत{ी|ा} हूँ"
      }
     ],
     "quiz": [
@@ -35767,7 +36087,9 @@
       "pron": "प्लांट",
       "emoji": "🌱",
       "type": "thing",
-      "plural": "plants"
+      "plural": "plants",
+      "use": "A plant needs water and light",
+      "useHi": "पौधे को पानी और रोशनी चाहिए"
      },
      {
       "en": "animal",
@@ -35775,7 +36097,9 @@
       "pron": "ऐनिमल",
       "emoji": "🐐",
       "type": "thing",
-      "plural": "animals"
+      "plural": "animals",
+      "use": "A dog is an animal",
+      "useHi": "कुत्ता एक जानवर है"
      },
      {
       "en": "stone",
@@ -35783,7 +36107,9 @@
       "pron": "स्टोन",
       "emoji": "🪨",
       "type": "thing",
-      "plural": "stones"
+      "plural": "stones",
+      "use": "A stone is not living",
+      "useHi": "पत्थर सजीव नहीं है"
      },
      {
       "en": "bird",
@@ -35791,7 +36117,9 @@
       "pron": "बर्ड",
       "emoji": "🐦",
       "type": "thing",
-      "plural": "birds"
+      "plural": "birds",
+      "use": "A bird has two wings",
+      "useHi": "पक्षी के दो पंख होते हैं"
      }
     ],
     "quiz": [
@@ -35948,7 +36276,9 @@
       "pron": "सन",
       "emoji": "☀️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The sun rises in the east",
+      "useHi": "सूरज पूरब में उगता है"
      },
      {
       "en": "moon",
@@ -35956,7 +36286,9 @@
       "pron": "मून",
       "emoji": "🌙",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "We see the moon at night",
+      "useHi": "हम रात में चाँद देखते हैं"
      },
      {
       "en": "star",
@@ -35964,7 +36296,9 @@
       "pron": "स्टार",
       "emoji": "⭐",
       "type": "thing",
-      "plural": "stars"
+      "plural": "stars",
+      "use": "Stars twinkle in the night sky",
+      "useHi": "तारे रात के आसमान में टिमटिमाते हैं"
      },
      {
       "en": "sky",
@@ -35972,7 +36306,9 @@
       "pron": "स्काई",
       "emoji": "🌌",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The sky is blue in the day",
+      "useHi": "दिन में आसमान नीला दिखता है"
      }
     ],
     "quiz": [
@@ -36098,7 +36434,9 @@
       "pron": "रेन",
       "emoji": "🌧️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "We get rain in the monsoon",
+      "useHi": "मानसून में बारिश होती है"
      },
      {
       "en": "cloud",
@@ -36106,7 +36444,9 @@
       "pron": "क्लाउड",
       "emoji": "☁️",
       "type": "thing",
-      "plural": "clouds"
+      "plural": "clouds",
+      "use": "Clouds are made of tiny drops",
+      "useHi": "बादल छोटी बूँदों से बनते हैं"
      },
      {
       "en": "wind",
@@ -36114,7 +36454,9 @@
       "pron": "विंड",
       "emoji": "💨",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "We can feel the wind",
+      "useHi": "हम हवा को महसूस कर सकते हैं"
      },
      {
       "en": "rainbow",
@@ -36122,7 +36464,9 @@
       "pron": "रेनबो",
       "emoji": "🌈",
       "type": "thing",
-      "plural": "rainbows"
+      "plural": "rainbows",
+      "use": "A rainbow has seven colours",
+      "useHi": "इंद्रधनुष में सात रंग होते हैं"
      }
     ],
     "quiz": [
@@ -36227,14 +36571,16 @@
       "pron": "फ़ायर",
       "emoji": "🔥",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Fire gives heat and light",
+      "useHi": "आग गरमी और रोशनी देती है"
      },
      {
       "en": "ice",
       "hi": "बर्फ़",
       "pron": "आइस",
       "emoji": "🧊",
-      "type": "thing",
+      "type": "mass",
       "uncount": true
      }
     ],
@@ -36365,7 +36711,7 @@
       "hi": "पानी",
       "pron": "वॉटर",
       "emoji": "💧",
-      "type": "thing",
+      "type": "mass",
       "uncount": true
      },
      {
@@ -36526,7 +36872,9 @@
       "pron": "डोर",
       "emoji": "🚪",
       "type": "thing",
-      "plural": "doors"
+      "plural": "doors",
+      "use": "I can push the door",
+      "useHi": "मैं दरवाज़ा धकेल सकत{ी|ा} हूँ"
      },
      {
       "en": "cart",
@@ -36534,7 +36882,9 @@
       "pron": "कार्ट",
       "emoji": "🛒",
       "type": "thing",
-      "plural": "carts"
+      "plural": "carts",
+      "use": "The bull pulls the cart",
+      "useHi": "बैल गाड़ी को खींचता है"
      }
     ],
     "quiz": [
@@ -36623,7 +36973,9 @@
       "pron": "समर",
       "emoji": "🌞",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Summer is very hot in Bihar",
+      "useHi": "बिहार में गर्मी बहुत तेज़ होती है"
      },
      {
       "en": "winter",
@@ -36631,7 +36983,9 @@
       "pron": "विंटर",
       "emoji": "🧣",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "We wear warm clothes in winter",
+      "useHi": "जाड़े में हम गरम कपड़े पहनते हैं"
      },
      {
       "en": "monsoon",
@@ -36639,7 +36993,9 @@
       "pron": "मॉनसून",
       "emoji": "🌧️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The monsoon brings heavy rain",
+      "useHi": "मानसून में तेज़ बारिश होती है"
      },
      {
       "en": "season",
@@ -36647,7 +37003,9 @@
       "pron": "सीज़न",
       "emoji": "🍂",
       "type": "thing",
-      "plural": "seasons"
+      "plural": "seasons",
+      "use": "India has three main seasons",
+      "useHi": "भारत में तीन मुख्य मौसम होते हैं"
      }
     ],
     "quiz": [
@@ -36795,7 +37153,7 @@
       "emoji": "🌱",
       "type": "thing",
       "plural": "plants",
-      "use": "The plant grows in the sun.",
+      "use": "The plant grows in the sun",
       "useHi": "पौधा धूप में बढ़ता है।"
      },
      {
@@ -36805,7 +37163,7 @@
       "emoji": "🍃",
       "type": "thing",
       "plural": "leaves",
-      "use": "The leaf is green.",
+      "use": "The leaf is green",
       "useHi": "पत्ता हरा है।"
      },
      {
@@ -36815,7 +37173,7 @@
       "emoji": "🥕",
       "type": "thing",
       "plural": "roots",
-      "use": "The root is under the soil.",
+      "use": "The root is under the soil",
       "useHi": "जड़ मिट्टी के नीचे होती है।"
      },
      {
@@ -36825,7 +37183,7 @@
       "emoji": "🌸",
       "type": "thing",
       "plural": "flowers",
-      "use": "The flower smells sweet.",
+      "use": "The flower smells sweet",
       "useHi": "फूल की खुशबू अच्छी होती है।"
      },
      {
@@ -36835,7 +37193,7 @@
       "emoji": "🌰",
       "type": "thing",
       "plural": "seeds",
-      "use": "A seed grows into a plant.",
+      "use": "A seed grows into a plant",
       "useHi": "बीज से पौधा बनता है।"
      }
     ],
@@ -36943,7 +37301,7 @@
       "emoji": "💨",
       "type": "thing",
       "uncount": true,
-      "use": "We cannot see air.",
+      "use": "We cannot see air",
       "useHi": "हम हवा को देख नहीं सकते।"
      },
      {
@@ -36953,7 +37311,7 @@
       "emoji": "🌬️",
       "type": "thing",
       "uncount": true,
-      "use": "The wind lifts the kite high.",
+      "use": "The wind lifts the kite high",
       "useHi": "हवा पतंग को ऊँचा उड़ाती है।"
      },
      {
@@ -36962,7 +37320,7 @@
       "pron": "ब्रीद",
       "emoji": "👃",
       "type": "action",
-      "use": "We breathe through our nose.",
+      "use": "We breathe through our nose",
       "useHi": "हम नाक से साँस लेते हैं।"
      },
      {
@@ -36972,7 +37330,7 @@
       "emoji": "🎈",
       "type": "thing",
       "plural": "balloons",
-      "use": "Air fills the balloon.",
+      "use": "Air fills the balloon",
       "useHi": "गुब्बारे में हवा भर जाती है।"
      },
      {
@@ -36982,7 +37340,7 @@
       "emoji": "🌀",
       "type": "thing",
       "plural": "fans",
-      "use": "The fan gives cool air.",
+      "use": "The fan gives cool air",
       "useHi": "पंखा ठंडी हवा देता है।"
      }
     ],
@@ -37094,7 +37452,7 @@
       "emoji": "❄️",
       "type": "thing",
       "uncount": true,
-      "use": "Ice is very cold.",
+      "use": "Ice is very cold",
       "useHi": "बर्फ़ बहुत ठंडी होती है।"
      },
      {
@@ -37104,7 +37462,7 @@
       "emoji": "💧",
       "type": "thing",
       "uncount": true,
-      "use": "We drink clean water.",
+      "use": "We drink clean water",
       "useHi": "हम साफ़ पानी पीते हैं।"
      },
      {
@@ -37114,7 +37472,7 @@
       "emoji": "♨️",
       "type": "thing",
       "uncount": true,
-      "use": "Steam rises from hot rice.",
+      "use": "Steam rises from hot rice",
       "useHi": "गरम भात से भाप उठती है।"
      },
      {
@@ -37123,7 +37481,7 @@
       "pron": "मेल्ट",
       "emoji": "🍦",
       "type": "action",
-      "use": "Ice melts in the sun.",
+      "use": "Ice melts in the sun",
       "useHi": "बर्फ़ धूप में पिघलती है।"
      },
      {
@@ -37132,7 +37490,7 @@
       "pron": "बॉइल",
       "emoji": "🍲",
       "type": "action",
-      "use": "We boil water for tea.",
+      "use": "We boil water for tea",
       "useHi": "हम चाय के लिए पानी उबालते हैं।"
      }
     ],
@@ -37272,7 +37630,7 @@
       "emoji": "💡",
       "type": "thing",
       "uncount": true,
-      "use": "The bulb gives light.",
+      "use": "The bulb gives light",
       "useHi": "बल्ब रोशनी देता है।"
      },
      {
@@ -37282,7 +37640,7 @@
       "emoji": "👤",
       "type": "thing",
       "plural": "shadows",
-      "use": "My shadow follows me in the sun.",
+      "use": "My shadow follows me in the sun",
       "useHi": "धूप में मेरी छाया मेरे साथ चलती है।"
      },
      {
@@ -37292,7 +37650,7 @@
       "emoji": "🌞",
       "type": "thing",
       "uncount": true,
-      "use": "The sun gives us light.",
+      "use": "The sun gives us light",
       "useHi": "सूरज हमें रोशनी देता है।"
      },
      {
@@ -37302,7 +37660,7 @@
       "emoji": "🔦",
       "type": "thing",
       "plural": "torches",
-      "use": "We use a torch at night.",
+      "use": "We use a torch at night",
       "useHi": "रात में हम टॉर्च जलाते हैं।"
      },
      {
@@ -37311,7 +37669,7 @@
       "pron": "डार्क",
       "emoji": "🌑",
       "type": "describe",
-      "use": "The room is dark at night.",
+      "use": "The room is dark at night",
       "useHi": "रात में कमरा अँधेरा होता है।"
      }
     ],
@@ -38990,7 +39348,9 @@
       "pron": "कंट्री",
       "emoji": "🇮🇳",
       "type": "thing",
-      "plural": "countries"
+      "plural": "countries",
+      "use": "India is a big country",
+      "useHi": "भारत एक बड़ा देश है"
      },
      {
       "en": "capital",
@@ -38998,7 +39358,9 @@
       "pron": "कैपिटल",
       "emoji": "🏛️",
       "type": "thing",
-      "plural": "capitals"
+      "plural": "capitals",
+      "use": "Delhi is the capital of India",
+      "useHi": "दिल्ली भारत की राजधानी है"
      },
      {
       "en": "border",
@@ -39006,7 +39368,9 @@
       "pron": "बॉर्डर",
       "emoji": "🗺️",
       "type": "thing",
-      "plural": "borders"
+      "plural": "borders",
+      "use": "Nepal is across our northern border",
+      "useHi": "नेपाल हमारी उत्तरी सीमा के पार है"
      },
      {
       "en": "citizen",
@@ -39014,7 +39378,9 @@
       "pron": "सिटिज़न",
       "emoji": "🧑",
       "type": "thing",
-      "plural": "citizens"
+      "plural": "citizens",
+      "use": "Every citizen can vote at eighteen",
+      "useHi": "हर नागरिक अठारह साल की उम्र में वोट दे सकता है"
      }
     ],
     "quiz": [
@@ -39103,7 +39469,9 @@
       "pron": "स्टेट",
       "emoji": "🗺️",
       "type": "thing",
-      "plural": "states"
+      "plural": "states",
+      "use": "Bihar is a state in India",
+      "useHi": "बिहार भारत का एक राज्य है"
      },
      {
       "en": "village",
@@ -39111,7 +39479,9 @@
       "pron": "विलेज",
       "emoji": "🏡",
       "type": "thing",
-      "plural": "villages"
+      "plural": "villages",
+      "use": "Many people live in my village",
+      "useHi": "मेरे गाँव में बहुत लोग रहते हैं"
      },
      {
       "en": "city",
@@ -39119,7 +39489,9 @@
       "pron": "सिटी",
       "emoji": "🏙️",
       "type": "thing",
-      "plural": "cities"
+      "plural": "cities",
+      "use": "Patna is a big city",
+      "useHi": "पटना एक बड़ा शहर है"
      },
      {
       "en": "district",
@@ -39127,7 +39499,9 @@
       "pron": "डिस्ट्रिक्ट",
       "emoji": "📍",
       "type": "thing",
-      "plural": "districts"
+      "plural": "districts",
+      "use": "Every district has many villages",
+      "useHi": "हर ज़िले में कई गाँव होते हैं"
      }
     ],
     "quiz": [
@@ -39264,7 +39638,9 @@
       "pron": "रिवर",
       "emoji": "🏞️",
       "type": "thing",
-      "plural": "rivers"
+      "plural": "rivers",
+      "use": "The Ganga is a long river",
+      "useHi": "गंगा एक लंबी नदी है"
      },
      {
       "en": "mountain",
@@ -39272,7 +39648,9 @@
       "pron": "माउंटेन",
       "emoji": "⛰️",
       "type": "thing",
-      "plural": "mountains"
+      "plural": "mountains",
+      "use": "Snow falls on the high mountain",
+      "useHi": "ऊँचे पहाड़ पर बर्फ़ गिरती है"
      },
      {
       "en": "forest",
@@ -39280,7 +39658,9 @@
       "pron": "फ़ॉरेस्ट",
       "emoji": "🌳",
       "type": "thing",
-      "plural": "forests"
+      "plural": "forests",
+      "use": "Many animals live in the forest",
+      "useHi": "जंगल में बहुत जानवर रहते हैं"
      },
      {
       "en": "valley",
@@ -39288,7 +39668,9 @@
       "pron": "वैली",
       "emoji": "🏔️",
       "type": "thing",
-      "plural": "valleys"
+      "plural": "valleys",
+      "use": "A valley lies between two hills",
+      "useHi": "घाटी दो पहाड़ों के बीच होती है"
      }
     ],
     "quiz": [
@@ -39392,7 +39774,9 @@
       "pron": "फ़्रीडम",
       "emoji": "🕊️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "India won freedom in 1947",
+      "useHi": "भारत को 1947 में आज़ादी मिली"
      },
      {
       "en": "leader",
@@ -39400,7 +39784,9 @@
       "pron": "लीडर",
       "emoji": "🧑‍💼",
       "type": "thing",
-      "plural": "leaders"
+      "plural": "leaders",
+      "use": "Gandhiji was a great leader",
+      "useHi": "गांधीजी एक महान नेता थे"
      },
      {
       "en": "protest",
@@ -39408,7 +39794,9 @@
       "pron": "प्रोटेस्ट",
       "emoji": "✊",
       "type": "thing",
-      "plural": "protests"
+      "plural": "protests",
+      "use": "People joined a peaceful protest",
+      "useHi": "लोगों ने शांतिपूर्ण विरोध किया"
      },
      {
       "en": "flag",
@@ -39545,7 +39933,9 @@
       "pron": "वोट",
       "emoji": "🗳️",
       "type": "thing",
-      "plural": "votes"
+      "plural": "votes",
+      "use": "Every vote is counted carefully",
+      "useHi": "हर वोट ध्यान से गिना जाता है"
      },
      {
       "en": "election",
@@ -39553,7 +39943,9 @@
       "pron": "इलेक्शन",
       "emoji": "🗳️",
       "type": "thing",
-      "plural": "elections"
+      "plural": "elections",
+      "use": "People choose leaders in an election",
+      "useHi": "चुनाव में लोग अपने नेता चुनते हैं"
      },
      {
       "en": "law",
@@ -39561,7 +39953,9 @@
       "pron": "लॉ",
       "emoji": "⚖️",
       "type": "thing",
-      "plural": "laws"
+      "plural": "laws",
+      "use": "Everyone must follow the law",
+      "useHi": "सबको कानून मानना चाहिए"
      },
      {
       "en": "minister",
@@ -39569,7 +39963,9 @@
       "pron": "मिनिस्टर",
       "emoji": "🧑‍💼",
       "type": "thing",
-      "plural": "ministers"
+      "plural": "ministers",
+      "use": "A minister works for the people",
+      "useHi": "मंत्री लोगों के लिए काम करता है"
      }
     ],
     "quiz": [
@@ -39662,7 +40058,9 @@
       "pron": "कॉन्स्टिट्यूशन",
       "emoji": "📜",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Our Constitution gives us rights",
+      "useHi": "हमारा संविधान हमें अधिकार देता है"
      },
      {
       "en": "right",
@@ -39670,7 +40068,9 @@
       "pron": "राइट",
       "emoji": "✋",
       "type": "thing",
-      "plural": "rights"
+      "plural": "rights",
+      "use": "Education is a right for children",
+      "useHi": "शिक्षा बच्चों का अधिकार है"
      },
      {
       "en": "duty",
@@ -39678,7 +40078,9 @@
       "pron": "ड्यूटी",
       "emoji": "🤲",
       "type": "thing",
-      "plural": "duties"
+      "plural": "duties",
+      "use": "Keeping India clean is our duty",
+      "useHi": "भारत को साफ़ रखना हमारा कर्तव्य है"
      },
      {
       "en": "equality",
@@ -39686,7 +40088,9 @@
       "pron": "इक्वैलिटी",
       "emoji": "⚖️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Our Constitution promises equality to all",
+      "useHi": "हमारा संविधान सबको समानता का वादा करता है"
      }
     ],
     "quiz": [
@@ -39845,7 +40249,9 @@
       "pron": "नॉर्थ",
       "emoji": "🧭",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Nepal is to the north",
+      "useHi": "नेपाल उत्तर दिशा में है"
      },
      {
       "en": "east",
@@ -39853,7 +40259,9 @@
       "pron": "ईस्ट",
       "emoji": "🧭",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The sun rises in the east",
+      "useHi": "सूरज पूरब से निकलता है"
      },
      {
       "en": "symbol",
@@ -39861,7 +40269,9 @@
       "pron": "सिंबल",
       "emoji": "🔣",
       "type": "thing",
-      "plural": "symbols"
+      "plural": "symbols",
+      "use": "Each state has its own symbol",
+      "useHi": "हर राज्य का अपना प्रतीक होता है"
      }
     ],
     "quiz": [
@@ -39960,7 +40370,9 @@
       "pron": "अर्थ",
       "emoji": "🌍",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The Earth moves around the sun",
+      "useHi": "पृथ्वी सूरज के चारों ओर घूमती है"
      },
      {
       "en": "planet",
@@ -39968,7 +40380,9 @@
       "pron": "प्लैनेट",
       "emoji": "🪐",
       "type": "thing",
-      "plural": "planets"
+      "plural": "planets",
+      "use": "The Earth is our planet",
+      "useHi": "पृथ्वी हमारा ग्रह है"
      },
      {
       "en": "continent",
@@ -39976,7 +40390,9 @@
       "pron": "कॉन्टिनेंट",
       "emoji": "🌐",
       "type": "thing",
-      "plural": "continents"
+      "plural": "continents",
+      "use": "Asia is the biggest continent",
+      "useHi": "एशिया सबसे बड़ा महाद्वीप है"
      },
      {
       "en": "globe",
@@ -39984,7 +40400,9 @@
       "pron": "ग्लोब",
       "emoji": "🌐",
       "type": "thing",
-      "plural": "globes"
+      "plural": "globes",
+      "use": "A globe shows the whole Earth",
+      "useHi": "ग्लोब पूरी पृथ्वी दिखाता है"
      }
     ],
     "quiz": [
@@ -40653,8 +41071,8 @@
       "emoji": "✈️",
       "type": "thing",
       "plural": "pilots",
-      "use": "A pilot flies the plane high in the sky",
-      "useHi": "पायलट हवाई जहाज़ को आसमान में उड़ाती है।"
+      "use": "A pilot flies the plane",
+      "useHi": "पायलट हवाई जहाज़ उड़ाती है।"
      },
      {
       "en": "history",
@@ -40788,7 +41206,9 @@
       "pron": "मशीन",
       "emoji": "⚙️",
       "type": "thing",
-      "plural": "machines"
+      "plural": "machines",
+      "use": "A computer is a machine",
+      "useHi": "कंप्यूटर एक मशीन है"
      },
      {
       "en": "screen",
@@ -40796,7 +41216,9 @@
       "pron": "स्क्रीन",
       "emoji": "🖥️",
       "type": "thing",
-      "plural": "screens"
+      "plural": "screens",
+      "use": "Look at the screen carefully",
+      "useHi": "स्क्रीन को ध्यान से देखो"
      },
      {
       "en": "power",
@@ -40804,7 +41226,9 @@
       "pron": "पावर",
       "emoji": "🔌",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Press the power button",
+      "useHi": "पावर बटन दबाओ"
      }
     ],
     "quiz": [
@@ -40888,7 +41312,9 @@
       "pron": "मॉनिटर",
       "emoji": "🖥️",
       "type": "thing",
-      "plural": "monitors"
+      "plural": "monitors",
+      "use": "The monitor shows the picture",
+      "useHi": "मॉनिटर तस्वीर दिखाता है"
      },
      {
       "en": "keyboard",
@@ -40896,7 +41322,9 @@
       "pron": "कीबोर्ड",
       "emoji": "⌨️",
       "type": "thing",
-      "plural": "keyboards"
+      "plural": "keyboards",
+      "use": "I type on the keyboard",
+      "useHi": "मैं कीबोर्ड पर टाइप करत{ी|ा} हूँ"
      },
      {
       "en": "mouse",
@@ -40904,7 +41332,9 @@
       "pron": "माउस",
       "emoji": "🖱️",
       "type": "thing",
-      "plural": "mice"
+      "plural": "mice",
+      "use": "Click with the mouse",
+      "useHi": "माउस से क्लिक करो"
      },
      {
       "en": "CPU",
@@ -40912,7 +41342,9 @@
       "pron": "सीपीयू",
       "emoji": "🧠",
       "type": "thing",
-      "plural": "CPUs"
+      "plural": "CPUs",
+      "use": "The CPU is the computer brain",
+      "useHi": "सीपीयू कंप्यूटर का दिमाग है"
      }
     ],
     "quiz": [
@@ -41049,7 +41481,9 @@
       "pron": "इनपुट",
       "emoji": "⬇️",
       "type": "thing",
-      "plural": "inputs"
+      "plural": "inputs",
+      "use": "A keyboard is an input device",
+      "useHi": "कीबोर्ड एक इनपुट डिवाइस है"
      },
      {
       "en": "output",
@@ -41057,7 +41491,9 @@
       "pron": "आउटपुट",
       "emoji": "⬆️",
       "type": "thing",
-      "plural": "outputs"
+      "plural": "outputs",
+      "use": "A printer is an output device",
+      "useHi": "प्रिंटर एक आउटपुट डिवाइस है"
      },
      {
       "en": "printer",
@@ -41065,7 +41501,9 @@
       "pron": "प्रिंटर",
       "emoji": "🖨️",
       "type": "thing",
-      "plural": "printers"
+      "plural": "printers",
+      "use": "The printer prints my page",
+      "useHi": "प्रिंटर मेरा पेज छापता है"
      },
      {
       "en": "speaker",
@@ -41073,7 +41511,9 @@
       "pron": "स्पीकर",
       "emoji": "🔊",
       "type": "thing",
-      "plural": "speakers"
+      "plural": "speakers",
+      "use": "The speaker plays the sound",
+      "useHi": "स्पीकर आवाज़ बजाता है"
      }
     ],
     "quiz": [
@@ -41210,7 +41650,9 @@
       "pron": "लेटर की",
       "emoji": "🔤",
       "type": "thing",
-      "plural": "letter keys"
+      "plural": "letter keys",
+      "use": "Press a letter key to type",
+      "useHi": "टाइप करने के लिए अक्षर वाली कुंजी दबाओ"
      },
      {
       "en": "spacebar",
@@ -41218,7 +41660,9 @@
       "pron": "स्पेसबार",
       "emoji": "␣",
       "type": "thing",
-      "plural": "spacebars"
+      "plural": "spacebars",
+      "use": "The spacebar makes a space",
+      "useHi": "स्पेसबार से जगह बनती है"
      },
      {
       "en": "enter key",
@@ -41226,7 +41670,9 @@
       "pron": "एंटर की",
       "emoji": "↵",
       "type": "thing",
-      "plural": "enter keys"
+      "plural": "enter keys",
+      "use": "Press the enter key to finish",
+      "useHi": "पूरा करने के लिए एंटर कुंजी दबाओ"
      },
      {
       "en": "number key",
@@ -41234,7 +41680,9 @@
       "pron": "नंबर की",
       "emoji": "🔢",
       "type": "thing",
-      "plural": "number keys"
+      "plural": "number keys",
+      "use": "A number key types a digit",
+      "useHi": "नंबर कुंजी से अंक टाइप होता है"
      },
      {
       "en": "key",
@@ -41242,7 +41690,9 @@
       "pron": "की",
       "emoji": "🔑",
       "type": "thing",
-      "plural": "keys"
+      "plural": "keys",
+      "use": "Press each key gently",
+      "useHi": "हर कुंजी को धीरे से दबाओ"
      }
     ],
     "quiz": [
@@ -41316,7 +41766,9 @@
       "pron": "आइकन",
       "emoji": "🔲",
       "type": "thing",
-      "plural": "icons"
+      "plural": "icons",
+      "use": "Tap the icon to open it",
+      "useHi": "खोलने के लिए आइकन पर टैप करो"
      },
      {
       "en": "desktop",
@@ -41324,7 +41776,9 @@
       "pron": "डेस्कटॉप",
       "emoji": "🖥️",
       "type": "thing",
-      "plural": "desktops"
+      "plural": "desktops",
+      "use": "The desktop shows all my icons",
+      "useHi": "डेस्कटॉप पर मेरे सारे आइकन दिखते हैं"
      },
      {
       "en": "cursor",
@@ -41332,7 +41786,9 @@
       "pron": "कर्सर",
       "emoji": "➤",
       "type": "thing",
-      "plural": "cursors"
+      "plural": "cursors",
+      "use": "The cursor blinks on the screen",
+      "useHi": "कर्सर स्क्रीन पर टिमटिमाता है"
      }
     ],
     "quiz": [
@@ -41579,7 +42035,9 @@
       "pron": "पेंट",
       "emoji": "🎨",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "I make a picture with paint",
+      "useHi": "मैं पेंट से तस्वीर बनात{ी|ा} हूँ"
      },
      {
       "en": "colour",
@@ -41587,7 +42045,9 @@
       "pron": "कलर",
       "emoji": "🌈",
       "type": "thing",
-      "plural": "colours"
+      "plural": "colours",
+      "use": "Choose a colour for the picture",
+      "useHi": "तस्वीर के लिए एक रंग चुनो"
      },
      {
       "en": "brush",
@@ -41676,7 +42136,9 @@
       "pron": "पासवर्ड",
       "emoji": "🔑",
       "type": "thing",
-      "plural": "passwords"
+      "plural": "passwords",
+      "use": "Keep your password secret always",
+      "useHi": "अपना पासवर्ड हमेशा गुप्त रखो"
      },
      {
       "en": "safe",
@@ -41691,14 +42153,18 @@
       "pron": "स्ट्रेंजर",
       "emoji": "🚫",
       "type": "thing",
-      "plural": "strangers"
+      "plural": "strangers",
+      "use": "Do not chat with a stranger",
+      "useHi": "किसी अजनबी से चैट मत करो"
      },
      {
       "en": "secret",
       "hi": "गुप्त",
       "pron": "सीक्रेट",
       "emoji": "🤫",
-      "type": "describe"
+      "type": "describe",
+      "use": "A password must stay secret",
+      "useHi": "पासवर्ड गुप्त रहना चाहिए"
      }
     ],
     "quiz": [
@@ -41839,7 +42305,7 @@
       "emoji": "🌐",
       "type": "thing",
       "uncount": true,
-      "use": "The internet connects computers everywhere.",
+      "use": "The internet connects computers everywhere",
       "useHi": "इंटरनेट हर जगह के कंप्यूटर जोड़ता है।"
      },
      {
@@ -41849,7 +42315,7 @@
       "emoji": "🖥️",
       "type": "thing",
       "plural": "websites",
-      "use": "A website is a page on the internet.",
+      "use": "A website is a page on the internet",
       "useHi": "वेबसाइट इंटरनेट पर एक पन्ना है।"
      },
      {
@@ -41858,7 +42324,7 @@
       "pron": "सर्च",
       "emoji": "🔍",
       "type": "action",
-      "use": "I search for my answer online.",
+      "use": "I search for my answer online",
       "useHi": "मैं अपना जवाब ऑनलाइन खोजत{ी|ा} हूँ।"
      },
      {
@@ -41868,7 +42334,7 @@
       "emoji": "🔗",
       "type": "thing",
       "plural": "links",
-      "use": "Tap the link to open the page.",
+      "use": "Tap the link to open the page",
       "useHi": "पन्ना खोलने के लिए लिंक दबाओ।"
      },
      {
@@ -41877,7 +42343,7 @@
       "pron": "ऑनलाइन",
       "emoji": "📶",
       "type": "describe",
-      "use": "The phone is online when it has network.",
+      "use": "The phone is online when it has network",
       "useHi": "नेटवर्क होने पर फ़ोन ऑनलाइन होता है।"
      }
     ],
@@ -42017,7 +42483,7 @@
       "emoji": "📧",
       "type": "thing",
       "plural": "emails",
-      "use": "An email is a letter on the computer.",
+      "use": "An email is a letter on the computer",
       "useHi": "ईमेल कंप्यूटर पर भेजी जाने वाली चिट्ठी है।"
      },
      {
@@ -42026,7 +42492,7 @@
       "pron": "सेंड",
       "emoji": "📤",
       "type": "action",
-      "use": "I send an email to my teacher.",
+      "use": "I send an email to my teacher",
       "useHi": "मैं अपनी शिक्षिका को ईमेल भेजत{ी|ा} हूँ।"
      },
      {
@@ -42036,7 +42502,7 @@
       "emoji": "📥",
       "type": "thing",
       "plural": "inboxes",
-      "use": "New emails come to the inbox.",
+      "use": "New emails come to the inbox",
       "useHi": "नए ईमेल इनबॉक्स में आते हैं।"
      },
      {
@@ -42046,7 +42512,7 @@
       "emoji": "📝",
       "type": "thing",
       "plural": "subjects",
-      "use": "The subject tells what the email is about.",
+      "use": "The subject tells what the email is about",
       "useHi": "विषय बताता है कि ईमेल किस बारे में है।"
      },
      {
@@ -42055,7 +42521,7 @@
       "pron": "अटैच",
       "emoji": "📎",
       "type": "action",
-      "use": "I attach a photo to the email.",
+      "use": "I attach a photo to the email",
       "useHi": "मैं ईमेल के साथ फ़ोटो जोड़त{ी|ा} हूँ।"
      }
     ],
@@ -42222,7 +42688,7 @@
       "emoji": "📱",
       "type": "thing",
       "plural": "mobiles",
-      "use": "The mobile rings loudly.",
+      "use": "The mobile rings loudly",
       "useHi": "मोबाइल ज़ोर से बजता है।"
      },
      {
@@ -42232,7 +42698,7 @@
       "emoji": "📲",
       "type": "thing",
       "plural": "apps",
-      "use": "This app teaches English.",
+      "use": "This app teaches English",
       "useHi": "यह ऐप अंग्रेज़ी सिखाता है।"
      },
      {
@@ -42242,7 +42708,7 @@
       "emoji": "🔄",
       "type": "thing",
       "plural": "recharges",
-      "use": "We get a recharge at the kirana shop.",
+      "use": "We get a recharge at the kirana shop",
       "useHi": "हम किराना दुकान पर रिचार्ज करवाते हैं।"
      },
      {
@@ -42252,8 +42718,8 @@
       "emoji": "🔋",
       "type": "thing",
       "plural": "batteries",
-      "use": "The battery is low, charge the phone.",
-      "useHi": "बैटरी कम है, फ़ोन चार्ज करो।"
+      "use": "Charge the phone when the battery is low",
+      "useHi": "बैटरी कम हो तो फ़ोन चार्ज करो"
      },
      {
       "en": "camera",
@@ -42262,7 +42728,7 @@
       "emoji": "📷",
       "type": "thing",
       "plural": "cameras",
-      "use": "I take a photo with the camera.",
+      "use": "I take a photo with the camera",
       "useHi": "मैं कैमरे से फ़ोटो खींचत{ी|ा} हूँ।"
      }
     ],
@@ -42379,7 +42845,7 @@
       "emoji": "📰",
       "type": "thing",
       "uncount": true,
-      "use": "The news comes on the phone.",
+      "use": "The news comes on the phone",
       "useHi": "ख़बर फ़ोन पर आती है।"
      },
      {
@@ -42388,7 +42854,7 @@
       "pron": "ट्रू",
       "emoji": "✅",
       "type": "describe",
-      "use": "Check if the news is true.",
+      "use": "Check if the news is true",
       "useHi": "जाँचो कि ख़बर सच है या नहीं।"
      },
      {
@@ -42397,7 +42863,7 @@
       "pron": "फ़ेक",
       "emoji": "❌",
       "type": "describe",
-      "use": "A fake message can trick people.",
+      "use": "A fake message can trick people",
       "useHi": "झूठा संदेश लोगों को धोखा दे सकता है।"
      },
      {
@@ -42406,7 +42872,7 @@
       "pron": "शेयर",
       "emoji": "📤",
       "type": "action",
-      "use": "Do not share fake news.",
+      "use": "Do not share fake news",
       "useHi": "झूठी ख़बर साझा मत करो।"
      },
      {
@@ -42415,7 +42881,7 @@
       "pron": "चेक",
       "emoji": "🔎",
       "type": "action",
-      "use": "I check the news before sharing it.",
+      "use": "I check the news before sharing it",
       "useHi": "मैं ख़बर साझा करने से पहले जाँचत{ी|ा} हूँ।"
      }
     ],
@@ -43934,7 +44400,9 @@
       "pron": "नेशन",
       "emoji": "🇮🇳",
       "type": "thing",
-      "plural": "nations"
+      "plural": "nations",
+      "use": "India is a free nation",
+      "useHi": "भारत एक स्वतंत्र राष्ट्र है"
      },
      {
       "en": "movement",
@@ -43942,7 +44410,9 @@
       "pron": "मूवमेंट",
       "emoji": "✊",
       "type": "thing",
-      "plural": "movements"
+      "plural": "movements",
+      "use": "The Quit India movement began in 1942",
+      "useHi": "भारत छोड़ो आंदोलन 1942 में शुरू हुआ"
      },
      {
       "en": "boycott",
@@ -43950,7 +44420,9 @@
       "pron": "बॉयकॉट",
       "emoji": "🚫",
       "type": "thing",
-      "plural": "boycotts"
+      "plural": "boycotts",
+      "use": "People began a boycott of foreign cloth",
+      "useHi": "लोगों ने विदेशी कपड़े का बहिष्कार किया"
      },
      {
       "en": "independence",
@@ -43958,7 +44430,9 @@
       "pron": "इंडिपेंडेंस",
       "emoji": "🕊️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "India got independence in 1947",
+      "useHi": "भारत को 1947 में स्वतंत्रता मिली"
      }
     ],
     "quiz": [
@@ -44097,7 +44571,9 @@
       "pron": "रेवोल्यूशन",
       "emoji": "🔥",
       "type": "thing",
-      "plural": "revolutions"
+      "plural": "revolutions",
+      "use": "The French Revolution began in 1789",
+      "useHi": "फ़्रांसीसी क्रांति 1789 में शुरू हुई"
      },
      {
       "en": "liberty",
@@ -44105,7 +44581,9 @@
       "pron": "लिबर्टी",
       "emoji": "🗽",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The French people wanted liberty",
+      "useHi": "फ़्रांस के लोग स्वतंत्रता चाहते थे"
      },
      {
       "en": "equality",
@@ -44113,7 +44591,9 @@
       "pron": "इक्वैलिटी",
       "emoji": "⚖️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Equality means the same rules for everyone",
+      "useHi": "समानता का मतलब है सबके लिए एक जैसे नियम"
      },
      {
       "en": "citizen",
@@ -44121,7 +44601,9 @@
       "pron": "सिटिज़न",
       "emoji": "🧑",
       "type": "thing",
-      "plural": "citizens"
+      "plural": "citizens",
+      "use": "Every citizen has rights and duties",
+      "useHi": "हर नागरिक के अधिकार और कर्तव्य होते हैं"
      },
      {
       "en": "king",
@@ -44129,7 +44611,9 @@
       "pron": "किंग",
       "emoji": "👑",
       "type": "thing",
-      "plural": "kings"
+      "plural": "kings",
+      "use": "A king ruled France before the revolution",
+      "useHi": "क्रांति से पहले फ़्रांस में राजा का शासन था"
      }
     ],
     "quiz": [
@@ -44237,14 +44721,18 @@
       "pron": "रिसोर्स",
       "emoji": "🛢️",
       "type": "thing",
-      "plural": "resources"
+      "plural": "resources",
+      "use": "Water is a precious resource",
+      "useHi": "पानी एक बहुमूल्य संसाधन है"
      },
      {
       "en": "renewable",
       "hi": "नवीकरणीय",
       "pron": "रिन्यूएबल",
       "emoji": "♻️",
-      "type": "describe"
+      "type": "describe",
+      "use": "Sunlight is a renewable resource",
+      "useHi": "सूरज की रोशनी एक नवीकरणीय संसाधन है"
      },
      {
       "en": "mineral",
@@ -44252,7 +44740,9 @@
       "pron": "मिनरल",
       "emoji": "⛏️",
       "type": "thing",
-      "plural": "minerals"
+      "plural": "minerals",
+      "use": "Iron is an important mineral",
+      "useHi": "लोहा एक ज़रूरी खनिज है"
      },
      {
       "en": "soil",
@@ -44260,7 +44750,9 @@
       "pron": "सॉइल",
       "emoji": "🟤",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Good soil helps crops grow",
+      "useHi": "अच्छी मिट्टी फ़सल उगाने में मदद करती है"
      }
     ],
     "quiz": [
@@ -44402,7 +44894,9 @@
       "pron": "क्रॉप",
       "emoji": "🌾",
       "type": "thing",
-      "plural": "crops"
+      "plural": "crops",
+      "use": "Wheat is a winter crop",
+      "useHi": "गेहूँ सर्दी की फ़सल है"
      },
      {
       "en": "harvest",
@@ -44410,7 +44904,9 @@
       "pron": "हार्वेस्ट",
       "emoji": "🚜",
       "type": "thing",
-      "plural": "harvests"
+      "plural": "harvests",
+      "use": "The harvest comes after months of work",
+      "useHi": "महीनों की मेहनत के बाद फ़सल कटती है"
      },
      {
       "en": "irrigation",
@@ -44418,7 +44914,9 @@
       "pron": "इरिगेशन",
       "emoji": "💦",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Canals bring irrigation to the fields",
+      "useHi": "नहरें खेतों तक सिंचाई पहुँचाती हैं"
      },
      {
       "en": "farmer",
@@ -44426,7 +44924,9 @@
       "pron": "फ़ार्मर",
       "emoji": "👨‍🌾",
       "type": "thing",
-      "plural": "farmers"
+      "plural": "farmers",
+      "use": "A farmer works hard in the field",
+      "useHi": "किसान खेत में कड़ी मेहनत करता है"
      }
     ],
     "quiz": [
@@ -44564,7 +45064,9 @@
       "pron": "डेमोक्रेसी",
       "emoji": "🗳️",
       "type": "thing",
-      "plural": "democracies"
+      "plural": "democracies",
+      "use": "In a democracy people choose their leaders",
+      "useHi": "लोकतंत्र में लोग अपने नेता चुनते हैं"
      },
      {
       "en": "candidate",
@@ -44572,7 +45074,9 @@
       "pron": "कैंडिडेट",
       "emoji": "🧑‍💼",
       "type": "thing",
-      "plural": "candidates"
+      "plural": "candidates",
+      "use": "Each candidate asks people for votes",
+      "useHi": "हर उम्मीदवार लोगों से वोट माँगता है"
      },
      {
       "en": "majority",
@@ -44580,7 +45084,9 @@
       "pron": "मेजॉरिटी",
       "emoji": "✅",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The party with a majority forms the government",
+      "useHi": "बहुमत वाली पार्टी सरकार बनाती है"
      },
      {
       "en": "parliament",
@@ -44588,7 +45094,9 @@
       "pron": "पार्लियामेंट",
       "emoji": "🏛️",
       "type": "thing",
-      "plural": "parliaments"
+      "plural": "parliaments",
+      "use": "Our Parliament makes laws for India",
+      "useHi": "हमारी संसद भारत के लिए कानून बनाती है"
      },
      {
       "en": "vote",
@@ -44596,7 +45104,9 @@
       "pron": "वोट",
       "emoji": "☑️",
       "type": "thing",
-      "plural": "votes"
+      "plural": "votes",
+      "use": "Every vote has equal value",
+      "useHi": "हर वोट का मूल्य बराबर है"
      }
     ],
     "quiz": [
@@ -44738,7 +45248,9 @@
       "pron": "कॉन्स्टिट्यूशन",
       "emoji": "📜",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Our Constitution came into force in 1950",
+      "useHi": "हमारा संविधान 1950 में लागू हुआ"
      },
      {
       "en": "fundamental right",
@@ -44746,7 +45258,9 @@
       "pron": "फ़ंडामेंटल राइट",
       "emoji": "✋",
       "type": "thing",
-      "plural": "fundamental rights"
+      "plural": "fundamental rights",
+      "use": "Equality is a fundamental right",
+      "useHi": "समानता एक मौलिक अधिकार है"
      },
      {
       "en": "justice",
@@ -44754,14 +45268,18 @@
       "pron": "जस्टिस",
       "emoji": "⚖️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Courts give justice to the people",
+      "useHi": "अदालतें लोगों को न्याय देती हैं"
      },
      {
       "en": "secular",
       "hi": "पंथनिरपेक्ष",
       "pron": "सेक्युलर",
       "emoji": "🕊️",
-      "type": "describe"
+      "type": "describe",
+      "use": "India is a secular country",
+      "useHi": "भारत एक धर्मनिरपेक्ष देश है"
      },
      {
       "en": "law",
@@ -44769,7 +45287,9 @@
       "pron": "लॉ",
       "emoji": "📖",
       "type": "thing",
-      "plural": "laws"
+      "plural": "laws",
+      "use": "The law is equal for everyone",
+      "useHi": "कानून सबके लिए बराबर है"
      }
     ],
     "quiz": [
@@ -44901,7 +45421,9 @@
       "pron": "करेंसी",
       "emoji": "💵",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The rupee is our currency",
+      "useHi": "रुपया हमारी मुद्रा है"
      },
      {
       "en": "loan",
@@ -44909,7 +45431,9 @@
       "pron": "लोन",
       "emoji": "🏦",
       "type": "thing",
-      "plural": "loans"
+      "plural": "loans",
+      "use": "The bank gave a loan to farmers",
+      "useHi": "बैंक ने किसानों को कर्ज़ दिया"
      },
      {
       "en": "interest",
@@ -44917,7 +45441,9 @@
       "pron": "इंटरेस्ट",
       "emoji": "📈",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "The bank pays interest on savings",
+      "useHi": "बैंक बचत पर ब्याज देता है"
      },
      {
       "en": "savings",
@@ -44925,7 +45451,9 @@
       "pron": "सेविंग्स",
       "emoji": "🐷",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "She keeps her savings in the bank",
+      "useHi": "वह अपनी बचत बैंक में रखती है"
      }
     ],
     "quiz": [
@@ -45086,7 +45614,9 @@
       "pron": "ग्लोबलाइज़ेशन",
       "emoji": "🌐",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Globalisation connects markets across the world",
+      "useHi": "वैश्वीकरण दुनिया भर के बाज़ारों को जोड़ता है"
      },
      {
       "en": "trade",
@@ -45094,7 +45624,9 @@
       "pron": "ट्रेड",
       "emoji": "🚢",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "India does trade with many countries",
+      "useHi": "भारत कई देशों से व्यापार करता है"
      },
      {
       "en": "export",
@@ -45102,7 +45634,9 @@
       "pron": "एक्सपोर्ट",
       "emoji": "📦",
       "type": "thing",
-      "plural": "exports"
+      "plural": "exports",
+      "use": "India can export rice to other countries",
+      "useHi": "भारत दूसरे देशों को चावल निर्यात कर सकता है"
      },
      {
       "en": "import",
@@ -45110,7 +45644,9 @@
       "pron": "इंपोर्ट",
       "emoji": "🛳️",
       "type": "thing",
-      "plural": "imports"
+      "plural": "imports",
+      "use": "We import oil from other countries",
+      "useHi": "हम दूसरे देशों से तेल आयात करते हैं"
      }
     ],
     "quiz": [
@@ -45242,7 +45778,9 @@
       "pron": "पंचायत",
       "emoji": "🏛️",
       "type": "thing",
-      "plural": "panchayats"
+      "plural": "panchayats",
+      "use": "The panchayat works for the village",
+      "useHi": "पंचायत गाँव के लिए काम करती है"
      },
      {
       "en": "sarpanch",
@@ -45250,7 +45788,9 @@
       "pron": "सरपंच",
       "emoji": "👩‍💼",
       "type": "thing",
-      "plural": "sarpanches"
+      "plural": "sarpanches",
+      "use": "The sarpanch leads the gram panchayat",
+      "useHi": "सरपंच ग्राम पंचायत का नेतृत्व करता है"
      },
      {
       "en": "ward",
@@ -45258,7 +45798,9 @@
       "pron": "वार्ड",
       "emoji": "🏘️",
       "type": "thing",
-      "plural": "wards"
+      "plural": "wards",
+      "use": "Each ward chooses one member",
+      "useHi": "हर वार्ड एक सदस्य चुनता है"
      },
      {
       "en": "meeting",
@@ -45266,7 +45808,9 @@
       "pron": "मीटिंग",
       "emoji": "🗣️",
       "type": "thing",
-      "plural": "meetings"
+      "plural": "meetings",
+      "use": "The gram sabha meeting is open",
+      "useHi": "ग्राम सभा की बैठक सबके लिए खुली होती है"
      },
      {
       "en": "development",
@@ -45274,7 +45818,9 @@
       "pron": "डेवलपमेंट",
       "emoji": "🛣️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Development brings roads and schools",
+      "useHi": "विकास से सड़कें और स्कूल बनते हैं"
      }
     ],
     "quiz": [
@@ -45404,7 +45950,9 @@
       "pron": "सेक्टर",
       "emoji": "📊",
       "type": "thing",
-      "plural": "sectors"
+      "plural": "sectors",
+      "use": "Farming is part of the primary sector",
+      "useHi": "खेती प्राथमिक क्षेत्र का हिस्सा है"
      },
      {
       "en": "factory",
@@ -45412,7 +45960,9 @@
       "pron": "फ़ैक्ट्री",
       "emoji": "🏭",
       "type": "thing",
-      "plural": "factories"
+      "plural": "factories",
+      "use": "Cloth is made in a factory",
+      "useHi": "कपड़ा कारखाने में बनता है"
      },
      {
       "en": "service",
@@ -45420,7 +45970,9 @@
       "pron": "सर्विस",
       "emoji": "🚌",
       "type": "thing",
-      "plural": "services"
+      "plural": "services",
+      "use": "Teaching is a service job",
+      "useHi": "पढ़ाना एक सेवा का काम है"
      },
      {
       "en": "worker",
@@ -45428,7 +45980,9 @@
       "pron": "वर्कर",
       "emoji": "👷",
       "type": "thing",
-      "plural": "workers"
+      "plural": "workers",
+      "use": "A worker deserves fair wages",
+      "useHi": "मज़दूर को उचित मज़दूरी मिलनी चाहिए"
      },
      {
       "en": "wages",
@@ -45436,7 +45990,9 @@
       "pron": "वेजेज़",
       "emoji": "💰",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Workers get their wages every month",
+      "useHi": "मज़दूरों को हर महीने मज़दूरी मिलती है"
      }
     ],
     "quiz": [
@@ -45598,7 +46154,9 @@
       "pron": "फ्लड",
       "emoji": "🌊",
       "type": "thing",
-      "plural": "floods"
+      "plural": "floods",
+      "use": "A flood damages homes and crops",
+      "useHi": "बाढ़ घरों और फ़सलों को नुकसान पहुँचाती है"
      },
      {
       "en": "dam",
@@ -45606,7 +46164,9 @@
       "pron": "डैम",
       "emoji": "🧱",
       "type": "thing",
-      "plural": "dams"
+      "plural": "dams",
+      "use": "A dam stores water in the river",
+      "useHi": "बाँध नदी का पानी रोककर रखता है"
      },
      {
       "en": "canal",
@@ -45614,7 +46174,9 @@
       "pron": "कैनाल",
       "emoji": "💧",
       "type": "thing",
-      "plural": "canals"
+      "plural": "canals",
+      "use": "The canal carries water to fields",
+      "useHi": "नहर खेतों तक पानी ले जाती है"
      },
      {
       "en": "irrigation",
@@ -45622,7 +46184,9 @@
       "pron": "इरिगेशन",
       "emoji": "🌱",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Irrigation helps crops in dry months",
+      "useHi": "सिंचाई सूखे महीनों में फ़सल की मदद करती है"
      },
      {
       "en": "rainfall",
@@ -45630,7 +46194,9 @@
       "pron": "रेनफ़ॉल",
       "emoji": "🌧️",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Bihar gets heavy rainfall in monsoon",
+      "useHi": "बिहार में मानसून में भारी वर्षा होती है"
      }
     ],
     "quiz": [
@@ -45778,7 +46344,9 @@
       "pron": "कंज़्यूमर",
       "emoji": "🛒",
       "type": "thing",
-      "plural": "consumers"
+      "plural": "consumers",
+      "use": "A consumer should ask for a bill",
+      "useHi": "उपभोक्ता को बिल ज़रूर माँगना चाहिए"
      },
      {
       "en": "receipt",
@@ -45786,7 +46354,9 @@
       "pron": "रिसीट",
       "emoji": "🧾",
       "type": "thing",
-      "plural": "receipts"
+      "plural": "receipts",
+      "use": "Always keep the shop receipt",
+      "useHi": "दुकान की रसीद हमेशा सँभालकर रखो"
      },
      {
       "en": "complaint",
@@ -45794,7 +46364,9 @@
       "pron": "कम्प्लेंट",
       "emoji": "📝",
       "type": "thing",
-      "plural": "complaints"
+      "plural": "complaints",
+      "use": "She filed a complaint about the shop",
+      "useHi": "उसने दुकान के बारे में शिकायत दर्ज की"
      },
      {
       "en": "quality",
@@ -45802,7 +46374,9 @@
       "pron": "क्वालिटी",
       "emoji": "✅",
       "type": "thing",
-      "uncount": true
+      "uncount": true,
+      "use": "Check the quality before you buy",
+      "useHi": "खरीदने से पहले गुणवत्ता जाँचो"
      },
      {
       "en": "guarantee",
@@ -45810,7 +46384,9 @@
       "pron": "गारंटी",
       "emoji": "📜",
       "type": "thing",
-      "plural": "guarantees"
+      "plural": "guarantees",
+      "use": "The phone has a one year guarantee",
+      "useHi": "फ़ोन पर एक साल की गारंटी है"
      }
     ],
     "quiz": [
