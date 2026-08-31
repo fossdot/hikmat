@@ -1,5 +1,13 @@
 # Hikmat — Security & Deploy Checklist
 
+> **Note (2026-08-29): this document describes the BACKEND and the WEB app, both unchanged.**
+> Accounts were removed from the **Android** build on 2026-08-27, so the packaged app no longer
+> exercises any of the authentication, token, rate-limiting or roster surfaces below — it makes three
+> unauthenticated content GETs and nothing else. None of the controls here are obsolete: they still
+> protect learn.bodhya.net/play and the facilitator Desk, which keep accounts. Treat this file as
+> covering the server and the web client, not the Play Store app.
+
+
 Hikmat stores data about **minors**. Treat it accordingly. This is the operational
 checklist that complements the in-code hardening (PIN hashing, login tokens, rate
 limits, input validation, cached read APIs).

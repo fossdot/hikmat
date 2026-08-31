@@ -302,8 +302,6 @@
   .pill.coin.gempop { animation: gempop .34s cubic-bezier(.3,1.6,.5,1); }
   @keyframes gempop { 0%{transform:scale(1)} 45%{transform:scale(1.22)} 100%{transform:scale(1)} }
   @media (prefers-reduced-motion:reduce){ .gemfly, .gemfly .gemflyi { transition:none; } }
-  .menuguest { cursor:default; box-shadow:none; background:transparent; border-style:dashed; }
-  .menuguest:active { transform:none; }
   .menulegal { text-align:center; font-size:13px; margin:0 0 14px; color:var(--muted); }
   .menulegal a { color:var(--muted); }
   /* ---- Guide picker ---- */
@@ -465,6 +463,18 @@
   .hint2 { color:var(--muted); font-size:12.5px; font-weight:600; margin:6px 2px 0; }
   .consent { display:flex; gap:10px; align-items:flex-start; margin:16px 2px 4px; font-weight:600; font-size:14px; color:var(--ink); cursor:pointer; }
   .consent input { width:20px; height:20px; margin-top:2px; flex:0 0 auto; accent-color:var(--grape); }
+  /* Profile screen. A section rule rather than another card, because the page is already a
+     stack of labelled fields and a second box inside the box just adds walls. */
+  .formsec { margin-top:28px; padding-top:18px; border-top:2px dashed var(--line); }
+  .formsec > .fieldlabel:first-child { margin-top:0; }
+  /* Log out is the one destructive control a learner can reach, so it is red — but a QUIET
+     red on a white face, not a filled danger button. #b91c1c on #fff is 5.9:1, and the dark
+     pairing below is 8:1; both clear AA for the 16px bold this button renders at. It must
+     never read as the primary action on a screen a six-year-old is poking at. */
+  .btn.danger { background:#fff; color:#b91c1c; box-shadow:var(--shadow-sm); }
+  .btn.danger:hover { color:#991b1b; }
+  [data-theme="dark"] .btn.danger { background:#2a1d24; color:#fca5a5; }
+  .profileface { font-size:44px; line-height:1; }
   .bandpick { display:flex; flex-wrap:wrap; gap:8px; }
   .bandchip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:2px solid var(--line); border-radius:14px; padding:8px 13px; font-weight:800; font-size:14px; cursor:pointer; color:var(--ink); box-shadow:var(--shadow-sm); }
   .bandchip .iconsvg svg { width:1.3em; height:1.3em; }
@@ -1453,12 +1463,37 @@ function levelsFor(lesson){
   return lv;
 }
 
+// ---------- Accounts: on for the web, off for the Play build ----------
+// Sign-in and sign-up are ANDROID-ONLY casualties (Vishal, 2026-08-27). The web app served by
+// Frappe keeps every account door exactly as it was; the packaged Play build ships without any
+// of them, because a store app that opens with a login screen asks a child for an identity
+// before it has given her a single reason to want one.
+//
+// This constant stays TRUE here. bundle-game.js rewrites it to false for the packaged build —
+// the same fail-loud `cut()` treatment that already makes Roshni AI, YouTube embeds and the
+// "Help Needed" button web-only. So "no accounts in this release" is provable by grepping the
+// shipped bundle rather than by trusting a runtime check, and the web build is untouched.
+//
+// Nothing is deleted either way. Every screen — renderOnlineLogin, renderOnlineSignup,
+// renderCompleteProfile, renderSignup, renderLogin, renderCampusLogin, renderProfile — and
+// every backend call behind them is still in this file and still works. Drop the cut from
+// bundle-game.js and the account doors reopen on Android exactly as they were, guest wall
+// and all.
+//
+// Where it is false the app never asks who you are: no login, no signup, no two-lesson wall,
+// no name, no class to pick. ALL progress lives on the device under one anonymous profile,
+// which is the point — the app remembers, so the child does not have to.
+const AUTH_ENABLED = true;
+
 // ---------- State / progress ----------
 // Identity: progress is stored per student so shared laptops keep girls separate.
 // null = "guest" (offline / not signed in) — still fully playable, just device-local.
+// With AUTH_ENABLED false, null is the ONLY identity there is, and "guest" stops being a
+// preview mode and becomes simply "this device".
 let currentStudent = null;
 try { currentStudent = JSON.parse(localStorage.getItem("hikmat_current")) || null; } catch(e){}
-function stateKey(){ return "hikmat_state_" + (currentStudent ? currentStudent.id : "guest"); }
+function stateKeyFor(id){ return "hikmat_state_" + (id || "guest"); }
+function stateKey(){ return stateKeyFor(currentStudent && currentStudent.id); }
 function fresh(){ return { progress:{}, coins:0, hindi:false, lang:"en", sound:true, testSeen:{}, testPassed:{}, videosSeen:{} }; }
 function loadState(){
   let st;
@@ -1472,6 +1507,89 @@ function loadState(){
   return st;
 }
 function save(){ localStorage.setItem(stateKey(), JSON.stringify(state)); }
+
+// Fold one saved state into another, taking the BETTER of each value — never the newer one.
+// Stars and gems only ever go up in this game, and a merge that could lower either would be a
+// child watching her own work get smaller.
+function mergeSavedState(into, from){
+  if(!from) return into;
+  into.progress = into.progress || {};
+  const p = from.progress || {};
+  for(const ck in p) for(const lk in p[ck]) for(const aid in p[ck][lk]){
+    into.progress[ck] = into.progress[ck] || {};
+    into.progress[ck][lk] = into.progress[ck][lk] || {};
+    into.progress[ck][lk][aid] = Math.max(into.progress[ck][lk][aid] || 0, p[ck][lk][aid] || 0);
+  }
+  into.coins = Math.max(into.coins || 0, from.coins || 0);
+  into.testPassed = into.testPassed || {};
+  const tp = from.testPassed || {};
+  for(const tk in tp){
+    const a = into.testPassed[tk] || { passed:false, bestPct:0, attempts:0 }, b = tp[tk] || {};
+    into.testPassed[tk] = { passed: !!(a.passed || b.passed),
+                            bestPct: Math.max(a.bestPct || 0, b.bestPct || 0),
+                            attempts: (a.attempts || 0) + (b.attempts || 0) };
+  }
+  // The seen-question lists are what stop a retake serving the same paper twice, so they union
+  // rather than replace — dropping either side would hand her questions she has already answered.
+  into.testSeen = into.testSeen || {};
+  const ts = from.testSeen || {};
+  for(const tk in ts){
+    const have = into.testSeen[tk] || [];
+    into.testSeen[tk] = have.concat((ts[tk] || []).filter(id => have.indexOf(id) < 0));
+  }
+  into.videosSeen = Object.assign({}, from.videosSeen || {}, into.videosSeen || {});
+  return into;
+}
+
+// A device that was signed in when accounts were switched off must not look wiped on the next
+// launch. This runs ONCE, before any state is loaded, and folds the signed-in learner's progress
+// into the anonymous device profile she is about to become.
+//
+// Her old `hikmat_state_<id>` key is deliberately left where it is. Nothing here destroys a
+// star: if accounts ever come back, logging in finds every one of them exactly where she left
+// it. Only the identity is dropped, and with it everything that hangs off the identity —
+//   * the 90-day auth token (nothing can authenticate it now, and it is a credential);
+//   * the half-finished "Continue with Google" marker, which would otherwise fire at boot
+//     forever, since the screen it wants to open is no longer reachable;
+//   * any cached campus roster, which on a shared laptop holds OTHER children's names, PIN
+//     hashes and tokens — unreachable now that the campus door is closed, so keeping it is
+//     pure liability;
+//   * the five sync queues, which carry tokens and children's wrong-answer text and can never
+//     be delivered again. They are cleared, not stranded: unsendable data about a child should
+//     not sit on a shared phone forever. This mirrors the Boli cleanup at the bottom of the file.
+function retireAccounts(){
+  if(AUTH_ENABLED) return;
+  const drop = ["hikmat_social_pending",
+                "hikmat_attempt_queue", "hikmat_test_queue", "hikmat_event_queue",
+                "hikmat_doubt_queue", "hikmat_att_queue"];
+  if(currentStudent){
+    let mine = null, device = null;
+    try { mine = JSON.parse(localStorage.getItem(stateKeyFor(currentStudent.id))); } catch(e){}
+    try { device = JSON.parse(localStorage.getItem(stateKeyFor(null))); } catch(e){}
+    const merged = mergeSavedState(device || {}, mine);
+    // Her guide and the way Hindi addresses her belong to HER, not to the account — carry them
+    // across, or she is greeted by a different friend on the first launch after the update.
+    if(!merged.gender && currentStudent.gender) merged.gender = currentStudent.gender;
+    if(!merged.mascot && currentStudent.mascot) merged.mascot = currentStudent.mascot;
+    try { localStorage.setItem(stateKeyFor(null), JSON.stringify(merged)); } catch(e){}
+    currentStudent = null;
+    drop.push("hikmat_current");
+  }
+  drop.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+  // Campus-roster keys by prefix rather than by name: the two constants that used to name them
+  // (CAMPUS_ROSTER_KEY / DEVICE_MODE_KEY) are no longer defined anywhere in this file, so an
+  // older build's roster can only be found by looking for it.
+  try {
+    const kill = [];
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && /^hikmat_(campus|roster|device_mode)/.test(k)) kill.push(k);
+    }
+    kill.forEach(k => localStorage.removeItem(k));
+  } catch(e){}
+}
+retireAccounts();          // before loadState(): it decides WHICH state we are about to load
+
 let state = loadState();
 
 // ---------- Progress: state.progress[courseKey][lessonKey][activityId] = stars(0-3) ----------
@@ -2557,14 +2675,65 @@ const PROVIDER_ICON = {
 // enabled. Rendered from SETTINGS.socialLogins so a provider can never be offered that the
 // backend cannot finish — enable the Social Login Key in Desk and the button appears.
 function socialButtons(){
+  // Only when the backend is SAME-ORIGIN, which is the whole mechanism: an OAuth handshake
+  // pays out in a session cookie set by the server it came from, and this page can only be
+  // signed in by a cookie for its own origin. A non-empty BACKEND_BASE means the two differ —
+  // that is the packaged Android build, where Capacitor hands a URL on another host to the
+  // SYSTEM browser and Google's cookie lands in Chrome, never in this WebView. She would
+  // complete the whole handshake, come back, and find a game that still thinks she is a guest.
+  //
+  // Tested on BACKEND_BASE rather than isPackagedApp() deliberately. That helper treats any
+  // localhost origin as "packaged" — which is right for the audio hint it was written for, and
+  // wrong here: it also describes a bench serving this game at localhost:8000, where the
+  // handshake works perfectly. Same-origin is the real condition, so ask it directly.
+  //
+  // A button that cannot work is worse than no button; the email-and-password door on the same
+  // screen is the one that works there. (Social sign-in inside the app needs a native OAuth
+  // plugin, not a link.)
+  if(BACKEND_BASE) return "";
   const list = (SETTINGS.socialLogins || []).filter(p => p && p.url);
   if(!list.length) return "";
   return `<div class="sociallogins">
-    ${list.map(p => `<a class="socialbtn" href="${escAttr(BACKEND_BASE + p.url)}" data-social="${escAttr(p.key)}">
+    ${list.map(p => `<a class="socialbtn" href="${escAttr(socialHref(p))}" data-social="${escAttr(p.key)}">
       <span class="socialicon">${PROVIDER_ICON[p.key] || ""}</span>
       <span>${esc(tx("Continue with " + p.label, p.label + " से आगे बढ़ो"))}</span></a>`).join("")}
     <div class="socialor"><span>${esc(tx("or","या"))}</span></div>
   </div>`;
+}
+// Where the handshake puts her down afterwards: back on THIS page. Frappe signs the
+// destination into the OAuth `state` at the moment the flow starts, so it has to be named on
+// the way OUT — there is no chance to say it on the way back. Without it a brand-new Website
+// User is dropped on /me, a Frappe portal page that is not this app, and a girl who tapped
+// "Continue with Google" inside a learning game is simply gone.
+function socialHref(p){
+  const u = BACKEND_BASE + p.url;
+  const back = location.pathname + location.search;
+  return u + (u.indexOf("?") >= 0 ? "&" : "?") + "redirect_to=" + encodeURIComponent(back);
+}
+// A social handshake leaves the page entirely and comes back as a fresh page load, so the only
+// thing that can carry "we were in the middle of signing up" across it is storage.
+//
+// This marker is not bookkeeping — it is what stops the boot check from firing for ANY Frappe
+// session the browser happens to hold. A facilitator with Desk open in another tab has a
+// perfectly good session and no Student behind it, and without the marker she would be shown
+// a "finish your profile" form for herself every time she opened the game.
+const SOCIAL_PENDING = "hikmat_social_pending";
+function markSocialPending(){ try { localStorage.setItem(SOCIAL_PENDING, String(Date.now())); } catch(e){} }
+function clearSocialPending(){ try { localStorage.removeItem(SOCIAL_PENDING); } catch(e){} }
+function socialPending(){
+  try {
+    const t = parseInt(localStorage.getItem(SOCIAL_PENDING) || "0", 10);
+    // Ten minutes: longer than any handshake, short enough that a marker left behind by a tap
+    // she abandoned cannot ambush her with a signup form a week later.
+    return !!t && (Date.now() - t) < 600000;
+  } catch(e){ return false; }
+}
+// Called by every screen that draws socialButtons(). Plain <a> elements, so the handler is
+// attached after render rather than inlined into the markup.
+function wireSocialButtons(){
+  root.querySelectorAll("a.socialbtn[data-social]").forEach(a => {
+    a.addEventListener("click", () => { markSocialPending(); logTool("social_" + a.getAttribute("data-social")); });
+  });
 }
 const WA_ICON = `<span class="iconsvg" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.347-.347.52-.52.174-.174.232-.298.347-.497.116-.198.058-.371-.03-.52-.087-.148-.66-1.594-.905-2.183-.238-.573-.48-.5-.66-.51-.17-.008-.365-.01-.56-.01-.194 0-.51.073-.776.372-.267.298-1.02.995-1.02 2.426 0 1.432 1.043 2.815 1.19 3.008.148.198 2.052 3.135 4.97 4.396.696.3 1.24.48 1.665.615.7.222 1.336.191 1.84.116.56-.084 1.925-.788 2.197-1.55.272-.76.272-1.412.19-1.55-.082-.138-.297-.223-.594-.372m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></span>`;
 
@@ -2657,9 +2826,9 @@ function openMenu(){
 }
 
 // ---- Pick a guide ----
-// Roshni is the guest's guide and cannot be changed without a profile: there is nowhere to
-// save the choice, and a picker that silently forgets is worse than no picker. A guest who
-// taps here is offered a sign-up instead, which is the honest answer.
+// The choice works for everybody, signed in or not: setMascot() writes it to `state`, which is
+// saved on the device. The only thing an account ever added was carrying it to a SECOND device,
+// which is all the guest nudge below claims — and only where there is an account to make.
 function openMascotPicker(){
   const _ex = document.getElementById("friendWrap"); if(_ex) _ex.remove();
   sfx.tap(); stopSpeech();
@@ -2676,9 +2845,9 @@ function openMascotPicker(){
         </div>
         <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
-      ${guest ? `<div class="teachbox">💛 <span>${esc(tx("Pick anyone you like. Make a profile and your friend follows you to any phone or laptop.","जो पसंद हो उसे चुनो। प्रोफ़ाइल बनाओ तो तुम्हारी सहेली हर फ़ोन और लैपटॉप पर तुम्हारे साथ रहेगी।"))}</span></div>` : ""}
+      ${guest && AUTH_ENABLED ? `<div class="teachbox">💛 <span>${esc(tx("Pick anyone you like. Make a profile and your friend follows you to any phone or laptop.","जो पसंद हो उसे चुनो। प्रोफ़ाइल बनाओ तो तुम्हारी सहेली हर फ़ोन और लैपटॉप पर तुम्हारे साथ रहेगी।"))}</span></div>` : ""}
       <div class="friendgrid" id="friendGrid"></div>
-      <button class="btn ghost wide" id="dClose">${guest ? tx("Close","बंद करो") : tx("Done →","हो गया →")}</button>
+      <button class="btn ghost wide" id="dClose">${guest && AUTH_ENABLED ? tx("Close","बंद करो") : tx("Done →","हो गया →")}</button>
     </div>
   </div>`);
   document.body.appendChild(sheet);
@@ -2709,13 +2878,16 @@ function openMascotPicker(){
 // One writer for the choice, so the local state and the server never disagree about who her
 // friend is. The server call is fire-and-forget: the pick must work offline (that is the whole
 // design of this app), and it re-syncs from state on the next login.
-function setMascot(id){
+// `skipSync` is for the Profile screen, which saves several fields at once and sends them in a
+// single set_profile call. It suppresses only the network half — the local write still goes
+// through here, so there is exactly one place that knows how a mascot choice is stored.
+function setMascot(id, skipSync){
   if(!MASCOT_BY_ID[id]) return;
   state.mascot = id; save();
   if(currentStudent){
     currentStudent.mascot = id;
     try { localStorage.setItem("hikmat_current", JSON.stringify(currentStudent)); } catch(e){}
-    api("set_profile", { student: currentStudent.id, token: currentStudent.token || "", mascot: id }, true);
+    if(!skipSync) api("set_profile", { student: currentStudent.id, token: currentStudent.token || "", mascot: id }, true);
   }
   logTool("mascot");
 }
@@ -2723,13 +2895,13 @@ const GENDER_OPTS = [{ v:"Female", en:"a girl", hi:"लड़की" },
                      { v:"Male",   en:"a boy",  hi:"लड़का" },
                      { v:"Other",  en:"…rather not say", hi:"…नहीं बताना" }];
 const GENDER_LABEL = { Female:"लड़की / girl", Male:"लड़का / boy", Other:"— / —" };
-function setGender(v){
+function setGender(v, skipSync){        // skipSync: see setMascot
   if(!GENDER_OPTS.some(g => g.v === v)) return;
   state.gender = v; save();
   if(currentStudent){
     currentStudent.gender = v;      // learnerGender() reads this FIRST, so both must move together
     try { localStorage.setItem("hikmat_current", JSON.stringify(currentStudent)); } catch(e){}
-    api("set_profile", { student: currentStudent.id, token: currentStudent.token || "", gender: v }, true);
+    if(!skipSync) api("set_profile", { student: currentStudent.id, token: currentStudent.token || "", gender: v }, true);
   }
   logTool("gender");
 }
@@ -2858,41 +3030,124 @@ function lifeSkillsCard(){
   return node;
 }
 
+// What the device remembers, and the way to make it forget. Reachable from ☰ on every screen
+// whenever accounts are off (see profileRows). Two jobs, and the second is why it exists:
+//
+//   1. Show her that the work is kept. Without a name, a greeting or a login, a child has no
+//      evidence at all that yesterday counted — this is the receipt.
+//   2. Erase it. On a shared phone with no accounts, "clear my data" cannot mean "log out",
+//      and the ☰ menu's data-deletion link goes to a WEBSITE, which is useless to a
+//      non-reader and useless offline. This is the in-app route.
+//
+// Deleting is deliberately two taps and never the resting state of the sheet: the button
+// arms first and only the second, differently-worded tap actually erases. Settings survive —
+// wiping her stars must not also switch her back to English or take her friend away.
+function openProgressSheet(){
+  const _ex = document.getElementById("progWrap"); if(_ex) _ex.remove();
+  sfx.tap(); stopSpeech();
+  let done = 0;
+  COURSES.forEach(c => { if(c.published) c.lessons.forEach(l => { if(lessonEarned(c.key, l.key) > 0) done++; }); });
+  const stars = totalStars(), gems = state.coins || 0;
+  const title = tx("My progress","मेरी प्रगति");
+  const body  = done
+    ? tx("Everything you have learned is kept on this phone. You do not need to sign in.",
+         "तुमने जो भी सीखा है, वह इसी फ़ोन पर सुरक्षित है। साइन इन करने की ज़रूरत नहीं।")
+    : tx("Play a lesson and your stars will be kept right here.",
+         "कोई पाठ खेलो, तुम्हारे सितारे यहीं सुरक्षित रहेंगे।");
+  const sheet = el(`<div class="sheetwrap" id="progWrap">
+    <div class="sheet settingsheet" role="dialog" aria-modal="true" aria-label="${escAttr(title)}">
+      <div class="doubthead">
+        <div class="mascot small">${mascotSVG()}</div>
+        <div class="doubttitle"><div class="doubtq">${esc(title)}</div><div class="doubtsub">${esc(body)}</div></div>
+        <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
+      </div>
+      <div class="center" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:4px 0 2px">
+        <div class="savechip">📖 ${esc(tx(done+" lessons", done+" पाठ"))}</div>
+        <div class="savechip">★ ${esc(tx(stars+" stars", stars+" सितारे"))}</div>
+        <div class="savechip">💎 ${esc(tx(gems+" gems", gems+" रत्न"))}</div>
+      </div>
+      <div class="teachbox" id="progWarn" style="display:none">💡 <span></span></div>
+      <button class="btn danger wide" id="progWipe">${tx("Start fresh","नए सिरे से शुरू करो")}</button>
+      <button class="btn ghost wide" id="dClose">${tx("Close","बंद करो")}</button>
+    </div>
+  </div>`);
+  document.body.appendChild(sheet);
+  const close = () => sheet.remove();
+  const wipe = sheet.querySelector("#progWipe");
+  const warn = sheet.querySelector("#progWarn");
+  let armed = false;
+  wipe.onclick = () => {
+    if(!armed){
+      armed = true; sfx.tap();
+      warn.style.display = "block";
+      warn.querySelector("span").textContent =
+        tx("This erases every star and gem on this phone. It cannot be undone.",
+           "इससे इस फ़ोन के सारे सितारे और रत्न मिट जाएँगे। यह वापस नहीं आएगा।");
+      wipe.textContent = tx("Yes, erase everything","हाँ, सब कुछ मिटा दो");
+      srSay(warn.querySelector("span").textContent);
+      return;
+    }
+    // Her settings are not her progress. Language, sound, theme, guide and the way Hindi
+    // addresses her all ride across the wipe — losing those too would be a second punishment
+    // for a tap that was only ever about stars.
+    const keep = { lang: state.lang, sound: state.sound, theme: state.theme,
+                   gender: state.gender, mascot: state.mascot, prefsTouched: state.prefsTouched };
+    state = Object.assign(fresh(), keep);
+    save();
+    sfx.back(); close(); renderHome();
+    srSay(tx("Progress erased.","प्रगति मिटा दी गई।"));
+  };
+  sheet.querySelector("#dClose").onclick = () => { sfx.back(); close(); };
+  sheet.querySelector("[data-x]").onclick = () => { sfx.back(); close(); };
+  sheet.onclick = (e) => { if(e.target === sheet) close(); };
+  srSay(title);
+}
+
 // Who is playing — rendered as menu rows. This used to be a chip bolted onto Home and the class
 // screen, in two different positions; identity now lives in ONE place a learner can always reach,
 // because the ☰ button is in the top bar of every screen (Vishal, 2026-08-25).
 // Login and signup are offered even with no backend: signup falls back to a local-only profile.
 function profileRows(host){
+  // ACCOUNTS OFF (the Play build): there is no identity to show and no door to offer. What
+  // takes its place answers the question the "Sign in" row used to answer — "where does my
+  // work go?" — with the honest new answer, and gives the one thing that vanished with the
+  // Profile screen and still has to exist: a way to erase yourself from a shared phone.
+  if(!AUTH_ENABLED){
+    const b = el(`<button class="menurow" id="mProg">
+      <span class="mi">⭐</span>
+      <span class="ml"><b>${esc(tx("My progress","मेरी प्रगति"))}</b>
+        <small>${esc(tx("Saved on this phone","इसी फ़ोन पर सेव है"))}</small></span>
+      <span class="mc">›</span></button>`);
+    b.onclick = () => { sfx.tap(); host._close(); openProgressSheet(); };
+    host.appendChild(b);
+    return;
+  }
+  // SIGNED IN: her own profile, not a way to become somebody else. The row used to read
+  // "Switch to another profile" and led straight back to the sign-in screen — the single most
+  // prominent thing a logged-in learner could tap did nothing for her at all. It now opens the
+  // screen where her name, class, age, picture and password live, and where Log out is.
   if(currentStudent){
     const b = el(`<button class="menurow" id="mWho">
       <span class="mi">${esc(currentStudent.avatar || "🙂")}</span>
       <span class="ml"><b>${esc(currentStudent.name)}</b>
-        <small>${esc(tx("Switch to another profile","दूसरी प्रोफ़ाइल पर जाओ"))}</small></span>
+        <small>${esc(tx("Your profile — name, class, picture","तुम्हारी प्रोफ़ाइल — नाम, कक्षा, तस्वीर"))}</small></span>
       <span class="mc">›</span></button>`);
-    b.onclick = () => { sfx.tap(); host._close(); startLogin(); };
+    b.onclick = () => { sfx.tap(); host._close(); renderProfile(); };
     host.appendChild(b);
     return;
   }
-  const guest = el(`<div class="menurow menuguest">
-    <span class="mi">🙂</span>
-    <span class="ml"><b>${esc(tx("You are playing as a guest","तुम मेहमान के रूप में खेल रही हो"))}</b>
-      <small>${esc(tx("Sign up to keep your stars and gems","अपने सितारे और रत्न बचाने के लिए साइन अप करो"))}</small></span>
-  </div>`);
-  host.appendChild(guest);
-  const su = el(`<button class="menurow" id="mSignup">
-    <span class="mi">✨</span>
-    <span class="ml"><b>${esc(tx("Sign up","साइन अप"))}</b>
-      <small>${esc(tx("Make a profile — it takes a minute","प्रोफ़ाइल बनाओ — एक मिनट लगेगा"))}</small></span>
-    <span class="mc">›</span></button>`);
-  su.onclick = () => { sfx.tap(); host._close(); renderSignup(); };
-  host.appendChild(su);
-  const li = el(`<button class="menurow" id="mLogin">
+  // SIGNED OUT: ONE door (Vishal, 2026-08-26). This was three rows — a dead "you are playing
+  // as a guest" line, then "Sign up", then "Log in" — three lines of menu for one decision,
+  // and the first of them was not even tappable. The sign-in screen already asks "New here?
+  // Sign up", so the choice between the two belongs THERE, next to the form, and not in a
+  // menu that has to be read before it can be used.
+  const si = el(`<button class="menurow" id="mSignin">
     <span class="mi">👋</span>
-    <span class="ml"><b>${esc(tx("Log in","लॉग इन"))}</b>
-      <small>${esc(tx("Already have a profile","पहले से प्रोफ़ाइल है"))}</small></span>
+    <span class="ml"><b>${esc(tx("Sign in","साइन इन"))}</b>
+      <small>${esc(tx("Keep your stars and gems on any phone","अपने सितारे और रत्न हर फ़ोन पर सुरक्षित रखो"))}</small></span>
     <span class="mc">›</span></button>`);
-  li.onclick = () => { sfx.tap(); host._close(); startLogin(); };
-  host.appendChild(li);
+  si.onclick = () => { sfx.tap(); host._close(); startLogin(); };
+  host.appendChild(si);
 }
 
 // HOME — "By Class" grade bands on top, the original thematic tracks as "Life Skills" below.
@@ -3040,6 +3295,7 @@ const GUEST_FREE_PER_GROUP = 2;
 function lessonGroup(course){ return course && course.band ? "class" : "life"; }
 function guestOpenedList(g){ state.guestLessons = state.guestLessons || {}; return (state.guestLessons[g] = state.guestLessons[g] || []); }
 function guestGate(course, lesson, back){
+  if(!AUTH_ENABLED) return true;                        // accounts are off → nothing to sign up FOR
   if(currentStudent) return true;                       // signed in → no wall
   const g = lessonGroup(course), key = course.key + "/" + lesson.key, opened = guestOpenedList(g);
   if(opened.includes(key)) return true;                 // already one of their free lessons
@@ -3209,10 +3465,12 @@ function renderTrack(course, back){
       onClick: !allDone
         ? (() => { sfx.locked(); const m = tx("Finish all lessons first.","पहले सभी पाठ पूरे करो।"); srSay(m); sayHi("पहले सभी पाठ पूरे करो"); })
         : (() => {
-            // tests need a real profile: results must be saved and follow her across
-            // laptops, and a guest's pass would evaporate on signup (never via guestGate —
-            // that would burn a free-lesson slot on a non-lesson)
-            if(!currentStudent){ renderGuestWall(lessonGroup(course), () => renderTrack(course, back)); return; }
+            // With accounts on, a test needed a real profile: the pass had to follow her
+            // across laptops, and a guest's would have evaporated at signup. With accounts
+            // off there is nowhere for it to travel TO — endTest() writes the pass straight
+            // into state.testPassed on this device, which is now the only place it lives.
+            // (Never via guestGate — that would burn a free-lesson slot on a non-lesson.)
+            if(AUTH_ENABLED && !currentStudent){ renderGuestWall(lessonGroup(course), () => renderTrack(course, back)); return; }
             sfx.enter(); renderTestIntro(course, back);
           }),
     });
@@ -3997,7 +4255,7 @@ function startLevel(course, lesson, lv, back){
       <div class="muted">${tx("You got "+score+" of "+rounds.length, rounds.length+" में से "+score+" सही")}</div>
       <div class="earn pop">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
       <div class="muted" id="gemLine">+${score*5 + stars*10} ${tx("💎 gems","💎 रत्न")}</div>
-      ${currentStudent ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
+      ${(!AUTH_ENABLED || currentStudent) ? `<div class="savechip">✓ ${tx("Saved on this device","इस डिवाइस पर सेव हो गया")}</div>` : ""}
       <div class="actionrow">
         <button class="btn ${canGoOn ? "ghost" : "primary"}" id="again">${tx("Play again","फिर से खेलो")}</button>
         <button class="btn ghost" id="map">${canGoOn ? tx("Map","नक्शा") : tx("Back to map →","नक्शे पर वापस →")}</button>
@@ -5631,8 +5889,11 @@ async function frappeLogin(usr, pwd){
   } catch(e){ return false; }                      // offline / no backend
 }
 
-function renderOnlineLogin(){
-  stopSpeech(); rerender = renderOnlineLogin; root.innerHTML = "";
+// `msg` is for the caller that already knows why she is here — a social handshake that came
+// back to a switched-off account, say. Carried through rerender so a language toggle does not
+// wipe the only explanation on the screen.
+function renderOnlineLogin(msg){
+  stopSpeech(); rerender = () => renderOnlineLogin(msg); root.innerHTML = "";
   setBack(tx("← Back","← वापस"), renderLogin);
   root.appendChild(el(`<div class="screen">
     <div class="hero"><h1>${tx("Log in 🌐","लॉग इन 🌐")}</h1>
@@ -5656,7 +5917,9 @@ function renderOnlineLogin(){
   </div>`));
   const narr = tx("Log in with your email and password.","अपने ईमेल और पासवर्ड से लॉग इन करो।");
   setNarration(narr, narr);
+  wireSocialButtons();
   const u = $("#olUser"), p = $("#olPin"), err = $("#olErr");
+  if(msg) err.textContent = msg;
   setTimeout(() => u.focus(), 60);
   $("#olToSignup").onclick = () => { sfx.tap(); renderOnlineSignup(); };
   $("#olGuest").onclick    = () => { sfx.tap(); setStudent(null); renderHome(); };
@@ -5673,136 +5936,607 @@ function renderOnlineLogin(){
       p.value = ""; p.focus(); return;
     }
     const r = await api("get_my_student");
-    if(r && r.ok){ finishLogin(r); }
-    else { err.textContent = tx("Logged in, but no learner profile was found.","लॉग इन हुआ, पर प्रोफ़ाइल नहीं मिली।"); }
+    if(r && r.ok){ finishLogin(r, { online: true, email: em }); return; }
+    // Signed in, but nothing to teach: an account made through some other door (or a
+    // half-finished social sign-up) that never got a learner. The form that fixes it is one
+    // screen away, so send her there instead of leaving her staring at a dead end.
+    if(r && r.needsProfile){ renderCompleteProfile({ existing: true, social: r.social || "", email: r.email || em, name: r.name || "" }); return; }
+    err.textContent = r && r.error === "inactive"
+      ? tx("This account is switched off. Please ask your teacher.","यह खाता बंद है। कृपया शिक्षिका से पूछो।")
+      : tx("Logged in, but no learner profile was found.","लॉग इन हुआ, पर प्रोफ़ाइल नहीं मिली।");
   };
   $("#olGo").onclick = submit;
   u.onkeydown = (e) => { if(e.key==="Enter") p.focus(); };
   p.onkeydown = (e) => { if(e.key==="Enter") submit(); };
   refreshTop();
 }
-function renderOnlineSignup(){
-  stopSpeech(); rerender = renderOnlineSignup; root.innerHTML = "";
+// SIGN UP, step 1 of 2 — the account.
+//
+// This screen used to be the whole sign-up: eleven fields, from an email box down through a
+// class picker, a gender picker, twelve avatars and nine guides, none of it saved until the
+// button at the bottom went live. It has a second half whether we like it or not, because a
+// social sign-up cannot show any of that: Google takes the browser away and brings back an
+// email and a display name and nothing else. So the form splits exactly where the handshake
+// splits — the account here, everything Google cannot answer on renderCompleteProfile — and
+// BOTH doors walk through that same second screen. One screen to build and one to fix.
+function renderOnlineSignup(draft){
+  draft = draft || {};
+  stopSpeech(); rerender = () => renderOnlineSignup(draft); root.innerHTML = "";
   setBack(tx("← Log in","← लॉग इन"), renderOnlineLogin);
-  let avatar = AVATARS[0], band = "", gender = "", mascot = "roshni";
-  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
-  const haveBands = bandList.length > 0;
   root.appendChild(el(`<div class="screen">
     <div class="hero"><h1>${tx("Create your account ✨","अपना खाता बनाओ ✨")}</h1>
-      <p>${tx("An email and a password — that is all.","एक ईमेल और एक पासवर्ड — बस इतना ही।")}</p></div>
+      <p>${tx("Two short steps. This is the first.","दो छोटे कदम। यह पहला है।")}</p></div>
     <div class="signup">
       ${socialButtons()}
-      <label class="fieldlabel">${tx("Email","ईमेल")}</label>
+      <label class="fieldlabel" for="osEmail">${tx("Email","ईमेल")}</label>
       <input id="osEmail" class="searchbox" type="email" autocomplete="email" autocapitalize="none"
              spellcheck="false" inputmode="email" maxlength="140" placeholder="you@example.com">
-      <label class="fieldlabel">${tx("Your name","तुम्हारा नाम")}</label>
-      <input id="osName" class="searchbox" type="text" autocomplete="name" maxlength="40"
-             placeholder="${tx('e.g. Asha','जैसे: आशा')}">
-      <label class="fieldlabel">${tx("Password","पासवर्ड")}</label>
+      <label class="fieldlabel" for="osPwd">${tx("Password","पासवर्ड")}</label>
       <input id="osPwd" class="searchbox" type="password" autocomplete="new-password" maxlength="128"
-             placeholder="${tx('at least 8 characters','कम से कम 8 अक्षर')}">
-      <div class="hint2" id="osPwdHint">${tx("At least 8 characters. Longer is stronger.","कम से कम 8 अक्षर। जितना लंबा, उतना मज़बूत।")}</div>
-      ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
-      <div class="bandpick" id="osBand"></div>` : ``}
-      <label class="fieldlabel">${tx("I am a…","मैं हूँ…")}</label>
-      <div class="bandpick" id="osGender"></div>
-      <div class="hint2">${tx("This is only so the app talks to you correctly in Hindi.","यह सिर्फ़ इसलिए है कि ऐप हिंदी में तुमसे सही तरह बात करे।")}</div>
-      <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
-      <div class="avpick" id="osAv"></div>
-      <label class="fieldlabel">${tx("Choose your friend","अपनी सहेली चुनो")}</label>
-      <div class="friendgrid" id="osFriend"></div>
-      <label class="consent"><input type="checkbox" id="osConsent">
-        <span>${tx("A parent or teacher said it's okay for me to make an account.","माता-पिता या शिक्षक ने मुझे खाता बनाने की अनुमति दी है।")}</span></label>
+             placeholder="${escAttr(tx("at least 8 characters","कम से कम 8 अक्षर"))}">
+      <div class="hint2">${tx("At least 8 characters. Longer is stronger.","कम से कम 8 अक्षर। जितना लंबा, उतना मज़बूत।")}</div>
       <div class="feedback bad" id="osErr" style="min-height:18px"></div>
-      <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
-      <div class="center" style="margin-top:14px"><button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button></div>
+      <div class="center"><button class="btn primary" id="osGo" disabled>${tx("Next: about you →","आगे: तुम्हारे बारे में →")}</button></div>
+      <div class="center" style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+        <button class="btn ghost" id="osLogin">${tx("Already have an account? Log in","पहले से खाता है? लॉग इन")}</button>
+        <button class="btn ghost" id="osGuest">${tx("Play without signing in","बिना साइन-इन खेलो")}</button>
+      </div>
     </div>
   </div>`));
-  const narr = tx("Create your account with an email and a password.","ईमेल और पासवर्ड से अपना खाता बनाओ।");
+  const narr = tx("Create your account. Use Google, or type an email and a password.",
+                  "अपना खाता बनाओ। Google से, या ईमेल और पासवर्ड लिखकर।");
+  setNarration(narr, narr);
+  wireSocialButtons();
+  const email = $("#osEmail"), pwd = $("#osPwd"), go = $("#osGo"), err = $("#osErr");
+  // Restored as PROPERTIES, never as value="" attributes: stepping back from step 2 must not
+  // lose what she typed, and a password does not belong in the markup to achieve that.
+  if(draft.email) email.value = draft.email;
+  if(draft.password) pwd.value = draft.password;
+  // Coming BACK here because the server refused the account — always at the end of step 2,
+  // since "is this address already taken" cannot be asked earlier without turning this screen
+  // into a membership oracle for arbitrary email addresses.
+  if(draft.err) err.textContent = draft.err;
+  const emailOK = () => /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email.value.trim());
+  const pwdOK   = () => pwd.value.length >= 8;
+  const refreshGo = () => { go.disabled = !(emailOK() && pwdOK()); };
+  [email, pwd].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
+  refreshGo();
+  setTimeout(() => email.focus(), 60);
+  $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+  $("#osGuest").onclick = () => { sfx.tap(); setStudent(null); renderHome(); };
+  const submit = () => {
+    if(!emailOK()){ err.textContent = tx("Please type a real email address.","सही ईमेल पता लिखो।"); return; }
+    if(!pwdOK()){ err.textContent = tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।"); return; }
+    sfx.tap();
+    // Nothing is created yet. The account and the learner are inserted together at the end of
+    // step 2, so backing out here leaves no half-made User behind.
+    //
+    // The WHOLE draft goes forward, not just the two fields on this screen: a girl bounced
+    // back here by "that email is already taken" has already chosen a class, a picture and a
+    // guide, and making her do all of it again to fix one address is the kind of thing that
+    // ends a sign-up. `err` stays behind — it describes the screen she is leaving.
+    renderCompleteProfile(Object.assign({}, draft,
+      { email: email.value.trim().toLowerCase(), password: pwd.value, err: "" }));
+  };
+  go.onclick = submit;
+  email.onkeydown = (e) => { if(e.key==="Enter") pwd.focus(); };
+  pwd.onkeydown   = (e) => { if(e.key==="Enter" && !go.disabled) submit(); };
+  refreshTop();
+}
+
+// SIGN UP, step 2 of 2 — everything an email address cannot tell us.
+//
+// Reached two ways, and the difference is the whole reason this screen exists separately:
+//   * ctx.password — the email door. Nothing has been created; this screen's button creates
+//     the User and the Student in one call, so abandoning it leaves nothing behind.
+//   * ctx.social   — back from "Continue with Google". The account ALREADY EXISTS: Frappe
+//     made a Website User out of the Google profile and stopped. There is a real, signed-in
+//     account with no learner behind it, and until this form is submitted the game has
+//     somebody it cannot teach — no class, no gender for Hindi to agree with, no guide.
+//
+// Which is why the social path's back button is a real exit that signs her out, rather than a
+// step backwards into a screen that would offer to create the account she already has.
+function renderCompleteProfile(ctx){
+  ctx = ctx || {};
+  stopSpeech(); rerender = () => renderCompleteProfile(ctx); root.innerHTML = "";
+  if(ctx.existing){
+    setBack(tx("← Not now","← अभी नहीं"), async () => {
+      // Leave nothing half-signed-in: drop the Frappe session too, or the next boot would find
+      // a session with no learner and put her right back on this screen.
+      await frappeLogout(); clearSocialPending(); setStudent(null); renderHome();
+    });
+  } else {
+    // Everything she has filled in HERE travels back with her, so stepping back to correct an
+    // email address costs exactly that one correction. The field refs below are captured by
+    // this closure and only read when the button is pressed, long after they exist.
+    setBack(tx("← Back","← वापस"), () => renderOnlineSignup(Object.assign({}, ctx,
+      { name: nameEl.value, age: ageEl.value, avatar, band, gender, mascot })));
+  }
+  let avatar = ctx.avatar || AVATARS[0], band = ctx.band || "",
+      gender = ctx.gender || "", mascot = ctx.mascot || "roshni";
+  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const haveBands = bandList.length > 0;
+  const who = (ctx.existing && ctx.email)
+    ? tx("Signed in as " + ctx.email, ctx.email + " से साइन इन")
+    : "";
+  root.appendChild(el(`<div class="screen">
+    <div class="hero"><h1>${tx("Tell us about you ✨","अपने बारे में बताओ ✨")}</h1>
+      <p>${tx("Last step — then you can start.","आख़िरी कदम — फिर तुम शुरू कर सकत{ी|े} हो।")}</p></div>
+    <div class="signup">
+      ${who ? `<div class="hint2" style="margin-bottom:2px">${esc(who)}</div>` : ``}
+      <label class="fieldlabel" for="cpName">${tx("Your name","तुम्हारा नाम")}</label>
+      <input id="cpName" class="searchbox" type="text" autocomplete="name" maxlength="40"
+             placeholder="${escAttr(tx("e.g. Asha, or a nickname","जैसे: आशा, या उपनाम"))}">
+      <div class="hint2">${tx("A first name or nickname is best — you don't need your full name.","पहला नाम या उपनाम काफ़ी है — पूरा नाम ज़रूरी नहीं।")}</div>
+      ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
+      <div class="bandpick" id="cpBand"></div>` : ``}
+      <label class="fieldlabel">${tx("I am a…","मैं हूँ…")}</label>
+      <div class="bandpick" id="cpGender"></div>
+      <div class="hint2">${tx("This is only so the app talks to you correctly in Hindi.","यह सिर्फ़ इसलिए है कि ऐप हिंदी में तुमसे सही तरह बात करे।")}</div>
+      <label class="fieldlabel" for="cpAge">${tx("How old are you?","तुम्हारी उम्र क्या है?")}</label>
+      <input id="cpAge" class="searchbox" type="number" inputmode="numeric" min="3" max="25" step="1"
+             placeholder="${escAttr(tx("e.g. 11","जैसे: 11"))}">
+      <div class="hint2">${tx("Your teacher uses this to plan your group. You can leave it empty.","तुम्हारी शिक्षिका इससे तुम्हारा समूह तय करती हैं। खाली भी छोड़ सकत{ी|े} हो।")}</div>
+      <label class="fieldlabel">${tx("Pick an avatar","अवतार चुनो")}</label>
+      <div class="avpick" id="cpAv"></div>
+      <label class="fieldlabel">${tx("Choose your friend","अपनी सहेली चुनो")}</label>
+      <div class="friendgrid" id="cpFriend"></div>
+      <div class="hint2" id="cpFriendLine">${tx("She will ask you the questions and cheer for you.","वही तुमसे सवाल पूछेगी और तुम्हारा हौसला बढ़ाएगी।")}</div>
+      <label class="consent"><input type="checkbox" id="cpConsent">
+        <span>${tx("A parent or teacher said it's okay for me to make an account.","माता-पिता या शिक्षक ने मुझे खाता बनाने की अनुमति दी है।")}</span></label>
+      <div class="feedback bad" id="cpErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="cpGo" disabled>${tx("Create & start →","बनाओ और शुरू करो →")}</button></div>
+    </div>
+  </div>`));
+  const narr = tx("Tell us about you. Type your name, choose your class, pick a picture, and choose your friend.",
+                  "अपने बारे में बताओ। नाम लिखो, कक्षा चुनो, तस्वीर चुनो, और अपनी सहेली चुनो।");
   setNarration(narr, narr);
 
-  const avwrap = $("#osAv");
-  AVATARS.forEach((a,i) => {
-    const b = el(`<button type="button" class="av ${i===0?'sel':''}">${a}</button>`);
+  const nameEl = $("#cpName"), ageEl = $("#cpAge"), go = $("#cpGo"),
+        err = $("#cpErr"), consent = $("#cpConsent");
+  // Google gives us a display name. It is a starting point, not an answer — plenty of these
+  // accounts are a father's or an elder brother's — so it is prefilled and fully editable
+  // rather than accepted silently.
+  if(ctx.name) nameEl.value = String(ctx.name).slice(0, 40);
+  if(ctx.age) ageEl.value = String(ctx.age);
+
+  const avwrap = $("#cpAv");
+  AVATARS.forEach(a => {
+    const b = el(`<button type="button" class="av ${a===avatar?"sel":""}">${a}</button>`);
     b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
     avwrap.appendChild(b);
   });
-  const gw = $("#osGender");
+  const gwrap = $("#cpGender");
   GENDER_OPTS.forEach(g => {
-    const btn = el(`<button type="button" class="bandchip">${esc(tx(g.en, g.hi))}</button>`);
-    btn.onclick = () => { gender = g.v; sfx.tap();
-      gw.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel");
+    const b = el(`<button type="button" class="bandchip${g.v===gender?" sel":""}">${esc(tx(g.en, g.hi))}</button>`);
+    b.onclick = () => { gender = g.v; sfx.tap();
+      gwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
       err.textContent=""; refreshGo(); };
-    gw.appendChild(btn);
+    gwrap.appendChild(b);
   });
-  const fw = $("#osFriend");
+  const fwrap = $("#cpFriend");
   MASCOTS.forEach(mm => {
     const b = el(`<button type="button" class="friendcard${mm.id===mascot?" sel":""}"
                     aria-label="${escAttr(tx(mm.name, mm.nameHi))}" aria-pressed="${mm.id===mascot}">
       <span class="mascot friendface">${mascotSVG(mm.id)}</span>
       <span class="friendname">${esc(tx(mm.name, mm.nameHi))}</span></button>`);
     b.onclick = () => { mascot = mm.id; sfx.tap();
-      fw.querySelectorAll(".friendcard").forEach(x=>{ x.classList.remove("sel"); x.setAttribute("aria-pressed","false"); });
+      fwrap.querySelectorAll(".friendcard").forEach(x=>{ x.classList.remove("sel"); x.setAttribute("aria-pressed","false"); });
       b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+      const fl = $("#cpFriendLine"); if(fl) fl.textContent = tx(mm.line, mm.lineHi);
       speak(tx(mm.line, mm.lineHi), state.lang==="hi" ? "hi" : "en"); };
-    fw.appendChild(b);
+    fwrap.appendChild(b);
   });
   if(haveBands){
-    const bw = $("#osBand");
+    const bwrap = $("#cpBand");
     bandList.forEach(b => {
-      const btn = el(`<button type="button" class="bandchip">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
-      btn.onclick = () => { band = b.key; sfx.tap(); bw.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
-      bw.appendChild(btn);
+      const btn = el(`<button type="button" class="bandchip${b.key===band?" sel":""}">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+      btn.onclick = () => { band = b.key; sfx.tap(); bwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; refreshGo(); };
+      bwrap.appendChild(btn);
     });
   }
-
-  const email = $("#osEmail"), nm = $("#osName"), pwd = $("#osPwd"),
-        go = $("#osGo"), err = $("#osErr"), consent = $("#osConsent");
-  const emailOK = () => /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email.value.trim());
-  const pwdOK   = () => pwd.value.length >= 8;
-  const refreshGo = () => { go.disabled = !(emailOK() && pwdOK() && nm.value.trim() && consent.checked && gender && (!haveBands || band)); };
-  [email, nm, pwd].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
+  const refreshGo = () => { go.disabled = !(nameEl.value.trim().length >= 2 && consent.checked && gender && (!haveBands || band)); };
+  [nameEl, ageEl].forEach(inp => inp.oninput = () => { refreshGo(); err.textContent = ""; });
   consent.onchange = refreshGo;
   refreshGo();
-  setTimeout(() => email.focus(), 60);
-  $("#osLogin").onclick = () => { sfx.back(); renderOnlineLogin(); };
+  setTimeout(() => nameEl.focus(), 60);
 
   const submit = async () => {
-    const em = email.value.trim().toLowerCase(), pw = pwd.value, who = nm.value.trim();
-    if(!emailOK()){ err.textContent = tx("Please type a real email address.","सही ईमेल पता लिखो।"); return; }
-    if(who.length < 2){ err.textContent = tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।"); return; }
-    if(!pwdOK()){ err.textContent = tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।"); return; }
-    if(!gender){ err.textContent = tx("Please tap one: a girl, a boy, or rather not say.","कृपया एक चुनो: लड़की, लड़का, या नहीं बताना।"); return; }
+    const nm = nameEl.value.trim();
+    if(nm.length < 2){ err.textContent = tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।"); nameEl.focus(); return; }
     if(haveBands && !band){ err.textContent = tx("Please choose your class.","कृपया अपनी कक्षा चुनो।"); return; }
+    if(!gender){ err.textContent = tx("Please tap one: a girl, a boy, or rather not say.","कृपया एक चुनो: लड़की, लड़का, या नहीं बताना।"); return; }
+    const ageRaw = ageEl.value.trim();
+    let ageVal = "";
+    if(ageRaw){
+      const a = parseInt(ageRaw, 10);
+      if(!(a >= 3 && a <= 25)){ err.textContent = tx("Age should be between 3 and 25.","उम्र 3 से 25 के बीच होनी चाहिए।"); ageEl.focus(); return; }
+      ageVal = String(a);
+    }
     if(!consent.checked){ err.textContent = tx("Please tick the box to continue.","आगे बढ़ने के लिए बॉक्स पर टिक करो।"); return; }
-    go.disabled = true; err.textContent = tx("Creating…","बना रहे हैं…");
-    const r = await api("signup_email", { email: em, password: pw, name: who, avatar, band, gender, mascot }, true);
+    go.disabled = true; err.className = "feedback"; err.textContent = tx("Creating…","बना रहे हैं…");
+    // Everything she picked, remembered — so a failure that sends her back a screen, or a
+    // second attempt, never costs her the form again.
+    const keep = { avatar, band, gender, mascot, name: nm, age: ageVal, email: ctx.email,
+                   password: ctx.password, social: ctx.social, existing: ctx.existing };
+    const fail = (msg) => { go.disabled = false; err.className = "feedback bad"; err.textContent = msg; };
+
+    if(ctx.existing){
+      // The account exists; this adds the learner behind it. Session-authenticated, so a CSRF
+      // token is required — and this page may have loaded on the very redirect that created
+      // the session, racing the boot-time refreshCsrf().
+      if(!CSRF_TOKEN) await refreshCsrf();
+      const r = await api("complete_profile", { name: nm, avatar, band, gender, mascot, age: ageVal }, true);
+      if(r && r.ok){ clearSocialPending(); await finishLogin(r, { gender, mascot, online: true, email: r.email || ctx.email || "", age: ageVal ? parseInt(ageVal,10) : 0 }); return; }
+      const e = r && r.error;
+      if(e === "already_enrolled"){
+        // Two tabs, or a double submit. She has a learner already — just go and get it.
+        const me = await api("get_my_student");
+        if(me && me.ok){ clearSocialPending(); await finishLogin(me, { online: true }); return; }
+      }
+      fail(
+        e === "bad_name"       ? tx("That name will not work — try another.","यह नाम नहीं चलेगा — दूसरा लिखो।") :
+        e === "inactive"       ? tx("This account is switched off. Please ask your teacher.","यह खाता बंद है। कृपया शिक्षिका से पूछो।") :
+        e === "not_authorized" ? tx("Please sign in again.","कृपया दोबारा साइन इन करो।") :
+        e === "rate_limited"   ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
+        tx("Could not finish — please try again.","पूरा नहीं हुआ — फिर कोशिश करो।"));
+      return;
+    }
+
+    // Email door: the User and the Student are created together, here, at the end.
+    const r = await api("signup_email", { email: ctx.email, password: ctx.password, name: nm,
+                                          avatar, band, gender, mascot, age: ageVal }, true);
     if(r && r.ok){
       // Sign in through the SAME door she will use every day after this, rather than being
       // handed a session by the signup call — one login path, exercised from minute one.
-      if(await frappeLogin(em, pw)){
+      if(await frappeLogin(ctx.email, ctx.password)){
         const me = await api("get_my_student");
-        if(me && me.ok){ finishLogin(me, { gender, mascot }); return; }
+        if(me && me.ok){ await finishLogin(me, { gender, mascot, online: true, email: ctx.email }); return; }
       }
+      err.className = "feedback good";
       err.textContent = tx("Account made — please log in.","खाता बन गया — अब लॉग इन करो।");
       setTimeout(() => renderOnlineLogin(), 900);
       return;
     }
-    go.disabled = false;
     const e = r && r.error;
-    err.textContent =
-      e==="email_taken" ? tx("That email already has an account — log in instead.","इस ईमेल का खाता पहले से है — लॉग इन करो।") :
-      e==="bad_email" ? tx("Please type a real email address.","सही ईमेल पता लिखो।") :
-      e==="weak_password" ? tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।") :
-      e==="common_password" ? tx("That password is too easy to guess — pick another.","यह पासवर्ड बहुत आसान है — दूसरा चुनो।") :
-      e==="bad_name" ? tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।") :
-      e==="rate_limited" ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
-      tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।");
+    // Anything wrong with the ADDRESS or the PASSWORD belongs on the screen that holds them.
+    // Showing "that email is taken" under an avatar grid, with no email box in sight, is how a
+    // form teaches somebody that it is broken.
+    if(e === "email_taken" || e === "bad_email" || e === "weak_password" || e === "common_password"){
+      renderOnlineSignup(Object.assign(keep, { err:
+        e === "email_taken"     ? tx("That email already has an account — log in instead.","इस ईमेल का खाता पहले से है — लॉग इन करो।") :
+        e === "bad_email"       ? tx("Please type a real email address.","सही ईमेल पता लिखो।") :
+        e === "common_password" ? tx("That password is too easy to guess — pick another.","यह पासवर्ड बहुत आसान है — दूसरा चुनो।") :
+                                  tx("Password must be at least 8 characters.","पासवर्ड कम से कम 8 अक्षर का हो।") }));
+      return;
+    }
+    fail(
+      e === "bad_name"     ? tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।") :
+      e === "rate_limited" ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
+      r == null            ? tx("No internet — try again when you are online.","इंटरनेट नहीं है — ऑनलाइन होने पर फिर कोशिश करो।") :
+      tx("Could not sign up — please try again.","साइन अप नहीं हुआ — फिर कोशिश करो।"));
   };
   go.onclick = submit;
-  pwd.onkeydown = (e) => { if(e.key==="Enter" && !go.disabled) submit(); };
+  nameEl.onkeydown = (e) => { if(e.key==="Enter" && !go.disabled) submit(); };
   refreshTop();
 }
+
+// Back from "Continue with Google". The browser has reloaded this page carrying a brand new
+// Frappe session and nothing else — no learner id, no token, no memory of the tap that started
+// it except the marker in localStorage.
+//
+// That marker is load-bearing (see SOCIAL_PENDING): without it this would fire for ANY Frappe
+// session the browser holds, and a facilitator with Desk open in another tab would be handed a
+// "finish your profile" form for herself every time she opened the game.
+//
+// Returns true when it has taken over the screen.
+async function resumeSocialSignup(){
+  if(!socialPending()) return false;
+  const r = await api("get_my_student");
+  if(!r) return false;                       // never reached the server — leave the marker for the next boot
+  clearSocialPending();                      // reached it; whatever it said, this handshake is over
+  if(r.ok){ await finishLogin(r, { online: true }); return true; }
+  if(r.needsProfile){
+    renderCompleteProfile({ existing: true, social: r.social || "", email: r.email || "", name: r.name || "" });
+    return true;
+  }
+  if(r.error === "inactive"){
+    renderOnlineLogin(tx("This account is switched off. Please ask your teacher.","यह खाता बंद है। कृपया शिक्षिका से पूछो।"));
+    return true;
+  }
+  return false;
+}
+
+// ============================================================
+//  PROFILE — who I am, and the way out
+// ============================================================
+// Everything a learner can change about herself, on one screen, reachable from the ☰ menu of
+// every screen in the game. Before this existed, her name, age, class and picture were fixed
+// at sign-up FOR GOOD — a mistyped name needed a facilitator with Desk access to correct —
+// and there was no Log out anywhere, on devices thirty girls share.
+//
+// Everything is staged and written on Save, including the guide and the gender that the ☰
+// sheets apply on tap. Those sheets are one-decision screens where an instant apply is the
+// clearest thing that can happen; this is a form, and a form that saved four of its seven
+// fields the moment you touched them would be lying about what the Save button does.
+function renderProfile(){
+  if(!currentStudent){ renderHome(); return; }   // signed out under our feet (another tab)
+  stopSpeech(); rerender = renderProfile; root.innerHTML = "";
+  setBack(tx("← Back","← वापस"), renderHome);
+  const stu = currentStudent;
+  let avatar = stu.avatar || AVATARS[0];
+  let band   = stu.band || "";
+  let gender = stu.gender || state.gender || "";
+  let mascot = stu.mascot || currentMascot();
+  const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const haveBands = bandList.length > 0;
+  // Which "change your password" story this account gets. There are three, and offering the
+  // wrong one is worse than offering none:
+  //   * a Google/Facebook account HAS a password — a random one Frappe generated that nobody
+  //     has ever seen — so a change form there asks for an old password that does not exist;
+  //   * a campus profile signs in with a name and a PIN and has no password at all;
+  //   * only an email account has something a learner can actually change.
+  const social = stu.social || "";
+  const online = !!stu.online && !stu.local;
+  root.appendChild(el(`<div class="screen">
+    <div class="hero hero-guide">
+      <div class="roshni">${mascotSVG(mascot)}</div>
+      <div class="herotext"><h1 id="pfTitle">${esc(stu.name)}</h1>
+        <p>${esc(tx("This is you. Change anything you like.","यह तुम हो। जो चाहो बदल सकत{ी|े} हो।"))}</p></div>
+    </div>
+    <div class="signup">
+      <label class="fieldlabel" for="pfName">${tx("Your name","तुम्हारा नाम")}</label>
+      <input id="pfName" class="searchbox" type="text" autocomplete="off" maxlength="40"
+             value="${escAttr(stu.name || "")}" placeholder="${escAttr(tx("e.g. Asha","जैसे: आशा"))}">
+      ${haveBands ? `<label class="fieldlabel">${tx("Your class","तुम्हारी कक्षा")}</label>
+      <div class="bandpick" id="pfBand"></div>` : ``}
+      <label class="fieldlabel">${tx("I am a…","मैं हूँ…")}</label>
+      <div class="bandpick" id="pfGender"></div>
+      <div class="hint2">${tx("This is only so the app talks to you correctly in Hindi.","यह सिर्फ़ इसलिए है कि ऐप हिंदी में तुमसे सही तरह बात करे।")}</div>
+      <label class="fieldlabel" for="pfAge">${tx("How old are you?","तुम्हारी उम्र क्या है?")}</label>
+      <input id="pfAge" class="searchbox" type="number" inputmode="numeric" min="3" max="25" step="1"
+             value="${escAttr(stu.age ? String(stu.age) : "")}" placeholder="${escAttr(tx("e.g. 11","जैसे: 11"))}">
+      <div class="hint2">${tx("Your teacher uses this to plan your group. You can leave it empty.","तुम्हारी शिक्षिका इससे तुम्हारा समूह तय करती हैं। खाली भी छोड़ सकत{ी|े} हो।")}</div>
+      <label class="fieldlabel">${tx("Your picture","तुम्हारी तस्वीर")}</label>
+      <div class="avpick" id="pfAv"></div>
+      <label class="fieldlabel">${tx("Choose your friend","अपनी सहेली चुनो")}</label>
+      <div class="friendgrid" id="pfFriend"></div>
+      <div class="hint2" id="pfFriendLine">${esc(tx(mascotById(mascot).line, mascotById(mascot).lineHi))}</div>
+      <div class="feedback bad" id="pfErr" style="min-height:18px"></div>
+      <div class="center"><button class="btn primary" id="pfSave">${tx("Save →","सहेजो →")}</button></div>
+
+      <div class="formsec">
+        <label class="fieldlabel">${tx("Password","पासवर्ड")}</label>
+        ${social ? `<div class="hint2">${esc(tx("You sign in with " + (social.charAt(0).toUpperCase() + social.slice(1)) + ". There is no password to change here.",
+                                                social + " से तुम साइन इन करत{ी|े} हो। यहाँ बदलने के लिए कोई पासवर्ड नहीं है।"))}</div>`
+        : online ? `<input id="pfOld" class="searchbox" type="password" autocomplete="current-password" maxlength="128"
+               placeholder="${escAttr(tx("your password now","अभी का पासवर्ड"))}">
+        <input id="pfNew" class="searchbox" type="password" autocomplete="new-password" maxlength="128"
+               style="margin-top:10px" placeholder="${escAttr(tx("new password — at least 8 letters","नया पासवर्ड — कम से कम 8 अक्षर"))}">
+        <div class="feedback bad" id="pfPwErr" style="min-height:18px"></div>
+        <div class="center"><button class="btn ghost" id="pfPwGo">${tx("Change password →","पासवर्ड बदलो →")}</button></div>`
+        : `<div class="hint2">${esc(tx("You sign in with your name and PIN. Ask your teacher to change your PIN.","तुम अपने नाम और पिन से साइन इन करत{ी|े} हो। पिन बदलने के लिए शिक्षिका से कहो।"))}</div>`}
+      </div>
+
+      <div class="formsec center">
+        <button class="btn danger wide" id="pfOut">${tx("Log out","लॉग आउट")}</button>
+        <div class="hint2" style="text-align:center">${esc(tx("Your stars are saved. You can sign in again any time.","तुम्हारे सितारे सुरक्षित हैं। कभी भी दोबारा साइन इन कर सकत{ी|े} हो।"))}</div>
+      </div>
+    </div>
+  </div>`));
+  const narr = tx("Your profile. Change your name, class, age, picture or friend, then save.",
+                  "तुम्हारी प्रोफ़ाइल। नाम, कक्षा, उम्र, तस्वीर या सहेली बदलो, फिर सहेजो।");
+  setNarration(narr, narr);
+
+  const err = $("#pfErr");
+  // Picture.
+  const avwrap = $("#pfAv");
+  AVATARS.forEach(a => {
+    const b = el(`<button type="button" class="av ${a===avatar?"sel":""}">${a}</button>`);
+    b.onclick = () => { avatar = a; sfx.tap(); avwrap.querySelectorAll(".av").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); };
+    avwrap.appendChild(b);
+  });
+  // Gender — three chips, no free text (see renderSignup).
+  const gwrap = $("#pfGender");
+  GENDER_OPTS.forEach(g => {
+    const b = el(`<button type="button" class="bandchip${g.v===gender?" sel":""}">${esc(tx(g.en, g.hi))}</button>`);
+    b.onclick = () => { gender = g.v; sfx.tap();
+      gwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); err.textContent=""; };
+    gwrap.appendChild(b);
+  });
+  // Guide — tapping a face plays her introduction, which for a non-reader IS the label.
+  const fwrap = $("#pfFriend");
+  MASCOTS.forEach(mm => {
+    const b = el(`<button type="button" class="friendcard${mm.id===mascot?" sel":""}"
+                    aria-label="${escAttr(tx(mm.name, mm.nameHi))}" aria-pressed="${mm.id===mascot}">
+      <span class="mascot friendface">${mascotSVG(mm.id)}</span>
+      <span class="friendname">${esc(tx(mm.name, mm.nameHi))}</span></button>`);
+    b.onclick = () => { mascot = mm.id; sfx.tap();
+      fwrap.querySelectorAll(".friendcard").forEach(x=>{ x.classList.remove("sel"); x.setAttribute("aria-pressed","false"); });
+      b.classList.add("sel"); b.setAttribute("aria-pressed","true");
+      const fl = $("#pfFriendLine"); if(fl) fl.textContent = tx(mm.line, mm.lineHi);
+      speak(tx(mm.line, mm.lineHi), state.lang==="hi" ? "hi" : "en"); };
+    fwrap.appendChild(b);
+  });
+  if(haveBands){
+    const bwrap = $("#pfBand");
+    bandList.forEach(b => {
+      const btn = el(`<button type="button" class="bandchip${b.key===band?" sel":""}">${iconFor("band:"+b.key, b.icon)} ${esc(tx(b.title, b.titleHi))}</button>`);
+      btn.onclick = () => { band = b.key; sfx.tap(); bwrap.querySelectorAll(".bandchip").forEach(x=>x.classList.remove("sel")); btn.classList.add("sel"); err.textContent=""; };
+      bwrap.appendChild(btn);
+    });
+  }
+
+  // ---- Save ----
+  const save2 = $("#pfSave");
+  save2.onclick = async () => {
+    const nm = $("#pfName").value.trim();
+    if(nm.length < 2){ err.textContent = tx("Please type at least 2 letters.","कम से कम 2 अक्षर लिखो।"); $("#pfName").focus(); return; }
+    const ageRaw = $("#pfAge").value.trim();
+    let ageVal = null;
+    if(ageRaw){
+      ageVal = parseInt(ageRaw, 10);
+      if(!(ageVal >= 3 && ageVal <= 25)){ err.textContent = tx("Age should be between 3 and 25.","उम्र 3 से 25 के बीच होनी चाहिए।"); $("#pfAge").focus(); return; }
+    }
+    if(!gender){ err.textContent = tx("Please tap one: a girl, a boy, or rather not say.","कृपया एक चुनो: लड़की, लड़का, या नहीं बताना।"); return; }
+    save2.disabled = true; err.className = "feedback"; err.textContent = tx("Saving…","सहेज रहे हैं…");
+    // The server is asked FIRST here, unlike the fire-and-forget mascot pick, because a name is
+    // not a presentation choice: on a campus laptop login_by_name authenticates on exactly this
+    // field, so a device that believes a name the server refused would lock her out of her own
+    // profile. A server that cannot be REACHED is a different case and still saves locally —
+    // going offline must never cost her an edit (api() answers null for unreachable, and an
+    // object with ok:false for a refusal, so the two are distinguishable).
+    let didSync = false;
+    if(backendLive && !stu.local){
+      // age "0" means SHE CLEARED IT — the server maps that back to an empty field. Sending
+      // "" instead would look like "field not present" and silently keep the old number.
+      const r = await api("set_profile", { student: stu.id, token: stu.token || "",
+                                           name: nm, avatar, band: band || "",
+                                           age: ageVal == null ? "0" : String(ageVal),
+                                           gender, mascot }, true);
+      didSync = !!(r && r.ok);
+      if(r && r.ok === false && r.error !== "nothing_to_set"){
+        save2.disabled = false; err.className = "feedback bad";
+        err.textContent =
+          r.error === "bad_name"  ? tx("That name will not work — try another.","यह नाम नहीं चलेगा — दूसरा लिखो।") :
+          r.error === "bad_age"   ? tx("Age should be between 3 and 25.","उम्र 3 से 25 के बीच होनी चाहिए।") :
+          r.error === "not_authorized" ? tx("Please sign in again.","कृपया दोबारा साइन इन करो।") :
+          tx("Could not save — please try again.","सहेजा नहीं जा सका — फिर कोशिश करो।");
+        return;
+      }
+    }
+    // Local writes go through the same single writers the ☰ sheets use. skipSync only when the
+    // one call above actually landed — if it never left the device, let the writers fire their
+    // own fire-and-forget attempts exactly as a tap in the ☰ sheet would.
+    setGender(gender, didSync);
+    setMascot(mascot, didSync);
+    stu.name = nm;
+    stu.avatar = avatar;
+    stu.age = ageVal == null ? 0 : ageVal;
+    if(haveBands && band) stu.band = band;
+    try { localStorage.setItem("hikmat_current", JSON.stringify(stu)); } catch(e){}
+    showAllClasses = false;                 // her class may have changed — refocus Home on it
+    save2.disabled = false;
+    $("#pfTitle").textContent = nm;
+    err.className = "feedback good"; err.textContent = tx("Saved ✓","सहेज लिया ✓");
+    srSay(tx("Saved","सहेज लिया"));
+    sfx.correct();
+    refreshTop();
+    logTool("profile_save");
+  };
+
+  // ---- Change password (email accounts only) ----
+  const pwGo = $("#pfPwGo");
+  if(pwGo) pwGo.onclick = async () => {
+    const oldEl = $("#pfOld"), newEl = $("#pfNew"), pwErr = $("#pfPwErr");
+    const o = oldEl.value, n = newEl.value;
+    if(!o){ pwErr.className="feedback bad"; pwErr.textContent = tx("Type your password now.","अभी का पासवर्ड लिखो।"); oldEl.focus(); return; }
+    if(n.length < 8){ pwErr.className="feedback bad"; pwErr.textContent = tx("New password must be at least 8 letters.","नया पासवर्ड कम से कम 8 अक्षर का हो।"); newEl.focus(); return; }
+    pwGo.disabled = true; pwErr.className="feedback"; pwErr.textContent = tx("Changing…","बदल रहे हैं…");
+    if(!CSRF_TOKEN) await refreshCsrf();
+    const r = await api("change_password", { old_password: o, new_password: n }, true);
+    pwGo.disabled = false;
+    if(r && r.ok){
+      oldEl.value = ""; newEl.value = "";
+      pwErr.className = "feedback good"; pwErr.textContent = tx("Password changed ✓","पासवर्ड बदल गया ✓");
+      srSay(tx("Password changed","पासवर्ड बदल गया")); sfx.correct();
+      return;
+    }
+    pwErr.className = "feedback bad";
+    const e = r && r.error;
+    // gform(): textContent skips esc(), and one of the branches below carries a {ी|े} marker
+    // that a screen reader would otherwise spell out character by character.
+    pwErr.textContent = gform(
+      e === "wrong_password"  ? tx("That is not your password now — try again.","यह अभी का पासवर्ड नहीं है — फिर कोशिश करो।") :
+      e === "weak_password"   ? tx("New password must be at least 8 letters.","नया पासवर्ड कम से कम 8 अक्षर का हो।") :
+      e === "common_password" ? tx("That password is too easy to guess — pick another.","यह पासवर्ड बहुत आसान है — दूसरा चुनो।") :
+      e === "same_password"   ? tx("That is the same password — pick a new one.","यह वही पासवर्ड है — नया चुनो।") :
+      e === "social_account"  ? tx("You sign in with Google or Facebook — there is no password here.","तुम Google या Facebook से साइन इन करत{ी|े} हो — यहाँ पासवर्ड नहीं है।") :
+      e === "rate_limited"    ? tx("Too many tries — wait a bit.","बहुत कोशिश — थोड़ा रुको।") :
+      e === "not_authorized"  ? tx("Please sign in again.","कृपया दोबारा साइन इन करो।") :
+      tx("Could not change it — please try again.","बदल नहीं सका — फिर कोशिश करो।"));
+  };
+
+  // ---- Log out ----
+  // Two taps, not a dialog. This is the one destructive control a six-year-old can reach from
+  // a menu she opens to change her friend, and a mis-tap on a shared laptop ends her session
+  // mid-lesson. The second tap arms for five seconds and then forgets, so the button cannot
+  // sit there primed for the next person who wanders past it.
+  const out = $("#pfOut");
+  let armed = 0, armTimer = null;
+  out.onclick = async () => {
+    if(!armed){
+      armed = 1; sfx.tap();
+      out.textContent = tx("Tap again to log out","लॉग आउट के लिए फिर दबाओ");
+      srSay(tx("Tap again to log out","लॉग आउट के लिए फिर दबाओ"));
+      clearTimeout(armTimer);
+      armTimer = setTimeout(() => { armed = 0; out.textContent = tx("Log out","लॉग आउट"); }, 5000);
+      return;
+    }
+    clearTimeout(armTimer);
+    out.disabled = true;
+    await doLogout();
+  };
+  moveFocusToTop();
+  refreshTop();
+  // An identity object saved before this screen existed has no email/social/online on it, so a
+  // learner who last signed in on an older build would be told she uses a name and a PIN when
+  // she does not. Ask the server who she is and redraw if the answer differs. Never on a
+  // local-only profile: there is no server behind it and get_my_student would answer for
+  // whatever OTHER session the browser happens to hold.
+  // An identity object saved before this screen existed has no email/social/online on it, so a
+  // learner who last signed in on an older build would be told she uses a name and a PIN when
+  // she does not. And for an ONLINE account we re-ask every time, because these three are the
+  // only fields here the device cannot work out for itself — the cost is one GET, and the
+  // alternative is a screen that stays wrong until she next signs in. Never on a local-only
+  // profile: there is no server behind it, and get_my_student would answer for whatever OTHER
+  // session the browser happens to be holding.
+  if(backendLive && !stu.local && (stu.email == null || stu.social == null || stu.online)) refreshIdentity();
+}
+
+// Reconcile the cached identity with the server's, and redraw the profile ONLY if something
+// actually moved — this is called from renderProfile, so an unconditional redraw would call
+// itself forever.
+//
+// Deliberately narrow: it fills in the fields the client cannot know on its own (which account
+// this is, and how it signs in) and never overwrites a name or a guide, because a choice made
+// on THIS device is the more recent deliberate act — see the note above finishLogin.
+async function refreshIdentity(){
+  const r = await api("get_my_student");
+  if(!r || !currentStudent) return;
+  const before = JSON.stringify([currentStudent.email, currentStudent.social, currentStudent.online, currentStudent.age]);
+  if(!r.ok || r.id !== currentStudent.id){
+    // Not an online session, or it belongs to somebody else (a facilitator with Desk open in
+    // another tab has a perfectly good session and it is not hers). Record "no password to
+    // change here" rather than asking again on every visit.
+    currentStudent.email = currentStudent.email || "";
+    currentStudent.social = currentStudent.social || "";
+    currentStudent.online = !!currentStudent.email;
+  } else {
+    currentStudent.email  = r.email || "";
+    currentStudent.social = r.social || "";
+    currentStudent.online = !!r.email;
+    if(!currentStudent.age && r.age) currentStudent.age = r.age;
+  }
+  if(JSON.stringify([currentStudent.email, currentStudent.social, currentStudent.online, currentStudent.age]) === before) return;
+  try { localStorage.setItem("hikmat_current", JSON.stringify(currentStudent)); } catch(e){}
+  if(rerender === renderProfile) renderProfile();
+}
+
+// Sign out of everything this device is holding: the Frappe session cookie (online accounts),
+// the half-finished-social-signup marker, and the current identity. Progress is untouched —
+// it is stored per student id, so signing back in finds every star exactly where it was.
+async function doLogout(){
+  stopSpeech();
+  await frappeLogout();
+  clearSocialPending();
+  setStudent(null);
+  logTool("logout");
+  flushTools();          // the counter is keyed to nothing after this; send it while it still means something
+  sfx.back();
+  renderHome();
+}
+
 function deviceMode(){ try { return localStorage.getItem(DEVICE_MODE_KEY) || ""; } catch(e){ return ""; } }
 function campusRoster(){ try { return JSON.parse(localStorage.getItem(CAMPUS_ROSTER_KEY)); } catch(e){ return null; } }
 function setCampusDevice(campus, students){
@@ -5967,8 +6701,17 @@ async function finishLogin(stu, chosen){
   const guestSnap = snapshotGuestProgress();     // capture any preview stars BEFORE we swap identity
   const pickedG = (chosen && chosen.gender) || "";
   const pickedM = (chosen && chosen.mascot) || "";
+  // How she signs in, remembered alongside who she is — the Profile screen has to decide
+  // between a change-password form, "you sign in with Google", and "ask your teacher about
+  // your PIN", and it has no other way to tell the three apart after a reload. `social` is the
+  // provider name or ""; `online` means there is a Frappe session behind this identity, which
+  // is what makes a password (and a logout that has to reach the server) meaningful at all.
+  const email  = (chosen && chosen.email) || stu.email || "";
+  const social = (chosen && chosen.social) || stu.social || "";
   setStudent({ id: stu.id, name: stu.name, avatar: stu.avatar || "🙂", token: stu.token, band: stu.band || "",
-               gender: pickedG || stu.gender || "", mascot: pickedM || stu.mascot || "" });
+               gender: pickedG || stu.gender || "", mascot: pickedM || stu.mascot || "",
+               age: (chosen && chosen.age) || stu.age || 0,
+               email, social, online: !!(chosen && chosen.online) || !!email });
   migrateGuestProgress(guestSnap);               // carry the guest's stars into this profile (+ queue to server)
   // Gender and guide are HER settings, not this laptop's: on 30 shared campus machines she
   // logs in somewhere new most days, so the server's copy seeds the fresh device rather than
@@ -6219,7 +6962,7 @@ state.testSeen = state.testSeen || {};       // states saved before module tests
 state.testPassed = state.testPassed || {};
 state.videosSeen = state.videosSeen || {};
 renderHome();          // instant: bundled or cached content, fully offline
-attInit();             // attendance clock for an already-logged-in reload (no-op for guests)
+if(AUTH_ENABLED) attInit();   // attendance clock for an already-logged-in reload (no-op for guests)
 // One-shot cleanup for the removed Bhojpuri AI / Boli section. A device that ran an older
 // build can still be holding recorded audio blobs in IndexedDB plus a queue of unsent
 // transcriptions — the feature is gone, so nothing will ever upload or replay them and they
@@ -6228,19 +6971,30 @@ attInit();             // attendance clock for an already-logged-in reload (no-o
 // the delete is idempotent, so it costs nothing on a device that never had the feature.
 try { localStorage.removeItem("hikmat_boli_out"); } catch(e){}
 try { indexedDB.deleteDatabase("hikmat_capture_db"); } catch(e){}
-refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 400 our POSTs without it
-  syncAttempts();            // flush any progress queued while offline
-  syncTests();               // flush any module-test attempts queued while offline
-  syncDoubts();              // flush any doubts logged while offline
-  syncEvents();              // flush any wrong-answer events queued while offline
-  syncAttendance();          // flush any attendance pings queued while offline
-});
+// Every one of these posts is signed with a student token, so with accounts off there is
+// nothing to send and nothing that could authenticate it — retireAccounts() has already
+// emptied the queues. Content sync below is separate and still runs: the app keeps getting
+// new lessons, it just stops reporting who played them.
+if(AUTH_ENABLED){
+  refreshCsrf().then(() => {   // CSRF token first — a logged-in session would 400 our POSTs without it
+    syncAttempts();            // flush any progress queued while offline
+    syncTests();               // flush any module-test attempts queued while offline
+    syncDoubts();              // flush any doubts logged while offline
+    syncEvents();              // flush any wrong-answer events queued while offline
+    syncAttendance();          // flush any attendance pings queued while offline
+  });
+}
 loadFromBackend().then(async ok => {
   backendLive = ok;
   applyServerDefaults();   // apply admin defaults (theme/sound/lang/help) for an untouched user
   // No forced login wall — everyone lands on Home (playable); the guest sees clear
   // "Log in" / "Sign up" buttons and chooses when to sign in.
   if(ok && currentStudent) await mergeServerProgress();
+  // A "Continue with Google" round trip lands HERE, on a fresh load of this page, with a new
+  // session cookie and nothing else. resumeSocialSignup() either signs her straight in or puts
+  // up the one screen Google cannot fill in; either way it owns the screen and Home must not
+  // paint over it. It is a no-op unless a handshake was actually started from this device.
+  if(AUTH_ENABLED && ok && !currentStudent && await resumeSocialSignup()){ refreshTop(); return; }
   if(document.getElementById("homeSections")) renderHome();   // refresh home in place once live content + structure arrive
   refreshTop();
 });
