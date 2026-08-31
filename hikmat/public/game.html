@@ -465,9 +465,11 @@
   /* Browse-mode picker: a mode card plus its per-mode "continue where you left off" chip */
   .modecell { display:flex; flex-direction:column; gap:8px; min-width:0; }
   .modecell .theme { width:100%; }
-  .continuechip { border:2px solid var(--line); background:var(--card); color:var(--ink); border-radius:999px;
-    padding:9px 14px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:var(--shadow-sm);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; transition:transform .06s; }
+  /* The lesson NAME is the useful half, so the chip wraps to two lines rather than cutting it
+     off ("Continue: ABC So…" tells her nothing about which lesson she is returning to). */
+  .continuechip { border:2px solid var(--line); background:var(--card); color:var(--ink); border-radius:18px;
+    padding:9px 14px; font-weight:800; font-size:13px; line-height:1.35; cursor:pointer;
+    box-shadow:var(--shadow-sm); max-width:100%; text-align:left; transition:transform .06s; }
   .continuechip:active { transform:translateY(2px); }
   /* First-time "how to play" coaching screen */
   .coach .display { margin-top:14px; }
@@ -3314,19 +3316,6 @@ function subjectCard(band, subj){
   return node;
 }
 
-// The original thematic tracks, collapsed into ONE "Life Skills" card (parallels the band cards).
-function lifeSkillsCard(){
-  const tracks = lifeSkillsTracks();
-  if(!tracks.length) return null;
-  const {earned, max} = progressOf(tracks);
-  const node = el(`<button class="theme" style="--tc:#e11d48;background:#e11d4814;border-color:#e11d4855">
-    <div class="big">${iconFor("lifeskills","🌼")}</div>
-    <h3>${tx("Life Skills","जीवन कौशल")}</h3>
-    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx("Everyday English for home, market, school & work","घर, बाज़ार, स्कूल और काम की अंग्रेज़ी")}</small>
-  </button>`);
-  node.onclick = () => { sfx.enter(); renderLifeSkills(); };
-  return node;
-}
 
 // What the device remembers, and the way to make it forget. Reachable from ☰ on every screen
 // whenever accounts are off (see profileRows). Two jobs, and the second is why it exists:
@@ -3664,11 +3653,11 @@ function renderHome(){
   setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
   const host = $("#homeSections");
   const seeBtn = (label, fn) => { const b = el(`<button class="btn ghost seeother">${label}</button>`); b.onclick = () => { sfx.tap(); fn(); }; const c = el(`<div class="center" style="margin:2px 0 4px"></div>`); c.appendChild(b); host.appendChild(c); };
-  // Life Skills used to get its own heading and grid underneath the class groups. It now rides
-  // in the SAME grid as the bands (Vishal, 2026-08-21): three bands leave an empty fourth cell
-  // in the two-column phone layout, so dropping Life Skills into it removes a section heading
-  // and a screenful of scrolling. The standalone path — no class bands published at all, where
-  // the thematic tracks ARE the content — is unchanged.
+  // Life Skills is NOT in this grid. It rode here for a while (2026-08-21) because three bands
+  // left an empty fourth cell, but it is now its own door on the mode picker (renderModeHome),
+  // and a card that appears in both places makes "By Class" mean two different things and
+  // splits its resume position across two modes (Vishal, 2026-08-31). The standalone path —
+  // no class bands published at all, where the thematic tracks ARE the content — is unchanged.
   const life = lifeSkillsTracks();
   if(haveBands){
     // A logged-in student sees ONLY her own class group, plus a way to peek at the others.
@@ -3677,7 +3666,6 @@ function renderHome(){
                                                              : tx("📚 Choose your class group","📚 अपनी कक्षा चुनो")}</div>`));
     const grid = el(`<div class="themes"></div>`);
     (onlyMine ? bandList.filter(b => b.key === myBand) : bandList).forEach(b => grid.appendChild(bandCard(b)));
-    if(life.length) grid.appendChild(lifeSkillsCard());
     host.appendChild(grid);
     if(onlyMine) seeBtn(tx("See other classes →","दूसरी कक्षाएँ देखो →"), () => { showAllClasses = true; renderHome(); });
     else if(hasMy) seeBtn(tx("← Show only my class","← सिर्फ़ मेरी कक्षा"), () => { showAllClasses = false; renderHome(); });
