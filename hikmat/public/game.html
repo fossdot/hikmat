@@ -462,15 +462,16 @@
   .pcard.matched { border-color:var(--good); background:#eafaf2; }
   [data-theme="dark"] .pcard.up { background:#2a2240; }
   [data-theme="dark"] .pcard.matched { background:#15341f; }
-  /* Browse-mode picker: a mode card plus its per-mode "continue where you left off" chip */
-  .modecell { display:flex; flex-direction:column; gap:8px; min-width:0; }
-  .modecell .theme { width:100%; }
-  /* The lesson NAME is the useful half, so the chip wraps to two lines rather than cutting it
-     off ("Continue: ABC So…" tells her nothing about which lesson she is returning to). */
-  .continuechip { border:2px solid var(--line); background:var(--card); color:var(--ink); border-radius:18px;
-    padding:9px 14px; font-weight:800; font-size:13px; line-height:1.35; cursor:pointer;
-    box-shadow:var(--shadow-sm); max-width:100%; text-align:left; transition:transform .06s; }
-  .continuechip:active { transform:translateY(2px); }
+  /* Browse-mode picker: three doors that must read as ONE row of equal cards. Their subtitles
+     are different lengths (a remembered lesson name vs a blurb), and left to itself the grid
+     gives each card its own height — which looks like a bug, not a layout. */
+  /* 1fr rows already make every card as tall as the tallest one, so no invented min-height —
+     that only added dead space under the shorter cards. */
+  .modegrid { grid-auto-rows:1fr; align-items:stretch; }
+  .modegrid .theme { height:100%; min-height:130px; display:flex; flex-direction:column; }
+  .modegrid .theme small { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; line-height:1.35; }
+  .modegrid .theme small.resumeline { color:var(--ink); font-weight:800; }   /* the lesson she is going back to */
   /* First-time "how to play" coaching screen */
   .coach .display { margin-top:14px; }
   .coach .actico { font-size:84px; line-height:1; text-align:center; }
@@ -3055,6 +3056,12 @@ function openMenu(){
         <button class="sheetx" data-x aria-label="${escAttr(tx("Close","बंद करो"))}" title="${escAttr(tx("Close","बंद करो"))}">&times;</button>
       </div>
       <div class="menurows" id="menuRows">
+        <button class="menurow" id="mHow">
+          <span class="mi">🚪</span>
+          <span class="ml"><b>${esc(tx("How I learn","मैं कैसे सीखूँ"))}</b>
+            <small>${esc(tx("Now: ","अभी: ") + MODE_TITLE(browseMode))}</small></span>
+          <span class="mc">›</span>
+        </button>
         <button class="menurow" id="mFriend">
           <span class="mi">🧑‍🤝‍🧑</span>
           <span class="ml"><b>${esc(tx("Choose your friend","अपनी सहेली चुनो"))}</b>
@@ -3110,6 +3117,9 @@ function openMenu(){
   const closeMenu = () => { sfx.back(); close(); };
   sheet.querySelector("#dClose").onclick = closeMenu;
   sheet.querySelector("[data-x]").onclick = closeMenu;
+  // The way back to the three doors from ANY screen — now that launching continues her last
+  // lesson, the picker is somewhere she chooses to go, not something she passes through.
+  sheet.querySelector("#mHow").onclick = () => { sfx.enter(); close(); renderModeHome(); };
   sheet.querySelector("#mFriend").onclick = () => { close(); openMascotPicker(); };
   sheet.querySelector("#mGender").onclick = () => { close(); openGenderPicker(); };
   sheet.querySelector("#mSound").onclick = () => { close(); document.getElementById("hearBtn").click(); };
@@ -3194,7 +3204,9 @@ function setMascot(id, skipSync){
 const GENDER_OPTS = [{ v:"Female", en:"a girl", hi:"लड़की" },
                      { v:"Male",   en:"a boy",  hi:"लड़का" },
                      { v:"Other",  en:"…rather not say", hi:"…नहीं बताना" }];
-const GENDER_LABEL = { Female:"लड़की / girl", Male:"लड़का / boy", Other:"— / —" };
+// "Other" here means SHE HAS NOT CHOSEN, and a menu row that reads "— / —" looks like a bug
+// rather than an unanswered question — so it says so in both languages.
+const GENDER_LABEL = { Female:"लड़की / girl", Male:"लड़का / boy", Other:"अभी नहीं चुना / not chosen yet" };
 function setGender(v, skipSync){        // skipSync: see setMascot
   if(!GENDER_OPTS.some(g => g.v === v)) return;
   state.gender = v; save();
@@ -3461,6 +3473,19 @@ function resumeLoc(mode){
   const ls = c.lessons.find(l => l.key === loc.lk);
   return ls ? { c, ls } : null;
 }
+const MODE_TITLE = m => m === "subject" ? tx("By Subject","विषय से")
+                      : m === "life"   ? tx("Life Skills","जीवन कौशल")
+                      :                  tx("By Class","कक्षा से");
+// Continuing is the default, not a button: on launch she lands back on the lesson she left,
+// in the style she left it in. Runs once, AFTER the real curriculum has loaded (the bundled
+// fallback has different lesson keys, so a saved position cannot resolve against it), and
+// only while she is still sitting on the root screen — never yank a screen she has tapped into.
+function autoResume(){
+  const m = state.lastMode;
+  if(!m || !resumeLoc(m)) return false;
+  resumeMode(m);
+  return true;
+}
 function resumeMode(mode){
   const r = resumeLoc(mode);
   if(!r){ renderModeHome(); return; }
@@ -3474,22 +3499,19 @@ function resumeMode(mode){
   if(!testGate(r.c, r.ls, back)) return;
   renderLessonMap(r.c, r.ls, back);
 }
+// One door. A door she has already used shows the lesson it remembers and goes straight back
+// to it — continuing is the DEFAULT, not a second button. (The floating "Continue" chip that
+// used to hang under each card made every card a different height and read as a broken
+// layout; the promise on the card now IS the tap.)
 function modeCard(mode, iconHtml, title, sub, color, openFn){
-  const wrap = el(`<div class="modecell"></div>`);
+  const r = resumeLoc(mode);
   const node = el(`<button class="theme" style="--tc:${col(color)};background:${col(color)}14;border-color:${col(color)}55">
     <div class="big">${iconHtml}</div>
     <h3>${esc(title)}</h3>
-    <small>${esc(sub)}</small>
+    <small class="${r ? "resumeline" : ""}">${r ? "▶ " + esc(tx(r.ls.title, r.ls.titleHi)) : esc(sub)}</small>
   </button>`);
-  node.onclick = () => { sfx.enter(); openFn(); };
-  wrap.appendChild(node);
-  const r = resumeLoc(mode);
-  if(r){
-    const chip = el(`<button class="continuechip">▶ ${esc(tx("Continue: ","आगे: ") + tx(r.ls.title, r.ls.titleHi))}</button>`);
-    chip.onclick = () => { sfx.enter(); resumeMode(mode); };
-    wrap.appendChild(chip);
-  }
-  return wrap;
+  node.onclick = () => { sfx.enter(); r ? resumeMode(mode) : openFn(); };
+  return node;
 }
 let pickerSkipped = false;   // true while Home is standing in for the picker (no band content yet)
 function renderModeHome(){
@@ -3514,7 +3536,7 @@ function renderModeHome(){
       <div class="roshni">${mascotSVG()}</div>
       <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
     </div>
-    <div class="themes" id="modeCards"></div>
+    <div class="themes modegrid" id="modeCards"></div>
   </div>`);
   root.appendChild(s);
   setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
@@ -8543,6 +8565,9 @@ loadFromBackend().then(async ok => {
   // up the one screen Google cannot fill in; either way it owns the screen and Home must not
   // paint over it. It is a no-op unless a handshake was actually started from this device.
   if(AUTH_ENABLED && ok && !currentStudent && await resumeSocialSignup()){ refreshTop(); return; }
+  // Still on the root screen with the real curriculum now in hand: put her back where she was.
+  const onRoot = document.getElementById("modeCards") || document.getElementById("homeSections");
+  if(onRoot && autoResume()){ refreshTop(); return; }
   // refresh the root screen in place once live content + structure arrive: the picker re-decides
   // (bands may just have appeared), and a Home the user actually CHOSE stays Home
   if(document.getElementById("modeCards")) renderModeHome();
