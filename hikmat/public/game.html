@@ -462,6 +462,13 @@
   .pcard.matched { border-color:var(--good); background:#eafaf2; }
   [data-theme="dark"] .pcard.up { background:#2a2240; }
   [data-theme="dark"] .pcard.matched { background:#15341f; }
+  /* Browse-mode picker: a mode card plus its per-mode "continue where you left off" chip */
+  .modecell { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .modecell .theme { width:100%; }
+  .continuechip { border:2px solid var(--line); background:var(--card); color:var(--ink); border-radius:999px;
+    padding:9px 14px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:var(--shadow-sm);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; transition:transform .06s; }
+  .continuechip:active { transform:translateY(2px); }
   /* First-time "how to play" coaching screen */
   .coach .display { margin-top:14px; }
   .coach .actico { font-size:84px; line-height:1; text-align:center; }
@@ -1819,6 +1826,8 @@ function mergeSavedState(into, from){
   }
   into.videosSeen = Object.assign({}, from.videosSeen || {}, into.videosSeen || {});
   into.seenTypes = Object.assign({}, from.seenTypes || {}, into.seenTypes || {});   // coached once anywhere = coached
+  into.lastLoc = Object.assign({}, from.lastLoc || {}, into.lastLoc || {});         // resume points: the state she now uses wins
+  if(!into.lastMode && from.lastMode) into.lastMode = from.lastMode;
   return into;
 }
 
@@ -2214,6 +2223,10 @@ function tx(en, hi){ return state.lang === "hi" ? gform(hi) : en; }
 // pointer to re-render the current screen (so the language toggle updates live)
 let rerender = function(){};
 let showAllClasses = false;   // a logged-in student sees only their class group until they tap "See other classes"
+// Which browse STYLE she is currently inside: "class" (grade bands), "subject" (subject →
+// beginner/intermediate/advanced), or "life" (the thematic tracks). The lesson map records her
+// position under this key, so each style keeps its own resume point (Vishal, 2026-08-31).
+let browseMode = "class";
 
 // ---------- Sonic identity: tiny offline Web-Audio sound kit ----------
 // One warm timbre + a major-pentatonic scale, so every cue is consonant and
@@ -3436,15 +3449,201 @@ function profileRows(host){
 }
 
 // HOME — "By Class" grade bands on top, the original thematic tracks as "Life Skills" below.
-function renderHome(){
+// ---- Browse-mode picker: the app's first screen ----
+// Three doors into the same curriculum: by CLASS (the grade bands), by SUBJECT (subject →
+// beginner/intermediate/advanced, the same courses pivoted), or LIFE SKILLS (the thematic
+// tracks). Each door also carries a "continue" chip — her position is saved per mode, so she
+// can switch styles when one feels boring and come back to the other exactly where she left it.
+const BAND_LEVELS = [
+  { band:"1-4",  title:"Beginner",     titleHi:"शुरुआती", icon:"🌱" },
+  { band:"5-8",  title:"Intermediate", titleHi:"मध्यम",   icon:"🌟" },
+  { band:"9-10", title:"Advanced",     titleHi:"उन्नत",   icon:"🎓" },
+];
+function subjectsWithContent(){
+  const present = new Set(COURSES.filter(c => c.subject && c.published && c.lessons.length).map(c => c.subject));
+  return SUBJECTS.filter(s => present.has(s.key));
+}
+// Resolve a saved per-mode position against the CURRENT curriculum — content may have moved on.
+function resumeLoc(mode){
+  const loc = (state.lastLoc || {})[mode];
+  if(!loc) return null;
+  const c = COURSES.find(x => x.key === loc.ck);
+  if(!c || !c.published || !c.lessons.length) return null;
+  const ls = c.lessons.find(l => l.key === loc.lk);
+  return ls ? { c, ls } : null;
+}
+function resumeMode(mode){
+  const r = resumeLoc(mode);
+  if(!r){ renderModeHome(); return; }
+  browseMode = mode;
+  const subj = SUBJECTS.find(s => s.key === r.c.subject);
+  const back = mode === "life"    ? { label: "← " + tx("Life Skills","जीवन कौशल"), fn: renderLifeSkills }
+             : mode === "subject" ? (subj ? { label: "← " + tx(subj.title, subj.titleHi), fn: () => renderSubjectLevels(subj) }
+                                          : { label: "← " + tx("Subjects","विषय"), fn: renderSubjectsHome })
+             :                      { label: "← " + tx("Home","घर"), fn: renderHome };
+  if(!guestGate(r.c, r.ls, back)) return;      // the same doors a lesson tap passes through
+  if(!testGate(r.c, r.ls, back)) return;
+  renderLessonMap(r.c, r.ls, back);
+}
+function modeCard(mode, iconHtml, title, sub, color, openFn){
+  const wrap = el(`<div class="modecell"></div>`);
+  const node = el(`<button class="theme" style="--tc:${col(color)};background:${col(color)}14;border-color:${col(color)}55">
+    <div class="big">${iconHtml}</div>
+    <h3>${esc(title)}</h3>
+    <small>${esc(sub)}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); openFn(); };
+  wrap.appendChild(node);
+  const r = resumeLoc(mode);
+  if(r){
+    const chip = el(`<button class="continuechip">▶ ${esc(tx("Continue: ","आगे: ") + tx(r.ls.title, r.ls.titleHi))}</button>`);
+    chip.onclick = () => { sfx.enter(); resumeMode(mode); };
+    wrap.appendChild(chip);
+  }
+  return wrap;
+}
+let pickerSkipped = false;   // true while Home is standing in for the picker (no band content yet)
+function renderModeHome(){
   stopSpeech();
-  rerender = renderHome;
+  const bandsHave = BANDS.some(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
+  const lifeHave  = lifeSkillsTracks().some(c => c.published && c.lessons.length);
+  // one door → no doorway screen (a site with only thematic tracks keeps its old single home).
+  // The bundled fallback often has no band courses at boot; when the real curriculum arrives a
+  // moment later, the refresh below re-runs this decision (see pickerSkipped).
+  if(!bandsHave){ pickerSkipped = true; renderHome(); return; }
+  pickerSkipped = false;
+  rerender = renderModeHome;
   root.innerHTML = "";
   setBack(null);
+  const guest = !currentStudent;
+  const heroH1 = guest ? tx("How do you want to learn? ✨","कैसे सीखना चाहोगी? ✨")
+                       : tx("Welcome back, "+currentStudent.name+"! ✨","वापसी पर स्वागत है, "+currentStudent.name+"! ✨");
+  const heroP = tx("By class, by subject — or everyday life skills. Switch any time: each door remembers your place.",
+                   "कक्षा से, विषय से — या रोज़मर्रा के जीवन कौशल। कभी भी बदलो: हर दरवाज़ा तुम्हारी जगह याद रखता है।");
+  const s = el(`<div class="screen">
+    <div class="hero hero-guide">
+      <div class="roshni">${mascotSVG()}</div>
+      <div class="herotext"><h1>${esc(heroH1)}</h1><p>${esc(heroP)}</p></div>
+    </div>
+    <div class="themes" id="modeCards"></div>
+  </div>`);
+  root.appendChild(s);
+  setNarration((heroH1 + ". " + heroP).replace(/✨/g, ""), (heroH1 + ". " + heroP).replace(/✨/g, ""));
+  const wrap = $("#modeCards");
+  wrap.appendChild(modeCard("class", "🏫", tx("By Class","कक्षा से"),
+    tx("Class 1–4 · 5–8 · 9–10","कक्षा 1–4 · 5–8 · 9–10"), "#f59e0b", renderHome));
+  if(subjectsWithContent().length)
+    wrap.appendChild(modeCard("subject", "📚", tx("By Subject","विषय से"),
+      tx("English, Maths, Science…","अंग्रेज़ी, गणित, विज्ञान…"), "#8b5cf6", renderSubjectsHome));
+  if(lifeHave)
+    wrap.appendChild(modeCard("life", iconFor("lifeskills","🌼"), tx("Life Skills","जीवन कौशल"),
+      tx("Home, market, school & work","घर, बाज़ार, स्कूल और काम"), "#e11d48", renderLifeSkills));
+  refreshTop();
+}
+
+// SUBJECT-WISE flow: subjects across ALL bands, then a level (beginner/intermediate/advanced),
+// which is the same band structure wearing learner-facing names.
+function subjectCardAll(subj){
+  const tracks = COURSES.filter(c => c.subject === subj.key && c.published && c.lessons.length);
+  const {earned, max} = progressOf(tracks);
+  const lessons = tracks.reduce((a,c) => a + c.lessons.length, 0);
+  const node = el(`<button class="theme" style="--tc:${col(subj.color)};background:${col(subj.color)}14;border-color:${col(subj.color)}55">
+    <div class="big">${iconFor("subject:"+subj.key, subj.icon)}</div>
+    <h3>${esc(tx(subj.title, subj.titleHi))}</h3>
+    <small>${earned>0 ? `<span class="staricon">★</span> ${earned}/${max}` : tx(lessons+" lessons", lessons+" पाठ")}</small>
+  </button>`);
+  node.onclick = () => { sfx.enter(); renderSubjectLevels(subj); };
+  return node;
+}
+function renderSubjectsHome(){
+  stopSpeech();
+  browseMode = "subject";
+  rerender = renderSubjectsHome;
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>📚 ${tx("Choose a subject","कोई विषय चुनो")}</h2>
+      <div class="sub">${tx("Then pick your level — beginner to advanced","फिर अपना स्तर चुनो — शुरुआती से उन्नत तक")}</div></div>
+    </div>
+    <div class="themes" id="subjects"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack("← " + tx("Back","वापस"), renderModeHome);
+  setNarration(tx("Choose a subject.","कोई विषय चुनो।"), tx("Choose a subject.","कोई विषय चुनो।"));
+  const wrap = $("#subjects");
+  subjectsWithContent().forEach(subj => wrap.appendChild(subjectCardAll(subj)));
+  refreshTop();
+}
+function renderSubjectLevels(subj){
+  stopSpeech();
+  browseMode = "subject";
+  rerender = () => renderSubjectLevels(subj);
+  const levels = BAND_LEVELS.filter(L =>
+    COURSES.some(c => c.subject === subj.key && c.band === L.band && c.published && c.lessons.length));
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>${iconFor("subject:"+subj.key, subj.icon)} ${esc(tx(subj.title, subj.titleHi))}</h2>
+      <div class="sub">${tx("Choose your level","अपना स्तर चुनो")}</div></div>
+    </div>
+    <div class="themes" id="levels"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack("← " + tx("Subjects","विषय"), renderSubjectsHome);
+  setNarration(tx(subj.title, subj.titleHi)+". "+tx("Choose your level.","अपना स्तर चुनो।"),
+               tx(subj.title, subj.titleHi)+". "+tx("Choose your level.","अपना स्तर चुनो।"));
+  const wrap = $("#levels");
+  levels.forEach(L => {
+    const band = BANDS.find(b => b.key === L.band) || { color:"#8b5cf6", title:L.band, titleHi:L.band };
+    const tracks = COURSES.filter(c => c.subject === subj.key && c.band === L.band && c.published && c.lessons.length);
+    const {earned, max} = progressOf(tracks);
+    const lessons = tracks.reduce((a,c) => a + c.lessons.length, 0);
+    const node = el(`<button class="theme" style="--tc:${col(band.color)};background:${col(band.color)}14;border-color:${col(band.color)}55">
+      <div class="big">${esc(L.icon)}</div>
+      <h3>${esc(tx(L.title, L.titleHi))}</h3>
+      <small>${esc(tx(band.title, band.titleHi))}${earned>0 ? ` · <span class="staricon">★</span> ${earned}/${max}` : ` · ${tx(lessons+" lessons", lessons+" पाठ")}`}</small>
+    </button>`);
+    node.onclick = () => { sfx.enter(); renderSubjectLevelTracks(subj, L); };
+    wrap.appendChild(node);
+  });
+  refreshTop();
+}
+function renderSubjectLevelTracks(subj, L){
+  const tracks = COURSES.filter(c => c.subject === subj.key && c.band === L.band && c.published && c.lessons.length);
+  const back = { label: "← " + tx(subj.title, subj.titleHi), fn: () => renderSubjectLevels(subj) };
+  // today every subject+level is exactly one course — go straight to its lessons; the topic
+  // chooser below wakes up by itself the day a level grows a second course
+  if(tracks.length === 1){ renderTrack(tracks[0], back); return; }
+  stopSpeech();
+  browseMode = "subject";
+  rerender = () => renderSubjectLevelTracks(subj, L);
+  root.innerHTML = "";
+  const s = el(`<div class="screen">
+    <div class="maphead"><div>
+      <h2>${esc(L.icon)} ${esc(tx(subj.title, subj.titleHi))} · ${esc(tx(L.title, L.titleHi))}</h2>
+      <div class="sub">${tx("Choose a topic","कोई विषय-वस्तु चुनो")}</div></div>
+    </div>
+    <div class="themes" id="tracks"></div>
+  </div>`);
+  root.appendChild(s);
+  setBack(back.label, back.fn);
+  const inner = { label: "← " + tx(L.title, L.titleHi), fn: () => renderSubjectLevelTracks(subj, L) };
+  tracks.forEach(c => $("#tracks").appendChild(trackCard(c, inner)));
+  refreshTop();
+}
+
+function renderHome(){
+  stopSpeech();
+  browseMode = "class";
+  rerender = renderHome;
+  root.innerHTML = "";
   const guest = !currentStudent;
   // Which grade bands actually have content; and the student's own band (if logged in).
   const bandList = BANDS.filter(b => bandTracks(b.key).some(c => c.published && c.lessons.length));
   const haveBands = bandList.length > 0;
+  // With bands present, Home is the CLASS door and backs out to the mode picker; without them
+  // the picker never shows (renderModeHome delegates here), so Home stays the root screen.
+  if(haveBands) setBack("← " + tx("Back","वापस"), renderModeHome); else setBack(null);
   const myBand = (currentStudent && currentStudent.band) || "";
   const hasMy = haveBands && bandList.some(b => b.key === myBand);
   const heroH1 = guest
@@ -3552,6 +3751,7 @@ function renderSubject(band, subj){
 // LIFE SKILLS screen — the original thematic tracks (Bazaar / At Home / At School / At Work).
 function renderLifeSkills(){
   stopSpeech();
+  browseMode = "life";
   rerender = renderLifeSkills;
   root.innerHTML = "";
   const s = el(`<div class="screen">
@@ -3562,7 +3762,9 @@ function renderLifeSkills(){
     <div class="themes" id="tracks"></div>
   </div>`);
   root.appendChild(s);
-  setBack(tx("← Home","← घर"), renderHome);
+  // Back goes to whichever screen makes sense as "up": the mode picker when the bands exist
+  // (Life Skills is then a sibling door), the old Home otherwise.
+  setBack("← " + tx("Back","वापस"), BANDS.some(b => bandTracks(b.key).some(c => c.published && c.lessons.length)) ? renderModeHome : renderHome);
   setNarration(tx("Life Skills. Everyday English for home, market, school and work.","जीवन कौशल। घर, बाज़ार, स्कूल और काम की रोज़मर्रा अंग्रेज़ी।"), tx("Life Skills. Everyday English for home, market, school and work.","जीवन कौशल। घर, बाज़ार, स्कूल और काम की रोज़मर्रा अंग्रेज़ी।"));
   const back = { label: "← " + tx("Life Skills","जीवन कौशल"), fn: renderLifeSkills };
   const wrap = $("#tracks");
@@ -3904,6 +4106,11 @@ function renderVideo(course, back, lesson){
 function renderLessonMap(course, lesson, back){
   stopSpeech();
   rerender = () => renderLessonMap(course, lesson, back);
+  // Remember where she is, PER BROWSE MODE — switching from subject-wise to class-wise and
+  // back must land each style exactly where it left off, not where the other one went.
+  state.lastMode = browseMode;
+  (state.lastLoc = state.lastLoc || {})[browseMode] = { ck: course.key, lk: lesson.key };
+  save();
   root.innerHTML = "";
   const s = el(`<div class="screen">
     <div class="maphead">
@@ -8313,7 +8520,8 @@ state.theme = state.theme || "light";
 state.testSeen = state.testSeen || {};       // states saved before module tests existed
 state.testPassed = state.testPassed || {};
 state.videosSeen = state.videosSeen || {};
-renderHome();          // instant: bundled or cached content, fully offline
+state.lastLoc = state.lastLoc || {};         // per-browse-mode resume positions (class / subject / life)
+renderModeHome();      // instant: bundled or cached content, fully offline
 if(AUTH_ENABLED) attInit();   // attendance clock for an already-logged-in reload (no-op for guests)
 // One-shot cleanup for the removed Bhojpuri AI / Boli section. A device that ran an older
 // build can still be holding recorded audio blobs in IndexedDB plus a queue of unsent
@@ -8347,7 +8555,10 @@ loadFromBackend().then(async ok => {
   // up the one screen Google cannot fill in; either way it owns the screen and Home must not
   // paint over it. It is a no-op unless a handshake was actually started from this device.
   if(AUTH_ENABLED && ok && !currentStudent && await resumeSocialSignup()){ refreshTop(); return; }
-  if(document.getElementById("homeSections")) renderHome();   // refresh home in place once live content + structure arrive
+  // refresh the root screen in place once live content + structure arrive: the picker re-decides
+  // (bands may just have appeared), and a Home the user actually CHOSE stays Home
+  if(document.getElementById("modeCards")) renderModeHome();
+  else if(document.getElementById("homeSections")) (pickerSkipped ? renderModeHome : renderHome)();
   refreshTop();
 });
 
