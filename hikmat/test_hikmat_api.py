@@ -4294,6 +4294,28 @@ class TestLessonExtras(FrappeTestCase):
 		self.assertEqual(lesson["key"], "x01")          # the lesson still ships
 		self.assertNotIn("pairs", lesson)
 
+	def test_every_track_carries_rotation_extras(self):
+		# the 2026-08-31 rollout: every published track has extras, every lesson's extras parse,
+		# and the whole curriculum uses a wide spread of the 19 activity types
+		KEYS = {"pairs", "odd", "sort", "sounds", "rhyme", "dictate", "translate", "branch",
+		        "story", "cloze", "notice", "rapid", "count", "money", "clock", "order",
+		        "scam", "hunt", "form"}
+		courses = api._build_courses()
+		self.assertGreaterEqual(len(courses), 26)
+		used = set()
+		lessons_with = 0
+		for c in courses:
+			track_used = set()
+			for lesson in c["lessons"]:
+				got = KEYS & set(lesson.keys())
+				if got:
+					lessons_with += 1
+					track_used |= got
+			self.assertTrue(track_used, f"track {c['key']} has no rotation extras")
+			used |= track_used
+		self.assertGreaterEqual(lessons_with, 270)
+		self.assertEqual(used, KEYS, f"types never used: {KEYS - used}")
+
 	def test_the_bazaar_pilot_carries_the_rotation(self):
 		# the seeded curriculum itself: l01 pairs, l02 sort, l03 odd+sort — each with a skip
 		baz = next(c for c in api._build_courses() if c["key"] == "bazaar")

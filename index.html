@@ -467,6 +467,101 @@
   .coach .actico { font-size:84px; line-height:1; text-align:center; }
   .coach .actico svg { width:104px; height:104px; }
   .coach .actionrow { justify-content:center; margin-top:18px; }
+  /* Quick Fire / Safe-or-Not — a statement card and two big verdict buttons */
+  .rapidcard { position:relative; background:var(--card); border:2px solid var(--line); border-radius:16px;
+               padding:22px 46px 22px 18px; margin:8px auto 14px; max-width:520px; box-shadow:var(--shadow-sm); }
+  .rapidtext { font-size:20px; font-weight:800; line-height:1.45; }
+  .rapidcard .speakchip, .scamcard .speakchip, .noticedoc .noticesay { position:absolute; right:10px; top:10px; }
+  .rapidbtns { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:520px; margin:0 auto 10px; }
+  .rapidbtn { border-radius:16px; border:2px solid var(--line); background:var(--card); cursor:pointer;
+              padding:20px 10px; font-size:19px; font-weight:900; box-shadow:var(--shadow-sm); transition:transform .06s; }
+  .rapidbtn:active { transform:translateY(3px); }
+  .rapidbtn.yes { color:var(--good-d); border-color:var(--good); }
+  .rapidbtn.no  { color:var(--bad-d);  border-color:var(--bad); }
+  .rapidbtn.correct { background:#eafaf2; }
+  .rapidbtn.wrong   { background:#fff0f0; }
+  .rapidbtn.disabled { pointer-events:none; opacity:.85; }
+  [data-theme="dark"] .rapidbtn.correct { background:#15341f; }
+  [data-theme="dark"] .rapidbtn.wrong   { background:#3a1622; }
+  /* Complete the Story — the sentence with its gap */
+  .clozecard { background:var(--card); border:2px solid var(--line); border-radius:16px; padding:20px 18px;
+               margin:8px auto 14px; max-width:560px; font-size:20px; font-weight:700; line-height:1.7; box-shadow:var(--shadow-sm); }
+  .clozegap { display:inline-block; min-width:84px; text-align:center; margin:0 4px; padding:0 8px;
+              border-bottom:3px dashed var(--grape); font-weight:900; color:var(--grape); }
+  .clozegap.good { color:var(--good-d); border-bottom-color:var(--good); border-bottom-style:solid; }
+  .clozegap.bad  { color:var(--bad-d);  border-bottom-color:var(--bad); }
+  .clozehi { margin-top:10px; font-size:15px; font-weight:600; opacity:.75; }
+  /* Story Time — the passage revealed after answering */
+  .storyreveal { display:flex; gap:8px; background:var(--card); border:2px solid var(--line); border-radius:14px;
+                 padding:14px 16px; margin:4px auto 12px; max-width:560px; font-size:16px; line-height:1.6; text-align:left; }
+  .storyq { margin:6px auto 10px; max-width:560px; }
+  /* Read the Notice — paper realia */
+  .noticedoc { position:relative; background:#fffdf2; border:2px solid #e3d5ae; border-radius:6px;
+               padding:16px 44px 14px 18px; margin:8px auto 14px; max-width:560px; text-align:left;
+               box-shadow:0 6px 16px -8px rgba(90,70,20,.35); color:#3d3320; }
+  .noticetitle { font-weight:900; font-size:17px; border-bottom:2px solid #e3d5ae; padding-bottom:6px; margin-bottom:8px; }
+  .noticeline { font-size:16px; font-weight:600; line-height:1.7; }
+  [data-theme="dark"] .noticedoc { background:#2e2a1c; border-color:#57503a; color:#efe8d0; box-shadow:none; }
+  [data-theme="dark"] .noticetitle { border-color:#57503a; }
+  /* Safe or Not — the phone message */
+  .scamcard { position:relative; background:var(--card); border:2px solid var(--line); border-radius:16px;
+              padding:14px 46px 16px 16px; margin:8px auto 14px; max-width:520px; text-align:left; box-shadow:var(--shadow-sm); }
+  .scamfrom { font-size:13px; font-weight:800; color:var(--muted); margin-bottom:8px; }
+  .scammsg { font-size:18px; font-weight:700; line-height:1.5; }
+  /* Count & Solve */
+  .countrow { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; font-size:36px; line-height:1.2;
+              max-width:440px; margin:6px auto; }
+  .countrow .citem.faded { opacity:.28; filter:grayscale(1); }
+  .countop { text-align:center; font-size:30px; font-weight:900; color:var(--muted); }
+  .countopt { font-variant-numeric:tabular-nums; }
+  /* Count the Money */
+  .moneyrow { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; margin:8px auto 14px; max-width:520px; }
+  .moneyrow svg.coin { width:52px; height:52px; }
+  .moneyrow svg.note { width:96px; height:44px; }
+  .mtray { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:6px auto; max-width:560px; }
+  .mden { background:none; border:none; padding:2px; cursor:pointer; border-radius:10px; transition:transform .06s; }
+  .mden:active { transform:translateY(2px); }
+  .mden svg.coin { width:48px; height:48px; }
+  .mden svg.note { width:86px; height:40px; }
+  .purse { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; align-items:center; min-height:64px;
+           background:var(--card); border:2px dashed var(--line); border-radius:16px; padding:10px; margin:10px auto; max-width:560px; }
+  .mtotal { text-align:center; font-size:19px; font-weight:900; margin-bottom:8px; }
+  /* Read the Clock */
+  .clockwrap { display:flex; justify-content:center; margin:6px auto 14px; }
+  .clockwrap svg { width:180px; height:180px; }
+  [data-theme="dark"] .clockface circle:first-of-type { fill:#2a2240; }
+  [data-theme="dark"] .clockface line { stroke:#cfc8e6; }
+  [data-theme="dark"] .clockface line[stroke="#e8714f"] { stroke:#ff9b7d; }
+  /* Order the Steps */
+  .orderslots { display:flex; flex-direction:column; gap:8px; max-width:560px; margin:6px auto 12px; }
+  .ordercard { display:flex; align-items:center; gap:10px; text-align:left; width:100%;
+               background:var(--card); border:2px solid var(--line); border-radius:14px; padding:12px 14px;
+               font-size:16px; font-weight:700; cursor:pointer; box-shadow:var(--shadow-sm); transition:transform .06s; }
+  .ordercard:active { transform:translateY(2px); }
+  .ordercard.placed { border-color:var(--grape); }
+  .ordercard.empty { border-style:dashed; color:var(--muted); box-shadow:none; cursor:default; }
+  .ordercard .onum { flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--grape); color:#fff;
+                     display:grid; place-items:center; font-size:14px; font-weight:900; }
+  .ordercard.empty .onum { background:var(--line); color:var(--muted); }
+  .ordercard .oemo { font-size:24px; }
+  .orderbank { display:flex; flex-direction:column; gap:8px; max-width:560px; margin:0 auto; }
+  /* Word Hunt */
+  .huntgrid { display:grid; gap:4px; max-width:440px; margin:8px auto 12px; }
+  .hcell { aspect-ratio:1; border-radius:8px; border:2px solid var(--line); background:var(--card);
+           font-size:16px; font-weight:900; color:var(--ink); cursor:pointer; padding:0;
+           display:grid; place-items:center; transition:background .1s, border-color .1s; }
+  .hcell.sel { border-color:var(--grape); background:var(--grape); color:#fff; }
+  .hcell.found { border-color:var(--good); background:#eafaf2; color:var(--good-d); }
+  [data-theme="dark"] .hcell.found { background:#15341f; }
+  .huntwords { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:8px; }
+  .hword { background:var(--card); border:2px solid var(--line); border-radius:999px; padding:6px 14px;
+           font-weight:800; font-size:15px; }
+  .hword small { display:block; font-size:11px; font-weight:600; opacity:.7; }
+  .hword.done { text-decoration:line-through; border-color:var(--good); color:var(--good-d); }
+  /* Fill the Form (borrows the email paper) */
+  .formdoc .formtitle { font-weight:900; font-size:17px; justify-content:center; text-align:center; }
+  /* Translate It */
+  .transhi { font-size:20px; font-weight:800; }
   /* Class 1–10 home sections + Quiz activity */
   .sectionhead { font-size:14px; font-weight:900; color:var(--muted); letter-spacing:.04em;
                  text-transform:uppercase; margin:22px 4px 10px; }
@@ -1043,6 +1138,38 @@ window.HIKMAT_ICONS = {
 
   "act:sort": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-srt-l" x1="8" y1="36" x2="26" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f4e6cf"/></linearGradient><linearGradient id="hk-srt-r" x1="38" y1="36" x2="56" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff2d6"/></linearGradient></defs><circle cx="32" cy="12" r="5.5" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><path d="M33 6c2-3 5-3 5-3" fill="none" stroke="#7cc36a" stroke-width="2" stroke-linecap="round"/><path d="M28 20c-4 3-8 6-11 8" fill="none" stroke="#f2b134" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 5"/><path d="M18 26l-2 4 4-1" fill="none" stroke="#f2b134" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 34h22l-2.4 14a4.4 4.4 0 0 1-4.3 3.8h-8.6a4.4 4.4 0 0 1-4.3-3.8z" fill="url(#hk-srt-l)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M35 34h22l-2.4 14a4.4 4.4 0 0 1-4.3 3.8h-8.6a4.4 4.4 0 0 1-4.3-3.8z" fill="url(#hk-srt-r)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 34h22M35 34h22" stroke="#00000026" stroke-width="1.6"/><g stroke="#c9a86a" stroke-width="1.6" opacity=".6"><path d="M13 38l-1 9M18 38v9M23 38l1 9"/></g><g stroke="#8fbf78" stroke-width="1.6" opacity=".6"><path d="M41 38l-1 9M46 38v9M51 38l1 9"/></g></svg>`,
 
+  "act:sounds": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-snd2" x1="10" y1="18" x2="34" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient></defs><path d="M10 26h8l11-9v30l-11-9h-8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="url(#hk-snd2)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g fill="none" stroke="#4a90d9" stroke-width="2.8" stroke-linecap="round"><path d="M37 24c3 5 3 11 0 16"/></g><g fill="none" stroke="#e8714f" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="3 4"><path d="M45 19c5 8 5 18 0 26"/></g><circle cx="52" cy="12" r="3" fill="#f2b134"/></svg>`,
+
+  "act:rhyme": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-rhy" x1="14" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9fc6ee"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M22 44V16l24-6v28" fill="none" stroke="url(#hk-rhy)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="16" cy="45" rx="7" ry="5.5" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><ellipse cx="40" cy="39" rx="7" ry="5.5" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><path d="M50 48c3 2 6 2 8 0" fill="none" stroke="#7cc36a" stroke-width="2.4" stroke-linecap="round"/><path d="M50 54c3 2 6 2 8 0" fill="none" stroke="#7cc36a" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+
+  "act:dictate": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-dic" x1="10" y1="10" x2="30" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe6da"/></linearGradient></defs><path d="M24 8c-7 0-12 5-12 12 0 5 2.4 6.4 2.4 10 0 4.6 3 7 7 7 3 0 4.6-2.3 4.6-5.4 0-2.3 1.5-3 3-4.6 3-3 4.6-4.6 4.6-9 0-5.5-4-10-9.6-10z" fill="url(#hk-dic)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 20a5 5 0 0 1 8.5 3c0 3-3 3-3 6" fill="none" stroke="#e8714f" stroke-width="2.2" stroke-linecap="round"/><path d="M52 26 30 48l-2 8 8-2 22-22a4.2 4.2 0 0 0-6-6z" fill="#f2b134" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M48 30l6 6" stroke="#00000026" stroke-width="1.6"/><g stroke="#9fb6d4" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M40 12h14M46 18h10"/></g></svg>`,
+
+  "act:translate": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-trn-a" x1="6" y1="10" x2="34" y2="34" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ffe2d2"/></linearGradient><linearGradient id="hk-trn-b" x1="30" y1="28" x2="58" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d8eafc"/></linearGradient></defs><path d="M8 10h24a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H18l-7 6 1-6h-4a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="url(#hk-trn-a)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><text x="21" y="25" font-family="Arial,sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="#e8714f">अ</text><path d="M56 28H32a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h14l7 6-1-6h4a4 4 0 0 0 4-4V32a4 4 0 0 0-4-4z" fill="url(#hk-trn-b)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><text x="43" y="43" font-family="Arial,sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="#4a90d9">A</text><path d="M40 20c6 0 8 2 8 6M24 44c-6 0-8-2-8-6" fill="none" stroke="#f2b134" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+
+  "act:branch": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-brn" x1="12" y1="8" x2="44" y2="34" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient></defs><path d="M14 8h30a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H26l-8 7 1-7h-5a5 5 0 0 1-5-5V13a5 5 0 0 1 5-5z" fill="url(#hk-brn)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><g fill="#4a90d9"><circle cx="22" cy="18" r="2"/><circle cx="29" cy="18" r="2"/><circle cx="36" cy="18" r="2"/></g><path d="M32 36v6M32 42c0 4-6 4-10 6M32 42c0 4 6 4 10 6" fill="none" stroke="#00000033" stroke-width="2.2" stroke-linecap="round"/><circle cx="18" cy="52" r="6" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M15 52l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="46" cy="52" r="6" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><path d="M44 52h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+
+  "act:story": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-sty" x1="14" y1="10" x2="50" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9fc6ee"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M14 38v-6a18 18 0 0 1 36 0v6" fill="none" stroke="url(#hk-sty)" stroke-width="5" stroke-linecap="round"/><rect x="9" y="36" width="12" height="18" rx="6" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><rect x="43" y="36" width="12" height="18" rx="6" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><path d="M27 45c2-2 8-2 10 0" fill="none" stroke="#f2b134" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="50" r="2" fill="#f2b134"/></svg>`,
+
+  "act:cloze": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-clz" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient></defs><rect x="10" y="10" width="44" height="44" rx="8" fill="url(#hk-clz)" stroke="#00000026" stroke-width="1.6"/><g stroke="#9fb6d4" stroke-width="2.6" stroke-linecap="round"><path d="M17 21h30M17 29h11M40 29h7M17 45h22"/></g><path d="M30 27h8v5h-8z" fill="none" stroke="#e8714f" stroke-width="2" stroke-dasharray="3 3"/><rect x="24" y="34" width="16" height="7" rx="3" fill="#f2b134" stroke="#00000022" stroke-width="1.4"/><path d="M32 34v-3" stroke="#00000033" stroke-width="1.6"/></svg>`,
+
+  "act:notice": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-ntc" x1="14" y1="12" x2="50" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fffdf2"/><stop offset="1" stop-color="#f3e8c8"/></linearGradient></defs><path d="M14 14h36v38l-6 4H14z" fill="url(#hk-ntc)" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><path d="M44 56v-6h6" fill="none" stroke="#00000026" stroke-width="1.6" stroke-linejoin="round"/><circle cx="32" cy="12" r="5" fill="#e8714f" stroke="#00000026" stroke-width="1.6"/><circle cx="32" cy="12" r="1.8" fill="#fff" opacity=".7"/><g stroke="#b09b62" stroke-width="2.2" stroke-linecap="round"><path d="M20 26h24M20 33h24M20 40h15"/></g></svg>`,
+
+  "act:rapid": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-rpd" x1="24" y1="6" x2="40" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd86b"/><stop offset="1" stop-color="#f2a33c"/></linearGradient></defs><path d="M36 6 16 34h12l-4 24 22-32H32z" fill="url(#hk-rpd)" stroke="#c9821f" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="14" r="6" fill="#7cc36a" stroke="#00000022" stroke-width="1.4"/><path d="M9 14l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="53" cy="50" r="6" fill="#e8714f" stroke="#00000022" stroke-width="1.4"/><path d="M50.5 47.5l5 5M55.5 47.5l-5 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+
+  "act:count": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-cnt" x1="34" y1="30" x2="56" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9eafc"/></linearGradient></defs><g stroke="#00000022" stroke-width="1.4"><circle cx="14" cy="16" r="8" fill="#e8714f"/><circle cx="34" cy="14" r="8" fill="#f2b134"/><circle cx="17" cy="37" r="8" fill="#7cc36a"/></g><path d="M12 12c2-3 5-3 5-3M32 10c2-3 5-3 5-3M15 33c2-3 5-3 5-3" fill="none" stroke="#4c6b3c" stroke-width="1.8" stroke-linecap="round" opacity=".6"/><rect x="34" y="32" width="22" height="22" rx="7" fill="url(#hk-cnt)" stroke="#00000026" stroke-width="1.6"/><text x="45" y="49" font-family="Arial,sans-serif" font-size="16" font-weight="800" text-anchor="middle" fill="#4a90d9">3</text></svg>`,
+
+  "act:money": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-mny" x1="8" y1="20" x2="52" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff2d6"/></linearGradient></defs><rect x="6" y="18" width="44" height="26" rx="5" fill="url(#hk-mny)" stroke="#00000026" stroke-width="1.6"/><circle cx="28" cy="31" r="8" fill="#7cc36a" opacity=".35"/><text x="28" y="36" font-family="Arial,sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="#4c8a3c">₹</text><circle cx="47" cy="43" r="11" fill="#d8d8de" stroke="#9a9aa6" stroke-width="1.8"/><circle cx="47" cy="43" r="7.5" fill="none" stroke="#b8b8c2" stroke-width="1.2"/><text x="47" y="47.5" font-family="Arial,sans-serif" font-size="11" font-weight="800" text-anchor="middle" fill="#565664">₹5</text></svg>`,
+
+  "act:clock": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-clk" x1="14" y1="12" x2="50" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9eef6"/></linearGradient></defs><circle cx="32" cy="32" r="24" fill="url(#hk-clk)" stroke="#00000026" stroke-width="1.8"/><g stroke="#8a8a96" stroke-width="2" stroke-linecap="round"><path d="M32 12v4M52 32h-4M32 52v-4M12 32h4"/></g><path d="M32 32V20" stroke="#2d3436" stroke-width="3.6" stroke-linecap="round"/><path d="M32 32l9 6" stroke="#e8714f" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="32" r="2.4" fill="#2d3436"/><circle cx="49" cy="13" r="2.2" fill="#f2b134"/></svg>`,
+
+  "act:order": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-ord" x1="10" y1="14" x2="50" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient></defs><g stroke="#00000026" stroke-width="1.6"><rect x="8" y="40" width="34" height="12" rx="5" fill="url(#hk-ord)"/><rect x="14" y="24" width="34" height="12" rx="5" fill="url(#hk-ord)"/><rect x="20" y="8" width="34" height="12" rx="5" fill="url(#hk-ord)"/></g><g font-family="Arial,sans-serif" font-size="9" font-weight="800" text-anchor="middle"><circle cx="15" cy="46" r="4.6" fill="#e8714f"/><text x="15" y="49" fill="#fff">1</text><circle cx="21" cy="30" r="4.6" fill="#f2b134"/><text x="21" y="33" fill="#fff">2</text><circle cx="27" cy="14" r="4.6" fill="#7cc36a"/><text x="27" y="17" fill="#fff">3</text></g><g stroke="#9fb6d4" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M23 46h13M29 30h13M35 14h13"/></g></svg>`,
+
+  "act:scam": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-scm" x1="16" y1="8" x2="48" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9fc6ee"/><stop offset="1" stop-color="#4a90d9"/></linearGradient></defs><path d="M32 6l20 7v14c0 13-8 24-20 29C20 51 12 40 12 27V13z" fill="url(#hk-scm)" stroke="#2f6ba8" stroke-width="1.8" stroke-linejoin="round"/><path d="M32 6l20 7v14c0 13-8 24-20 29z" fill="#00000014"/><path d="M32 18v14" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><circle cx="32" cy="41" r="2.8" fill="#fff"/><path d="M18 14l8-3" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/></svg>`,
+
+  "act:hunt": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-hnt" x1="10" y1="10" x2="46" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient><linearGradient id="hk-hnt-gl" x1="30" y1="30" x2="52" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="8" fill="url(#hk-hnt)" stroke="#00000026" stroke-width="1.6"/><g font-family="Arial,sans-serif" font-size="10" font-weight="800" text-anchor="middle" fill="#8a97ad"><text x="17" y="21">C</text><text x="28" y="21">A</text><text x="39" y="21">T</text><text x="17" y="34">M</text><text x="39" y="34">R</text><text x="17" y="45">B</text><text x="28" y="45">X</text></g><rect x="12" y="13" width="33" height="11" rx="5.5" fill="none" stroke="#e8714f" stroke-width="2.2"/><circle cx="40" cy="40" r="10" fill="url(#hk-hnt-gl)" fill-opacity=".5" stroke="#f2b134" stroke-width="2.4"/><path d="M47 47l8 8" stroke="#f2b134" stroke-width="3.6" stroke-linecap="round"/></svg>`,
+
+  "act:form": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-frm" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef3fb"/></linearGradient></defs><rect x="12" y="10" width="40" height="46" rx="7" fill="url(#hk-frm)" stroke="#00000026" stroke-width="1.6"/><rect x="24" y="5" width="16" height="9" rx="4" fill="#4a90d9" stroke="#00000022" stroke-width="1.4"/><g stroke="#9fb6d4" stroke-width="2" stroke-linecap="round"><path d="M19 24h12M35 24h10M19 33h12M35 33h10"/></g><path d="M19 41h26" stroke="#9fb6d4" stroke-width="2" stroke-linecap="round" opacity=".6"/><rect x="18" y="45" width="8" height="8" rx="2" fill="none" stroke="#7cc36a" stroke-width="2"/><path d="M20 49l2 2 4-5" fill="none" stroke="#7cc36a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 49h13" stroke="#e8714f" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+
   "gem": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-gem-t" x1="20" y1="14" x2="44" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9be9ff"/><stop offset="1" stop-color="#4ec8e8"/></linearGradient><linearGradient id="hk-gem-b" x1="14" y1="24" x2="40" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3fb6e0"/><stop offset="1" stop-color="#2c84c4"/></linearGradient></defs><path d="M20 12h24l10 14-22 26L12 26z" fill="url(#hk-gem-b)" stroke="#1f6aa8" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 12h24l-3 14H23z" fill="url(#hk-gem-t)" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M44 12l10 14H41zM20 12L12 26h11z" fill="#6fd6f0" stroke="#1f6aa8" stroke-width="1.4" stroke-linejoin="round"/><path d="M23 26h18l-9 26z" fill="#5cc6ea"/><path d="M23 26l9 26-20-26zM41 26l-9 26 22-26z" fill="#4ab6df"/><path d="M27 16l-4 8" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>`,
 
   "star": `<svg viewBox="0 0 64 64"><defs><linearGradient id="hk-star-g" x1="32" y1="8" x2="32" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff2bd"/><stop offset="1" stop-color="#f5b730"/></linearGradient></defs><path d="M32 8c1.6 0 3 .9 3.7 2.4l5.2 10.6 11.7 1.7c3.4.5 4.8 4.7 2.3 7.1l-8.5 8.3 2 11.6c.6 3.4-3 6-6 4.4L32 49.1l-10.4 5.5c-3 1.6-6.6-1-6-4.4l2-11.6-8.5-8.3c-2.5-2.4-1.1-6.6 2.3-7.1l11.7-1.7 5.2-10.6A4 4 0 0 1 32 8z" fill="url(#hk-star-g)" stroke="#d99a1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 18l-6 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><circle cx="22" cy="32" r="2" fill="#fff" opacity=".5"/></svg>`,
@@ -1501,31 +1628,70 @@ const REPLY_LEVEL = { id:"reply", name:"Reply to the Email", nameHi:"ईमे�
 const PAIRS_LEVEL = { id:"pairs", name:"Match the Pairs", nameHi:"जोड़ी मिलाओ",  sub:"Find word + picture", subHi:"शब्द और तस्वीर की जोड़ी ढूँढो", ico:"🎴", type:"pairs" };
 const ODD_LEVEL   = { id:"odd",   name:"Odd One Out",     nameHi:"अलग कौन?",    sub:"Tap the different one", subHi:"जो अलग है उसे चुनो",        ico:"🔍", type:"odd" };
 const SORT_LEVEL  = { id:"sort",  name:"Sort the Baskets",nameHi:"टोकरी में डालो", sub:"Put each in its place", subHi:"हर चीज़ सही टोकरी में डालो",  ico:"🧺", type:"sort" };
+// The 2026-08-31 wave — sixteen more, same contract: content present → level appears.
+const SOUNDS_LEVEL    = { id:"sounds",    name:"Hear the Difference", nameHi:"ध्यान से सुनो",     sub:"Tap the word you hear",     subHi:"जो शब्द सुनो उसे चुनो",       ico:"🔉", type:"sounds" };
+const RHYME_LEVEL     = { id:"rhyme",     name:"Rhyme Time",          nameHi:"तुक मिलाओ",        sub:"Which one rhymes?",         subHi:"किसकी तुक मिलती है?",         ico:"🎵", type:"rhyme" };
+const DICTATE_LEVEL   = { id:"dictate",   name:"Hear & Write",        nameHi:"सुनो और लिखो",     sub:"Listen, then build it",     subHi:"सुनो, फिर वाक्य बनाओ",        ico:"✍️", type:"dictate" };
+const TRANSLATE_LEVEL = { id:"translate", name:"Translate It",        nameHi:"अनुवाद करो",       sub:"Say it in English",         subHi:"इसे अंग्रेज़ी में बनाओ",       ico:"🌉", type:"translate" };
+const BRANCH_LEVEL    = { id:"branch",    name:"What Would You Say?", nameHi:"तुम क्या कहोगी?",   sub:"Your words shape the story",subHi:"तुम्हारे शब्द कहानी बदलते हैं", ico:"💬", type:"branch" };
+const STORY_LEVEL     = { id:"story",     name:"Story Time",          nameHi:"कहानी सुनो",       sub:"Listen, then answer",       subHi:"सुनो, फिर जवाब दो",           ico:"🎧", type:"story" };
+const CLOZE_LEVEL     = { id:"cloze",     name:"Complete the Story",  nameHi:"कहानी पूरी करो",    sub:"Fill the missing word",     subHi:"छूटा शब्द भरो",              ico:"📝", type:"cloze" };
+const NOTICE_LEVEL    = { id:"notice",    name:"Read the Notice",     nameHi:"सूचना पढ़ो",        sub:"Find the answer in it",     subHi:"इसमें से जवाब ढूँढो",          ico:"📌", type:"notice" };
+const RAPID_LEVEL     = { id:"rapid",     name:"Quick Fire",          nameHi:"झटपट जवाब",        sub:"True or false — be quick!", subHi:"सही या गलत — जल्दी बताओ!",    ico:"⚡", type:"rapid" };
+const COUNT_LEVEL     = { id:"count",     name:"Count & Solve",       nameHi:"गिनो और बताओ",     sub:"Count the things",          subHi:"चीज़ें गिनो",                 ico:"🔢", type:"count" };
+const MONEY_LEVEL     = { id:"money",     name:"Count the Money",     nameHi:"पैसे गिनो",         sub:"Coins and notes",           subHi:"सिक्के और नोट",              ico:"💰", type:"money" };
+const CLOCK_LEVEL     = { id:"clock",     name:"Read the Clock",      nameHi:"घड़ी देखो",         sub:"What time is it?",          subHi:"क्या समय हुआ है?",            ico:"🕓", type:"clock" };
+const ORDER_LEVEL     = { id:"order",     name:"Order the Steps",     nameHi:"क्रम लगाओ",        sub:"Put them in order",         subHi:"सही क्रम में लगाओ",           ico:"🪜", type:"order" };
+const SCAM_LEVEL      = { id:"scam",      name:"Safe or Not?",        nameHi:"सुरक्षित या नहीं?",  sub:"Think before you tap",      subHi:"सोचकर बताओ",                ico:"🛡️", type:"scam" };
+const HUNT_LEVEL      = { id:"hunt",      name:"Word Hunt",           nameHi:"शब्द खोजो",        sub:"Find the hidden words",     subHi:"छिपे शब्द ढूँढो",             ico:"🔎", type:"hunt" };
+const FORM_LEVEL      = { id:"form",      name:"Fill the Form",       nameHi:"फ़ॉर्म भरो",         sub:"Complete every line",       subHi:"हर लाइन भरो",               ico:"📋", type:"form" };
 // The activities for a given lesson. The 5 base activities need their content: learn/listen/
 // spell/phrase require words, talk requires dialogues. Academic lessons (e.g. Math) may carry
 // only a quiz — so we never render an empty Learn/Spell screen. Extra activities add on when present.
 // `skip` is the curation half of the rotation model: a lesson names the steps it does NOT
 // want ("skip":["spell","fix"]) so no lesson has to carry every activity its data could feed.
 function levelsFor(lesson){
-  const hasWords = !!(lesson && lesson.words && lesson.words.length);
-  const hasTalk  = !!(lesson && lesson.dialogues && lesson.dialogues.length);
-  let lv = LEVELS.filter(l => l.type==="talk" ? hasTalk : hasWords);
-  // pairs:true reuses the lesson's own words as the board; an array is an authored board
-  const recog = [];
-  if(lesson && (Array.isArray(lesson.pairs) ? lesson.pairs.length : (lesson.pairs===true && hasWords))) recog.push(PAIRS_LEVEL);
-  if(lesson && lesson.odd  && lesson.odd.length) recog.push(ODD_LEVEL);
-  if(lesson && lesson.sort && lesson.sort.items && lesson.sort.items.length) recog.push(SORT_LEVEL);
-  if(recog.length){
-    const li = lv.findIndex(l => l.id==="listen");   // -1 (no words) → recognition games lead
-    lv = lv.slice(0, li+1).concat(recog, lv.slice(li+1));
-  }
-  if(lesson && lesson.read  && lesson.read.length)  lv = lv.concat([READ_LEVEL]);
-  if(lesson && lesson.quiz  && lesson.quiz.length)  lv = lv.concat([QUIZ_LEVEL]);
-  if(lesson && lesson.code  && lesson.code.length)  lv = lv.concat([CODE_LEVEL]);
-  if(lesson && lesson.fix   && lesson.fix.length)   lv = lv.concat([FIX_LEVEL]);
-  if(lesson && lesson.email && lesson.email.length) lv = lv.concat([EMAIL_LEVEL]);
-  if(lesson && lesson.reply && lesson.reply.length) lv = lv.concat([REPLY_LEVEL]);
-  if(lesson && Array.isArray(lesson.skip) && lesson.skip.length) lv = lv.filter(l => lesson.skip.indexOf(l.id) < 0);
+  if(!lesson) return [];
+  const ls = lesson;
+  const arr = k => !!(ls[k] && ls[k].length);
+  const hasWords = arr("words");
+  // One canonical ladder, in the arc a lesson should climb:
+  // hear → recognize → produce → converse → read → apply → play.
+  // pairs/hunt accept `true` (board built from the lesson's own words) or an authored array.
+  const rows = [
+    [LEVELS[0],       hasWords],                                                       // learn
+    [LEVELS[1],       hasWords],                                                       // listen
+    [SOUNDS_LEVEL,    arr("sounds")],
+    [RHYME_LEVEL,     arr("rhyme")],
+    [PAIRS_LEVEL,     Array.isArray(ls.pairs) ? !!ls.pairs.length : (ls.pairs===true && hasWords)],
+    [ODD_LEVEL,       arr("odd")],
+    [SORT_LEVEL,      !!(ls.sort && ls.sort.items && ls.sort.items.length)],
+    [LEVELS[2],       hasWords],                                                       // spell
+    [DICTATE_LEVEL,   arr("dictate")],
+    [LEVELS[3],       hasWords],                                                       // phrase
+    [TRANSLATE_LEVEL, arr("translate")],
+    [LEVELS[4],       arr("dialogues")],                                               // talk
+    [BRANCH_LEVEL,    arr("branch")],
+    [STORY_LEVEL,     arr("story")],
+    [READ_LEVEL,      arr("read")],
+    [CLOZE_LEVEL,     arr("cloze")],
+    [NOTICE_LEVEL,    arr("notice")],
+    [QUIZ_LEVEL,      arr("quiz")],
+    [RAPID_LEVEL,     arr("rapid")],
+    [COUNT_LEVEL,     arr("count")],
+    [MONEY_LEVEL,     arr("money")],
+    [CLOCK_LEVEL,     arr("clock")],
+    [ORDER_LEVEL,     arr("order")],
+    [SCAM_LEVEL,      arr("scam")],
+    [CODE_LEVEL,      arr("code")],
+    [FIX_LEVEL,       arr("fix")],
+    [HUNT_LEVEL,      Array.isArray(ls.hunt) ? !!ls.hunt.length : (ls.hunt===true && hasWords)],
+    [FORM_LEVEL,      arr("form")],
+    [EMAIL_LEVEL,     arr("email")],
+    [REPLY_LEVEL,     arr("reply")],
+  ];
+  let lv = rows.filter(r => r[1]).map(r => r[0]);
+  if(Array.isArray(ls.skip) && ls.skip.length) lv = lv.filter(l => ls.skip.indexOf(l.id) < 0);
   return lv;
 }
 
@@ -1550,6 +1716,22 @@ const COACH = {
   odd:    { en:"Most of them belong together. One does not. Tap the odd one out.",              hi:"इनमें से ज़्यादातर एक जैसे हैं। एक अलग है। जो अलग है उसे छुओ।" },
   sort:   { en:"Look at each thing and listen to its word. Then tap the basket where it belongs.",
             hi:"हर चीज़ को देखो और उसका शब्द सुनो। फिर वह जिस टोकरी की है, उसे चुनो।" },
+  sounds: { en:"Two words sound almost the same. Listen carefully, then tap the one you hear.",  hi:"दो शब्दों की आवाज़ लगभग एक जैसी है। ध्यान से सुनो, फिर जो सुना वही चुनो।" },
+  rhyme:  { en:"Listen to the word, then tap the word that sounds like it.",                     hi:"शब्द सुनो, फिर वह शब्द चुनो जिसकी आवाज़ इससे मिलती हो।" },
+  dictate:{ en:"Listen to the sentence, then build it word by word.",                            hi:"वाक्य सुनो, फिर उसे शब्द-दर-शब्द बनाओ।" },
+  translate:{ en:"Read the Hindi sentence, then build the same sentence in English.",            hi:"हिंदी वाक्य पढ़ो, फिर वही वाक्य अंग्रेज़ी में बनाओ।" },
+  branch: { en:"This is a real conversation — your reply decides what happens next.",            hi:"यह असली बातचीत है — तुम्हारा जवाब तय करेगा कि आगे क्या होगा।" },
+  story:  { en:"Listen to the little story with your ears only. Then answer the question.",      hi:"छोटी कहानी सिर्फ़ कानों से सुनो। फिर सवाल का जवाब दो।" },
+  cloze:  { en:"A word is missing. Tap the right word to fill the gap.",                         hi:"एक शब्द छूट गया है। सही शब्द चुनकर खाली जगह भरो।" },
+  notice: { en:"Read the notice like a real one, then find the answer inside it.",               hi:"सूचना को असली की तरह पढ़ो, फिर उसी में से जवाब ढूँढो।" },
+  rapid:  { en:"Quick! Is it true or false? Tap the tick or the cross.",                         hi:"जल्दी बताओ! सही है या गलत? टिक ✓ या क्रॉस ✗ छुओ।" },
+  count:  { en:"Count the things on the screen, then tap the right number.",                     hi:"स्क्रीन पर चीज़ें गिनो, फिर सही संख्या चुनो।" },
+  money:  { en:"Count the coins and notes, or make the amount that is asked.",                   hi:"सिक्के और नोट गिनो, या जितने पैसे मांगे जाएँ उतने बनाओ।" },
+  clock:  { en:"Look at the clock's hands, then tap the right time.",                            hi:"घड़ी की सुइयाँ देखो, फिर सही समय चुनो।" },
+  order:  { en:"These steps are mixed up. Tap them in the right order.",                         hi:"ये कदम उलट-पुलट हैं। इन्हें सही क्रम में लगाओ।" },
+  scam:   { en:"Read the message. Is it safe, or is someone tricking you?",                      hi:"संदेश पढ़ो। यह सुरक्षित है, या कोई धोखा दे रहा है?" },
+  hunt:   { en:"Words are hiding in the letters. Tap a word's first letter, then its last.",     hi:"अक्षरों में शब्द छिपे हैं। शब्द का पहला अक्षर छुओ, फिर आख़िरी।" },
+  form:   { en:"Fill the form one line at a time — pick the right answer for each line.",        hi:"फ़ॉर्म एक-एक लाइन करके भरो — हर लाइन के लिए सही जवाब चुनो।" },
 };
 
 // ---------- Accounts: on for the web, off for the Play build ----------
@@ -1975,6 +2157,10 @@ function speak(text, lang="en", opts){
 }
 // Always spoken: Hindi help must not depend on the removed Guide toggle.
 function sayHi(text){ speak(text, "hi", { queue:true }); }
+// Speak one tile/card's text in the voice that can actually say it. The recognition games
+// (pairs/odd/sort) carry Hindi-track content in the same fields as English-track content, so
+// the script, not the track, decides the voice — an English voice reading Devanagari is noise.
+function speakWord(t, opts){ speak(t, /[ऀ-ॿ]/.test(String(t||"")) ? "hi" : "en", opts); }
 
 // ---------- Audio-first shell: tap-to-hear narration of the current screen ----------
 // A non-reader (or non-reading parent) navigates by tapping the 🔊 button to hear the screen.
@@ -3763,6 +3949,27 @@ function renderLessonMap(course, lesson, back){
   refreshTop();
 }
 
+// ---------- Drawn props for the numeracy games (offline: everything is inline SVG) ----------
+// Indian money, near its real colours so the game trains the eye for the actual notes.
+const NOTE_INK = { 10:"#8a6642", 20:"#a3b64a", 50:"#43b6b0", 100:"#8779b5", 200:"#e8a33d", 500:"#95936f" };
+function moneySVG(v){
+  if(v < 10)  // ₹1 / ₹2 / ₹5 coins
+    return `<svg viewBox="0 0 48 48" class="coin" role="img" aria-label="₹${v}"><circle cx="24" cy="24" r="21" fill="#d8d8de" stroke="#9a9aa6" stroke-width="2"/><circle cx="24" cy="24" r="16" fill="none" stroke="#b8b8c2" stroke-width="1.4"/><text x="24" y="31" text-anchor="middle" font-size="17" font-weight="800" fill="#565664">₹${v}</text></svg>`;
+  const ink = NOTE_INK[v] || "#8f9779";
+  return `<svg viewBox="0 0 96 44" class="note" role="img" aria-label="₹${v}"><rect x="2" y="2" width="92" height="40" rx="5" fill="${ink}" opacity=".22"/><rect x="2" y="2" width="92" height="40" rx="5" fill="none" stroke="${ink}" stroke-width="2"/><circle cx="30" cy="22" r="11" fill="${ink}" opacity=".3"/><text x="62" y="29" text-anchor="middle" font-size="17" font-weight="800" fill="${ink}">₹${v}</text></svg>`;
+}
+function clockSVG(h, m){
+  const ha = ((h % 12) + m/60) * 30, ma = m * 6;
+  let ticks = "";
+  for(let i=0;i<12;i++) ticks += `<line x1="60" y1="10" x2="60" y2="${i%3===0?18:14}" stroke="#8a8a96" stroke-width="${i%3===0?3:2}" transform="rotate(${i*30} 60 60)"/>`;
+  return `<svg viewBox="0 0 120 120" class="clockface" role="img" aria-label="clock">
+    <circle cx="60" cy="60" r="55" fill="#fff" stroke="#5a5a68" stroke-width="4"/>${ticks}
+    <line x1="60" y1="60" x2="60" y2="34" stroke="#2d3436" stroke-width="5.5" stroke-linecap="round" transform="rotate(${ha} 60 60)"/>
+    <line x1="60" y1="60" x2="60" y2="22" stroke="#e8714f" stroke-width="3.5" stroke-linecap="round" transform="rotate(${ma} 60 60)"/>
+    <circle cx="60" cy="60" r="4" fill="#2d3436"/></svg>`;
+}
+function fmtTime(h, m){ return h + ":" + (m<10?"0":"") + m; }
+
 // ---------- Level runner ----------
 function startLevel(course, lesson, lv, back){
   const rounds = buildRounds(lv, lesson) || [];
@@ -3856,6 +4063,22 @@ function startLevel(course, lesson, lv, back){
     if(lv.type==="pairs")  return roundPairs();
     if(lv.type==="odd")    return roundOdd(r);
     if(lv.type==="sort")   return roundSort(r);
+    if(lv.type==="sounds")    return roundSounds(r);
+    if(lv.type==="rhyme")     return roundRhyme(r);
+    if(lv.type==="dictate")   return roundDictate(r);
+    if(lv.type==="translate") return roundTranslate(r);
+    if(lv.type==="branch")    return roundBranch(r);
+    if(lv.type==="story")     return roundStory(r);
+    if(lv.type==="cloze")     return roundCloze(r);
+    if(lv.type==="notice")    return roundNotice(r);
+    if(lv.type==="rapid")     return roundRapid(r);
+    if(lv.type==="count")     return roundCount(r);
+    if(lv.type==="money")     return roundMoney(r);
+    if(lv.type==="clock")     return roundClock(r);
+    if(lv.type==="order")     return roundOrder(r);
+    if(lv.type==="scam")      return roundScam(r);
+    if(lv.type==="hunt")      return roundHunt();
+    if(lv.type==="form")      return roundForm(r);
     if(lv.type==="spell")  return roundSpell(r);
     if(lv.type==="phrase") return roundPhrase(r);
     if(lv.type==="talk")   return roundTalk(r);
@@ -3947,9 +4170,9 @@ function startLevel(course, lesson, lv, back){
           aria-label="${up ? escAttr(c.say) : escAttr(tx("Hidden card","बंद कार्ड")+" "+(k+1))}">
           <span class="pface">${up ? esc(c.face) : ""}</span></button>`);
         b.onclick = () => {
-          if(found.indexOf(c.pair) >= 0){ speak(c.say); return; }   // matched cards re-speak on tap
+          if(found.indexOf(c.pair) >= 0){ speakWord(c.say); return; }   // matched cards re-speak on tap
           if(lock || open.indexOf(k) >= 0 || open.length === 2) return;
-          open.push(k); sfx.tap(); speak(c.say); redraw();
+          open.push(k); sfx.tap(); speakWord(c.say); redraw();
           if(open.length < 2) return;
           const [a, b2] = open.map(i => cards[i]);
           if(a.pair === b2.pair){
@@ -3986,7 +4209,7 @@ function startLevel(course, lesson, lv, back){
       <div class="feedback" id="fb"></div>`);
     setFooter("");
     const items = shuffle(r.items.slice());
-    const sayAll = () => items.forEach((c,i) => speak(c.en, "en", { queue: i>0 }));
+    const sayAll = () => items.forEach((c,i) => speakWord(c.en, { queue: i>0 }));
     $("#sayall").onclick = sayAll;
     announce(sayAll);
     const showTeach = () => {
@@ -4036,9 +4259,9 @@ function startLevel(course, lesson, lv, back){
       <div class="options" id="opts"></div>
       <div class="feedback" id="fb"></div>`);
     setFooter("");
-    $("#say").onclick = () => speak(it.en);
-    $("#thing").onclick = () => speak(it.en);
-    announce(() => speak(it.en));
+    $("#say").onclick = () => speakWord(it.en);
+    $("#thing").onclick = () => speakWord(it.en);
+    announce(() => speakWord(it.en));
     const opts = $("#opts");
     const rightBucket = buckets.filter(x => x.key === it.bucket)[0];
     const bkName = b => tx(b.en, b.hi || b.en);
@@ -4062,6 +4285,823 @@ function startLevel(course, lesson, lv, back){
       };
       opts.appendChild(b);
     });
+  }
+
+  // --- SOUNDS: minimal pairs — hear one word, pick it from near-identical options
+  // r = { play, choices:[{en,hi?,emoji?}], answer, teach?, teachHi? }
+  function roundSounds(r){
+    mount(`${head(tx("Which word did you hear?","कौन-सा शब्द सुना?"), tx("Listen carefully — they sound alike","ध्यान से सुनो — आवाज़ मिलती-जुलती है"),"ध्यान से सुनो और जो शब्द सुना वही चुनो।")}
+      <div class="center"><button class="speakbtn" id="say">🔊 ${tx("Play word","शब्द सुनो")}</button></div>
+      <div class="options" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    $("#say").onclick = () => speakWord(r.play);
+    announce(() => speakWord(r.play));
+    const opts = $("#opts");
+    let done = false;
+    shuffle(r.choices.slice()).forEach(c => {
+      const b = el(`<button class="opt" data-en="${escAttr(c.en)}">${c.emoji?`<span class="oe">${esc(c.emoji)}</span>`:""}<span>${esc(c.en)}</span></button>`);
+      b.onclick = () => {
+        if(done) return; done = true;
+        const correct = c.en === r.answer;
+        document.querySelectorAll(".opt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("Sharp ears! 🎉","क्या खूब सुना! 🎉"); fb.className = "feedback good"; }
+        else {
+          logWrong("sounds: "+r.play, c.en, r.answer);
+          fb.textContent = tx("It was ","शब्द था ") + r.answer; fb.className = "feedback bad";
+          document.querySelectorAll(".opt").forEach(o => { if(o.dataset.en === r.answer) o.classList.add("correct"); });
+        }
+        if(r.teach){ const tb=$("#teach"); tb.style.display="flex"; tb.innerHTML = `💡 <span>${esc(tx(r.teach, r.teachHi||r.teach))}</span>`; }
+        setTimeout(() => next(correct), r.teach ? 2000 : (correct ? 900 : 1600));
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- RHYME: hear the target word, tap the option that rhymes with it
+  // r = { target:{en,hi?,emoji?}, choices:[{en,hi?,emoji?}], answer, teach?, teachHi? }
+  function roundRhyme(r){
+    mount(`${head(tx("Which one rhymes with…","किसकी तुक मिलती है…"), tx("Sounds that end the same way rhyme","जिनका अंत एक जैसा लगे, उनकी तुक मिलती है"),"शब्द सुनो और उसकी तुक वाला शब्द चुनो।")}
+      <div class="display"><div class="emoji pop tap-emoji" id="tgt">${esc(r.target.emoji||"🎵")}</div>
+        <div class="wordrow"><span class="word">${esc(r.target.en)}</span>
+          <button class="speakchip" id="say" title="Hear it">🔊</button></div></div>
+      <div class="center"><button class="speakbtn" id="sayall">🔊 ${tx("Hear the choices","विकल्प सुनो")}</button></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const items = shuffle(r.choices.slice());
+    $("#say").onclick = () => speakWord(r.target.en);
+    $("#tgt").onclick = () => speakWord(r.target.en);
+    const sayAll = () => { speakWord(r.target.en); items.forEach(c => speakWord(c.en, { queue:true, gap:350 })); };
+    $("#sayall").onclick = sayAll;
+    announce(sayAll);
+    const opts = $("#opts");
+    let done = false;
+    items.forEach(c => {
+      const b = el(`<button class="opt" data-en="${escAttr(c.en)}">${c.emoji?`<span class="oe">${esc(c.emoji)}</span>`:""}<span>${esc(c.en)}</span></button>`);
+      b.onclick = () => {
+        if(done) return; done = true;
+        const correct = c.en === r.answer;
+        document.querySelectorAll(".opt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        speakWord(r.target.en); speakWord(correct ? c.en : r.answer, { queue:true, gap:250 });   // hear the rhyme together
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("They rhyme! 🎵","तुक मिल गई! 🎵"); fb.className = "feedback good"; }
+        else {
+          logWrong("rhyme: "+r.target.en, c.en, r.answer);
+          fb.textContent = tx(r.target.en+" rhymes with "+r.answer, r.target.en+" की तुक "+r.answer+" से मिलती है"); fb.className = "feedback bad";
+          document.querySelectorAll(".opt").forEach(o => { if(o.dataset.en === r.answer) o.classList.add("correct"); });
+        }
+        setTimeout(() => next(correct), correct ? 1200 : 2000);
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- DICTATE: hear a sentence (no text shown), build it from word tiles
+  // r = { en, hi? }
+  function roundDictate(r){
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;
+    const words = _d ? _d.words.slice() : shuffle(r.en.split(" "));
+    mount(`${head(tx("Write what you hear","जो सुनो वही लिखो"), tx("Play it as many times as you need","जितनी बार चाहो, सुनो"),"वाक्य सुनो और शब्दों से बनाओ।")}
+      <div class="center" style="margin-bottom:10px">
+        <button class="speakbtn" id="say">🔊 ${tx("Play sentence","वाक्य सुनो")}</button>
+        <button class="speakbtn" id="slow">🐢 ${tx("Slowly","धीरे से")}</button></div>
+      <div class="tray" id="tray"></div>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    $("#say").onclick = () => speakWord(r.en);
+    $("#slow").onclick = () => speakWord(r.en, { rate: 0.6 });
+    announce(() => speakWord(r.en));
+    const tray=$("#tray"), bank=$("#bank");
+    let built = _d ? _d.built.slice() : [];
+    const target = r.en.split(" ");
+    function redraw(){
+      tray.innerHTML=""; bank.innerHTML="";
+      built.forEach((w,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(w)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach(w=>{ const t=el(`<button type="button" class="tile">${esc(w)}</button>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
+      $("#check").disabled = built.length!==target.length;
+      tileDraft = { idx, words: words.slice(), built: built.slice() };
+    }
+    function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
+      words.forEach(w=>{ if(tmp[w]){tmp[w]--;} else out.push(w); }); return out; }
+    $("#clear").onclick=()=>{built=[];redraw();};
+    $("#check").onclick=()=>{
+      const ok = built.join(" ")===r.en;
+      setMood(ok?"happy":"sad");
+      (ok?sfx.correct:sfx.wrong)();
+      const fb=$("#fb");
+      if(ok){ fb.textContent=tx("Perfect listening! ⭐","क्या खूब सुना! ⭐"); fb.className="feedback good"; speakWord(r.en); setTimeout(()=>next(true),1100); }
+      else { logWrong("dictate", built.join(" "), r.en);
+             fb.textContent=tx("It was: ","वाक्य था: ")+'"'+r.en+'"'; fb.className="feedback bad"; speakWord(r.en); setTimeout(()=>next(false),2000); }
+    };
+    redraw();
+  }
+
+  // --- TRANSLATE: read the Hindi sentence, build the same sentence in English
+  // r = { en, hi }
+  function roundTranslate(r){
+    const _d = (tileDraft && tileDraft.idx===idx) ? tileDraft : null;
+    const words = _d ? _d.words.slice() : shuffle(r.en.split(" "));
+    mount(`${head(tx("Say it in English","इसे अंग्रेज़ी में बनाओ"), tx("Build the English sentence","अंग्रेज़ी वाक्य बनाओ"),"हिंदी वाक्य पढ़ो और वही अंग्रेज़ी में बनाओ।")}
+      <div class="display"><div class="hi transhi">"${esc(r.hi)}"</div>
+        <div class="center"><button class="speakchip" id="say" title="Hear it">🔊</button></div></div>
+      <div class="tray" id="tray"></div>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    $("#say").onclick = () => sayHi(r.hi);
+    announce(() => sayHi(r.hi));
+    const tray=$("#tray"), bank=$("#bank");
+    let built = _d ? _d.built.slice() : [];
+    const target = r.en.split(" ");
+    function redraw(){
+      tray.innerHTML=""; bank.innerHTML="";
+      built.forEach((w,i)=>{ const t=el(`<button type="button" class="tile placed">${esc(w)}</button>`); t.onclick=()=>{built.splice(i,1);redraw();}; tray.appendChild(t); });
+      remaining().forEach(w=>{ const t=el(`<button type="button" class="tile">${esc(w)}</button>`); t.onclick=()=>{built.push(w);sfx.tap();redraw();}; bank.appendChild(t); });
+      $("#check").disabled = built.length!==target.length;
+      tileDraft = { idx, words: words.slice(), built: built.slice() };
+    }
+    function remaining(){ const used={}; built.forEach(w=>used[w]=(used[w]||0)+1); const out=[]; const tmp={...used};
+      words.forEach(w=>{ if(tmp[w]){tmp[w]--;} else out.push(w); }); return out; }
+    $("#clear").onclick=()=>{built=[];redraw();};
+    $("#check").onclick=()=>{
+      const ok = built.join(" ")===r.en;
+      setMood(ok?"happy":"sad");
+      (ok?sfx.correct:sfx.wrong)();
+      const fb=$("#fb");
+      if(ok){ fb.textContent=tx("Great translation! 🌉","बढ़िया अनुवाद! 🌉"); fb.className="feedback good"; speakWord(r.en); setTimeout(()=>next(true),1100); }
+      else { logWrong(r.hi, built.join(" "), r.en);
+             fb.textContent=tx("In English: ","अंग्रेज़ी में: ")+'"'+r.en+'"'; fb.className="feedback bad"; speakWord(r.en); setTimeout(()=>next(false),2000); }
+    };
+    redraw();
+  }
+
+  // --- BRANCH: a conversation with consequences — every reply moves the story
+  // r = { who?, start, nodes:{ id:{ say, sayHi?, replies:[{en,hi?,score(0-2),then?,thenHi?,next?}] } } }
+  function roundBranch(r){
+    const nodes = r.nodes || {};
+    let earned = 0, possible = 0;
+    mount(`${head(tx("💬 What would you say?","💬 तुम क्या कहोगी?"), tx("Your reply decides what happens next","तुम्हारा जवाब तय करेगा कि आगे क्या होगा"),"बातचीत करो — तुम्हारा जवाब कहानी बदलेगा।")}
+      <div class="chat" id="chat"></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const chat = $("#chat"), opts = $("#opts");
+    function show(id, first){
+      const n = nodes[id];
+      if(!n) return verdict();
+      const line = tx(n.say, n.sayHi || n.say);
+      chat.appendChild(el(`<div class="bubble them">${esc(r.who||"🙂")} ${esc(line)}</div>`));
+      if(first) announce(() => speakWord(line)); else speakWord(line, { queue:true, gap:600 });
+      opts.innerHTML = "";
+      shuffle((n.replies||[]).slice()).forEach(rep => {
+        const b = el(`<button class="opt" style="font-size:17px">${esc(tx(rep.en, rep.hi||rep.en))}</button>`);
+        b.onclick = () => {
+          opts.innerHTML = "";
+          const said = tx(rep.en, rep.hi||rep.en);
+          possible += 2; earned += Math.max(0, Math.min(2, rep.score||0));
+          chat.appendChild(el(`<div class="bubble me">${esc(said)}</div>`));
+          speakWord(said);
+          ((rep.score||0)>=2 ? sfx.correct : (rep.score||0)>=1 ? sfx.tap : sfx.wrong)();
+          setMood((rep.score||0)>=2 ? "happy" : (rep.score||0)>=1 ? "think" : "sad");
+          if((rep.score||0) < 1) logWrong(n.say, rep.en, (((n.replies||[]).filter(x=>(x.score||0)>=2)[0])||{}).en);
+          if(rep.then){
+            const thenLine = tx(rep.then, rep.thenHi||rep.then);
+            chat.appendChild(el(`<div class="bubble them">${esc(r.who||"🙂")} ${esc(thenLine)}</div>`));
+            speakWord(thenLine, { queue:true, gap:500 });
+          }
+          try { chat.lastChild.scrollIntoView({ block:"nearest", behavior:"smooth" }); } catch(e){}
+          setTimeout(() => (rep.next && nodes[rep.next]) ? show(rep.next) : verdict(), rep.then ? 1400 : 800);
+        };
+        opts.appendChild(b);
+      });
+    }
+    function verdict(){
+      const pct = possible ? earned/possible : 0;
+      const good = pct >= 0.75, ok = pct >= 0.4;
+      const fb = $("#fb");
+      fb.textContent = good ? tx("You spoke really well! 🌟","तुमने बहुत अच्छे से बात की! 🌟")
+                     : ok   ? tx("Good try — next time you can say it even better.","अच्छी कोशिश — अगली बार और भी अच्छा कह सकती हो।")
+                            : tx("Let's try kinder, clearer words next time.","अगली बार और साफ़, विनम्र शब्द आज़माओ।");
+      fb.className = "feedback " + (ok ? "good" : "bad");
+      speak(fb.textContent, state.lang==="hi" ? "hi" : "en", { queue:true, gap:600 });
+      setFooter(`<button class="btn primary" id="go2">${tx("Continue →","आगे बढ़ो →")}</button>`);
+      $("#go2").onclick = () => { sfx.next(); next(pct >= 0.6); };
+      const gf = document.querySelector(".gamefooter");
+      if(gf) try { gf.scrollIntoView({ block:"end", behavior:"smooth" }); } catch(e){}
+    }
+    show(r.start || Object.keys(nodes)[0], true);
+  }
+
+  // --- STORY: audio-only comprehension — the text stays hidden until she has answered
+  // r = { text, textHi?, q, qHi?, choices:[str], answer, teach?, teachHi? }
+  function roundStory(r){
+    mount(`${head(tx("🎧 Listen to the story","🎧 कहानी सुनो"), tx("Ears only — then answer below","सिर्फ़ कानों से — फिर नीचे जवाब दो"),"कहानी ध्यान से सुनो, फिर सवाल का जवाब दो।")}
+      <div class="center" style="margin-bottom:10px">
+        <button class="speakbtn" id="play">▶ ${tx("Play story","कहानी सुनो")}</button>
+        <button class="speakbtn" id="slow">🐢 ${tx("Slowly","धीरे से")}</button></div>
+      <div class="storyreveal" id="reveal" style="display:none"></div>
+      <div class="bubble2 storyq"><div class="q">${esc(tx(r.q, r.qHi || r.q))}</div></div>
+      <div class="options quizopts" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const playStory = rate => { speakWord(r.text, rate ? { rate } : undefined); speak(tx(r.q, r.qHi||r.q), state.lang==="hi"?"hi":"en", { queue:true, gap:900 }); };
+    $("#play").onclick = () => playStory();
+    $("#slow").onclick = () => playStory(0.6);
+    announce(() => playStory());
+    const opts = $("#opts");
+    let tries = 0, done = false;
+    const reveal = () => { const rv=$("#reveal"); rv.style.display="block"; rv.innerHTML = `📖 <span>${esc(r.text)}</span>`; };
+    const showTeach = () => { if(!r.teach) return; const tb=$("#teach"); tb.style.display="flex"; tb.innerHTML = `💡 <span>${esc(tx(r.teach, r.teachHi||r.teach))}</span>`; };
+    shuffle(r.choices.slice()).forEach(c => {
+      const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+      b.onclick = () => {
+        if(done) return;
+        const fb = $("#fb");
+        if(c === r.answer){
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add("correct"); setMood("happy"); sfx.correct();
+          fb.textContent = tx("You listened well! 🎉","खूब ध्यान से सुना! 🎉"); fb.className = "feedback good";
+          reveal(); showTeach();
+          setTimeout(() => next(true), 2000);
+          return;
+        }
+        logWrong("story: "+r.q, c, r.answer);
+        tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
+        if(tries === 1){
+          fb.textContent = tx("Not quite — listen once more.","बिल्कुल नहीं — एक बार फिर सुनो।"); fb.className = "feedback bad";
+          speakWord(r.text);
+        } else {
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => { o.classList.add("disabled"); if(o.textContent === r.answer) o.classList.add("correct"); });
+          fb.textContent = tx("Answer: ","सही जवाब: ") + r.answer; fb.className = "feedback bad";
+          reveal(); showTeach();
+          setTimeout(() => next(false), 2200);
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- CLOZE: the story has a gap — tap the right word into it
+  // r = { text (with ___), textHi?, options:[str], answer, teach?, teachHi? }
+  function roundCloze(r){
+    const parts = String(r.text).split("___");
+    mount(`${head(tx("Fill the missing word","छूटा शब्द भरो"), tx("Tap the word that completes it","जो शब्द इसे पूरा करे, उसे चुनो"),"वाक्य में एक शब्द छूटा है — सही शब्द चुनो।")}
+      <div class="clozecard"><span>${esc(parts[0]||"")}</span><span class="clozegap" id="gap">______</span><span>${esc(parts[1]||"")}</span>
+        ${r.textHi ? `<div class="hi clozehi">${esc(r.textHi)}</div>` : ""}</div>
+      <div class="options quizopts" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    announce(() => { speakWord(parts[0]||""); });
+    const opts = $("#opts");
+    let tries = 0, done = false;
+    const showTeach = () => { if(!r.teach) return; const tb=$("#teach"); tb.style.display="flex"; tb.innerHTML = `💡 <span>${esc(tx(r.teach, r.teachHi||r.teach))}</span>`; };
+    shuffle(r.options.slice()).forEach(c => {
+      const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+      b.onclick = () => {
+        if(done) return;
+        const gap = $("#gap"), fb = $("#fb");
+        gap.textContent = c;
+        if(c === r.answer){
+          done = true; gap.classList.add("good");
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add("correct"); setMood("happy"); sfx.correct();
+          fb.textContent = tx("That's it! 🎉","बिल्कुल सही! 🎉"); fb.className = "feedback good";
+          speakWord(String(r.text).replace("___", r.answer));
+          showTeach();
+          setTimeout(() => next(true), r.teach ? 2100 : 1500);
+          return;
+        }
+        logWrong("cloze: "+r.text, c, r.answer);
+        tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
+        gap.classList.add("bad");
+        setTimeout(() => { const g=$("#gap"); if(g && !done){ g.textContent="______"; g.classList.remove("bad"); } }, 900);
+        if(tries === 1 && r.teach){
+          fb.textContent = tx("Not that one — here's a hint.","वह नहीं — यह रहा संकेत।"); fb.className = "feedback bad";
+          showTeach();
+        } else if(tries >= 2){
+          done = true;
+          const g=$("#gap"); g.textContent = r.answer; g.classList.remove("bad"); g.classList.add("good");
+          document.querySelectorAll(".quizopt").forEach(o => { o.classList.add("disabled"); if(o.textContent === r.answer) o.classList.add("correct"); });
+          fb.textContent = tx("The word was ","शब्द था ") + r.answer; fb.className = "feedback bad";
+          speakWord(String(r.text).replace("___", r.answer));
+          setTimeout(() => next(false), 2000);
+        } else {
+          fb.textContent = tx("Try another word.","कोई और शब्द आज़माओ।"); fb.className = "feedback bad";
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- NOTICE: a real-world document (notice / price list / label), then a question about it
+  // r = { title, titleHi?, lines:[str | {en,hi?}], q, qHi?, choices:[str], answer, teach?, teachHi? }
+  function roundNotice(r){
+    const lineTx = l => typeof l === "string" ? l : tx(l.en, l.hi || l.en);
+    mount(`${head(tx("Read it like a real notice","असली सूचना की तरह पढ़ो"), tx("The answer is inside it","जवाब इसी के अंदर है"),"सूचना पढ़ो और उसी में से जवाब ढूँढो।")}
+      <div class="noticedoc"><div class="noticetitle">📌 ${esc(tx(r.title, r.titleHi || r.title))}</div>
+        ${(r.lines||[]).map(l => `<div class="noticeline">${esc(lineTx(l))}</div>`).join("")}
+        <button class="speakchip noticesay" id="say" title="Hear it">🔊</button></div>
+      <div class="bubble2 storyq"><div class="q">${esc(tx(r.q, r.qHi || r.q))}</div></div>
+      <div class="options quizopts" id="opts"></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const readAll = () => {
+      speakWord(tx(r.title, r.titleHi || r.title));
+      (r.lines||[]).forEach(l => speakWord(lineTx(l), { queue:true, gap:250 }));
+      speak(tx(r.q, r.qHi || r.q), state.lang==="hi"?"hi":"en", { queue:true, gap:800 });
+    };
+    $("#say").onclick = readAll;
+    announce(readAll);
+    const opts = $("#opts");
+    let tries = 0, done = false;
+    const showTeach = () => { if(!r.teach) return; const tb=$("#teach"); tb.style.display="flex"; tb.innerHTML = `💡 <span>${esc(tx(r.teach, r.teachHi||r.teach))}</span>`; };
+    shuffle(r.choices.slice()).forEach(c => {
+      const b = el(`<button class="opt quizopt">${esc(c)}</button>`);
+      b.onclick = () => {
+        if(done) return;
+        const fb = $("#fb");
+        if(c === r.answer){
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add("correct"); setMood("happy"); sfx.correct();
+          fb.textContent = tx("You read it right! 🎉","बिल्कुल सही पढ़ा! 🎉"); fb.className = "feedback good";
+          showTeach();
+          setTimeout(() => next(true), r.teach ? 1900 : 1100);
+          return;
+        }
+        logWrong("notice: "+r.q, c, r.answer);
+        tries++; b.classList.add("wrong","disabled"); setMood("sad"); sfx.wrong();
+        if(tries === 1){
+          fb.textContent = tx("Look at the notice again.","सूचना को फिर से देखो।"); fb.className = "feedback bad";
+          showTeach();
+        } else {
+          done = true;
+          document.querySelectorAll(".quizopt").forEach(o => { o.classList.add("disabled"); if(o.textContent === r.answer) o.classList.add("correct"); });
+          fb.textContent = tx("Answer: ","सही जवाब: ") + r.answer; fb.className = "feedback bad";
+          setTimeout(() => next(false), 1800);
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- RAPID: quick-fire true/false — pace is the point, so one tap and on we go
+  // r = { en, hi?, truth:bool, teach?, teachHi? }
+  function roundRapid(r){
+    mount(`${head(tx("⚡ True or false?","⚡ सही या गलत?"), tx("Tap ✓ if it's true, ✗ if it's not","सही हो तो ✓, गलत हो तो ✗"),"झटपट बताओ — सही या गलत?")}
+      <div class="rapidcard"><div class="rapidtext">${esc(tx(r.en, r.hi || r.en))}</div>
+        <button class="speakchip" id="say" title="Hear it">🔊</button></div>
+      <div class="rapidbtns">
+        <button class="rapidbtn yes" id="tbtn">✓ ${tx("True","सही")}</button>
+        <button class="rapidbtn no" id="fbtn">✗ ${tx("False","गलत")}</button></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const sayIt = () => speak(tx(r.en, r.hi || r.en), state.lang==="hi"?"hi":"en");
+    $("#say").onclick = sayIt;
+    announce(sayIt);
+    let done = false;
+    const pickAns = ans => {
+      if(done) return; done = true;
+      const correct = ans === !!r.truth;
+      const chosenBtn = ans ? $("#tbtn") : $("#fbtn");
+      const rightBtn  = r.truth ? $("#tbtn") : $("#fbtn");
+      [$("#tbtn"), $("#fbtn")].forEach(b => b.classList.add("disabled"));
+      chosenBtn.classList.add(correct ? "correct" : "wrong");
+      if(!correct) rightBtn.classList.add("correct");
+      setMood(correct ? "happy" : "sad");
+      (correct ? sfx.correct : sfx.wrong)();
+      const fb = $("#fb");
+      fb.textContent = correct ? tx("Fast AND right! ⚡","तेज़ भी, सही भी! ⚡")
+                               : tx(r.truth ? "It was true." : "It was false.", r.truth ? "यह सही था।" : "यह गलत था।");
+      fb.className = "feedback " + (correct ? "good" : "bad");
+      if(!correct){ logWrong(r.en, ans ? "true" : "false", r.truth ? "true" : "false");
+        if(r.teach){ const tb=$("#teach"); tb.style.display="flex"; tb.innerHTML = `💡 <span>${esc(tx(r.teach, r.teachHi||r.teach))}</span>`; } }
+      setTimeout(() => next(correct), correct ? 700 : (r.teach ? 2100 : 1500));
+    };
+    $("#tbtn").onclick = () => pickAns(true);
+    $("#fbtn").onclick = () => pickAns(false);
+  }
+
+  // --- COUNT: math with real things — count, add, or take away, then tap the number
+  // r = { emoji, a, b?, op? "+"|"-" }  (op "-" fades b of the a things)
+  function roundCount(r){
+    const ans = r.op === "+" ? r.a + r.b : r.op === "-" ? r.a - r.b : r.a;
+    const q = !r.op ? tx("How many?","कितने हैं?")
+            : r.op === "+" ? tx("How many altogether?","कुल कितने हैं?")
+            : tx("How many are left?","कितने बचे?");
+    const row = (n, faded) => Array.from({length:n}, () => `<span class="citem${faded?" faded":""}">${esc(r.emoji)}</span>`).join("");
+    let scene;
+    if(r.op === "+") scene = `<div class="countrow">${row(r.a)}</div><div class="countop">+</div><div class="countrow">${row(r.b)}</div>`;
+    else if(r.op === "-") scene = `<div class="countrow">${row(r.a - r.b)}${row(r.b, true)}</div>`;
+    else scene = `<div class="countrow">${row(r.a)}</div>`;
+    // choices: the answer + near-misses, never negative, always unique
+    const set = [ans]; [ans+1, ans-1, ans+2, ans-2].forEach(v => { if(set.length<3 && v>=0 && set.indexOf(v)<0) set.push(v); });
+    mount(`${head(q, tx("Count them one by one","एक-एक करके गिनो"),"चीज़ें गिनो और सही संख्या चुनो।")}
+      ${scene}
+      <div class="options quizopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    announce(() => speak(q, state.lang==="hi" ? "hi" : "en"));
+    const opts = $("#opts");
+    let done = false;
+    shuffle(set).forEach(v => {
+      const b = el(`<button class="opt quizopt countopt">${v}</button>`);
+      b.onclick = () => {
+        if(done) return; done = true;
+        const correct = v === ans;
+        document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("Counted right! 🎉","सही गिना! 🎉"); fb.className = "feedback good"; }
+        else { logWrong(q + " " + (r.emoji||""), String(v), String(ans));
+               fb.textContent = tx("It is ","सही संख्या है ") + ans; fb.className = "feedback bad";
+               document.querySelectorAll(".quizopt").forEach(o => { if(o.textContent === String(ans)) o.classList.add("correct"); }); }
+        setTimeout(() => next(correct), correct ? 900 : 1600);
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- MONEY: count what's shown, or build the asked amount from coins and notes
+  // r = { show:[values] }  OR  { make:N, denoms?:[values] }
+  function roundMoney(r){
+    if(Array.isArray(r.show)){
+      const total = r.show.reduce((s,v)=>s+v, 0);
+      const set = [total]; [total+5, total-5, total+10, total-10, total+1].forEach(v => { if(set.length<3 && v>0 && set.indexOf(v)<0) set.push(v); });
+      mount(`${head(tx("How much money is this?","यह कितने पैसे हैं?"), tx("Add up the coins and notes","सिक्के और नोट जोड़ो"),"सिक्के और नोट गिनकर बताओ कितने पैसे हैं।")}
+        <div class="moneyrow">${r.show.map(moneySVG).join("")}</div>
+        <div class="options quizopts" id="opts"></div>
+        <div class="feedback" id="fb"></div>`);
+      setFooter("");
+      announce(() => speak(tx("How much money is this?","यह कितने पैसे हैं?"), state.lang==="hi"?"hi":"en"));
+      const opts = $("#opts");
+      let done = false;
+      shuffle(set).forEach(v => {
+        const b = el(`<button class="opt quizopt">₹${v}</button>`);
+        b.onclick = () => {
+          if(done) return; done = true;
+          const correct = v === total;
+          document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+          b.classList.add(correct ? "correct" : "wrong");
+          setMood(correct ? "happy" : "sad");
+          (correct ? sfx.correct : sfx.wrong)();
+          const fb = $("#fb");
+          if(correct){ fb.textContent = tx("Yes — ₹"+total+"! 🎉","हाँ — ₹"+total+"! 🎉"); fb.className = "feedback good"; }
+          else { logWrong("money count", "₹"+v, "₹"+total);
+                 fb.textContent = tx("It adds up to ₹","कुल हैं ₹") + total; fb.className = "feedback bad";
+                 document.querySelectorAll(".quizopt").forEach(o => { if(o.textContent === "₹"+total) o.classList.add("correct"); }); }
+          setTimeout(() => next(correct), correct ? 1000 : 1700);
+        };
+        opts.appendChild(b);
+      });
+      return;
+    }
+    // make-the-amount mode
+    const target = r.make, denoms = r.denoms || [1,2,5,10,20,50,100];
+    const _d = (tileDraft && tileDraft.idx===idx && tileDraft.purse) ? tileDraft.purse : null;
+    let purse = _d ? _d.slice() : [];
+    mount(`${head(tx("Make ₹"+target,"₹"+target+" बनाओ"), tx("Tap coins and notes to add them","सिक्के-नोट छूकर जोड़ो"),"₹"+target+" बनाने के लिए सिक्के और नोट चुनो।")}
+      <div class="mtray" id="mtray"></div>
+      <div class="purse" id="purse"></div>
+      <div class="mtotal" id="mtotal"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check">${tx("Check","जाँचो")}</button>`);
+    announce(() => speak(tx("Make "+target+" rupees.","₹"+target+" बनाओ।"), state.lang==="hi"?"hi":"en"));
+    const sum = () => purse.reduce((s,v)=>s+v, 0);
+    function redraw(){
+      $("#mtray").innerHTML = denoms.map((v,i)=>`<button class="mden" data-v="${v}">${moneySVG(v)}</button>`).join("");
+      $("#purse").innerHTML = purse.length
+        ? purse.map((v,i)=>`<button class="mden inpurse" data-i="${i}" title="${tx("Tap to put back","वापस रखने के लिए छुओ")}">${moneySVG(v)}</button>`).join("")
+        : `<i class="eplace">${tx("Your money goes here ↑ tap above","तुम्हारे पैसे यहाँ आएँगे ↑ ऊपर छुओ")}</i>`;
+      $("#mtotal").textContent = tx("You have: ₹","तुम्हारे पास: ₹") + sum();
+      document.querySelectorAll("#mtray .mden").forEach(b => b.onclick = () => { purse.push(+b.dataset.v); sfx.gem(); redraw(); });
+      document.querySelectorAll("#purse .mden").forEach(b => b.onclick = () => { purse.splice(+b.dataset.i, 1); sfx.tap(); redraw(); });
+      tileDraft = { idx, purse: purse.slice() };
+    }
+    $("#clear").onclick = () => { purse = []; redraw(); };
+    $("#check").onclick = () => {
+      const t = sum(), ok = t === target;
+      setMood(ok ? "happy" : "sad");
+      (ok ? sfx.correct : sfx.wrong)();
+      const fb = $("#fb");
+      if(ok){ fb.textContent = tx("Exactly ₹"+target+"! 🎉","पूरे ₹"+target+"! 🎉"); fb.className = "feedback good"; setTimeout(()=>next(true), 1100); }
+      else { logWrong("make ₹"+target, "₹"+t, "₹"+target);
+             fb.textContent = t > target ? tx("That's ₹"+t+" — too much.","यह ₹"+t+" है — ज़्यादा हो गया।")
+                                         : tx("That's ₹"+t+" — not enough yet.","यह ₹"+t+" है — अभी कम है।");
+             fb.className = "feedback bad"; setTimeout(()=>next(false), 1900); }
+    };
+    redraw();
+  }
+
+  // --- CLOCK: read the analog face, tap the right time
+  // r = { h(1-12), m(0/15/30/45) }
+  function roundClock(r){
+    const right = fmtTime(r.h, r.m);
+    const altH = (r.h % 12) + 1;
+    const altM = (r.m + 30) % 60 === r.m ? (r.m + 15) % 60 : (r.m + 30) % 60;
+    const set = [right];
+    [fmtTime(altH, r.m), fmtTime(r.h, altM), fmtTime(altH, altM)].forEach(t => { if(set.length<3 && set.indexOf(t)<0) set.push(t); });
+    mount(`${head(tx("What time is it?","क्या समय हुआ है?"), tx("The short hand tells the hour","छोटी सुई घंटा बताती है"),"घड़ी देखो और सही समय चुनो।")}
+      <div class="clockwrap">${clockSVG(r.h, r.m)}</div>
+      <div class="options quizopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    announce(() => speak(tx("What time is it?","क्या समय हुआ है?"), state.lang==="hi"?"hi":"en"));
+    const opts = $("#opts");
+    let done = false;
+    shuffle(set).forEach(t => {
+      const b = el(`<button class="opt quizopt">${esc(t)}</button>`);
+      b.onclick = () => {
+        if(done) return; done = true;
+        const correct = t === right;
+        document.querySelectorAll(".quizopt").forEach(o => o.classList.add("disabled"));
+        b.classList.add(correct ? "correct" : "wrong");
+        setMood(correct ? "happy" : "sad");
+        (correct ? sfx.correct : sfx.wrong)();
+        const fb = $("#fb");
+        if(correct){ fb.textContent = tx("Right time! 🎉","सही समय! 🎉"); fb.className = "feedback good"; }
+        else { logWrong("clock", t, right);
+               fb.textContent = tx("It shows ","घड़ी में है ") + right; fb.className = "feedback bad";
+               document.querySelectorAll(".quizopt").forEach(o => { if(o.textContent === right) o.classList.add("correct"); }); }
+        setTimeout(() => next(correct), correct ? 900 : 1600);
+      };
+      opts.appendChild(b);
+    });
+  }
+
+  // --- ORDER: mixed-up steps of a process or story — tap them into the right sequence
+  // r = { title?, titleHi?, steps:[{en,hi?,emoji?}] in the CORRECT order }
+  function roundOrder(r){
+    const steps = r.steps || [];
+    const _d = (tileDraft && tileDraft.idx===idx && tileDraft.ord) ? tileDraft.ord : null;
+    const bankOrder = _d ? _d.bank.slice() : shuffle(steps.map((s,i)=>i));
+    let placed = _d ? _d.placed.slice() : [];
+    mount(`${head(r.title ? tx(r.title, r.titleHi || r.title) : tx("Put the steps in order","कदम क्रम में लगाओ"), tx("What happens first? Tap in order","पहले क्या होता है? क्रम से छुओ"),"कदमों को सही क्रम में लगाओ।")}
+      <div class="orderslots" id="slots"></div>
+      <div class="bank orderbank" id="bank"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn ghost" id="clear">${tx("Clear","मिटाओ")}</button>
+      <button class="btn primary" id="check" disabled>${tx("Check","जाँचो")}</button>`);
+    announce(() => speak(tx("Tap the steps in the right order.","कदमों को सही क्रम में छुओ।"), state.lang==="hi"?"hi":"en"));
+    function redraw(){
+      const slots=$("#slots"), bank=$("#bank");
+      slots.innerHTML = ""; bank.innerHTML = "";
+      steps.forEach((s, pos) => {
+        if(pos < placed.length){
+          const si = placed[pos], st = steps[si];
+          const c = el(`<button type="button" class="ordercard placed"><span class="onum">${pos+1}</span>${st.emoji?`<span class="oemo">${esc(st.emoji)}</span>`:""}<span>${esc(tx(st.en, st.hi||st.en))}</span></button>`);
+          c.onclick = () => { placed.splice(pos,1); redraw(); };
+          slots.appendChild(c);
+        } else {
+          slots.appendChild(el(`<div class="ordercard empty"><span class="onum">${pos+1}</span><i>${tx("…","…")}</i></div>`));
+        }
+      });
+      bankOrder.filter(i => placed.indexOf(i) < 0).forEach(i => {
+        const st = steps[i];
+        const c = el(`<button type="button" class="ordercard">${st.emoji?`<span class="oemo">${esc(st.emoji)}</span>`:""}<span>${esc(tx(st.en, st.hi||st.en))}</span></button>`);
+        c.onclick = () => { placed.push(i); sfx.tap(); speakWord(tx(st.en, st.hi||st.en)); redraw(); };
+        bank.appendChild(c);
+      });
+      $("#check").disabled = placed.length !== steps.length;
+      tileDraft = { idx, ord: { bank: bankOrder.slice(), placed: placed.slice() } };
+    }
+    $("#clear").onclick = () => { placed = []; redraw(); };
+    $("#check").onclick = () => {
+      const ok = placed.every((si, pos) => si === pos);
+      setMood(ok ? "happy" : "sad");
+      (ok ? sfx.correct : sfx.wrong)();
+      const fb = $("#fb");
+      if(ok){ fb.textContent = tx("Perfect order! 🎉","एकदम सही क्रम! 🎉"); fb.className = "feedback good"; setTimeout(()=>next(true), 1100); }
+      else {
+        logWrong(r.title || "order", placed.map(i=>steps[i].en).join(" → "), steps.map(s=>s.en).join(" → "));
+        fb.textContent = tx("Right order: ","सही क्रम: ") + steps.map((s,i)=>(i+1)+". "+tx(s.en, s.hi||s.en)).join("  ");
+        fb.className = "feedback bad"; setTimeout(()=>next(false), 2600);
+      }
+    };
+    redraw();
+  }
+
+  // --- SCAM: a message arrives — safe, or a trick? Judgment first, the why right after
+  // r = { from?, msg, msgHi?, safe:bool, why, whyHi?, action?, actionHi? }
+  function roundScam(r){
+    mount(`${head(tx("Is this message safe?","क्या यह संदेश सुरक्षित है?"), tx("Read it carefully before you decide","फ़ैसला करने से पहले ध्यान से पढ़ो"),"संदेश पढ़ो — सुरक्षित है या धोखा?")}
+      <div class="scamcard"><div class="scamfrom">📱 ${esc(r.from || tx("Unknown number","अनजान नंबर"))}</div>
+        <div class="scammsg">${esc(tx(r.msg, r.msgHi || r.msg))}</div>
+        <button class="speakchip" id="say" title="Hear it">🔊</button></div>
+      <div class="rapidbtns">
+        <button class="rapidbtn yes" id="safe">✅ ${tx("Safe","सुरक्षित")}</button>
+        <button class="rapidbtn no" id="unsafe">🚫 ${tx("Not safe","सुरक्षित नहीं")}</button></div>
+      <div id="teach" class="teachbox" style="display:none"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const sayIt = () => speak(tx(r.msg, r.msgHi || r.msg), state.lang==="hi"?"hi":"en");
+    $("#say").onclick = sayIt;
+    announce(sayIt);
+    let done = false;
+    const pickAns = saidSafe => {
+      if(done) return; done = true;
+      const correct = saidSafe === !!r.safe;
+      const chosenBtn = saidSafe ? $("#safe") : $("#unsafe");
+      const rightBtn  = r.safe ? $("#safe") : $("#unsafe");
+      [$("#safe"), $("#unsafe")].forEach(b => b.classList.add("disabled"));
+      chosenBtn.classList.add(correct ? "correct" : "wrong");
+      if(!correct) rightBtn.classList.add("correct");
+      setMood(correct ? "happy" : "surprised");
+      (correct ? sfx.correct : sfx.wrong)();
+      const why = tx(r.why, r.whyHi || r.why);
+      const act = r.action ? " " + tx(r.action, r.actionHi || r.action) : "";
+      const tb = $("#teach"); tb.style.display = "flex";
+      tb.innerHTML = `${r.safe ? "💡" : "⚠️"} <span>${esc(why + act)}</span>`;
+      setNarration(why + act, why + act);
+      const fb = $("#fb");
+      fb.textContent = correct ? tx("You spotted it! 🛡️","सही पहचाना! 🛡️")
+                               : tx("Careful — read why below.","सावधान — नीचे कारण पढ़ो।");
+      fb.className = "feedback " + (correct ? "good" : "bad");
+      if(!correct) logWrong(r.msg, saidSafe ? "safe" : "not safe", r.safe ? "safe" : "not safe");
+      speak(why + act, state.lang==="hi" ? "hi" : "en", { queue:true, gap:400 });
+      setTimeout(() => next(correct), 2600);
+    };
+    $("#safe").onclick = () => pickAns(true);
+    $("#unsafe").onclick = () => pickAns(false);
+  }
+
+  // --- HUNT: a letter grid hiding this lesson's words — tap a word's first and last letter.
+  // One board = the whole activity (like pairs). Misses cost accuracy, never a sad mascot.
+  function roundHunt(){
+    const words = rounds.map(w => w.en.toUpperCase());
+    const N = words.length;
+    const size = Math.max(7, ...words.map(w => w.length));
+    const _d = (tileDraft && tileDraft.idx===idx && tileDraft.hunt) ? tileDraft.hunt : null;
+    let grid, place;                                  // place: word -> [cellIndex,...]
+    if(_d){ grid = _d.grid.slice(); place = _d.place; }
+    else {
+      // place each word horizontally or vertically; letters may cross where they agree
+      for(let attempt = 0; attempt < 8 && !place; attempt++){
+        const g = Array(size*size).fill("");
+        const p = {};
+        let ok = true;
+        for(const w of shuffle(words.slice()).sort((a,b)=>b.length-a.length)){
+          let put = null;
+          for(let t = 0; t < 80 && !put; t++){
+            const vert = Math.random() < 0.5;
+            const row = Math.floor(Math.random() * (vert ? size - w.length + 1 : size));
+            const col = Math.floor(Math.random() * (vert ? size : size - w.length + 1));
+            const cells = [];
+            let fits = true;
+            for(let k = 0; k < w.length; k++){
+              const ci = vert ? (row+k)*size + col : row*size + col + k;
+              if(g[ci] && g[ci] !== w[k]){ fits = false; break; }
+              cells.push(ci);
+            }
+            if(fits) put = cells;
+          }
+          if(!put){ ok = false; break; }
+          put.forEach((ci,k) => g[ci] = w[k]);
+          p[w] = put;
+        }
+        if(ok){ grid = g; place = p; }
+      }
+      if(!place){                                      // deterministic fallback: one word per row
+        grid = Array(size*size).fill(""); place = {};
+        words.forEach((w, wi) => {
+          const cells = Array.from({length:w.length}, (_,k) => wi*2*size + k);
+          cells.forEach((ci,k) => grid[ci] = w[k]);
+          place[w] = cells;
+        });
+      }
+      const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for(let i = 0; i < grid.length; i++) if(!grid[i]) grid[i] = AZ[Math.floor(Math.random()*26)];
+    }
+    let found  = _d ? _d.found.slice() : [];
+    let misses = _d ? _d.misses : 0;
+    let sel = null;
+    mount(`${head(tx("Find the hidden words","छिपे शब्द ढूँढो"), tx("Tap a word's first letter, then its last","शब्द का पहला अक्षर छुओ, फिर आख़िरी"),"अक्षरों में छिपे शब्द ढूँढो — पहला अक्षर छुओ, फिर आख़िरी।")}
+      <div class="huntgrid" id="grid" style="grid-template-columns:repeat(${size},1fr)"></div>
+      <div class="huntwords" id="hwords"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter("");
+    const draft = () => { tileDraft = { idx, hunt: { grid: grid.slice(), place, found: found.slice(), misses } } };
+    const bar = () => { const b=$("#bar"); if(b) b.style.width = (found.length/N*100)+"%"; };
+    draft(); bar();
+    function redrawWords(){
+      $("#hwords").innerHTML = rounds.map(w => {
+        const done = found.indexOf(w.en.toUpperCase()) >= 0;
+        return `<span class="hword ${done?"done":""}">${esc(w.en)}${w.hi?`<small>${esc(w.hi)}</small>`:""}</span>`;
+      }).join("");
+    }
+    function redraw(){
+      const foundCells = {};
+      found.forEach(w => place[w].forEach(ci => foundCells[ci] = 1));
+      const g = $("#grid");
+      g.innerHTML = "";
+      grid.forEach((ch, ci) => {
+        const b = el(`<button type="button" class="hcell ${foundCells[ci]?"found":""} ${sel===ci?"sel":""}" data-ci="${ci}">${esc(ch)}</button>`);
+        b.onclick = () => cellTap(ci);
+        g.appendChild(b);
+      });
+      redrawWords();
+    }
+    function lineBetween(a, b){
+      const r1 = Math.floor(a/size), c1 = a%size, r2 = Math.floor(b/size), c2 = b%size;
+      if(r1 !== r2 && c1 !== c2) return null;
+      const cells = [];
+      if(r1 === r2){ const [lo,hi] = c1<c2 ? [c1,c2] : [c2,c1]; for(let c=lo;c<=hi;c++) cells.push(r1*size+c); if(c1>c2) cells.reverse(); }
+      else { const [lo,hi] = r1<r2 ? [r1,r2] : [r2,r1]; for(let r=lo;r<=hi;r++) cells.push(r*size+c1); if(r1>r2) cells.reverse(); }
+      return cells;
+    }
+    function cellTap(ci){
+      if(sel === null){ sel = ci; sfx.tap(); redraw(); return; }
+      if(sel === ci){ sel = null; redraw(); return; }
+      const path = lineBetween(sel, ci);
+      sel = null;
+      if(path){
+        const s = path.map(i => grid[i]).join("");
+        const hit = words.find(w => (w === s || w === s.split("").reverse().join("")) && found.indexOf(w) < 0);
+        if(hit){
+          found.push(hit);
+          sfx.correct(); setMood("happy");
+          speakWord(hit.toLowerCase());
+          srSay(tx(hit + " — found!", hit + " — मिल गया!"));
+          draft(); bar(); redraw();
+          if(found.length === N){
+            score = Math.max(Math.ceil(N*0.34), Math.round(N * (N / (N + misses))));
+            state.coins += score*5;
+            idx = rounds.length; save();
+            setTimeout(finish, 700);
+          }
+          return;
+        }
+      }
+      misses++; sfx.wrong(); setMood("think"); draft(); redraw();
+    }
+    redraw();
+  }
+
+  // --- FORM: the real-world document you WRITE — one right line at a time (email's pattern)
+  // r = { title, titleHi?, scenario?, scenarioHi?, fields:[{label, labelHi?, options:[{t,hi?,ok}]}] }
+  function roundForm(r){
+    const chosen = {};
+    mount(`${head(tx("📋 Fill the form","📋 फ़ॉर्म भरो"), r.scenario ? tx(r.scenario, r.scenarioHi || r.scenario) : tx("Complete every line","हर लाइन भरो"), r.scenarioHi || "फ़ॉर्म की हर लाइन सही भरो।")}
+      <div class="email formdoc" id="formdoc"></div>
+      <div class="eopts" id="opts"></div>
+      <div class="feedback" id="fb"></div>`);
+    setFooter(`<button class="btn primary" id="submit" disabled>${tx("Submit ✒️","जमा करो ✒️")}</button>`);
+    announce(() => speak(r.scenario ? tx(r.scenario, r.scenarioHi || r.scenario) : tx("Fill the form.","फ़ॉर्म भरो।"), state.lang==="hi"?"hi":"en"));
+    const docEl = $("#formdoc"), optsEl = $("#opts");
+    const fields = r.fields.map(f => ({ label:f.label, labelHi:f.labelHi, options:shuffle(f.options.slice()) }));
+    function lineFor(fi){
+      const c = chosen[fi];
+      return c==null ? `<i class="eplace">${tx("Tap a line below ↓","नीचे से चुनो ↓")}</i>` : esc(fields[fi].options[c].t);
+    }
+    function render(){
+      docEl.innerHTML =
+        `<div class="erow formtitle">${esc(tx(r.title, r.titleHi || r.title))}</div>` +
+        fields.map((f,fi)=>`<div class="erow"><span class="elabel">${esc(tx(f.label, f.labelHi || f.label))}:</span> <span class="eslot ${chosen[fi]!=null?"set":""}" data-fi="${fi}">${lineFor(fi)}</span></div>`).join("");
+      optsEl.innerHTML = fields.map((f,fi)=>
+        `<div class="optgroup"><div class="oglabel">${esc(tx(f.label, f.labelHi || f.label))}</div>` +
+        f.options.map((o,oi)=>`<button class="echip ${chosen[fi]===oi?"sel":""}" data-fi="${fi}" data-oi="${oi}">${esc(o.t)}${(state.hindi && o.hi)?`<small>${esc(o.hi)}</small>`:""}</button>`).join("") +
+        `</div>`).join("");
+      optsEl.querySelectorAll(".echip").forEach(b => b.onclick = () => { chosen[+b.dataset.fi] = +b.dataset.oi; sfx.tap(); render(); });
+      $("#submit").disabled = Object.keys(chosen).length !== fields.length;
+    }
+    render();
+    $("#submit").onclick = () => {
+      const allOk = fields.every((f,fi)=> f.options[chosen[fi]] && f.options[chosen[fi]].ok);
+      const fb = $("#fb");
+      if(allOk){
+        setMood("happy"); sfx.correct(); docEl.classList.add("sent"); setFooter("");
+        fb.textContent = tx("Form submitted! 🎉","फ़ॉर्म जमा हो गया! 🎉"); fb.className = "feedback good";
+        setTimeout(() => next(true), 1400);
+      } else {
+        setMood("sad"); sfx.wrong();
+        fields.forEach((f,fi)=>{ if(!(f.options[chosen[fi]] && f.options[chosen[fi]].ok)){
+          logWrong((r.title||"form") + " — " + f.label, (f.options[chosen[fi]]||{}).t, ((f.options.find(o=>o.ok))||{}).t);
+          const e = docEl.querySelector(`.eslot[data-fi="${fi}"]`); if(e) e.classList.add("bad"); } });
+        fb.textContent = tx("Some lines are wrong — fix the red ones.","कुछ लाइनें गलत हैं — लाल को ठीक करो।"); fb.className = "feedback bad";
+        setTimeout(() => { docEl.querySelectorAll(".eslot.bad").forEach(e=>e.classList.remove("bad")); fb.textContent=""; }, 1700);
+      }
+    };
   }
 
   // --- SPELL: show picture, build word from letter tiles
@@ -4960,6 +6000,27 @@ function buildRounds(lv, lesson){
   if(lv.type==="sort"){
     const s = lesson.sort || {};
     return shuffle((s.items||[]).slice()).map(it => ({ item: it, buckets: s.buckets || [] }));
+  }
+  if(lv.type==="sounds")    return (lesson.sounds||[]).slice();
+  if(lv.type==="rhyme")     return (lesson.rhyme||[]).slice();
+  if(lv.type==="dictate")   return (lesson.dictate||[]).slice();
+  if(lv.type==="translate") return (lesson.translate||[]).slice();
+  if(lv.type==="branch")    return (lesson.branch||[]).slice();
+  if(lv.type==="story")     return (lesson.story||[]).slice();
+  if(lv.type==="cloze")     return (lesson.cloze||[]).slice();
+  if(lv.type==="notice")    return (lesson.notice||[]).slice();
+  if(lv.type==="rapid")     return (lesson.rapid||[]).slice();
+  if(lv.type==="count")     return (lesson.count||[]).slice();
+  if(lv.type==="money")     return (lesson.money||[]).slice();
+  if(lv.type==="clock")     return (lesson.clock||[]).slice();
+  if(lv.type==="order")     return (lesson.order||[]).slice();
+  if(lv.type==="scam")      return (lesson.scam||[]).slice();
+  if(lv.type==="form")      return (lesson.form||[]).slice();
+  if(lv.type==="hunt"){
+    // the board hides 4 short plain-letter words; `true` draws from the lesson's own words
+    const raw = Array.isArray(lesson.hunt) ? lesson.hunt.map(w => typeof w==="string" ? {en:w} : w)
+                                           : (lesson.words||[]);
+    return pick(raw.filter(w => w.en && /^[A-Za-z]{3,7}$/.test(w.en)), 4);
   }
   if(lv.type==="talk") return lesson.dialogues.slice();
   if(lv.type==="quiz") return (lesson.quiz||[]).slice();

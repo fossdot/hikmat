@@ -672,7 +672,9 @@ def export_offline_curriculum():
 # rotation-era activity types (pairs / odd / sort) plus per-lesson curation (skip): the game
 # merges the blob's keys into the lesson verbatim (see api.get_courses), so adding another
 # such activity later is a content change, not a schema change.
-EXTRA_LESSON_KEYS = ("pairs", "odd", "sort", "skip")
+EXTRA_LESSON_KEYS = ("pairs", "odd", "sort", "sounds", "rhyme", "dictate", "translate",
+                     "branch", "story", "cloze", "notice", "rapid", "count", "money",
+                     "clock", "order", "scam", "hunt", "form", "skip")
 
 
 COURSES = [
