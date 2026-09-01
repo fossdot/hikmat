@@ -833,8 +833,16 @@ def _track_json(t, with_content):
                 word["useHi"] = w.use_hi or ""
             if w.uncountable:
                 word["uncount"] = True
-            else:
-                word["plural"] = w.plural or (w.en + "s")
+            elif w.plural:
+                # Only ever ship an AUTHORED plural. The old fallback was `w.plural or w.en + "s"`,
+                # which invented one for every countable word that lacked it — blind to the word's
+                # class, so `less` became "lesss", `today` "todays", `please` "pleases" (174 words
+                # in all). Nothing showed them today: the only consumer is the "Give me two X"
+                # sentence frame, which those words never reach. But it was a landmine — the first
+                # `thing` word added without a plural would have been pluralised wrongly — and it
+                # made the online payload disagree with the offline bundle, which never had them.
+                # An absent plural is already handled: the frame returns null and is skipped.
+                word["plural"] = w.plural
             words.append(word)
 
         dialogues = []
