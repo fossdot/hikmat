@@ -1,4 +1,4 @@
-# Hikmat — Security & Deploy Checklist
+# Bodhya Learn — Security & Deploy Checklist
 
 > **Note (2026-08-29): this document describes the BACKEND and the WEB app, both unchanged.**
 > Accounts were removed from the **Android** build on 2026-08-27, so the packaged app no longer
@@ -8,7 +8,7 @@
 > covering the server and the web client, not the Play Store app.
 
 
-Hikmat stores data about **minors**. Treat it accordingly. This is the operational
+Bodhya Learn stores data about **minors**. Treat it accordingly. This is the operational
 checklist that complements the in-code hardening (PIN hashing, login tokens, rate
 limits, input validation, cached read APIs).
 
