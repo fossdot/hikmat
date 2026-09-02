@@ -33,7 +33,7 @@
  "is_hidden": 0,
  "label": "Hikmat",
  "links": [],
- "modified": "2026-07-06 23:01:38.826712",
+ "modified": "2026-08-26 07:01:19.418768",
  "modified_by": "Administrator",
  "module": "Hikmat",
  "name": "Hikmat",
@@ -147,19 +147,6 @@
    "doc_view": "",
    "label": "Doubts",
    "link_to": "Lesson Doubt",
-   "type": "DocType"
-  },
-  {
-   "doc_view": "",
-   "label": "Pending Evaluations",
-   "link_to": "Pending Evaluations",
-   "report_ref_doctype": "Evaluation",
-   "type": "Report"
-  },
-  {
-   "doc_view": "",
-   "label": "Milestones",
-   "link_to": "Hikmat Milestone",
    "type": "DocType"
   },
   {

@@ -21,6 +21,7 @@ import re
 import secrets
 import time
 import unicodedata
+from urllib.parse import quote
 
 import frappe
 from frappe import _
@@ -698,7 +699,7 @@ def _require_staff():
 
 # ---------------------------------------------------------------------------
 # Facilitator notifications — surface a learner's "I'm stuck" tap (and, later,
-# milestone checkpoints) to every facilitator's Desk bell. Best-effort: a
+# doubts and help requests) to every facilitator's Desk bell. Best-effort: a
 # notification failure must never block the child's action.
 # ---------------------------------------------------------------------------
 def _facilitator_users():
@@ -815,7 +816,7 @@ def _track_json(t, with_content):
 
     lessons = frappe.get_all(
         "Lesson", filters={"track": t.name, "published": 1},
-        fields=["name", "lesson_key", "title", "title_hi",
+        fields=["name", "lesson_key", "title", "title_hi", "extras_json",
                 "video", "video_title", "video_title_hi", "video_duration_secs"],
         order_by="sort_order asc, creation asc",
     )
@@ -832,8 +833,16 @@ def _track_json(t, with_content):
                 word["useHi"] = w.use_hi or ""
             if w.uncountable:
                 word["uncount"] = True
-            else:
-                word["plural"] = w.plural or (w.en + "s")
+            elif w.plural:
+                # Only ever ship an AUTHORED plural. The old fallback was `w.plural or w.en + "s"`,
+                # which invented one for every countable word that lacked it — blind to the word's
+                # class, so `less` became "lesss", `today` "todays", `please` "pleases" (174 words
+                # in all). Nothing showed them today: the only consumer is the "Give me two X"
+                # sentence frame, which those words never reach. But it was a landmine — the first
+                # `thing` word added without a plural would have been pluralised wrongly — and it
+                # made the online payload disagree with the offline bundle, which never had them.
+                # An absent plural is already handled: the frame returns null and is skipped.
+                word["plural"] = w.plural
             words.append(word)
 
         dialogues = []
@@ -930,6 +939,17 @@ def _track_json(t, with_content):
             ld["videoTitleHi"] = l.get("video_title_hi") or ""
             if _int(l.get("video_duration_secs")):
                 ld["videoDuration"] = _int(l.get("video_duration_secs"))
+        # Rotation-era activities (pairs / odd / sort) and per-lesson curation (skip) ride one
+        # JSON blob rather than a child DocType each — merged into the lesson verbatim, and the
+        # game ignores keys it does not know. Malformed JSON must cost that lesson its extras,
+        # never the whole curriculum payload.
+        if (l.get("extras_json") or "").strip():
+            try:
+                extras = json.loads(l.extras_json)
+                if isinstance(extras, dict):
+                    ld.update(extras)
+            except Exception:
+                pass
         track["lessons"].append(ld)
 
     # Module test: the question bank ships WITH the curriculum so tests work fully
@@ -956,6 +976,109 @@ def _track_json(t, with_content):
     return track
 
 
+# Providers the site can actually authenticate against, in the order they should be shown.
+# `social_login_provider` is Frappe's own field; the redirect URL it builds is the documented
+# entry point (frappe.integrations.oauth2_logins), so we are not inventing an auth route.
+_SOCIAL_LABELS = {"Google": "Google", "Facebook": "Facebook", "GitHub": "GitHub"}
+
+
+def _enabled_social_logins():
+    if not frappe.db.exists("DocType", "Social Login Key"):
+        return []
+    out = []
+    try:
+        rows = frappe.get_all("Social Login Key",
+                              filters={"enable_social_login": 1},
+                              fields=["name", "provider_name", "social_login_provider"],
+                              order_by="creation asc")
+    except Exception:
+        return []
+    for r in rows:
+        key = r.social_login_provider or r.provider_name or r.name
+        label = _SOCIAL_LABELS.get(key, r.provider_name or key)
+        # Two different identifiers, and conflating them is a bug waiting to happen:
+        #   `key`  — lowercased provider family, all the game uses it for is picking the right
+        #            brand glyph (PROVIDER_ICON in the game).
+        #   r.name — the Social Login Key DOCNAME (frappe.scrub of the provider name), which is
+        #            what frappe.utils.oauth keys its provider registry on. A custom provider
+        #            called "My SSO" scrubs to "my_sso" but lowercases to "my sso", so handing
+        #            the display key to the authorize-url builder would KeyError on exactly the
+        #            providers a site adds itself.
+        out.append({"key": str(key).lower(), "label": label,
+                    "url": "/api/method/hikmat.api.social_login?provider="
+                           + quote(str(r.name), safe="")})
+    return out
+
+
+@frappe.whitelist(allow_guest=True)
+def social_login(provider=None, redirect_to=None):
+    """START a "Continue with Google / Facebook" handshake, and land back IN THE GAME.
+
+    The game used to link straight at
+    /api/method/frappe.integrations.oauth2_logins.login_via_<provider>. That is the CALLBACK
+    Google redirects *to*; reaching it without the `code` and `state` Google appends is an
+    error page, so the button could never have worked from a cold click. The real entry point
+    is an authorize URL built per click by get_oauth2_authorize_url — and it has to be built
+    per click, because the `state` it signs carries the site, a nonce, and the one thing that
+    matters here: where to send the browser afterwards.
+
+    Without that, Frappe drops a freshly created Website User on /me — a Frappe page, not this
+    app — and a girl who tapped "Continue with Google" inside a learning game ends up staring
+    at a portal she has no idea what to do with. So `redirect_to` defaults to the game itself.
+
+    `redirect_to` is confined to a PATH on this site (_safe_redirect). A caller-supplied
+    absolute URL here would be an open redirect wearing a login screen, which is the standard
+    way an OAuth entry point becomes someone else's phishing hop.
+
+    allow_guest, necessarily: signing in is the one thing you do before you have a session.
+    It creates nothing and reveals nothing — a disabled or unknown provider is refused with
+    the same 404-ish answer, so it is not a probe for which keys a site has configured."""
+    from frappe.utils.oauth import get_oauth2_authorize_url
+
+    name = _docname(provider, 140)
+    ok = bool(name) and frappe.db.exists("Social Login Key",
+                                         {"name": name, "enable_social_login": 1})
+    if not ok:
+        frappe.local.response["http_status_code"] = 404
+        return {"ok": False, "error": "unknown_provider"}
+    try:
+        url = get_oauth2_authorize_url(name, _safe_redirect(redirect_to))
+    except Exception:
+        # Keys half-configured in Desk (client id set, secret missing) raise from rauth. The
+        # learner gets the sign-in screen back rather than a traceback; the site gets the log.
+        frappe.log_error(title="hikmat.social_login", message=frappe.get_traceback())
+        frappe.local.response["http_status_code"] = 503
+        return {"ok": False, "error": "provider_unavailable"}
+    frappe.local.response["type"] = "redirect"
+    frappe.local.response["location"] = url
+
+
+#: Where a social sign-in comes back to when the caller names nowhere. The game is served as a
+#: static asset by Frappe, so this is a real URL on this site and not a route we have to keep.
+GAME_PATH = "/assets/hikmat/game.html"
+_REDIRECT_PATH_RE = re.compile(r"^/[A-Za-z0-9._~%!$&'()*+,;=:@/?#-]*$")
+
+
+def _safe_redirect(value):
+    """A same-site PATH, or the game. Never a host anyone else controls.
+
+    Rejects on purpose: absolute URLs (`https://evil/`), protocol-relative ones (`//evil/` —
+    the one that looks like a path and is not), backslash variants some browsers normalise to
+    a slash, and anything with control characters or a newline in it (response splitting)."""
+    p = _plain_text(value)
+    if not p or len(p) > 512:
+        return GAME_PATH
+    if not p.startswith("/") or p.startswith("//") or p.startswith("/\\"):
+        return GAME_PATH
+    # An ALLOWLIST, not a list of tricks: only the characters that are legal in a URL path or
+    # query survive. A blocklist here would be a list of the evasions somebody has already
+    # thought of, and _plain_text folds a CR/LF into a SPACE on the way in — so the obvious
+    # "reject control characters" test passes a header-splitting attempt straight through.
+    if not _REDIRECT_PATH_RE.match(p):
+        return GAME_PATH
+    return p
+
+
 @frappe.whitelist(allow_guest=True)
 def get_settings():
     return _cached(SETTINGS_CACHE_KEY, _build_settings)
@@ -972,6 +1095,12 @@ def _build_settings():
         "helpDefaultOn": bool(s.help_default_on),
         "defaultTheme": s.get("default_theme") or "light",
         "defaultSound": bool(s.get("default_sound")),
+        # Which "Continue with X" buttons to draw. Read from Frappe's OWN Social Login Key
+        # doctype rather than a flag of ours, so the app can never offer a provider the server
+        # cannot actually complete a handshake with: enable the key in Desk and the button
+        # appears, disable it and the button goes. Only the provider name and its sign-in URL
+        # cross the wire — never the client id, and certainly never the secret.
+        "socialLogins": _enabled_social_logins(),
         # Only the on/off flags are public — the model, endpoints, system prompt and crisis
         # copy stay server-side (read from the Single inside ai_ask/ai_transcribe/ai_tts),
         # never in this cached payload that any guest can fetch.
@@ -990,11 +1119,6 @@ def _build_settings():
         "consentVersion": _CONSENT_VERSION,
         "consentText": _CONSENT_TEXT_EN,
         "consentTextHi": _CONSENT_TEXT_HI,
-        # Belt thresholds ship with settings so gate DETECTION works fully offline;
-        # CLEARING stays server-side (Evaluation status, synced via get_progress).
-        "milestones": [{"key": m.milestone_key, "title": m.title, "titleHi": m.title_hi or "",
-                        "icon": m.icon or "🏅", "threshold": m.threshold_gems}
-                       for m in _active_milestones()],
     }
 
 
@@ -1052,11 +1176,7 @@ def submit_attempt(student=None, token=None, track=None, lesson=None, activity=N
         existing = frappe.db.get_value("Lesson Attempt", {"client_id": client_id}, "name")
         return {"ok": True, "name": existing, "dedup": True}
     frappe.db.commit()
-    gate = _check_milestones(student, sinfo)                 # belt threshold crossed? (never blocks the write)
-    out = {"ok": True, "name": doc.name}
-    if gate:
-        out["milestone"] = gate
-    return out
+    return {"ok": True, "name": doc.name}
 
 
 _TEST_STATUS = {"completed": "Completed", "exited": "Exited", "timed_out": "Timed Out"}
@@ -1133,69 +1253,21 @@ def submit_test(student=None, token=None, track=None, paper=None, score=0, total
 
 
 # ---------------------------------------------------------------------------
-# Milestone "belt" gates — configurable star thresholds; crossing one creates a
-# Pending Evaluation (an in-person facilitator rubric) and notifies facilitators.
-# Clearing is server-authoritative: a facilitator marks the Evaluation Passed in
-# Desk; the client syncs gate status down via get_progress.
+# Gems — the only progress metric the app rewards. There used to be "belt" gates on top of
+# these: crossing a gem threshold created a Pending Evaluation and LOCKED every new lesson
+# until a facilitator marked it Passed in Desk. Removed 2026-08-26 (v17) — a learner should
+# never be stopped by an adult's queue. Gems themselves are unchanged.
 # ---------------------------------------------------------------------------
-def _active_milestones():
-    """Active milestones, cheapest-first. Cached with the settings payload lifecycle."""
-    return frappe.get_all("Hikmat Milestone", filters={"active": 1},
-                          fields=["milestone_key", "title", "title_hi", "icon", "threshold_gems"],
-                          order_by="threshold_gems asc")
-
-
 def _total_gems(student):
     """A student's global gem total 💎 = SUM of coins over every lesson attempt
     (score*5 + stars*10 each) — mirrors the client's state.coins, and unlike stars it keeps
     growing on replays, so practice keeps counting toward the next belt.
 
     Corpus XP used to be added here too. The Bhojpuri AI / Boli pipeline is gone and its
-    ledger table with it, so lesson attempts are now the whole story. A girl who had banked
-    corpus XP therefore sees her SERVER-side gem total drop by that much, which can un-cross
-    a belt she had reached — Evaluations already created are untouched, but the next one may
-    take longer. v12_remove_boli prints who was affected so a facilitator can clear them by
-    hand rather than the loss going unnoticed."""
+    ledger table with it, so lesson attempts are now the whole story."""
     r = frappe.db.sql(
         "select coalesce(sum(coins), 0) from `tabLesson Attempt` where student=%s", student)
     return int(r[0][0]) if r else 0
-
-
-def _check_milestones(student, sinfo):
-    """After a committed attempt: create a Pending Evaluation for every newly-crossed
-    active milestone and ping the facilitators. Failures here must never undo the
-    attempt (already committed), so everything is wrapped and rolled back on error.
-    Returns the highest newly-crossed milestone key (for the client's celebration)."""
-    try:
-        milestones = _active_milestones()
-        if not milestones:
-            return None
-        total = _total_gems(student)
-        campus = frappe.db.get_value("Student", student, "campus")
-        crossed = None
-        for m in milestones:
-            if total < (m.threshold_gems or 0):
-                break                                        # sorted ascending — nothing further is reached
-            if frappe.db.exists("Evaluation", {"student": student, "milestone": m.milestone_key}):
-                continue                                     # already pending/passed — one row per belt, ever
-            frappe.get_doc({
-                "doctype": "Evaluation", "student": student,
-                "student_name": sinfo.get("student_name"), "cohort": sinfo.get("cohort"),
-                "campus": campus, "milestone": m.milestone_key,
-                "threshold_gems": m.threshold_gems, "gems_at_reach": total,
-                "status": "Pending", "reached_on": frappe.utils.now(),
-            }).insert(ignore_permissions=True)
-            frappe.db.commit()
-            _notify_facilitators(
-                "🏅 %s reached %s (%s💎) — evaluation needed" %
-                (sinfo.get("student_name") or student, m.title, total),
-                "Evaluation", "EV-%s-%s" % (student, m.milestone_key))
-            crossed = m.milestone_key
-        return crossed
-    except Exception:
-        frappe.db.rollback()
-        frappe.log_error(frappe.get_traceback(), "hikmat milestone check")
-        return None
 
 
 def validate_cohort(doc, method=None):
@@ -2441,19 +2513,238 @@ def signup_online(username=None, pin=None, invite_code=None, name=None, avatar=N
             "username": username}
 
 
+_EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[A-Za-z0-9]([A-Za-z0-9.-]{0,251}[A-Za-z0-9])?\.[A-Za-z]{2,24}$")
+_MIN_PASSWORD = 8
+
+# The commonest passwords, refused outright. Not a security theatre list — these are what a
+# rushed adult actually types, and this account is the only thing standing between a stranger
+# and a child's learning record.
+_WEAK_PASSWORDS = frozenset("""
+password password1 password123 12345678 123456789 1234567890 qwerty123 qwertyui
+iloveyou1 letmein1 welcome1 abc12345 admin123 bodhya123 hikmat123 changeme
+""".split())
+
+
+def _validated_password(pwd):
+    """(password, None) or (None, error_code). Length first, then the obvious-guess list.
+
+    Deliberately NOT delegating to Frappe's password policy: v2_online_auth switched that off
+    site-wide so that 4-digit PINs could be stored as passwords. Turning it back on now would
+    reject every existing PIN account at next login, so this door enforces its own floor and
+    leaves the site setting alone."""
+    pwd = pwd if isinstance(pwd, str) else ""
+    if len(pwd) < _MIN_PASSWORD:
+        return None, "weak_password"
+    if pwd.strip().lower() in _WEAK_PASSWORDS:
+        return None, "common_password"
+    return pwd, None
+
+
+def _normalised_email(value):
+    e = _plain_text(value).strip().lower()
+    return e if (len(e) <= 140 and _EMAIL_RE.match(e)) else ""
+
+
+@frappe.whitelist(allow_guest=True)
+def signup_email(email=None, password=None, name=None, avatar=None, band=None,
+                 gender=None, mascot=None, age=None):
+    """Open sign-up for ONLINE learners: a real email address and a real password.
+
+    This is the door for people who find the app themselves, and it deliberately has no invite
+    code — unlike signup_online, which gates on a cohort code because it enrols someone into a
+    facilitator's cohort. It also has no PIN: a 4-digit PIN typed on a shared classroom laptop
+    and a password protecting an internet-facing account are not the same security problem, and
+    pretending otherwise is how the PIN ended up being stored as a User password.
+
+    Creates a Website User (no Desk, no welcome mail) plus the linked Student, then answers
+    ok. The CLIENT logs in afterwards through Frappe's own /api/method/login with the same
+    address and password — one tested path for signing in, exercised from the first minute,
+    rather than a bespoke session handed out here that only ever runs once.
+
+    NOT verified by email. There is no outbound mail configured on this site, so a verification
+    step would either block every signup or be a link nobody receives. The address is stored as
+    given; treat it as a login identifier, not as proof of ownership, until mail is set up."""
+    if not _rate_ok("signup:" + _client_ip(), 60, 3600, fail_closed=True):   # see signup_student
+        return {"ok": False, "error": "rate_limited"}
+
+    email = _normalised_email(email)
+    if not email:
+        return {"ok": False, "error": "bad_email"}
+    password, err = _validated_password(password)
+    if err:
+        return {"ok": False, "error": err}
+
+    display = _display_name(name) or email.split("@")[0]
+    if not (2 <= len(display) <= 40):
+        return {"ok": False, "error": "bad_name"}
+
+    if frappe.db.exists("User", email):
+        # Same wording as a wrong password would produce on the login screen, so this endpoint
+        # is not a membership oracle for arbitrary addresses.
+        return {"ok": False, "error": "email_taken"}
+
+    avatar = _plain_text(avatar)[:20] or "🙂"
+    band = _docname(band)
+    band = band if (band and frappe.db.exists("Grade Band", band)) else None
+    g = _plain_text(gender)
+    g = g if g in GENDERS else "Other"
+    mas = _plain_text(mascot).lower()
+    mas = mas if mas in MASCOT_IDS else "roshni"
+
+    user = frappe.get_doc({
+        "doctype": "User", "email": email, "first_name": display,
+        "user_type": "Website User", "send_welcome_email": 0, "enabled": 1,
+        "new_password": password,
+    })
+    user.flags.no_welcome_mail = True
+    user.insert(ignore_permissions=True)
+
+    cohort = "Online"
+    if not frappe.db.exists("Cohort", cohort):
+        try:
+            frappe.get_doc({"doctype": "Cohort", "cohort_name": cohort, "mode": "Online",
+                            "center": "Self sign-up"}).insert(ignore_permissions=True)
+        except frappe.DuplicateEntryError:
+            pass
+
+    a = _int(age, None)
+    stu = frappe.get_doc({
+        "doctype": "Student", "student_name": display, "avatar": avatar,
+        "cohort": cohort, "active": 1, "gender": g, "mascot": mas,
+        "age": a if (a is not None and 3 <= a <= 25) else 0,   # Int column: 0 IS "not given"
+        "band": band, "mode": "Online", "user": user.name,
+    }).insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"ok": True, "id": stu.name, "email": email, "name": display,
+            "avatar": stu.avatar or "🙂", "band": band or "", "gender": g, "mascot": mas,
+            "age": stu.age or 0}
+
+
+def _social_provider(user):
+    """Which "Continue with X" this account was made with, or "" for an email+password one.
+
+    Frappe gives an OAuth-created User a RANDOM password (frappe.generate_hash in
+    get_user_record), so "does a password row exist" answers yes for everyone and cannot tell
+    the two apart. The social_logins child table can. The game needs the difference because a
+    Change-password box is a dead end on a Google account: there is no old password for her to
+    type, and a new one would not be what Google asks for next time."""
+    try:
+        rows = frappe.get_all("User Social Login", filters={"parent": user, "parenttype": "User"},
+                              fields=["provider"])
+    except Exception:
+        return ""
+    for r in rows:
+        p = (r.provider or "").lower()
+        # "frappe" is NOT a third-party sign-in. Frappe stamps EVERY User with one of these as
+        # its own OAuth identity (User.validate -> set_social_login_userid), so a naive "does a
+        # social row exist" answers yes for an ordinary email signup — which showed a girl who
+        # had just chosen a password "you sign in with Frappe, there is no password here", and
+        # hid the only box that would let her change it. Verified against a freshly created
+        # email account on 2026-08-26; it is not a quirk of one site.
+        if p and p != "frappe":
+            return p
+    return ""
+
+
 @frappe.whitelist(allow_guest=True)
 def get_my_student():
     """After an ONLINE Frappe login (POST /api/method/login with the username + PIN), the game
     calls this over the same session to load the linked Student's profile + a bearer token —
     the client never needs to know the student id up front. Returns {ok:False} for a guest."""
     sid = _session_student()
-    if not sid:
+    if sid:
+        s = frappe.db.get_value("Student", sid,
+                                ["student_name", "avatar", "band", "gender", "mascot", "age",
+                                 "user"], as_dict=True)
+        return {"ok": True, "id": sid, "name": s.student_name, "avatar": s.avatar or "🙂",
+                "band": s.band or "", "gender": s.gender or "", "mascot": s.mascot or "roshni",
+                "age": s.age or 0, "email": s.user or "",
+                "social": _social_provider(s.user) if s.user else "",
+                "token": _token_for(sid)}   # request-level commit persists the token
+
+    # Signed in, but no learner behind the account. This is what a "Continue with Google"
+    # round trip looks like the first time: Frappe made the Website User from the Google
+    # profile and there is nothing else — no name we chose, no class, no guide. The game asks
+    # for those on one more screen and calls complete_profile.
+    u = getattr(frappe.session, "user", None)
+    if not u or u == "Guest":
         return {"ok": False}
-    s = frappe.db.get_value("Student", sid,
-                            ["student_name", "avatar", "band", "gender", "mascot"], as_dict=True)
-    return {"ok": True, "id": sid, "name": s.student_name, "avatar": s.avatar or "🙂",
-            "band": s.band or "", "gender": s.gender or "", "mascot": s.mascot or "roshni",
-            "token": _token_for(sid)}   # request-level commit persists the token
+    if frappe.db.exists("Student", {"user": u}):
+        # A learner IS linked; _session_student just refused her because active=0. Saying
+        # "needsProfile" here would hand a deactivated girl a form that mints her a second,
+        # active profile — a way around the off switch, reached by pressing back. Say what is
+        # actually true instead.
+        return {"ok": False, "error": "inactive"}
+    return {"ok": False, "needsProfile": True, "email": u,
+            "name": frappe.db.get_value("User", u, "full_name") or "",
+            "social": _social_provider(u)}
+
+
+@frappe.whitelist()
+def complete_profile(name=None, avatar=None, age=None, band=None, gender=None, mascot=None):
+    """Create the learner behind an account that already exists — the second half of a social
+    sign-up.
+
+    Google and Facebook hand back an email and a display name. They do not hand back the
+    things this app actually needs in order to teach somebody: which class she is in, whether
+    Hindi should address her as a girl or a boy, which guide asks her the questions. So the
+    OAuth round trip creates the Website User and stops, and the game asks for the rest on one
+    more screen. This is where that screen lands.
+
+    NOT allow_guest, and there is no token parameter: the proof of who is asking is the
+    session cookie the handshake just set, and nothing else. No id crosses the wire, so there
+    is no id to forge — this endpoint can only ever create the CALLER'S OWN learner.
+
+    ONE learner per account, always. The exists() check deliberately ignores `active`: with an
+    active=1 filter a deactivated girl could press back to this screen and mint herself a
+    fresh, active profile, which would make the off switch decorative.
+
+    No PIN is set. A campus PIN protects a name typed on a shared classroom laptop; this
+    account is protected by the password (or the Google session) behind it. Storing a second,
+    weaker secret for the same person is how a PIN ended up in a User password field once
+    already."""
+    u = getattr(frappe.session, "user", None)
+    if not u or u == "Guest":
+        return {"ok": False, "error": "not_authorized"}
+    if not _rate_ok("complete_profile:" + str(u), 10, 3600, fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+    existing = frappe.db.get_value("Student", {"user": u}, ["name", "active"], as_dict=True)
+    if existing:
+        return {"ok": False, "error": "inactive" if not existing.active else "already_enrolled"}
+
+    display = _display_name(name) or str(u).split("@")[0]
+    if not (2 <= len(display) <= 40):
+        return {"ok": False, "error": "bad_name"}
+    avatar = _plain_text(avatar)[:20] or "🙂"
+    a = _int(age, None)
+    band = _docname(band)
+    band = band if (band and frappe.db.exists("Grade Band", band)) else None
+    g = _plain_text(gender)
+    g = g if g in GENDERS else "Other"
+    mas = _plain_text(mascot).lower()
+    mas = mas if mas in MASCOT_IDS else "roshni"
+
+    cohort = "Online"
+    if not frappe.db.exists("Cohort", cohort):
+        try:
+            frappe.get_doc({"doctype": "Cohort", "cohort_name": cohort, "mode": "Online",
+                            "center": "Self sign-up"}).insert(ignore_permissions=True)
+        except frappe.DuplicateEntryError:
+            pass
+
+    # mode="Online" explicitly, for the same reason _insert_self_signup_student spells it out:
+    # leaving it to the doctype default is what filed every Play Store tester under "Campus".
+    stu = frappe.get_doc({
+        "doctype": "Student", "student_name": display, "avatar": avatar,
+        "cohort": cohort, "active": 1, "gender": g, "mascot": mas,
+        "age": a if (a is not None and 3 <= a <= 25) else 0,   # Int column: 0 IS "not given"
+        "band": band, "mode": "Online", "user": u,
+    }).insert(ignore_permissions=True)
+    token = _token_for(stu.name)
+    frappe.db.commit()
+    return {"ok": True, "id": stu.name, "name": stu.student_name,
+            "avatar": stu.avatar or "🙂", "band": band or "", "gender": g, "mascot": mas,
+            "age": stu.age or 0, "email": u, "social": _social_provider(u), "token": token}
 
 
 @frappe.whitelist()   # STAFF-ONLY — enforced by _require_staff(), not by the decorator
@@ -3292,9 +3583,10 @@ def average_stars():
 
 
 @frappe.whitelist(allow_guest=True)
-def set_profile(student=None, token=None, mascot=None, gender=None):
-    """Save a learner's own presentation choices — which named guide asks her the questions,
-    and the gender the Hindi has to agree with.
+def set_profile(student=None, token=None, mascot=None, gender=None,
+                name=None, avatar=None, age=None, band=None):
+    """Save a learner's own profile — her name, picture, age, class, guide, and the gender the
+    Hindi has to agree with.
 
     Why this exists at all: both are chosen at signup, but they are also changeable from the
     in-app menu, and the roster runs on ~30 SHARED campus laptops. Keeping the choice only in
@@ -3302,10 +3594,26 @@ def set_profile(student=None, token=None, mascot=None, gender=None):
     laptop, and — worse — a boy who set himself as a boy is addressed as a girl in Hindi by
     every machine except the one he happened to sign up on.
 
-    Deliberately narrow: it can write nothing but these two whitelisted enums, on the caller's
-    OWN row, proven by the same bearer token (or online session) every other per-student
-    endpoint uses. It cannot touch a name, a PIN, a band, a cohort or the active flag, so the
-    worst a stolen token can do here is change whose face says hello.
+    It started as mascot+gender only, and was widened (2026-08-26) when the game grew a real
+    Profile screen — a learner who mistyped her name at signup, or whose age or class changed
+    over a year, previously had to find a facilitator with Desk access to fix a typo.
+
+    Still deliberately narrow, and the boundary is the point: every field here is one the
+    LEARNER chose about herself and can see on her own screen. It cannot touch the PIN, the
+    password, the cohort, the campus, the linked User or the active flag — so the worst a
+    stolen token can do is change whose face says hello and what the profile screen reads,
+    never who the account is or whether it still works.
+
+    ONLY the fields actually sent are written. Absent is not empty: the client sends the whole
+    form, but a fire-and-forget mascot pick sends one key, and a partial payload must never
+    blank the rest of a row.
+
+    On changing the NAME: for an online learner, login is by email, so this is cosmetic. For a
+    campus learner, login_by_name authenticates on exactly this field — so a rename really does
+    change how she signs in. That is the honest behaviour (her name is the thing she types),
+    and _login_name_candidates already copes with two girls sharing a spelling by checking the
+    PIN against each candidate. What it must never become is a way to take over another row,
+    and it is not: the PIN is untouched and still has to match.
 
     Fail-open by design on the client side: the game writes the choice to localStorage FIRST
     and calls this fire-and-forget, because picking a friend must work with no network at all.
@@ -3325,6 +3633,30 @@ def set_profile(student=None, token=None, mascot=None, gender=None):
         if g not in GENDERS:
             return {"ok": False, "error": "bad_gender"}
         vals["gender"] = g
+    if name is not None and _plain_text(name).strip():
+        nm = _display_name(name)          # same normalisation every signup door uses
+        if not (2 <= len(nm) <= 40):
+            return {"ok": False, "error": "bad_name"}
+        vals["student_name"] = nm
+    if avatar is not None and _plain_text(avatar).strip():
+        vals["avatar"] = _plain_text(avatar)[:20]
+    if age is not None and str(age).strip() != "":
+        a = _int(age, None)
+        if a == 0:
+            # 0 is the client saying "she emptied the box", not an age. It is stored AS 0
+            # rather than as NULL because Student.age is an Int column — NOT NULL DEFAULT 0 —
+            # and set_value(None) is a MariaDB 1048, not an empty field. 0 is what an age that
+            # was never given reads back as anyway, so the two are the same state.
+            vals["age"] = 0
+        elif a is None or not (3 <= a <= 25):
+            return {"ok": False, "error": "bad_age"}
+        else:
+            vals["age"] = a
+    if band is not None and _docname(band):
+        b = _docname(band)
+        if not frappe.db.exists("Grade Band", b):
+            return {"ok": False, "error": "bad_band"}
+        vals["band"] = b
     if not vals:
         return {"ok": False, "error": "nothing_to_set"}
     # update_modified=False: this is a preference, not a content edit, and letting it bump
@@ -3332,7 +3664,61 @@ def set_profile(student=None, token=None, mascot=None, gender=None):
     # time a child tries on a different guide.
     frappe.db.set_value("Student", student, vals, update_modified=False)
     frappe.db.commit()
-    return {"ok": True, "mascot": vals.get("mascot", ""), "gender": vals.get("gender", "")}
+    # Echo back exactly what was written, so a client can tell "saved" from "silently ignored"
+    # — the whole payload, not just the two enums this used to handle.
+    return {"ok": True, "mascot": vals.get("mascot", ""), "gender": vals.get("gender", ""),
+            "name": vals.get("student_name", ""), "avatar": vals.get("avatar", ""),
+            "age": vals.get("age", 0), "band": vals.get("band", ""), "saved": list(vals)}
+
+
+@frappe.whitelist()
+def change_password(old_password=None, new_password=None):
+    """Change the password of the ONLINE account the caller is signed in as.
+
+    Frappe ships frappe.core.doctype.user.user.update_password, and this does not replace it —
+    it wraps the one case the game needs behind the same JSON contract every other endpoint
+    here answers with. The core call is allow_guest (it doubles as the reset-key door), answers
+    with an HTTP 410 and a translated sentence on failure, and sets a redirect on success. A
+    six-year-old's Profile screen cannot render any of that; it needs "wrong_password" or
+    "weak_password" as a code it can turn into a Hindi sentence.
+
+    Session-only, and the OLD password is required even though the session already proves who
+    is asking. That is the point: the session is what a shared classroom laptop leaves behind
+    when a girl walks away from it, and without this check the next person at that machine
+    could lock her out of her own account in two taps.
+
+    A campus learner has no password to change — she signs in with a name and a PIN, and PIN
+    changes go through a facilitator (or the guardian-verified reset). She is refused here
+    rather than silently given a password she will never be asked for."""
+    u = getattr(frappe.session, "user", None)
+    if not u or u == "Guest":
+        return {"ok": False, "error": "not_authorized"}
+    if not _rate_ok("chpw:" + str(u), 10, 3600, fail_closed=True):
+        return {"ok": False, "error": "rate_limited"}
+    if _social_provider(u):
+        # A Google/Facebook account HAS a password row — a random one Frappe generated and
+        # nobody has ever seen. Checking it would answer "wrong password" forever, which reads
+        # as "you typed it wrong" rather than "this is not how you sign in". Say the true thing.
+        return {"ok": False, "error": "social_account"}
+    old = old_password if isinstance(old_password, str) else ""
+    if not old:
+        return {"ok": False, "error": "wrong_password"}
+    from frappe.utils.password import check_password
+    try:
+        check_password(u, old)
+    except frappe.AuthenticationError:
+        return {"ok": False, "error": "wrong_password"}
+    except Exception:
+        return {"ok": False, "error": "wrong_password"}
+    pwd, err = _validated_password(new_password)
+    if err:
+        return {"ok": False, "error": err}
+    if pwd == old:
+        return {"ok": False, "error": "same_password"}
+    from frappe.utils.password import update_password as _set_password
+    _set_password(u, pwd)
+    frappe.db.commit()
+    return {"ok": True}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -3353,8 +3739,6 @@ def get_progress(student=None, token=None):
     prog = {}
     for r in rows:
         prog.setdefault(r.track, {}).setdefault(r.lesson, {})[r.activity] = r.stars or 0
-    gates = {e.milestone: e.status for e in frappe.get_all(
-        "Evaluation", filters={"student": student}, fields=["milestone", "status"])}
     # Module tests: pass/best per track, plus the union of every question id this
     # student has ever been served (ordered by first exposure) — so a girl on a NEW
     # device keeps her no-repeat guarantee once she's online. Bounded by bank sizes.
@@ -3375,7 +3759,7 @@ def get_progress(student=None, token=None):
             for qid in ids:
                 if qid not in dst:
                     dst.append(qid)
-    return {"progress": prog, "gates": gates, "gems": _total_gems(student),
+    return {"progress": prog, "gems": _total_gems(student),
             "tests": tests, "testSeen": test_seen}
 
 
@@ -3397,7 +3781,7 @@ def get_progress(student=None, token=None):
 _LEARNER_DOCTYPES = ("Hikmat Consent", "Hikmat OTP",
                      "AI Conversation Turn", "AI Conversation", "Lesson Doubt",
                      "Lesson Attempt", "Test Attempt", "Learning Event",
-                     "Attendance Ping", "Attendance Day", "Evaluation")
+                     "Attendance Ping", "Attendance Day")
 # Hikmat Consent is listed FIRST, and it is not optional. It denormalises student_name, so
 # leaving it out meant an "erase ALL her data" that left the child's NAME behind — the exact
 # residue the rest of this section exists to remove — plus her guardian's number hash. There
@@ -3539,8 +3923,9 @@ def _scrub_name_residue(receipt, student=None, user=None):
                 subjects += ["%s %s" % (label, n) for n in chunk]
             _safe_delete("Comment", {"comment_type": "Deleted", "reference_doctype": dt,
                                      "subject": ["in", subjects]})
-    # Bell alerts whose document_name is a COMPOSITE embedding her id — _check_milestones
-    # writes document_name="EV-<student>-<milestone>", which no (doctype, name) pair matches.
+    # Bell alerts whose document_name is a COMPOSITE embedding her id. Nothing writes these
+    # any more (the milestone check that produced "EV-<student>-<milestone>" was removed in
+    # v17), but rows from before that are still on disk and must still be erased on request.
     if student and frappe.db.exists("DocType", "Notification Log"):
         _safe_delete("Notification Log",
                      {"document_name": ("like", "%" + _like_literal(student) + "%")})

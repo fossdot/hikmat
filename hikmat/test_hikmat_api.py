@@ -3,6 +3,7 @@
 """Contract + validation tests for the public API. Run with:
     bench --site <site> run-tests --app hikmat
 """
+import json
 import time
 
 import frappe
@@ -144,26 +145,9 @@ class TestHikmatApi(FrappeTestCase):
 		self.assertIn("bands", st)
 		self.assertIn("subjects", st)
 
-	# ---------------- Milestone "belt" gates ----------------
-	# _check_milestones commits mid-test (it must — the attempt is already committed in
-	# real use), which defeats FrappeTestCase's rollback. So every helper registers an
-	# explicit cleanup; nothing test-made may survive into the live DB.
-	def _mk_test_milestone(self):
-		if not frappe.db.exists("Hikmat Milestone", "belt_test"):
-			frappe.get_doc({"doctype": "Hikmat Milestone", "milestone_key": "belt_test",
-			                "title": "Test Belt", "threshold_gems": 20, "active": 1,
-			                "sort_order": 99}).insert(ignore_permissions=True)
-		def _rm():
-			frappe.db.delete("Evaluation", {"milestone": "belt_test"})
-			frappe.db.delete("Hikmat Milestone", {"name": "belt_test"})
-			frappe.db.commit()
-			api.clear_content_cache()
-		self.addCleanup(_rm)
-
 	def _mk_student(self, name):
 		def _rm():
 			for s in frappe.get_all("Student", filters={"student_name": name}, pluck="name"):
-				frappe.db.delete("Evaluation", {"student": s})
 				frappe.db.delete("Lesson Attempt", {"student": s})
 				frappe.db.delete("Student", {"name": s})
 			frappe.db.commit()
@@ -184,39 +168,6 @@ class TestHikmatApi(FrappeTestCase):
 		self._attempt(stu, "l1", "spell", 1, coins=25)
 		self.assertEqual(api._total_gems(stu.name), 120)
 
-	def test_milestone_crossing_creates_pending_evaluation(self):
-		stu = self._mk_student("Belt Cross Girl")
-		sinfo = frappe._dict(student_name=stu.student_name, cohort=None)
-		self._mk_test_milestone()   # a tiny milestone the student has already crossed
-		self._attempt(stu, "l1", "learn", 3, coins=30)
-		crossed = api._check_milestones(stu.name, sinfo)
-		self.assertEqual(crossed, "belt_test")
-		ev = frappe.get_doc("Evaluation", {"student": stu.name, "milestone": "belt_test"})
-		self.assertEqual(ev.status, "Pending")
-		self.assertEqual(ev.gems_at_reach, 30)
-		# idempotent: crossing again never makes a second row
-		self.assertIsNone(api._check_milestones(stu.name, sinfo))
-		self.assertEqual(frappe.db.count("Evaluation",
-			{"student": stu.name, "milestone": "belt_test"}), 1)
-
-	def test_get_progress_returns_gates(self):
-		stu = self._mk_student("Belt Gate Girl")
-		tok = api._token_for(stu.name)
-		self._mk_test_milestone()
-		frappe.get_doc({"doctype": "Evaluation", "student": stu.name,
-		                "milestone": "belt_test", "status": "Passed",
-		                "reached_on": frappe.utils.now()}).insert(ignore_permissions=True)
-		res = api.get_progress(student=stu.name, token=tok)
-		self.assertEqual(res.get("gates", {}).get("belt_test"), "Passed")
-
-	def test_settings_payload_carries_milestones(self):
-		s = api._build_settings()
-		self.assertIn("milestones", s)
-		for m in s["milestones"]:
-			for key in ("key", "title", "titleHi", "icon", "threshold"):
-				self.assertIn(key, m)
-
-	# ---------------- Learning-event stream (wrong answers) ----------------
 	def test_log_event_rejects_unknown_kind(self):
 		self.assertEqual(api.log_event(kind="dance_party").get("error"), "bad_kind")
 
@@ -746,12 +697,14 @@ class TestErasure(FrappeTestCase):
 		                "student_name": girl.student_name, "track": "t1", "lesson": "l1",
 		                "activity": "learn", "question": "समझ नहीं आया", "resolved": 0,
 		                "raised_on": frappe.utils.now()}).insert(ignore_permissions=True)
-		milestone = frappe.get_all("Hikmat Milestone", limit=1, pluck="name")
-		if milestone:                       # facilitator free text ABOUT the child
-			frappe.get_doc({"doctype": "Evaluation", "student": girl.name,
-			                "student_name": girl.student_name, "milestone": milestone[0],
-			                "status": "Pending", "rubric_notes": "notes about the child",
-			                }).insert(ignore_permissions=True)
+		# Free text written ABOUT the child, rather than by her — the erasure has to take
+		# this too. It used to be an Evaluation's rubric notes; that doctype was removed with
+		# the belt gates (v17), so the same coverage now rides on an AI Conversation.
+		frappe.get_doc({"doctype": "AI Conversation", "student": girl.name,
+		                "student_name": girl.student_name,
+		                "conversation_id": "erase-" + frappe.generate_hash(length=10),
+		                "flagged": 1, "flag_reason": "notes about the child",
+		                "started_on": frappe.utils.now()}).insert(ignore_permissions=True)
 		frappe.db.commit()
 
 	def test_delete_student_erases_her_whole_trail_and_her_user(self):
@@ -1971,7 +1924,7 @@ class TestIngestSanitisation(FrappeTestCase):
 			frappe.set_user("Administrator")
 			frappe.db.commit()
 			for dt in ("Lesson Attempt", "Test Attempt", "Lesson Doubt", "Learning Event",
-			           "Attendance Ping", "Attendance Day", "Evaluation"):
+			           "Attendance Ping", "Attendance Day"):
 				frappe.db.delete(dt, {"student": doc.name})
 			frappe.db.delete("Student", {"name": doc.name})
 			frappe.db.commit()
@@ -2194,7 +2147,7 @@ class TestRound3ReportGuards(FrappeTestCase):
 	"""The five reports round 2 missed, plus a sweep that refuses to let a sixth hide."""
 
 	CONVERTED = ("Hardest Questions", "Student Progress", "Confusion Heatmap",
-	             "AI Review Queue", "Pending Evaluations")
+	             "AI Review Queue")
 	# `onerror` writes to a global so a browser harness can count executions; the string
 	# only has to contain angle brackets for the assertions here.
 	XSS = '<img src=x onerror="window.__fired=(window.__fired||0)+1">'
@@ -2255,11 +2208,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 		camp = self.TAG + " Campus"
 		if not frappe.db.exists("Campus", camp):
 			self._mk({"doctype": "Campus", "campus_name": camp, "location": "t", "active": 1})
-		mile = frappe.get_all("Hikmat Milestone", pluck="name", limit=1)
-		mile = mile[0] if mile else self._mk({
-			"doctype": "Hikmat Milestone", "milestone_key": self.TAG.lower(),
-			"title": "R3 Belt", "threshold_gems": 10, "sort_order": 99, "active": 1}).name
-
 		now = frappe.utils.now()
 		for i, base in enumerate((self.FORMULA + self.XSS, self.DEVANAGARI, self.DDE + self.XSS)):
 			pay = base + " " + self.TAG
@@ -2295,12 +2243,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			self._raw("AI Conversation", c.name, student_name=pay, cohort=pay,
 			          lesson=pay, flag_reason=pay)
 
-			v = self._mk({"doctype": "Evaluation", "student": girl.name, "student_name": "s",
-			              "cohort": coh, "campus": camp, "milestone": mile,
-			              "threshold_gems": 10, "gems_at_reach": 20, "status": "Pending",
-			              "reached_on": now})
-			self._raw("Evaluation", v.name, student_name=pay, cohort=pay,
-			          campus=pay, milestone=pay)
 		frappe.db.commit()
 
 	def _control(self):
@@ -2391,9 +2333,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			"AI Review Queue": ("AI Conversation", [
 				("Conversation", 150), ("Name", 130), ("Cohort", 120), ("Lesson", 110),
 				("Flagged", 70), ("Reason", 110), ("Reviewed", 80), ("When", 160)]),
-			"Pending Evaluations": ("Evaluation", [
-				("Evaluation", 160), ("Student", 140), ("Cohort", 120), ("Campus", 140),
-				("Milestone", 110), ("Threshold", 100), ("Gems", 90), ("Reached", 160)]),
 		}
 		for name, (ref, cols) in expected.items():
 			self.assertEqual(frappe.db.get_value("Report", name, "ref_doctype"), ref, name)
@@ -2420,8 +2359,10 @@ class TestRound3ReportGuards(FrappeTestCase):
 				self.assertNotIn(v[:1], self.LEAD,
 				                 f"{report}[{label}] leads with a formula char: {v!r}")
 			checked += len(cells)
-		# every learner-authored column of all five, three girls each
-		self.assertGreaterEqual(checked, 3 * (6 + 2 + 3 + 4 + 4))
+		# every learner-authored column of all four, three girls each. The fifth report,
+		# Pending Evaluations, went with the belt gates in v17 — its 4 columns come off the
+		# total rather than the assertion being loosened.
+		self.assertGreaterEqual(checked, 3 * (6 + 2 + 3 + 4))
 
 	def test_every_learner_column_is_actually_reached_by_the_guard(self):
 		"""Inertness is worthless if a column simply never carried the payload: name the
@@ -2434,7 +2375,6 @@ class TestRound3ReportGuards(FrappeTestCase):
 			"Student Progress": {"Name", "Cohort"},
 			"Confusion Heatmap": {"Track", "Lesson", "Activity"},
 			"AI Review Queue": {"Name", "Cohort", "Lesson", "Reason"},
-			"Pending Evaluations": {"Student", "Cohort", "Campus", "Milestone"},
 		}
 		for report, labels in expected.items():
 			seen = {label for label, _v in self._mine(report)}
@@ -2507,8 +2447,7 @@ class TestRound3ReportGuards(FrappeTestCase):
 		applied to the DB row. Each seeder now adopts the on-disk script report instead."""
 		from hikmat import setup_data
 		for setup in (setup_data.setup_hard_questions_report, setup_data.setup_student_report,
-		              setup_data.setup_doubt_report, setup_data.setup_ai_report,
-		              setup_data.setup_evaluation_report):
+		              setup_data.setup_doubt_report, setup_data.setup_ai_report):
 			setup()
 			setup()                                   # idempotent: called twice on purpose
 		for name in self.CONVERTED:
@@ -3932,3 +3871,457 @@ class TestGenderAndMascot(FrappeTestCase):
 			self.assertTrue(api.set_profile(student=r["id"], token=r["token"],
 			                                mascot=mid).get("ok"), mid)
 			self.assertEqual(frappe.db.get_value("Student", r["id"], "mascot"), mid)
+
+
+class TestEmailSignup(FrappeTestCase):
+	"""Open sign-up with a real email and a real password — the online door.
+
+	This replaces username+PIN for online learners (2026-08-26). A 4-digit PIN typed on a
+	shared classroom laptop and a password protecting an internet-facing account are not the
+	same security problem, and treating them as one is how the PIN came to be stored as a User
+	password in the first place.
+	"""
+
+	EMAIL = "unit.test.learner@example.com"
+	PWD = "correct horse battery"
+
+	def setUp(self):
+		self._purge()
+		self.addCleanup(self._purge)
+
+	def _purge(self):
+		for s in frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"):
+			frappe.db.delete("Student", {"name": s})
+		frappe.db.delete("Student", {"student_name": "Unit Test Learner"})
+		if frappe.db.exists("User", self.EMAIL):
+			frappe.delete_doc("User", self.EMAIL, force=True, ignore_permissions=True)
+		frappe.db.commit()
+
+	def test_creates_a_website_user_and_a_linked_student(self):
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner",
+		                     gender="Female", mascot="zoya")
+		self.assertTrue(r.get("ok"), r)
+		u = frappe.db.get_value("User", self.EMAIL, ["user_type", "enabled", "first_name"], as_dict=True)
+		self.assertEqual(u.user_type, "Website User")     # never a Desk user
+		self.assertTrue(u.enabled)
+		stu = frappe.db.get_value("Student", r["id"],
+		                          ["user", "mode", "cohort", "gender", "mascot"], as_dict=True)
+		self.assertEqual(stu.user, self.EMAIL)
+		self.assertEqual(stu.mode, "Online")
+		self.assertEqual(stu.gender, "Female")
+		self.assertEqual(stu.mascot, "zoya")
+
+	def test_the_password_actually_authenticates(self):
+		"""The whole point: the client signs in afterwards through Frappe's own /api/method/login,
+		so the password we stored has to be the one that check_password accepts."""
+		from frappe.utils.password import check_password
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(check_password(self.EMAIL, self.PWD), self.EMAIL)
+		with self.assertRaises(frappe.AuthenticationError):
+			check_password(self.EMAIL, self.PWD + "x")
+
+	def test_rejects_a_short_or_obvious_password(self):
+		self.assertEqual(api.signup_email(email=self.EMAIL, password="short1", name="X Y").get("error"),
+		                 "weak_password")
+		self.assertFalse(frappe.db.exists("User", self.EMAIL))
+		self.assertEqual(api.signup_email(email=self.EMAIL, password="password123", name="X Y").get("error"),
+		                 "common_password")
+		self.assertFalse(frappe.db.exists("User", self.EMAIL))
+
+	def test_rejects_a_malformed_email(self):
+		for bad in ("not-an-email", "a@b", "@example.com", "two@@example.com", "x y@example.com", ""):
+			self.assertEqual(api.signup_email(email=bad, password=self.PWD, name="X Y").get("error"),
+			                 "bad_email", bad)
+
+	def test_a_taken_email_is_refused_and_nothing_is_overwritten(self):
+		first = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(first.get("ok"), first)
+		again = api.signup_email(email=self.EMAIL, password="a different one", name="Someone Else")
+		self.assertEqual(again.get("error"), "email_taken")
+		# the original account is untouched — a second signup must not be a password reset
+		from frappe.utils.password import check_password
+		self.assertEqual(check_password(self.EMAIL, self.PWD), self.EMAIL)
+		self.assertEqual(frappe.db.get_value("User", self.EMAIL, "first_name"), "Unit Test Learner")
+
+	def test_email_is_normalised_and_no_markup_survives_in_the_name(self):
+		r = api.signup_email(email="  " + self.EMAIL.upper() + " ", password=self.PWD,
+		                     name="<b>Unit</b> Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(r["email"], self.EMAIL)                 # lower-cased, trimmed
+		self.assertTrue(frappe.db.exists("User", self.EMAIL))
+		self.assertNotIn("<", frappe.db.get_value("Student", r["id"], "student_name"))
+
+	def test_no_invite_code_is_required(self):
+		"""Unlike signup_online, this door is open — it is for people who find the app
+		themselves, not for enrolling someone into a facilitator's cohort."""
+		r = api.signup_email(email=self.EMAIL, password=self.PWD, name="Unit Test Learner")
+		self.assertTrue(r.get("ok"), r)
+		self.assertEqual(frappe.db.get_value("Student", r["id"], "cohort"), "Online")
+
+
+class TestSocialSignupAndProfile(FrappeTestCase):
+	"""The second half of a social sign-up, and the Profile screen that grew out of it.
+
+	The shape being pinned here: an OAuth handshake creates a Frappe Website User and stops.
+	There is a real, signed-in ACCOUNT with no LEARNER behind it — no name we chose, no class,
+	no gender for Hindi to agree with. get_my_student has to say so (needsProfile),
+	complete_profile has to fill it in exactly once, and set_profile has to let her fix any of
+	it afterwards without ever reaching a field that decides who she is or whether she works.
+	"""
+
+	EMAIL = "socialgate.learner@" + api._ONLINE_EMAIL_DOMAIN
+	PWD = "champaran-2026-longer"
+
+	def setUp(self):
+		self.addCleanup(frappe.set_user, "Administrator")
+		# The per-user ceilings are per HOUR, so without this the suite blocks itself on the
+		# second run inside the same hour rather than on anything it is testing.
+		api._rate_reset("complete_profile:" + self.EMAIL)
+		api._rate_reset("chpw:" + self.EMAIL)
+
+	# ---- helpers ----------------------------------------------------------
+	def _user(self, password=None):
+		"""An enabled Website User with NO Student behind it — what an OAuth round trip leaves.
+		With `password`, it is an email account; without, it stands in for a Google one."""
+		if not frappe.db.exists("User", self.EMAIL):
+			u = frappe.get_doc({"doctype": "User", "email": self.EMAIL,
+			                    "first_name": "Social Gate Learner", "user_type": "Website User",
+			                    "enabled": 1, "send_welcome_email": 0,
+			                    **({"new_password": password} if password else {})})
+			u.flags.no_welcome_mail = True
+			u.insert(ignore_permissions=True)
+			frappe.db.commit()
+
+		def _rm():
+			frappe.set_user("Administrator")
+			for s in frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"):
+				frappe.db.delete("Student", {"name": s})
+			if frappe.db.exists("User", self.EMAIL):
+				frappe.delete_doc("User", self.EMAIL, force=1, ignore_permissions=True)
+			frappe.db.commit()
+
+		self.addCleanup(_rm)
+		return self.EMAIL
+
+	def _signed_in(self, password=None):
+		frappe.set_user(self._user(password))
+		return self.EMAIL
+
+	# ---- where a handshake is allowed to land -----------------------------
+	def test_safe_redirect_only_ever_yields_a_path_on_this_site(self):
+		"""An OAuth entry point that will forward anywhere is an open redirect wearing a login
+		screen. Every one of these is a real way to write "somewhere else" that still looks
+		like a path."""
+		self.assertEqual(api._safe_redirect("/assets/hikmat/game.html?x=1"),
+		                 "/assets/hikmat/game.html?x=1")          # ordinary path: kept
+		for bad in ("https://evil.example/steal", "//evil.example/steal", "/\\evil.example",
+		            "\\\\evil.example", "javascript:alert(1)", "", None, "   ",
+		            "/ok\r\nLocation: https://evil.example", "/x" * 400):
+			self.assertEqual(api._safe_redirect(bad), api.GAME_PATH, bad)
+
+	def test_social_login_refuses_a_provider_the_site_cannot_complete(self):
+		# Same answer for unknown and for disabled, so this is not a probe for which keys a
+		# site has configured.
+		for bad in (None, "", "nope", {"a": 1}):
+			self.assertEqual(api.social_login(provider=bad).get("error"), "unknown_provider")
+
+	def test_frappes_own_oauth_id_is_not_a_social_login(self):
+		"""Frappe stamps EVERY User with a provider="frappe" row as its own OAuth identity, so
+		"does a social row exist" answers yes for an ordinary email signup. That mistake showed
+		a girl who had just chosen a password "you sign in with Frappe — no password here", and
+		hid the only box that would let her change it."""
+		u = self._user(self.PWD)
+		self.assertTrue(frappe.get_all("User Social Login",
+		                               filters={"parent": u, "provider": "frappe"}),
+		                "expected Frappe to have stamped its own oauth id on the user")
+		self.assertEqual(api._social_provider(u), "")
+
+	# ---- get_my_student ---------------------------------------------------
+	def test_guest_is_not_offered_a_profile_form(self):
+		frappe.set_user("Guest")
+		self.assertEqual(api.get_my_student(), {"ok": False})
+
+	def test_signed_in_with_no_learner_asks_for_the_rest_of_the_form(self):
+		u = self._signed_in()
+		r = api.get_my_student()
+		self.assertFalse(r["ok"])
+		self.assertTrue(r["needsProfile"])
+		self.assertEqual(r["email"], u)
+		self.assertEqual(r["name"], "Social Gate Learner")   # prefill, from the account
+
+	def test_a_deactivated_learner_is_never_offered_a_fresh_profile(self):
+		"""_session_student filters active=1, so a switched-off girl looks exactly like a new
+		one. Answering needsProfile there would let her press back and mint herself a second,
+		ACTIVE profile — which would make the off switch decorative."""
+		self._signed_in()
+		api.complete_profile(name="Switched Off Girl", gender="Female")
+		frappe.set_user("Administrator")
+		sid = frappe.db.get_value("Student", {"user": self.EMAIL}, "name")
+		frappe.db.set_value("Student", sid, "active", 0)
+		frappe.db.commit()
+		frappe.set_user(self.EMAIL)
+		r = api.get_my_student()
+		self.assertEqual(r.get("error"), "inactive")
+		self.assertNotIn("needsProfile", r)
+		self.assertEqual(api.complete_profile(name="Second Go", gender="Female").get("error"),
+		                 "inactive")
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"),
+		                 [sid])                              # still exactly one, still off
+
+	# ---- complete_profile -------------------------------------------------
+	def test_guest_cannot_complete_a_profile(self):
+		frappe.set_user("Guest")
+		self.assertEqual(api.complete_profile(name="Nobody").get("error"), "not_authorized")
+
+	def test_complete_profile_creates_one_online_learner_with_no_pin(self):
+		u = self._signed_in()
+		r = api.complete_profile(name="Priya", avatar="🌸", age="9", band="1-4",
+		                         gender="Female", mascot="chanda")
+		self.assertTrue(r.get("ok"), r)
+		frappe.set_user("Administrator")
+		s = frappe.db.get_value("Student", r["id"],
+		                        ["student_name", "avatar", "age", "gender", "mascot", "mode",
+		                         "cohort", "user", "login_pin", "active"], as_dict=True)
+		self.assertEqual((s.student_name, s.avatar, s.age, s.gender, s.mascot), 
+		                 ("Priya", "🌸", 9, "Female", "chanda"))
+		# mode is set explicitly, not left to the doctype default — that default is what filed
+		# every Play Store tester under "Campus" while their cohort said Online.
+		self.assertEqual((s.mode, s.cohort, s.user, s.active), ("Online", "Online", u, 1))
+		# No PIN. This account is protected by the password (or the Google session) behind it;
+		# a second, weaker secret for the same person is how a PIN ended up in a User password.
+		self.assertIsNone(s.login_pin)
+		self.assertTrue(r["token"])
+
+	def test_completing_twice_does_not_make_a_second_learner(self):
+		self._signed_in()
+		first = api.complete_profile(name="Priya", gender="Female")
+		self.assertTrue(first.get("ok"))
+		again = api.complete_profile(name="Priya Again", gender="Male")
+		self.assertEqual(again.get("error"), "already_enrolled")
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"),
+		                 [first["id"]])
+		# and the refused call changed nothing on the row it refused
+		self.assertEqual(frappe.db.get_value("Student", first["id"], "student_name"), "Priya")
+
+	def test_complete_profile_clamps_what_it_is_given(self):
+		self._signed_in()
+		r = api.complete_profile(name="<b>Priya</b>", age="99", band="no-such-band",
+		                         gender="Wizard", mascot="godzilla")
+		self.assertTrue(r.get("ok"), r)
+		frappe.set_user("Administrator")
+		s = frappe.db.get_value("Student", r["id"],
+		                        ["student_name", "age", "band", "gender", "mascot"], as_dict=True)
+		self.assertNotIn("<", s.student_name)
+		# Student.age is an Int column (NOT NULL DEFAULT 0), so "no age" IS 0, not NULL.
+		self.assertEqual(s.age, 0)               # 99 is outside 3–25 → stored as no age at all
+		self.assertIsNone(s.band)                # a band that does not exist is not a band
+		self.assertEqual(s.gender, "Other")      # anything unrecognised lands on Other
+		self.assertEqual(s.mascot, "roshni")
+
+	def test_a_short_name_is_refused_before_anything_is_created(self):
+		self._signed_in()
+		self.assertEqual(api.complete_profile(name="A", gender="Female").get("error"), "bad_name")
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.get_all("Student", filters={"user": self.EMAIL}, pluck="name"), [])
+
+	# ---- set_profile, now that it carries a whole profile ------------------
+	def test_set_profile_writes_the_fields_the_profile_screen_owns(self):
+		self._signed_in()
+		sid = api.complete_profile(name="Priya", gender="Female")["id"]
+		r = api.set_profile(student=sid, name="Priya Devi", avatar="🦋", age="13",
+		                    band="9-10", gender="Male", mascot="tara")
+		self.assertTrue(r.get("ok"), r)
+		frappe.set_user("Administrator")
+		s = frappe.db.get_value("Student", sid,
+		                        ["student_name", "avatar", "age", "band", "gender", "mascot"],
+		                        as_dict=True)
+		self.assertEqual((s.student_name, s.avatar, s.age, s.band, s.gender, s.mascot),
+		                 ("Priya Devi", "🦋", 13, "9-10", "Male", "tara"))
+
+	def test_set_profile_leaves_absent_fields_alone(self):
+		"""Absent is not empty. A fire-and-forget mascot pick sends one key, and it must not
+		blank the name, the age or the class on its way past them."""
+		self._signed_in()
+		sid = api.complete_profile(name="Priya", age="9", band="1-4", gender="Female")["id"]
+		api.set_profile(student=sid, mascot="zoya")
+		frappe.set_user("Administrator")
+		s = frappe.db.get_value("Student", sid,
+		                        ["student_name", "age", "band", "gender", "mascot"], as_dict=True)
+		self.assertEqual((s.student_name, s.age, s.band, s.gender, s.mascot),
+		                 ("Priya", 9, "1-4", "Female", "zoya"))
+
+	def test_set_profile_can_empty_an_age_but_not_invent_one(self):
+		self._signed_in()
+		sid = api.complete_profile(name="Priya", age="9", gender="Female")["id"]
+		self.assertTrue(api.set_profile(student=sid, age="0").get("ok"))   # 0 = she cleared it
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.db.get_value("Student", sid, "age"), 0)
+		frappe.set_user(self.EMAIL)
+		for bad in ("2", "26", "abc", "-5"):
+			self.assertEqual(api.set_profile(student=sid, age=bad).get("error"), "bad_age", bad)
+
+	def test_set_profile_refuses_a_name_or_band_it_cannot_stand_behind(self):
+		self._signed_in()
+		sid = api.complete_profile(name="Priya", gender="Female")["id"]
+		self.assertEqual(api.set_profile(student=sid, name="A").get("error"), "bad_name")
+		self.assertEqual(api.set_profile(student=sid, band="no-such-band").get("error"), "bad_band")
+		self.assertEqual(api.set_profile(student=sid, gender="Wizard").get("error"), "bad_gender")
+		self.assertEqual(api.set_profile(student=sid, mascot="godzilla").get("error"), "bad_mascot")
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.db.get_value("Student", sid, "student_name"), "Priya")
+
+	def test_set_profile_still_cannot_reach_the_fields_that_decide_who_she_is(self):
+		"""The widening is the point of the boundary, not the end of it: everything reachable
+		here is something the LEARNER chose about herself and can see on her own screen."""
+		self._signed_in()
+		sid = api.complete_profile(name="Priya", gender="Female")["id"]
+		# The signature simply has no parameter for any of them — active, cohort, login_pin,
+		# user, auth_token. That is the strongest form of "cannot", so pin the shape rather
+		# than a refusal message that could drift.
+		import inspect
+		params = set(inspect.signature(api.set_profile).parameters)
+		self.assertEqual(params, {"student", "token", "mascot", "gender",
+		                          "name", "avatar", "age", "band"})
+		frappe.set_user("Administrator")
+		s = frappe.db.get_value("Student", sid, ["active", "cohort", "login_pin"], as_dict=True)
+		self.assertEqual((s.active, s.cohort, s.login_pin), (1, "Online", None))
+
+	def test_one_learner_cannot_rename_another(self):
+		self._signed_in()
+		mine = api.complete_profile(name="Priya", gender="Female")["id"]
+		frappe.set_user("Administrator")
+		victim = frappe.get_doc({"doctype": "Student", "student_name": "Someone Else Entirely",
+		                         "active": 1, "gender": "Female"}).insert(ignore_permissions=True)
+		self.addCleanup(lambda: frappe.db.delete("Student", {"name": victim.name}))
+		frappe.db.commit()
+		frappe.set_user(self.EMAIL)
+		self.assertEqual(api.set_profile(student=victim.name, name="Pwned").get("error"),
+		                 "not_authorized")
+		frappe.set_user("Administrator")
+		self.assertEqual(frappe.db.get_value("Student", victim.name, "student_name"),
+		                 "Someone Else Entirely")
+		self.assertEqual(frappe.db.get_value("Student", mine, "student_name"), "Priya")
+
+	# ---- change_password --------------------------------------------------
+	def test_change_password_needs_the_old_one_even_though_the_session_proves_who_she_is(self):
+		"""The session is what a shared classroom laptop leaves behind when a girl walks away
+		from it. Without this check the next person at that machine locks her out in two taps."""
+		u = self._signed_in(self.PWD)
+		self.assertEqual(api.change_password(old_password="", new_password="whatever-long")
+		                 .get("error"), "wrong_password")
+		self.assertEqual(api.change_password(old_password="not-it", new_password="whatever-long")
+		                 .get("error"), "wrong_password")
+		from frappe.utils.password import check_password
+		self.assertEqual(check_password(u, self.PWD), u)      # untouched
+
+	def test_change_password_enforces_the_same_floor_as_signup(self):
+		self._signed_in(self.PWD)
+		self.assertEqual(api.change_password(old_password=self.PWD, new_password="short")
+		                 .get("error"), "weak_password")
+		self.assertEqual(api.change_password(old_password=self.PWD, new_password="password")
+		                 .get("error"), "common_password")
+		self.assertEqual(api.change_password(old_password=self.PWD, new_password=self.PWD)
+		                 .get("error"), "same_password")
+
+	def test_change_password_actually_changes_it(self):
+		u = self._signed_in(self.PWD)
+		new = "a-much-better-secret-2026"
+		self.assertTrue(api.change_password(old_password=self.PWD, new_password=new).get("ok"))
+		from frappe.utils.password import check_password
+		self.assertEqual(check_password(u, new), u)
+		with self.assertRaises(frappe.AuthenticationError):
+			check_password(u, self.PWD)
+
+	def test_a_guest_cannot_change_anybodys_password(self):
+		self._user(self.PWD)
+		frappe.set_user("Guest")
+		self.assertEqual(api.change_password(old_password=self.PWD, new_password="anything-long")
+		                 .get("error"), "not_authorized")
+
+	# ---- signup_email now carries an age ----------------------------------
+	def test_signup_email_stores_a_sane_age_and_ignores_a_silly_one(self):
+		def _rm(email):
+			for s in frappe.get_all("Student", filters={"user": email}, pluck="name"):
+				frappe.db.delete("Student", {"name": s})
+			if frappe.db.exists("User", email):
+				frappe.delete_doc("User", email, force=1, ignore_permissions=True)
+			frappe.db.commit()
+
+		for email, age, expected in ((("age.ok@" + api._ONLINE_EMAIL_DOMAIN), "11", 11),
+		                             (("age.silly@" + api._ONLINE_EMAIL_DOMAIN), "99", 0)):
+			api._rate_reset("signup:" + api._client_ip())
+			self.addCleanup(_rm, email)
+			r = api.signup_email(email=email, password=self.PWD, name="Age Test Girl", age=age)
+			self.assertTrue(r.get("ok"), r)
+			self.assertEqual(frappe.db.get_value("Student", r["id"], "age"), expected)
+
+
+class TestLessonExtras(FrappeTestCase):
+	"""extras_json: rotation-era activity data (pairs/odd/sort/skip) riding one JSON blob."""
+
+	def _mk(self, key, extras_json):
+		def _rm():
+			frappe.db.delete("Lesson", {"track": key})
+			frappe.db.delete("Track", {"name": key})
+			frappe.db.commit()
+			api.clear_content_cache()
+		self.addCleanup(_rm)
+		t = frappe.get_doc({"doctype": "Track", "track_key": key, "title": "X Track",
+		                    "published": 1}).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Lesson", "track": t.name, "lesson_key": "x01",
+		                "title": "X", "title_hi": "क्ष", "published": 1,
+		                "extras_json": extras_json}).insert(ignore_permissions=True)
+		api.clear_content_cache()
+		return next(c for c in api._build_courses() if c["key"] == key)["lessons"][0]
+
+	def test_extras_merge_into_the_lesson_verbatim(self):
+		lesson = self._mk("extras-t", json.dumps({
+			"pairs": True, "skip": ["fix"],
+			"odd": [{"items": [{"en": "a"}, {"en": "b"}], "answer": "b"}],
+			"sort": {"buckets": [{"key": "k", "en": "K"}],
+			         "items": [{"en": "a", "bucket": "k"}]},
+		}))
+		self.assertIs(lesson["pairs"], True)
+		self.assertEqual(lesson["skip"], ["fix"])
+		self.assertEqual(lesson["odd"][0]["answer"], "b")
+		self.assertEqual(lesson["sort"]["items"][0]["bucket"], "k")
+
+	def test_malformed_extras_cost_the_extras_never_the_payload(self):
+		lesson = self._mk("extras-bad", "{not json")
+		self.assertEqual(lesson["key"], "x01")          # the lesson still ships
+		self.assertNotIn("pairs", lesson)
+
+	def test_every_track_carries_rotation_extras(self):
+		# the 2026-08-31 rollout: every published track has extras, every lesson's extras parse,
+		# and the whole curriculum uses a wide spread of the 19 activity types
+		KEYS = {"pairs", "odd", "sort", "sounds", "rhyme", "dictate", "translate", "branch",
+		        "story", "cloze", "notice", "rapid", "count", "money", "clock", "order",
+		        "scam", "hunt", "form"}
+		courses = api._build_courses()
+		self.assertGreaterEqual(len(courses), 26)
+		used = set()
+		lessons_with = 0
+		for c in courses:
+			track_used = set()
+			for lesson in c["lessons"]:
+				got = KEYS & set(lesson.keys())
+				if got:
+					lessons_with += 1
+					track_used |= got
+			self.assertTrue(track_used, f"track {c['key']} has no rotation extras")
+			used |= track_used
+		self.assertGreaterEqual(lessons_with, 270)
+		self.assertEqual(used, KEYS, f"types never used: {KEYS - used}")
+
+	def test_the_bazaar_pilot_carries_the_rotation(self):
+		# the seeded curriculum itself: l01 pairs, l02 sort, l03 odd+sort — each with a skip
+		baz = next(c for c in api._build_courses() if c["key"] == "bazaar")
+		l = {x["key"]: x for x in baz["lessons"]}
+		self.assertIs(l["l01"]["pairs"], True)
+		self.assertEqual(l["l01"]["skip"], ["fix"])
+		self.assertEqual(len(l["l02"]["sort"]["items"]), 8)
+		self.assertEqual(len(l["l03"]["odd"]), 4)
+		self.assertEqual(l["l03"]["skip"], ["listen", "spell"])

@@ -1,10 +1,10 @@
 /* Hikmat PWA service worker — offline-first app shell + content.
    Scope: /assets/hikmat/. Bump CACHE to ship an update to installed PWAs. */
-const CACHE = "hikmat-pwa-v7";   // v7: Reply-to-the-Email activity
+const CACHE = "hikmat-pwa-v8";   // v8: the 283-lesson curriculum + the activity rotation
 const BASE = "/assets/hikmat/";
 const SHELL = [
   BASE + "game.html",
-  BASE + "curriculum.json",          // full 74-lesson offline baseline (survives localStorage eviction)
+  BASE + "curriculum.json",          // full 283-lesson offline baseline (survives localStorage eviction)
   BASE + "manifest.webmanifest",
   BASE + "icons/icon-192.png",
   BASE + "icons/icon-512.png",

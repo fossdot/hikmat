@@ -38,7 +38,8 @@ CONVERTED = {
     "Student Progress": setup_data.setup_student_report,
     "Confusion Heatmap": setup_data.setup_doubt_report,
     "AI Review Queue": setup_data.setup_ai_report,
-    "Pending Evaluations": setup_data.setup_evaluation_report,
+    # "Pending Evaluations" was here until v17 removed the belt gates and, with them, the
+    # Evaluation doctype this report read. Its guard is not weakened, it has no rows to guard.
 }
 
 
